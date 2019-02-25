@@ -1,10 +1,10 @@
-This is the github repository of EazyNick.
+#This is the github repository of EazyNick.
 
-Author:
+##Author:
 JustixDevelopment
 
-Donations for continuing the project:
+##Donations for continuing the project:
 https://www.paypal.me/JustixDevelopment
 
-APIs (for editing the code):
+##APIs (for editing the code):
 https://workupload.com/archive/eKvUE4S
