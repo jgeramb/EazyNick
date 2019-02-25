@@ -1,6 +1,5 @@
 This is the github repository of EazyNick.
 
-
 Author:
 JustixDevelopment
 
@@ -9,9 +8,6 @@ https://www.spigotmc.org/resources/eazynick-autonicksystem-api-src-bungeecord-mu
 
 Donations for continuing the project:
 https://www.paypal.me/JustixDevelopment
-
-
-
 
 APIs (for editing the code):
 https://workupload.com/archive/eKvUE4S
