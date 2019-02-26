@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import com.gmail.filoghost.coloredtags.ColoredTags;
 import com.mojang.authlib.GameProfile;
@@ -30,7 +29,7 @@ import net.minecraft.server.v1_8_R2.PacketPlayOutRespawn;
 
 public class NickManager_1_8_R2 {
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation" })
 	public static void changeSkin(CraftPlayer cp, String skinName) {
 		if (Utils.health.containsKey(cp.getUniqueId())) {
 			Utils.heldItemSlots.remove(cp.getUniqueId());
@@ -52,7 +51,7 @@ public class NickManager_1_8_R2 {
 		
 		Utils.health.put(cp.getUniqueId(), Double.valueOf(cp.getHealth()));
 		Utils.food.put(cp.getUniqueId(), Integer.valueOf(cp.getFoodLevel()));
-		Utils.locations.put(cp.getUniqueId(), cp.getLocation().add(0.0D, 0.75D, 0.0D));
+		Utils.locations.put(cp.getUniqueId(), cp.getLocation().add(0.0D, 0.5D, 0.0D));
 		Utils.scoreBoards.put(cp.getUniqueId(), cp.getScoreboard());
 		
 		GameProfile gp = cp.getProfile();
@@ -91,8 +90,6 @@ public class NickManager_1_8_R2 {
 				spawnPlayer(cp);
 			}
 		}, 5);
-		
-		cp.teleport(Bukkit.getWorld("nickWorld").getSpawnLocation(), TeleportCause.PLUGIN);
 		
 		if (Utils.health.containsKey(cp.getUniqueId())) {
 			cp.teleport(Utils.locations.get(cp.getUniqueId()));

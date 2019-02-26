@@ -2,15 +2,16 @@ package net.dev.nickplugin.utils.nickutils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import com.gmail.filoghost.coloredtags.ColoredTags;
 import com.mojang.authlib.GameProfile;
@@ -28,10 +29,11 @@ import net.minecraft.server.v1_10_R1.PacketPlayOutNamedEntitySpawn;
 import net.minecraft.server.v1_10_R1.PacketPlayOutPlayerInfo;
 import net.minecraft.server.v1_10_R1.PacketPlayOutPlayerInfo.EnumPlayerInfoAction;
 import net.minecraft.server.v1_10_R1.PacketPlayOutRespawn;
+import net.minecraft.server.v1_10_R1.PlayerList;
 
 public class NickManager_1_10_R1 {
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	public static void changeSkin(CraftPlayer cp, String skinName) {
 		if (Utils.health.containsKey(cp.getUniqueId())) {
 			Utils.armor.remove(cp.getUniqueId());
@@ -50,7 +52,7 @@ public class NickManager_1_10_R1 {
 		}
 		Utils.health.put(cp.getUniqueId(), Double.valueOf(cp.getHealth()));
 		Utils.food.put(cp.getUniqueId(), Integer.valueOf(cp.getFoodLevel()));
-		Utils.locations.put(cp.getUniqueId(), cp.getLocation().add(0.0D, 0.75D, 0.0D));
+		Utils.locations.put(cp.getUniqueId(), cp.getLocation().add(0.0D, 0.5D, 0.0D));
 		Utils.scoreBoards.put(cp.getUniqueId(), cp.getScoreboard());
 		
 		GameProfile gp = cp.getProfile();
@@ -90,7 +92,26 @@ public class NickManager_1_10_R1 {
 			}
 		}, 5);
 		
-		cp.teleport(Bukkit.getWorld("nickWorld").getSpawnLocation(), TeleportCause.PLUGIN);
+		try {
+			Field f = PlayerList.class.getDeclaredField("playersByName");
+			f.setAccessible(true);
+			Map<String, EntityPlayer> map = (Map<String, EntityPlayer>) f.get(MinecraftServer.getServer().getPlayerList());
+			ArrayList<String> toRemove = new ArrayList<>();
+			
+			for (String name : map.keySet()) {
+				if(map.get(name).getUniqueID().toString().equals(cp.getUniqueId().toString()))
+					toRemove.add(name);
+			}
+			
+			for (String string : toRemove) {
+				map.remove(string);
+			}
+			
+			map.put(cp.getName(), cp.getHandle());
+			f.set(MinecraftServer.getServer().getPlayerList(), map);
+			f.setAccessible(false);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+		}
 		
 		if (Utils.health.containsKey(cp.getUniqueId())) {
 			cp.teleport(Utils.locations.get(cp.getUniqueId()));
