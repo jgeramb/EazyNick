@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -69,7 +68,7 @@ public class Main extends JavaPlugin {
 
 	public static File pluginFile;
 	public static MySQL mysql;
-	public static String version = "XX_XX_RX";
+	public static String version = "XX_XX_RXX";
 	public boolean isCancelled;
 
 	@Override
@@ -286,9 +285,6 @@ public class Main extends JavaPlugin {
 								+ "TagPrefix varchar(64), TagSuffix varchar(64))");
 			}
 
-			if (Bukkit.getWorld("nickWorld") == null)
-				Bukkit.createWorld(new WorldCreator("nickWorld"));
-			
 			Utils.sendConsole("	§7");
 			Utils.sendConsole("	§7API-Mode§8: §3" + FileUtils.cfg.getBoolean("APIMode"));
 			Utils.sendConsole("	§7Plugin by§8: §3"
