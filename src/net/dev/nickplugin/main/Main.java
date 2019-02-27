@@ -68,7 +68,7 @@ public class Main extends JavaPlugin {
 
 	public static File pluginFile;
 	public static MySQL mysql;
-	public static String version = "XX_XX_RX";
+	public static String version = "XX_XX_RXX";
 	public boolean isCancelled;
 
 	@Override
