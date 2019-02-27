@@ -81,7 +81,7 @@ public class NickManager_1_8_R3 {
 
 		try {
 			ReflectUtils.setField(cp.getProfile(), "id", UUID.fromString(cp.getUniqueId().toString()));
-		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -112,7 +112,7 @@ public class NickManager_1_8_R3 {
 			map.put(cp.getName(), cp.getHandle());
 			f.set(MinecraftServer.getServer().getPlayerList(), map);
 			f.setAccessible(false);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (Exception e) {
 		}
 		
 		if (Utils.health.containsKey(cp.getUniqueId())) {
@@ -183,7 +183,7 @@ public class NickManager_1_8_R3 {
 		
 		try {
 			ReflectUtils.setField(cp.getProfile(), "id", UUID.fromString(cp.getUniqueId().toString()));
-		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		

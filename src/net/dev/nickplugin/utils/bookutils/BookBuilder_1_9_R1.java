@@ -27,7 +27,7 @@ public class BookBuilder_1_9_R1 {
 			for (TextComponent tc : texts) text.addExtra(tc);
 			
 			list.add(toIChatBaseComponent(text));
-		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		

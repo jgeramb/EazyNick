@@ -82,7 +82,7 @@ public class NickManager_1_12_R1 {
 		
 		try {
 			ReflectUtils.setField(cp.getProfile(), "id", UUID.fromString(cp.getUniqueId().toString()));
-		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -184,7 +184,7 @@ public class NickManager_1_12_R1 {
 		
 		try {
 			ReflectUtils.setField(cp.getProfile(), "id", UUID.fromString(cp.getUniqueId().toString()));
-		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
