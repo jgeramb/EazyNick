@@ -67,7 +67,7 @@ commands:
       nickupdatecheck:
         description: Checks for updates of the plugin
       togglebungeenick:
-      	description: Toggles the automatic nickname on server switch
+        description: Toggles the automatic nickname on server switch
         aliases:
         - togglenick
         - togglebungeedisguise
