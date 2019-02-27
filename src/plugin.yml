@@ -1,5 +1,5 @@
 name: EazyNick
-version: 1.147
+version: 1.148
 author: Justix
 main: net.dev.nickplugin.main.Main
 description: This plugin allows you to change your identity (skin, name, nametag, tabname, chatname)
@@ -66,3 +66,9 @@ commands:
         description: Shows some informations of the plugin/a list of commands
       nickupdatecheck:
         description: Checks for updates of the plugin
+      togglebungeenick:
+      	description: Toggles the automatic nickname on server switch
+        aliases:
+        - togglenick
+        - togglebungeedisguise
+        - toggledisguise

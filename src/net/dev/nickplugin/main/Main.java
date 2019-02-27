@@ -42,6 +42,7 @@ import net.dev.nickplugin.commands.RealNameCommand_1_8_R1;
 import net.dev.nickplugin.commands.ReloadConfigCommand;
 import net.dev.nickplugin.commands.ResetNameCommand;
 import net.dev.nickplugin.commands.ResetSkinCommand;
+import net.dev.nickplugin.commands.ToggleBungeeNickCommand;
 import net.dev.nickplugin.commands.UnnickCommand;
 import net.dev.nickplugin.listeners.NickListener;
 import net.dev.nickplugin.listeners.NickListener_1_13;
@@ -257,6 +258,7 @@ public class Main extends JavaPlugin {
 				getCommand("renick").setExecutor(new ReNickCommand());
 				getCommand("nickedplayers").setExecutor(new NickedPlayersCommand());
 				getCommand("nickupdatecheck").setExecutor(new NickUpdateCheckCommand());
+				getCommand("togglebungeenick").setExecutor(new ToggleBungeeNickCommand());
 
 				for (Player all : Bukkit.getOnlinePlayers()) {
 					if ((all != null) && (all.getUniqueId() != null)) {
