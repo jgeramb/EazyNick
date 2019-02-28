@@ -118,7 +118,7 @@ public class ChangeNameCommand implements CommandExecutor {
 											}
 											
 											p.setDisplayName(prefix + nameWhithoutColors + suffix);
-											p.setPlayerListName(prefix + nameWhithoutColors + suffix);
+											api.setPlayerListName(prefix + nameWhithoutColors + suffix);
 											
 											api.setName(nameWhithoutColors);
 											api.refreshPlayer();

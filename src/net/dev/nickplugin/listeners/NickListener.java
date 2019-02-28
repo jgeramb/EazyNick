@@ -152,7 +152,7 @@ public class NickListener implements Listener {
 							}
 
 							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								p.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId())
+								api.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId())
 										+ MySQLNickManager.getNickName(p.getUniqueId())
 										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()));
 							}
@@ -164,7 +164,7 @@ public class NickListener implements Listener {
 							}
 
 							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								p.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId())
+								api.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId())
 										+ Utils.playerNicknames.get(p.getUniqueId())
 										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()));
 							}
@@ -175,7 +175,7 @@ public class NickListener implements Listener {
 							}
 
 							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								p.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()) + p.getName()
+								api.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()) + p.getName()
 										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()));
 							}
 						}
@@ -199,9 +199,9 @@ public class NickListener implements Listener {
 										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId());
 
 								if (format.length() <= 16) {
-									p.setPlayerListName(format);
+									api.setPlayerListName(format);
 								} else {
-									p.setPlayerListName(MySQLNickManager.getNickName(p.getUniqueId()));
+									api.setPlayerListName(MySQLNickManager.getNickName(p.getUniqueId()));
 								}
 							}
 						} else if (Utils.playerNicknames.containsKey(p.getUniqueId())) {
@@ -227,9 +227,9 @@ public class NickListener implements Listener {
 										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId());
 
 								if (format.length() <= 16) {
-									p.setPlayerListName(format);
+									api.setPlayerListName(format);
 								} else {
-									p.setPlayerListName(Utils.playerNicknames.get(p.getUniqueId()));
+									api.setPlayerListName(Utils.playerNicknames.get(p.getUniqueId()));
 								}
 							}
 						} else {
@@ -249,9 +249,9 @@ public class NickListener implements Listener {
 										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId());
 
 								if (format.length() <= 16) {
-									p.setPlayerListName(format);
+									api.setPlayerListName(format);
 								} else {
-									p.setPlayerListName(p.getName());
+									api.setPlayerListName(p.getName());
 								}
 							}
 						}
@@ -421,7 +421,7 @@ public class NickListener implements Listener {
 				Utils.playerNicknames.remove(p.getUniqueId());
 
 				p.setDisplayName(Utils.oldDisplayNames.get(p.getUniqueId()));
-				p.setPlayerListName(Utils.oldPlayerListNames.get(p.getUniqueId()));
+				api.setPlayerListName(Utils.oldPlayerListNames.get(p.getUniqueId()));
 
 				Utils.oldDisplayNames.remove(p.getUniqueId());
 				Utils.oldPlayerListNames.remove(p.getUniqueId());
@@ -740,7 +740,7 @@ public class NickListener implements Listener {
 
 			if (api.isNicked()) {
 				e.setCancelled(true);
-
+				
 				String format;
 
 				if (FileUtils.cfg.getBoolean("ReplaceNickedChatFormat") == true) {
@@ -752,7 +752,7 @@ public class NickListener implements Listener {
 					format = format.replace("%message%", e.getMessage());
 				} else
 					format = e.getFormat().replace("%1$s", p.getDisplayName()).replace("%2$s", e.getMessage());
-
+				
 				Bukkit.getConsoleSender().sendMessage(format);
 
 				for (Player all : Bukkit.getOnlinePlayers()) {

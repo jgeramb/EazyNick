@@ -270,6 +270,36 @@ public class NickManager_1_7_R4 {
 		}
 	}
 	
+	public static void setPlayerListName(CraftPlayer cp, String name) {
+		cp.getHandle().listName = name;
+
+		for(Player all : Bukkit.getOnlinePlayers()) {
+			CraftPlayer cpAll = ((CraftPlayer)all);
+			
+			if(cpAll.canSee(cp)) {
+				if(!(cpAll.getUniqueId().equals(cp.getUniqueId()))) {
+					if(!(all.hasPermission("nick.bypass"))) {
+						if (cpAll.getHandle().playerConnection.networkManager.getVersion() < 28) {
+							sendPacket(cpAll, PacketPlayOutPlayerInfo.removePlayer(cp.getHandle()));
+							sendPacket(cpAll, PacketPlayOutPlayerInfo.addPlayer(cp.getHandle()));
+						} else {
+							sendPacket(cpAll, PacketPlayOutPlayerInfo.updateDisplayName(cp.getHandle()));
+						}
+					}
+				} else {
+					if(FileUtils.cfg.getBoolean("SeeNickSelf") == true) {
+						if (cp.getHandle().playerConnection.networkManager.getVersion() < 28) {
+							sendPacket(cp, PacketPlayOutPlayerInfo.removePlayer(cp.getHandle()));
+							sendPacket(cp, PacketPlayOutPlayerInfo.addPlayer(cp.getHandle()));
+						} else {
+							sendPacket(cp, PacketPlayOutPlayerInfo.updateDisplayName(cp.getHandle()));
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	public static void sendPacket(CraftPlayer cp, Packet packet) {
 		cp.getHandle().playerConnection.sendPacket(packet);
 	}

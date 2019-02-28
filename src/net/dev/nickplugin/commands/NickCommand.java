@@ -172,12 +172,12 @@ public class NickCommand implements CommandExecutor {
 									
 									if(Main.version == "1_7_R4") {
 										if(nameFormatTab.length() <= 16) {
-											p.setPlayerListName(nameFormatTab);
+											api.setPlayerListName(nameFormatTab);
 										} else {
-											p.setPlayerListName(p.getName());
+											api.setPlayerListName(p.getName());
 										}
 									} else {
-										p.setPlayerListName(nameFormatTab);
+										api.setPlayerListName(nameFormatTab);
 									}
 								}
 								
@@ -199,12 +199,12 @@ public class NickCommand implements CommandExecutor {
 									
 									if(Main.version == "1_7_R4") {
 										if(nameFormatTab.length() <= 16) {
-											p.setPlayerListName(nameFormatTab);
+											api.setPlayerListName(nameFormatTab);
 										} else {
-											p.setPlayerListName(p.getName());
+											api.setPlayerListName(p.getName());
 										}
 									} else {
-										p.setPlayerListName(nameFormatTab);
+										api.setPlayerListName(nameFormatTab);
 									}
 								}
 								
@@ -389,12 +389,12 @@ public class NickCommand implements CommandExecutor {
 															
 															if(Main.version == "1_7_R4") {
 																if(nameFormatTab.length() <= 16) {
-																	p.setPlayerListName(nameFormatTab);
+																	api.setPlayerListName(nameFormatTab);
 																} else {
-																	p.setPlayerListName(p.getName());
+																	api.setPlayerListName(p.getName());
 																}
 															} else {
-																p.setPlayerListName(nameFormatTab);
+																api.setPlayerListName(nameFormatTab);
 															}
 														}
 														
@@ -416,12 +416,12 @@ public class NickCommand implements CommandExecutor {
 																
 															if(Main.version == "1_7_R4") {
 																if(nameFormatTab.length() <= 16) {
-																	p.setPlayerListName(nameFormatTab);
+																	api.setPlayerListName(nameFormatTab);
 																} else {
-																	p.setPlayerListName(p.getName());
+																	api.setPlayerListName(p.getName());
 																}
 															} else {
-																p.setPlayerListName(nameFormatTab);
+																api.setPlayerListName(nameFormatTab);
 															}
 														}
 														

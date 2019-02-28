@@ -166,7 +166,7 @@ public class BookNickCommand implements CommandExecutor {
 									}
 									
 									if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored") == true) {
-										p.setPlayerListName(prefix + name + suffix);
+										api.setPlayerListName(prefix + name + suffix);
 									}
 									
 									if(Utils.nameTagEditStatus()) {

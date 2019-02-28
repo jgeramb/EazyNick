@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R2.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 
 import com.gmail.filoghost.coloredtags.ColoredTags;
@@ -268,6 +269,26 @@ public class NickManager_1_8_R2 {
 			} else {
 				if(FileUtils.cfg.getBoolean("SeeNickSelf") == true) {
 					sendPacket(cpAll, new PacketPlayOutPlayerInfo(EnumPlayerInfoAction.ADD_PLAYER, cp.getHandle()));
+				}
+			}
+		}
+	}
+	
+	public static void setPlayerListName(CraftPlayer cp, String name) {
+		cp.getHandle().listName = (name.equals(cp.getName()) ? null : CraftChatMessage.fromString(name)[0]);
+
+		for(Player all : Bukkit.getOnlinePlayers()) {
+			CraftPlayer cpAll = ((CraftPlayer)all);
+			
+			if(cpAll.canSee(cp)) {
+				if(!(cpAll.getUniqueId().equals(cp.getUniqueId()))) {
+					if(!(all.hasPermission("nick.bypass"))) {
+						sendPacket(cpAll, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_DISPLAY_NAME, new EntityPlayer[] { cp.getHandle() }));
+					}
+				} else {
+					if(FileUtils.cfg.getBoolean("SeeNickSelf") == true) {
+						sendPacket(cp, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_DISPLAY_NAME, new EntityPlayer[] { cp.getHandle() }));
+					}
 				}
 			}
 		}

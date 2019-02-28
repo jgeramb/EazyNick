@@ -46,6 +46,32 @@ public class NickManager {
 		this.p = p;
 	}
 	
+	public void setPlayerListName(String name) {
+		if(Main.version == "1_7_R4") {
+			NickManager_1_7_R4.setPlayerListName(((org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_8_R1") {
+			NickManager_1_8_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_8_R2") {
+			NickManager_1_8_R2.setPlayerListName(((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_8_R3") {
+			NickManager_1_8_R3.setPlayerListName(((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_9_R1") {
+			NickManager_1_9_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_9_R2") {
+			NickManager_1_9_R2.setPlayerListName(((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_10_R1") {
+			NickManager_1_10_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_11_R1") {
+			NickManager_1_11_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_12_R1") {
+			NickManager_1_12_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_13_R1") {
+			NickManager_1_13_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)p), name);
+		} else if(Main.version == "1_13_R2") {
+			NickManager_1_13_R2.setPlayerListName(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)p), name);
+		}
+	}
+	
 	public void changeSkin(String skinName) {
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer") == true) {
 			if(Main.version == "1_7_R4") {
@@ -107,14 +133,14 @@ public class NickManager {
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(nameFormatTab);
+				setPlayerListName(nameFormatTab);
 			} else {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(p.getName());
+				setPlayerListName(p.getName());
 			}
 		} else {
 			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			p.setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
 		}
 	}
 	
@@ -244,7 +270,7 @@ public class NickManager {
 		changeSkin(nickName);
 
 		p.setDisplayName(Utils.oldDisplayNames.get(p.getUniqueId()));
-		p.setPlayerListName(Utils.oldPlayerListNames.get(p.getUniqueId()));
+		setPlayerListName(Utils.oldPlayerListNames.get(p.getUniqueId()));
 		
 		Utils.oldDisplayNames.remove(p.getUniqueId());
 		Utils.oldPlayerListNames.remove(p.getUniqueId());
@@ -342,14 +368,14 @@ public class NickManager {
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(nameFormatTab);
+				setPlayerListName(nameFormatTab);
 			} else {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(p.getName());
+				setPlayerListName(p.getName());
 			}
 		} else {
 			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			p.setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
 		}
 	}
 
@@ -366,14 +392,14 @@ public class NickManager {
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(nameFormatTab);
+				setPlayerListName(nameFormatTab);
 			} else {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(p.getName());
+				setPlayerListName(p.getName());
 			}
 		} else {
 			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			p.setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
 		}
 	}
 
@@ -390,14 +416,14 @@ public class NickManager {
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(nameFormatTab);
+				setPlayerListName(nameFormatTab);
 			} else {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(p.getName());
+				setPlayerListName(p.getName());
 			}
 		} else {
 			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			p.setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
 		}
 	}
 
@@ -414,14 +440,14 @@ public class NickManager {
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(nameFormatTab);
+				setPlayerListName(nameFormatTab);
 			} else {
 				p.setDisplayName(nameFormatChat);
-				p.setPlayerListName(p.getName());
+				setPlayerListName(p.getName());
 			}
 		} else {
 			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			p.setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
 		}
 	}
 
