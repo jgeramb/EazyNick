@@ -11,7 +11,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 
 import com.gmail.filoghost.coloredtags.ColoredTags;
@@ -22,6 +21,7 @@ import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.ReflectUtils;
 import net.dev.nickplugin.utils.Utils;
+import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import net.minecraft.server.v1_8_R3.Packet;
@@ -299,7 +299,7 @@ public class NickManager_1_8_R3 {
 	}
 	
 	public static void setPlayerListName(CraftPlayer cp, String name) {
-		cp.getHandle().listName = (name.equals(cp.getName()) ? null : CraftChatMessage.fromString(name)[0]);
+		cp.getHandle().listName = (name.equals(cp.getName()) ? null : new ChatComponentText(name));
 
 		for(Player all : Bukkit.getOnlinePlayers()) {
 			CraftPlayer cpAll = ((CraftPlayer)all);

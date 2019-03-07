@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_9_R2.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -22,6 +21,7 @@ import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.ReflectUtils;
 import net.dev.nickplugin.utils.Utils;
+import net.minecraft.server.v1_9_R2.ChatComponentText;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import net.minecraft.server.v1_9_R2.MinecraftServer;
 import net.minecraft.server.v1_9_R2.Packet;
@@ -299,7 +299,7 @@ public class NickManager_1_9_R2 {
 	}
 	
 	public static void setPlayerListName(CraftPlayer cp, String name) {
-		cp.getHandle().listName = (name.equals(cp.getName()) ? null : CraftChatMessage.fromString(name)[0]);
+		cp.getHandle().listName = (name.equals(cp.getName()) ? null : new ChatComponentText(name));
 
 		for(Player all : Bukkit.getOnlinePlayers()) {
 			CraftPlayer cpAll = ((CraftPlayer)all);
