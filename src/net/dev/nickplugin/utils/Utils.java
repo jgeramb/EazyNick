@@ -88,7 +88,7 @@ public class Utils {
 	public static HashMap<UUID, String> oldCloudNETSuffixes = new HashMap<>();
 	public static HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
 	public static HashMap<UUID, String> luckPermsPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> luckPermsSufixes = new HashMap<>();
+	public static HashMap<UUID, String> luckPermsSuffixes = new HashMap<>();
 	
 	public static HashMap<UUID, Double> health = new HashMap<>();
 	public static HashMap<UUID, Integer> food = new HashMap<>();

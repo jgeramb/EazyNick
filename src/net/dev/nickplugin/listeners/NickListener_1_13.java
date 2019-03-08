@@ -398,10 +398,10 @@ public class NickListener_1_13 implements Listener {
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + api.getRealName()
 							+ " permission unset prefix.99." + Utils.luckPermsPrefixes.get(p.getUniqueId()));
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + api.getRealName()
-							+ " permission unset suffix.99." + Utils.luckPermsSufixes.get(p.getUniqueId()));
+							+ " permission unset suffix.99." + Utils.luckPermsSuffixes.get(p.getUniqueId()));
 
 					Utils.luckPermsPrefixes.remove(p.getUniqueId());
-					Utils.luckPermsSufixes.remove(p.getUniqueId());
+					Utils.luckPermsSuffixes.remove(p.getUniqueId());
 				}
 
 				if (Utils.permissionsExStatus()) {

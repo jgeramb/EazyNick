@@ -130,16 +130,16 @@ public class BookNickCommand implements CommandExecutor {
 									}
 									
 									if(Utils.luckPermsStatus()) {
-										if(Utils.luckPermsPrefixes.containsKey(p.getUniqueId()) || Utils.luckPermsSufixes.containsKey(p.getUniqueId())) {
+										if(Utils.luckPermsPrefixes.containsKey(p.getUniqueId()) || Utils.luckPermsSuffixes.containsKey(p.getUniqueId())) {
 											Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset prefix.99." + Utils.luckPermsPrefixes.get(p.getUniqueId()));
-											Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset suffix.99." + Utils.luckPermsSufixes.get(p.getUniqueId()));
+											Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset suffix.99." + Utils.luckPermsSuffixes.get(p.getUniqueId()));
 										
 											Utils.luckPermsPrefixes.remove(p.getUniqueId());
-											Utils.luckPermsSufixes.remove(p.getUniqueId());
+											Utils.luckPermsSuffixes.remove(p.getUniqueId());
 										}
 										
 										Utils.luckPermsPrefixes.put(p.getUniqueId(), prefix);
-										Utils.luckPermsSufixes.put(p.getUniqueId(), suffix);
+										Utils.luckPermsSuffixes.put(p.getUniqueId(), suffix);
 										
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set prefix.99." + prefix);
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set suffix.99." + suffix);

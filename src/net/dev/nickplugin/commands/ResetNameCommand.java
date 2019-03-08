@@ -28,10 +28,10 @@ public class ResetNameCommand implements CommandExecutor {
 				
 				if(Utils.luckPermsStatus()) {
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset prefix.99." + Utils.luckPermsPrefixes.get(p.getUniqueId()));
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset suffix.99." + Utils.luckPermsSufixes.get(p.getUniqueId()));
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset suffix.99." + Utils.luckPermsSuffixes.get(p.getUniqueId()));
 				
 					Utils.luckPermsPrefixes.remove(p.getUniqueId());
-					Utils.luckPermsSufixes.remove(p.getUniqueId());
+					Utils.luckPermsSuffixes.remove(p.getUniqueId());
 				}
 				
 				MySQLPlayerDataManager.removeData(p.getUniqueId());
