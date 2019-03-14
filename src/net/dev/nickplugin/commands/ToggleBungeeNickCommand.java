@@ -22,10 +22,16 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.use") && p.hasPermission("nick.item")) {
-				if (FileUtils.cfg.getBoolean("BungeeCord") && (p.getItemInHand() != null)
-						&& (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null)
-						&& (p.getItemInHand().getItemMeta().getDisplayName() .equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")))
-						   || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled"))))) {
+				if (FileUtils.cfg.getBoolean("BungeeCord")) {
+					if(FileUtils.cfg.getBoolean("NeedItemToToggleNick")) {
+						 if(!((p.getItemInHand() != null)
+							&& (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null)
+							&& (p.getItemInHand().getItemMeta().getDisplayName() .equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")))
+							   || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled")))))) {
+							 return true;
+						 }
+					}
+					
 					if(MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 						MySQLNickManager.removePlayer(p.getUniqueId());
 						p.getInventory().setItem(p.getInventory().getHeldItemSlot(),
