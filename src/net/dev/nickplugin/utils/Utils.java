@@ -33,43 +33,27 @@ public class Utils {
 	public static PagesHandler<String> nickNamesHandler;
 
 	public static boolean cloudNetStatus() {
-		if (Bukkit.getPluginManager().getPlugin("CloudNetAPI") != null) {
-			return true;
-		}
-
-		return false;
+		return (Bukkit.getPluginManager().getPlugin("CloudNetAPI") != null);
 	}
 
 	public static boolean coloredTagsStatus() {
-		if (Bukkit.getPluginManager().getPlugin("ColoredTags") != null) {
-			return true;
-		}
-
-		return false;
+		return (Bukkit.getPluginManager().getPlugin("ColoredTags") != null);
 	}
 
 	public static boolean nameTagEditStatus() {
-		if (Bukkit.getPluginManager().getPlugin("NametagEdit") != null) {
-			return true;
-		}
-
-		return false;
+		return (Bukkit.getPluginManager().getPlugin("NametagEdit") != null);
 	}
 
 	public static boolean permissionsExStatus() {
-		if (Bukkit.getPluginManager().getPlugin("PermissionsEx") != null) {
-			return true;
-		}
-
-		return false;
+		return (Bukkit.getPluginManager().getPlugin("PermissionsEx") != null);
 	}
 	
 	public static boolean luckPermsStatus() {
-		if (Bukkit.getPluginManager().getPlugin("LuckPerms") != null) {
-			return true;
-		}
-
-		return false;
+		return (Bukkit.getPluginManager().getPlugin("LuckPerms") != null);
+	}
+	
+	public static boolean authmeStatus() {
+		return (Bukkit.getPluginManager().getPlugin("AuthMe") != null);
 	}
 
 	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();

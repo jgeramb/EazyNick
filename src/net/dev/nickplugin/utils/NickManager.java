@@ -1,7 +1,9 @@
 package net.dev.nickplugin.utils;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Random;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -31,9 +33,12 @@ import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.bridge.CloudServer;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
 import de.dytanic.cloudnet.lib.player.permission.PermissionEntity;
+import fr.xephi.authme.AuthMe;
+import fr.xephi.authme.api.NewAPI;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
+@SuppressWarnings("deprecation")
 public class NickManager {
 
 	private Player p;
@@ -188,8 +193,22 @@ public class NickManager {
 			CloudServer.getInstance().updateNameTags(p);
 			CloudAPI.getInstance().updatePlayer(cloudPlayer);
 		}
+		
+		if(Utils.authmeStatus()) {
+			performAuthMeLogin();
+		}
 	}
 	
+	private void performAuthMeLogin() {
+		NewAPI api = AuthMe.getApi();
+		String name = p.getName();
+		
+		if(!(api.isRegistered(name)))
+			api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
+		else
+			api.forceLogin(p);
+	}
+
 	public void nickPlayer(String nickName) {
 		p.setCustomName(nickName);
 		
