@@ -747,6 +747,8 @@ public class NickListener_1_13 implements Listener {
 					format = ChatColor.translateAlternateColorCodes('&',
 							FileUtils.cfg.getString("Settings.ChatFormat"));
 					format = format.replace("%displayName%", p.getDisplayName());
+					format = format.replace("%nickName%", api.getNickName());
+					format = format.replace("%playerName%", api.getRealName());
 					format = format.replace("%prefix%", api.getChatPrefix());
 					format = format.replace("%suffix%", api.getChatSuffix());
 					format = format.replace("%message%", e.getMessage());
@@ -756,8 +758,7 @@ public class NickListener_1_13 implements Listener {
 				Bukkit.getConsoleSender().sendMessage(format);
 
 				for (Player all : Bukkit.getOnlinePlayers()) {
-					if (new NickManager(all).getRealName().equalsIgnoreCase(api.getRealName())
-							&& !(all.hasPermission("nick.bypass"))) {
+					if (all.getName().equalsIgnoreCase(p.getName())) {
 						if (FileUtils.cfg.getBoolean("SeeNickSelf") == true)
 							all.sendMessage(format);
 						else
@@ -802,7 +803,7 @@ public class NickListener_1_13 implements Listener {
 					|| Utils.hasLuckPermsPermission(p.getUniqueId(), "bukkit.command.help")) {
 				e.setCancelled(true);
 
-				p.sendMessage("§e--------- §fHep: " + Main.getPlugin(Main.class).getDescription().getName()
+				p.sendMessage("§e--------- §fHelp: " + Main.getPlugin(Main.class).getDescription().getName()
 						+ " §e----------------------");
 				p.sendMessage("§7Below is a list of all " + Main.getPlugin(Main.class).getDescription().getName()
 						+ " commands:");
