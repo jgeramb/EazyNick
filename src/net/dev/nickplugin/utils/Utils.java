@@ -52,8 +52,16 @@ public class Utils {
 		return (Bukkit.getPluginManager().getPlugin("LuckPerms") != null);
 	}
 	
-	public static boolean authmeStatus() {
+	public static boolean authMeStatus() {
 		return (Bukkit.getPluginManager().getPlugin("AuthMe") != null);
+	}
+	
+	public static boolean datenschutzStatus() {
+		return (Bukkit.getPluginManager().getPlugin("Datenschutz") != null);
+	}
+	
+	public static boolean ultraPermissionsStatus() {
+		return (Bukkit.getPluginManager().getPlugin("UltraPermissions") != null);
 	}
 
 	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();
@@ -73,6 +81,8 @@ public class Utils {
 	public static HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
 	public static HashMap<UUID, String> luckPermsPrefixes = new HashMap<>();
 	public static HashMap<UUID, String> luckPermsSuffixes = new HashMap<>();
+	public static HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
+	public static HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
 	
 	public static HashMap<UUID, Double> health = new HashMap<>();
 	public static HashMap<UUID, Integer> food = new HashMap<>();

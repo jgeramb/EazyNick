@@ -15,6 +15,9 @@ import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
+import me.TechsCode.UltraPermissions.UltraPermissions;
+import me.TechsCode.UltraPermissions.storage.objects.User;
+
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -75,6 +78,17 @@ public class UnnickCommand implements CommandExecutor {
 						
 						if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
 							MySQLPlayerDataManager.removeData(p.getUniqueId());
+						}
+						
+						if(Utils.ultraPermissionsStatus()) {
+							User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+							
+							user.setPrefix(Utils.ultraPermsPrefixes.get(p.getUniqueId()));
+							user.setSuffix(Utils.ultraPermsSuffixes.get(p.getUniqueId()));
+							user.save();
+							
+							Utils.ultraPermsPrefixes.remove(p.getUniqueId());
+							Utils.ultraPermsSuffixes.remove(p.getUniqueId());
 						}
 						
 						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.Unnick")));

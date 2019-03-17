@@ -20,6 +20,9 @@ import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
+import me.TechsCode.UltraPermissions.UltraPermissions;
+import me.TechsCode.UltraPermissions.storage.objects.User;
+
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
@@ -81,6 +84,17 @@ public class NickCommand implements CommandExecutor {
 						
 						if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
 							MySQLPlayerDataManager.removeData(p.getUniqueId());
+						}
+						
+						if(Utils.ultraPermissionsStatus()) {
+							User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+							
+							user.setPrefix(Utils.ultraPermsPrefixes.get(p.getUniqueId()));
+							user.setSuffix(Utils.ultraPermsSuffixes.get(p.getUniqueId()));
+							user.save();
+							
+							Utils.ultraPermsPrefixes.remove(p.getUniqueId());
+							Utils.ultraPermsSuffixes.remove(p.getUniqueId());
 						}
 
 						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.Unnick")));
@@ -218,6 +232,25 @@ public class NickCommand implements CommandExecutor {
 									NametagEdit.getApi().setPrefix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")));
 									NametagEdit.getApi().setSuffix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")));
 								}
+							}
+							
+							if(Utils.ultraPermissionsStatus()) {
+								String prefix = ((Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix"));
+								String suffix = ((Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix"));
+								
+								if(Utils.ultraPermsPrefixes.containsKey(p.getUniqueId()) || Utils.ultraPermsSuffixes.containsKey(p.getUniqueId())) {
+									Utils.ultraPermsPrefixes.remove(p.getUniqueId());
+									Utils.ultraPermsSuffixes.remove(p.getUniqueId());
+								}
+								
+								User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+								
+								Utils.ultraPermsPrefixes.put(p.getUniqueId(), user.getPrefix());
+								Utils.ultraPermsSuffixes.put(p.getUniqueId(), user.getSuffix());
+								
+								user.setPrefix(prefix);
+								user.setSuffix(suffix);
+								user.save();
 							}
 							
 							if(Utils.permissionsExStatus()) {
@@ -359,7 +392,7 @@ public class NickCommand implements CommandExecutor {
 														Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set prefix.99." + prefix);
 														Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set suffix.99." + suffix);
 													}
-
+													
 													api.nickPlayer(name);
 													
 													if(Utils.cloudNetStatus())
@@ -435,6 +468,22 @@ public class NickCommand implements CommandExecutor {
 															NametagEdit.getApi().setPrefix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")));
 															NametagEdit.getApi().setSuffix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")));
 														}
+													}
+													
+													if(Utils.ultraPermissionsStatus()) {
+														if(Utils.ultraPermsPrefixes.containsKey(p.getUniqueId()) || Utils.ultraPermsSuffixes.containsKey(p.getUniqueId())) {
+															Utils.ultraPermsPrefixes.remove(p.getUniqueId());
+															Utils.ultraPermsSuffixes.remove(p.getUniqueId());
+														}
+														
+														User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+														
+														Utils.ultraPermsPrefixes.put(p.getUniqueId(), user.getPrefix());
+														Utils.ultraPermsSuffixes.put(p.getUniqueId(), user.getSuffix());
+														
+														user.setPrefix(prefix);
+														user.setSuffix(suffix);
+														user.save();
 													}
 													
 													if(Utils.permissionsExStatus()) {

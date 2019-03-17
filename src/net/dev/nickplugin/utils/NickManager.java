@@ -1,5 +1,6 @@
 package net.dev.nickplugin.utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Random;
@@ -194,8 +195,16 @@ public class NickManager {
 			CloudAPI.getInstance().updatePlayer(cloudPlayer);
 		}
 		
-		if(Utils.authmeStatus()) {
+		if(Utils.authMeStatus()) {
 			performAuthMeLogin();
+		}
+		
+		if(Utils.datenschutzStatus()) {
+			try {
+				new me.tim.Main.Main().setDatenschutz(p, true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
