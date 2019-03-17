@@ -201,9 +201,9 @@ public class NickManager {
 		
 		if(Utils.datenschutzStatus()) {
 			try {
-				new me.tim.Main.Main().setDatenschutz(p, true);
+				me.tim.Main.Main.PlayerDatenschutz_Config.set(p.getName() + ".Entscheidung", true);
+				me.tim.Main.Main.PlayerDatenschutz_Config.save(me.tim.Main.Main.PlayerDatenschutz);
 			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 	}
