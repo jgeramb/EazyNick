@@ -271,8 +271,23 @@ public class NickManager_1_7_R4 {
 	}
 	
 	public static void setPlayerListName(CraftPlayer cp, String name) {
+		String oldName = cp.getHandle().listName;
+		
+		if (name == null)
+			name = cp.getHandle().getName();
+
+		if (oldName.equals(name))
+			return;
+
+		if (name.length() > 16)
+			return;
+		
 		cp.getHandle().listName = name;
 
+		String temp = cp.getHandle().listName;
+		cp.getHandle().listName = oldName;
+		cp.getHandle().listName = temp;
+		
 		for(Player all : Bukkit.getOnlinePlayers()) {
 			CraftPlayer cpAll = ((CraftPlayer)all);
 			

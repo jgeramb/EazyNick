@@ -92,6 +92,7 @@ public class Utils {
 	public static HashMap<UUID, Location> locations = new HashMap<>();
 	public static HashMap<UUID, Scoreboard> scoreBoards = new HashMap<>();
 	public static HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
+	public static HashMap<UUID, String> nameCache = new HashMap<>();
 	public static ArrayList<String> scoreboardTeamContents = new ArrayList<>();
 
 	public static void sendConsole(String msg) {

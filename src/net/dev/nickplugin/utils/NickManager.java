@@ -6,6 +6,7 @@ import java.util.Base64;
 import java.util.Random;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -328,12 +329,16 @@ public class NickManager {
 	public String getRealName() {
 		String realName = p.getName();
 		
-		if(Main.version.equalsIgnoreCase("1_7_R4")) {
-			realName = UUIDFetcher_1_7.getName(p.getUniqueId());
-		} else if(Main.version.equalsIgnoreCase("1_8_R1")) {
-			realName = UUIDFetcher_1_8_R1.getName(p.getUniqueId());
-		} else {
-			realName = UUIDFetcher.getName(p.getUniqueId());
+		if(!(Bukkit.getOnlineMode()) && Utils.nameCache.containsKey(p.getUniqueId()))
+			realName = Utils.nameCache.get(p.getUniqueId());
+		else {
+			if(Main.version.equalsIgnoreCase("1_7_R4")) {
+				realName = UUIDFetcher_1_7.getName(p.getUniqueId());
+			} else if(Main.version.equalsIgnoreCase("1_8_R1")) {
+				realName = UUIDFetcher_1_8_R1.getName(p.getUniqueId());
+			} else {
+				realName = UUIDFetcher.getName(p.getUniqueId());
+			}
 		}
 		
 		return realName;

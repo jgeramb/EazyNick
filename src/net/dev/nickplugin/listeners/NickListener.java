@@ -45,6 +45,8 @@ public class NickListener implements Listener {
 		Player p = e.getPlayer();
 		NickManager api = new NickManager(p);
 
+		Utils.nameCache.put(p.getUniqueId(), p.getName());
+		
 		if (!(Utils.canUseNick.containsKey(p.getUniqueId()))) {
 			Utils.canUseNick.put(p.getUniqueId(), true);
 		}
@@ -389,7 +391,10 @@ public class NickListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
-
+		
+		if(Utils.nameCache.containsKey(p.getUniqueId()))
+			Utils.nameCache.remove(p.getUniqueId());
+		
 		if (FileUtils.cfg.getBoolean("DisconnectUnnick") == true) {
 			NickManager api = new NickManager(p);
 

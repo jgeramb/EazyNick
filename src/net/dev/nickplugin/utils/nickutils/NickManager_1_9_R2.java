@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R2.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 
 import com.gmail.filoghost.coloredtags.ColoredTags;
@@ -21,7 +22,6 @@ import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.ReflectUtils;
 import net.dev.nickplugin.utils.Utils;
-import net.minecraft.server.v1_9_R2.ChatComponentText;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import net.minecraft.server.v1_9_R2.MinecraftServer;
 import net.minecraft.server.v1_9_R2.Packet;
@@ -299,22 +299,29 @@ public class NickManager_1_9_R2 {
 	}
 	
 	public static void setPlayerListName(CraftPlayer cp, String name) {
-		cp.getHandle().listName = (name.equals(cp.getName()) ? null : new ChatComponentText(name));
-
-		for(Player all : Bukkit.getOnlinePlayers()) {
-			CraftPlayer cpAll = ((CraftPlayer)all);
+		try {
+			if(name == null)
+				name = cp.getHandle().getName();
 			
-			if(cpAll.canSee(cp)) {
-				if(!(cpAll.getUniqueId().equals(cp.getUniqueId()))) {
-					if(!(all.hasPermission("nick.bypass"))) {
-						sendPacket(cpAll, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_DISPLAY_NAME, new EntityPlayer[] { cp.getHandle() }));
-					}
-				} else {
-					if(FileUtils.cfg.getBoolean("SeeNickSelf") == true) {
-						sendPacket(cp, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_DISPLAY_NAME, new EntityPlayer[] { cp.getHandle() }));
+			cp.getHandle().listName = (name.equals(cp.getHandle().getName()) ? null : CraftChatMessage.fromString(name)[0]);
+
+			for(Player all : Bukkit.getOnlinePlayers()) {
+				CraftPlayer cpAll = ((CraftPlayer)all);
+				
+				if(cpAll.canSee(cp)) {
+					if(!(cpAll.getUniqueId().equals(cp.getUniqueId()))) {
+						if(!(all.hasPermission("nick.bypass"))) {
+							sendPacket(cpAll, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_DISPLAY_NAME, new EntityPlayer[] { cp.getHandle() }));
+						}
+					} else {
+						if(FileUtils.cfg.getBoolean("SeeNickSelf") == true) {
+							sendPacket(cp, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_DISPLAY_NAME, new EntityPlayer[] { cp.getHandle() }));
+						}
 					}
 				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
