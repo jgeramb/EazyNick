@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Scoreboard;
 
 import net.dev.nickplugin.main.Main;
@@ -52,16 +53,22 @@ public class Utils {
 		return (Bukkit.getPluginManager().getPlugin("LuckPerms") != null);
 	}
 	
-	public static boolean authMeStatus() {
-		return (Bukkit.getPluginManager().getPlugin("AuthMe") != null);
-	}
-	
 	public static boolean datenschutzStatus() {
 		return (Bukkit.getPluginManager().getPlugin("Datenschutz") != null);
 	}
 	
 	public static boolean ultraPermissionsStatus() {
 		return (Bukkit.getPluginManager().getPlugin("UltraPermissions") != null);
+	}
+	
+	public static boolean authMeReloadedStatus(String version) {
+		Plugin plugin = Bukkit.getPluginManager().getPlugin("AuthMe");
+		
+		if(plugin.getDescription().getMain().equalsIgnoreCase("fr.xephi.authme.AuthMe"))
+			if(plugin != null)
+				return plugin.getDescription().getVersion().contains(version);
+
+		return false;
 	}
 
 	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();

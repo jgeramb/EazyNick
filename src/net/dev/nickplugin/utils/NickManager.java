@@ -37,6 +37,7 @@ import de.dytanic.cloudnet.lib.player.CloudPlayer;
 import de.dytanic.cloudnet.lib.player.permission.PermissionEntity;
 import fr.xephi.authme.AuthMe;
 import fr.xephi.authme.api.NewAPI;
+import fr.xephi.authme.api.v3.AuthMeApi;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -196,9 +197,7 @@ public class NickManager {
 			CloudAPI.getInstance().updatePlayer(cloudPlayer);
 		}
 		
-		if(Utils.authMeStatus()) {
-			performAuthMeLogin();
-		}
+		performAuthMeLogin();
 		
 		if(Utils.datenschutzStatus()) {
 			try {
@@ -210,13 +209,23 @@ public class NickManager {
 	}
 	
 	private void performAuthMeLogin() {
-		NewAPI api = AuthMe.getApi();
-		String name = p.getName();
-		
-		if(!(api.isRegistered(name)))
-			api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
-		else
-			api.forceLogin(p);
+		if(Utils.authMeReloadedStatus("5.5.0")) {
+			NewAPI api = AuthMe.getApi();
+			String name = p.getName();
+			
+			if(!(api.isRegistered(name)))
+				api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
+			else
+				api.forceLogin(p);
+		} else if(Utils.authMeReloadedStatus("5.5.1")) {
+			AuthMeApi api = AuthMeApi.getInstance();
+			String name = p.getName();
+			
+			if(!(api.isRegistered(name)))
+				api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
+			else
+				api.forceLogin(p);
+		}
 	}
 
 	public void nickPlayer(String nickName) {
