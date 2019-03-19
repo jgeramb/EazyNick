@@ -64,8 +64,8 @@ public class Utils {
 	public static boolean authMeReloadedStatus(String version) {
 		Plugin plugin = Bukkit.getPluginManager().getPlugin("AuthMe");
 		
-		if(plugin.getDescription().getMain().equalsIgnoreCase("fr.xephi.authme.AuthMe"))
-			if(plugin != null)
+		if(plugin != null)
+			if(plugin.getDescription().getMain().equalsIgnoreCase("fr.xephi.authme.AuthMe"))
 				return plugin.getDescription().getVersion().contains(version);
 
 		return false;
