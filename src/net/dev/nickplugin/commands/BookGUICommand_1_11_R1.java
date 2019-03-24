@@ -62,14 +62,14 @@ public class BookGUICommand_1_11_R1 implements CommandExecutor {
 					
 					BookUtils_1_11_R1.open(p, BookBuilder_1_11_R1.create("Ranks", 
 							new TextComponent("§0Let's get you set up\nwith your nickname!\nFirst, you'll need to choose which §0§lRANK§0\nyou would like to be\nshown as when nicked.\n\n"),
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") == true)) ? option1 : new TextComponent(""), 
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") == true)) ? option2 : new TextComponent(""), 
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") == true)) ? option3 : new TextComponent(""), 
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") == true)) ? option4 : new TextComponent(""), 
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") == true)) ? option5 : new TextComponent(""),
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") == true)) ? option6 : new TextComponent(""),
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled") == true)) ? option7 : new TextComponent(""),
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank8.Enabled") == true)) ? option8 : new TextComponent("")), 
+							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled"))) ? option1 : new TextComponent(""), 
+							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled"))) ? option2 : new TextComponent(""), 
+							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled"))) ? option3 : new TextComponent(""), 
+							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled"))) ? option4 : new TextComponent(""), 
+							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled"))) ? option5 : new TextComponent(""),
+							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled"))) ? option6 : new TextComponent(""),
+							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled"))) ? option7 : new TextComponent(""),
+							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank8.Enabled"))) ? option8 : new TextComponent("")), 
 							false);
 				} else if(args.length == 1) {
 					String arrow = "§0\u27A4";
@@ -112,7 +112,7 @@ public class BookGUICommand_1_11_R1 implements CommandExecutor {
 							}
 						}
 						
-						while (nickNameIsInUse == true) {
+						while (nickNameIsInUse ) {
 							nickNameIsInUse = false;
 							name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 							

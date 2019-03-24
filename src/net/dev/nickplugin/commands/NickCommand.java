@@ -38,7 +38,7 @@ public class NickCommand implements CommandExecutor {
 			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
 				NickManager api = new NickManager(p);
 				
-				if((Utils.canUseNick.get(p.getUniqueId()) == true)) {
+				if((Utils.canUseNick.get(p.getUniqueId()))) {
 					if(Utils.nickedPlayers.contains(p.getUniqueId())) {
 						api.unnickPlayer();
 						
@@ -70,7 +70,7 @@ public class NickCommand implements CommandExecutor {
 							}
 						}
 						
-						if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored") == true) {
+						if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 							if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
 								ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
 								
@@ -82,7 +82,7 @@ public class NickCommand implements CommandExecutor {
 							}
 						}
 						
-						if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+						if(FileUtils.cfg.getBoolean("BungeeCord")) {
 							MySQLPlayerDataManager.removeData(p.getUniqueId());
 						}
 						
@@ -109,7 +109,7 @@ public class NickCommand implements CommandExecutor {
 								}
 							}
 							
-							while (nickNameIsInUse == true) {
+							while (nickNameIsInUse ) {
 								nickNameIsInUse = false;
 								name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 								
@@ -151,7 +151,7 @@ public class NickCommand implements CommandExecutor {
 								api.changeCloudNET(prefix, suffix);
 							}
 
-							if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored") == true) {
+							if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 								String prefix = "";
 								String suffix = "";
 								
@@ -181,21 +181,13 @@ public class NickCommand implements CommandExecutor {
 							if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) {
 								groupName = FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName");
 								
-								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored") == true) {
+								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
 									String nameFormatTab = ChatColor.translateAlternateColorCodes('&', (FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") + name + FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix")));
 									
-									if(Main.version == "1_7_R4") {
-										if(nameFormatTab.length() <= 16) {
-											api.setPlayerListName(nameFormatTab);
-										} else {
-											api.setPlayerListName(p.getName());
-										}
-									} else {
-										api.setPlayerListName(nameFormatTab);
-									}
+									api.setPlayerListName(nameFormatTab);
 								}
 								
-								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored") == true) {
+								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
 									String nameFormatChat = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") + name + FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix"));
 									
 									p.setDisplayName(nameFormatChat);
@@ -208,21 +200,13 @@ public class NickCommand implements CommandExecutor {
 							} else {
 								groupName = FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName");
 								
-								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored") == true) {
+								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
 									String nameFormatTab = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix") + name + FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix"));
 									
-									if(Main.version == "1_7_R4") {
-										if(nameFormatTab.length() <= 16) {
-											api.setPlayerListName(nameFormatTab);
-										} else {
-											api.setPlayerListName(p.getName());
-										}
-									} else {
-										api.setPlayerListName(nameFormatTab);
-									}
+									api.setPlayerListName(nameFormatTab);
 								}
 								
-								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored") == true) {
+								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
 									String nameFormatChat = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix") + name + FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix"));
 									
 									p.setDisplayName(nameFormatChat);
@@ -292,7 +276,7 @@ public class NickCommand implements CommandExecutor {
 								}
 							}, FileUtils.cfg.getLong("Settings.NickDelay") * 20);
 							
-							if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+							if(FileUtils.cfg.getBoolean("BungeeCord")) {
 								String oldPermissionsExRank = "";
 								String prefix = "";
 								String suffix = "";
@@ -398,7 +382,7 @@ public class NickCommand implements CommandExecutor {
 													if(Utils.cloudNetStatus())
 														api.changeCloudNET(prefix, suffix);
 													
-													if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored") == true) {
+													if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 														if(!(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))) {
 															Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, prefix, suffix));
 														} else {
@@ -417,21 +401,13 @@ public class NickCommand implements CommandExecutor {
 													if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) {
 														groupName = FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName");
 														
-														if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored") == true) {
+														if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
 															String nameFormatTab = ChatColor.translateAlternateColorCodes('&', (FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") + name + FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix")));
 															
-															if(Main.version == "1_7_R4") {
-																if(nameFormatTab.length() <= 16) {
-																	api.setPlayerListName(nameFormatTab);
-																} else {
-																	api.setPlayerListName(p.getName());
-																}
-															} else {
-																api.setPlayerListName(nameFormatTab);
-															}
+															api.setPlayerListName(nameFormatTab);
 														}
 														
-														if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored") == true) {
+														if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
 															String nameFormatChat = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") + name + FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix"));
 															
 															p.setDisplayName(nameFormatChat);
@@ -444,21 +420,13 @@ public class NickCommand implements CommandExecutor {
 													} else {
 														groupName = FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName");
 														
-														if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored") == true) {
+														if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
 															String nameFormatTab = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix") + name + FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix"));
 																
-															if(Main.version == "1_7_R4") {
-																if(nameFormatTab.length() <= 16) {
-																	api.setPlayerListName(nameFormatTab);
-																} else {
-																	api.setPlayerListName(p.getName());
-																}
-															} else {
-																api.setPlayerListName(nameFormatTab);
-															}
+															api.setPlayerListName(nameFormatTab);
 														}
 														
-														if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored") == true) {
+														if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
 															String nameFormatChat = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix") + name + FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix"));
 															
 															p.setDisplayName(nameFormatChat);
@@ -525,7 +493,7 @@ public class NickCommand implements CommandExecutor {
 														}
 													}, FileUtils.cfg.getLong("Settings.NickDelay") * 20);
 													
-													if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+													if(FileUtils.cfg.getBoolean("BungeeCord")) {
 														String oldPermissionsExRank = "";
 	
 														if(Utils.permissionsExStatus()) {

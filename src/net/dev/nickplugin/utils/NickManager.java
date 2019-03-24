@@ -16,17 +16,7 @@ import com.nametagedit.plugin.NametagEdit;
 
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.sql.MySQLNickManager;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_10_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_11_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_12_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_13_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_13_R2;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_7_R4;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_8_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_8_R2;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_8_R3;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_9_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_9_R2;
+import net.dev.nickplugin.utils.nickutils.NMSNickManager;
 import net.dev.nickplugin.utils.nickutils.UUIDFetcher;
 import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_7;
 import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_8_R1;
@@ -55,84 +45,40 @@ public class NickManager {
 	}
 	
 	public void setPlayerListName(String name) {
-		if(Main.version == "1_7_R4") {
-			NickManager_1_7_R4.setPlayerListName(((org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_8_R1") {
-			NickManager_1_8_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_8_R2") {
-			NickManager_1_8_R2.setPlayerListName(((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_8_R3") {
-			NickManager_1_8_R3.setPlayerListName(((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_9_R1") {
-			NickManager_1_9_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_9_R2") {
-			NickManager_1_9_R2.setPlayerListName(((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_10_R1") {
-			NickManager_1_10_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_11_R1") {
-			NickManager_1_11_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_12_R1") {
-			NickManager_1_12_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_13_R1") {
-			NickManager_1_13_R1.setPlayerListName(((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)p), name);
-		} else if(Main.version == "1_13_R2") {
-			NickManager_1_13_R2.setPlayerListName(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)p), name);
-		}
+		Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+			
+			@Override
+			public void run() {
+				if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
+					if(Main.version == "1_7_R4") {
+						NMSNickManager.updatePlayerListName_1_7_R4(p, name);
+					} else {
+						NMSNickManager.updatePlayerListName(p, name);
+					}
+				}
+			}
+		}, 5);
 	}
 	
 	public void changeSkin(String skinName) {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer") == true) {
-			if(Main.version == "1_7_R4") {
-				NickManager_1_7_R4.changeSkin(((org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_8_R1") {
-				NickManager_1_8_R1.changeSkin(((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_8_R2") {
-				NickManager_1_8_R2.changeSkin(((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_8_R3") {
-				NickManager_1_8_R3.changeSkin(((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_9_R1") {
-				NickManager_1_9_R1.changeSkin(((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_9_R2") {
-				NickManager_1_9_R2.changeSkin(((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_10_R1") {
-				NickManager_1_10_R1.changeSkin(((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_11_R1") {
-				NickManager_1_11_R1.changeSkin(((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_12_R1") {
-				NickManager_1_12_R1.changeSkin(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_13_R1") {
-				NickManager_1_13_R1.changeSkin(((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)p), skinName);
-			} else if(Main.version == "1_13_R2") {
-				NickManager_1_13_R2.changeSkin(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)p), skinName);
-			}
+		if(Main.version == "1_7_R4") {
+			NMSNickManager.updateSkin_1_7_R4(p, skinName);
+		} else if(Main.version == "1_8_R1") {
+			NMSNickManager.updateSkin_1_8_R1(p, skinName);
+		} else {
+			NMSNickManager.updateSkin(p, skinName);
+		}
+	}
+	
+	public void updatePlayer() {
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer")) {
+			NMSNickManager.updatePlayer(p);
 		}
 	}
 	
 	public void refreshPlayer() {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer") == true) {
-			if(Main.version == "1_7_R4") {
-				NickManager_1_7_R4.refreshPlayer(((org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer)p));
-			} else if(Main.version == "1_8_R1") {
-				NickManager_1_8_R1.refreshPlayer(((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)p));
-			} else if(Main.version == "1_8_R2") {
-				NickManager_1_8_R2.refreshPlayer(((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)p));
-			} else if(Main.version == "1_8_R3") {
-				NickManager_1_8_R3.refreshPlayer(((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)p));
-			} else if(Main.version == "1_9_R1") {
-				NickManager_1_9_R1.refreshPlayer(((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)p));
-			} else if(Main.version == "1_9_R2") {
-				NickManager_1_9_R2.refreshPlayer(((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)p));
-			} else if(Main.version == "1_10_R1") {
-				NickManager_1_10_R1.refreshPlayer(((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)p));
-			} else if(Main.version == "1_11_R1") {
-				NickManager_1_11_R1.refreshPlayer(((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)p));
-			} else if(Main.version == "1_12_R1") {
-				NickManager_1_12_R1.refreshPlayer(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)p));
-			} else if(Main.version == "1_13_R1") {
-				NickManager_1_13_R1.refreshPlayer(((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)p));
-			} else if(Main.version == "1_13_R2") {
-				NickManager_1_13_R2.refreshPlayer(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)p));
-			}
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer")) {
+			NMSNickManager.updatePlayer(p);
 		}
 		
 		if(Main.version == "1_7_R4") {
@@ -153,31 +99,7 @@ public class NickManager {
 	}
 	
 	public void setName(String nickName) {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer") == true) {
-			if(Main.version == "1_7_R4") {
-				NickManager_1_7_R4.setName(((org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_8_R1") {
-				NickManager_1_8_R1.setName(((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_8_R2") {
-				NickManager_1_8_R2.setName(((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_8_R3") {
-				NickManager_1_8_R3.setName(((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_9_R1") {
-				NickManager_1_9_R1.setName(((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_9_R2") {
-				NickManager_1_9_R2.setName(((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_10_R1") {
-				NickManager_1_10_R1.setName(((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_11_R1") {
-				NickManager_1_11_R1.setName(((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_12_R1") {
-				NickManager_1_12_R1.setName(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_13_R1") {
-				NickManager_1_13_R1.setName(((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)p), nickName);
-			} else if(Main.version == "1_13_R2") {
-				NickManager_1_13_R2.setName(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)p), nickName);
-			}
-		}
+		NMSNickManager.updateName(p, nickName);
 		
 		if(Utils.nameTagEditStatus()) {
 			NametagEdit.getApi().reloadNametag(p);
@@ -235,11 +157,12 @@ public class NickManager {
 		
 		setName(new StringUtils(nickName).removeColorCodes().getString());
 		changeSkin(new StringUtils(nickName).removeColorCodes().getString());
+		updatePlayer();
 		
 		Utils.nickedPlayers.add(p.getUniqueId());
 		Utils.playerNicknames.put(p.getUniqueId(), nickName);
 		
-		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin") == true && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
+		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
@@ -268,11 +191,12 @@ public class NickManager {
 		
 		setName(new StringUtils(nickName).removeColorCodes().getString());
 		changeSkin(new StringUtils(skinName).removeColorCodes().getString());
+		updatePlayer();
 		
 		Utils.nickedPlayers.add(p.getUniqueId());
 		Utils.playerNicknames.put(p.getUniqueId(), nickName);
 		
-		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin") == true && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
+		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
@@ -306,14 +230,15 @@ public class NickManager {
 		
 		setName(nickName);
 		changeSkin(nickName);
-
+		updatePlayer();
+		
 		p.setDisplayName(Utils.oldDisplayNames.get(p.getUniqueId()));
 		setPlayerListName(Utils.oldPlayerListNames.get(p.getUniqueId()));
 		
 		Utils.oldDisplayNames.remove(p.getUniqueId());
 		Utils.oldPlayerListNames.remove(p.getUniqueId());
-		
-		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin") == true && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
+
+		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
@@ -519,36 +444,6 @@ public class NickManager {
 	
 	public String getOldPlayerListName() {
 		return Utils.oldPlayerListNames.containsKey(p.getUniqueId()) ? Utils.oldPlayerListNames.get(p.getUniqueId()) : p.getDisplayName();
-	}
-	
-	public Object getGameProfile() {
-		Object gp = null;
-		
-		if(Main.version == "1_7_R4") {
-			gp = ((org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_8_R1") {
-			gp = ((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_8_R2") {
-			gp = ((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_8_R3") {
-			gp = ((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_9_R1") {
-			gp = ((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_9_R2") {
-			gp = ((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_10_R1") {
-			gp = ((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_11_R1") {
-			gp = ((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_12_R1") {
-			gp = ((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_13_R1") {
-			gp = ((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)p).getProfile();
-		} else if(Main.version == "1_13_R2") {
-			gp = ((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)p).getProfile();
-		}
-		
-		return gp;
 	}
 
 }

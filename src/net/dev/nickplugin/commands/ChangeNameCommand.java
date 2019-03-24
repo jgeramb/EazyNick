@@ -27,7 +27,7 @@ public class ChangeNameCommand implements CommandExecutor {
 			if(p.hasPermission("nick.name") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.name")) {
 				NickManager api = new NickManager(p);
 				
-				if((Utils.canUseNick.get(p.getUniqueId()) == true)) {
+				if((Utils.canUseNick.get(p.getUniqueId()))) {
 					if(args.length >= 1) {
 						String name = args[0].replace("\"", "");
 						boolean isCancelled;
@@ -103,7 +103,7 @@ public class ChangeNameCommand implements CommandExecutor {
 											if(Utils.cloudNetStatus())
 												api.changeCloudNET(prefix, suffix);
 											
-											if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored") == true) {
+											if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 												if(!(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))) {
 													Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, prefix, suffix));
 												} else {
@@ -123,7 +123,7 @@ public class ChangeNameCommand implements CommandExecutor {
 											api.setName(nameWhithoutColors);
 											api.refreshPlayer();
 											
-											if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+											if(FileUtils.cfg.getBoolean("BungeeCord")) {
 												String oldPermissionsExRank = "";
 												
 												if(Utils.permissionsExStatus()) {
@@ -164,7 +164,7 @@ public class ChangeNameCommand implements CommandExecutor {
 							}
 						}
 
-						while (nickNameIsInUse == true) {
+						while (nickNameIsInUse ) {
 							nickNameIsInUse = false;
 							name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 							

@@ -28,7 +28,7 @@ public class MySQLNickManager {
 	}
 	
 	public static void addPlayer(UUID uuid, String name) {
-		if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+		if(FileUtils.cfg.getBoolean("BungeeCord")) {
 			if(Main.mysql.isConnected()) {
 				if(!(isPlayerNicked(uuid))) {
 					Main.mysql.update("INSERT INTO NickedPlayers (UUID, NAME) VALUES ('" + uuid.toString() + "', '" + name + "')");
@@ -38,7 +38,7 @@ public class MySQLNickManager {
 	}
 	
 	public static void removePlayer(UUID uuid) {
-		if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+		if(FileUtils.cfg.getBoolean("BungeeCord")) {
 			if(Main.mysql.isConnected()) {
 				if(isPlayerNicked(uuid)) {
 					Main.mysql.update("DELETE FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");
@@ -48,7 +48,7 @@ public class MySQLNickManager {
 	}
 
 	public static boolean isPlayerNicked(UUID uuid) {
-		if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+		if(FileUtils.cfg.getBoolean("BungeeCord")) {
 			if(Main.mysql.isConnected()) {
 				try {
 					ResultSet rs = Main.mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");

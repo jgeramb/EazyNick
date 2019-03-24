@@ -157,7 +157,7 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public static void insertData(UUID uuid, String oldPermissionsExRank, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
-		if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+		if(FileUtils.cfg.getBoolean("BungeeCord")) {
 			if(Main.mysql.isConnected()) {
 				if(isRegistered(uuid)) {
 					removeData(uuid);
@@ -174,7 +174,7 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public static void removeData(UUID uuid) {
-		if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+		if(FileUtils.cfg.getBoolean("BungeeCord")) {
 			if(Main.mysql.isConnected()) {
 				if(isRegistered(uuid)) {
 					Main.mysql.update("DELETE FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
@@ -184,7 +184,7 @@ public class MySQLPlayerDataManager {
 	}
 
 	public static boolean isRegistered(UUID uuid) {
-		if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+		if(FileUtils.cfg.getBoolean("BungeeCord")) {
 			if(Main.mysql.isConnected()) {
 				try {
 					ResultSet rs = Main.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");

@@ -103,7 +103,7 @@ public class NickListener_1_13 implements Listener {
 						}
 					}
 
-					if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored") == true) {
+					if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 						if (!(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))) {
 							if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 								Utils.scoreboardTeamManagers.put(p.getUniqueId(),
@@ -273,7 +273,7 @@ public class NickListener_1_13 implements Listener {
 					}
 				}
 
-				if (FileUtils.cfg.getBoolean("BungeeCord") == true) {
+				if (FileUtils.cfg.getBoolean("BungeeCord")) {
 					if (FileUtils.cfg.getBoolean("LobbyMode") == false) {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (!(api.isNicked())) {
@@ -290,7 +290,7 @@ public class NickListener_1_13 implements Listener {
 						}
 					} else {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
-							if (FileUtils.cfg.getBoolean("GetNewNickOnEveryServerSwitch") == true) {
+							if (FileUtils.cfg.getBoolean("GetNewNickOnEveryServerSwitch")) {
 								MySQLNickManager.removePlayer(p.getUniqueId());
 								MySQLNickManager.addPlayer(p.getUniqueId(),
 										Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size()))));
@@ -298,7 +298,7 @@ public class NickListener_1_13 implements Listener {
 						}
 					}
 
-					if (FileUtils.cfg.getBoolean("NickItem.getOnJoin") == true) {
+					if (FileUtils.cfg.getBoolean("NickItem.getOnJoin")) {
 						if (p.hasPermission("nick.item")) {
 							if (!(MySQLNickManager.isPlayerNicked(p.getUniqueId()))) {
 								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(
@@ -326,9 +326,9 @@ public class NickListener_1_13 implements Listener {
 						}
 					}
 				} else {
-					if (FileUtils.cfg.getBoolean("NickItem.getOnJoin") == true) {
+					if (FileUtils.cfg.getBoolean("NickItem.getOnJoin")) {
 						if (p.hasPermission("nick.item")) {
-							if (FileUtils.cfg.getBoolean("NickOnWorldChange") == true) {
+							if (FileUtils.cfg.getBoolean("NickOnWorldChange")) {
 								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(
 										Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")),
 										FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"),
@@ -357,7 +357,7 @@ public class NickListener_1_13 implements Listener {
 					}
 				}
 
-				if (FileUtils.cfg.getBoolean("JoinNick") == true) {
+				if (FileUtils.cfg.getBoolean("JoinNick")) {
 					if (!(api.isNicked())) {
 						Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
 
@@ -395,7 +395,7 @@ public class NickListener_1_13 implements Listener {
 		if(Utils.nameCache.containsKey(p.getUniqueId()))
 			Utils.nameCache.remove(p.getUniqueId());
 		
-		if (FileUtils.cfg.getBoolean("DisconnectUnnick") == true) {
+		if (FileUtils.cfg.getBoolean("DisconnectUnnick")) {
 			NickManager api = new NickManager(p);
 
 			if (api.isNicked()) {
@@ -431,13 +431,13 @@ public class NickListener_1_13 implements Listener {
 				Utils.oldDisplayNames.remove(p.getUniqueId());
 				Utils.oldPlayerListNames.remove(p.getUniqueId());
 
-				if (FileUtils.cfg.getBoolean("BungeeCord") == true) {
+				if (FileUtils.cfg.getBoolean("BungeeCord")) {
 					if (!(MySQLNickManager.isPlayerNicked(p.getUniqueId()))) {
 						MySQLPlayerDataManager.removeData(p.getUniqueId());
 					}
 				}
 
-				if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored") == true) {
+				if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 					if (Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
 						if (Utils.scoreboardTeamContents.contains(api.getRealName())) {
 							ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
@@ -473,7 +473,7 @@ public class NickListener_1_13 implements Listener {
 		if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			if ((e.getItem() != null) && (e.getItem().getType() != Material.AIR && e.getItem().getItemMeta() != null
 					&& e.getItem().getItemMeta().getDisplayName() != null)) {
-				if (FileUtils.cfg.getBoolean("NickItem.getOnJoin") == true) {
+				if (FileUtils.cfg.getBoolean("NickItem.getOnJoin")) {
 					if (e.getItem().getItemMeta().getDisplayName()
 							.equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&',
 									FileUtils.cfg.getString("NickItem.DisplayName.Disabled")))) {
@@ -505,7 +505,7 @@ public class NickListener_1_13 implements Listener {
 										FileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")),
 								FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 					} else {
-						if (FileUtils.cfg.getBoolean("NickOnWorldChange") == true) {
+						if (FileUtils.cfg.getBoolean("NickOnWorldChange")) {
 							if (e.getItem().getItemMeta().getDisplayName()
 									.equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&',
 											FileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Disabled")))) {
@@ -547,7 +547,7 @@ public class NickListener_1_13 implements Listener {
 							}
 						}
 
-						if (FileUtils.cfg.getBoolean("BungeeCord") == true) {
+						if (FileUtils.cfg.getBoolean("BungeeCord")) {
 							if (!(Utils.nickedPlayers.contains(p.getUniqueId()))) {
 								if (e.getItem().getItemMeta().getDisplayName()
 										.equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&',
@@ -707,12 +707,6 @@ public class NickListener_1_13 implements Listener {
 	public void onDeath(PlayerDeathEvent e) {
 		Player p = e.getEntity();
 
-		if (Utils.health.containsKey(p.getUniqueId())) {
-			e.getDrops().clear();
-			e.setDeathMessage(null);
-			p.spigot().respawn();
-		}
-
 		NickManager api = new NickManager(p);
 		String deathMessage = (e.getDeathMessage() != null && e.getDeathMessage() != "") ? e.getDeathMessage() : null;
 
@@ -748,7 +742,7 @@ public class NickListener_1_13 implements Listener {
 
 				String format;
 
-				if (FileUtils.cfg.getBoolean("ReplaceNickedChatFormat") == true) {
+				if (FileUtils.cfg.getBoolean("ReplaceNickedChatFormat")) {
 					format = ChatColor.translateAlternateColorCodes('&',
 							FileUtils.cfg.getString("Settings.ChatFormat"));
 					format = format.replace("%displayName%", p.getDisplayName());
@@ -764,7 +758,7 @@ public class NickListener_1_13 implements Listener {
 
 				for (Player all : Bukkit.getOnlinePlayers()) {
 					if (all.getName().equalsIgnoreCase(p.getName())) {
-						if (FileUtils.cfg.getBoolean("SeeNickSelf") == true)
+						if (FileUtils.cfg.getBoolean("SeeNickSelf"))
 							all.sendMessage(format);
 						else
 							all.sendMessage(format.replace(p.getDisplayName(), api.getOldDisplayName()));

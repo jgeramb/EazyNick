@@ -40,49 +40,49 @@ public class BookGUICommand_1_8_R1 implements CommandExecutor {
 					
 					String arrow = "\u27A4";
 
-					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") == true)) {
+					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled"))) {
 						page1.add(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Rank")) + "\n")
 								.clickEvent(ClickAction.Run_Command, "/bookgui " + BookGUIFileUtils.cfg.getString("BookGUI.Rank1.RankName"))
 								.hoverEvent(HoverAction.Show_Text, "§fClick here to be show as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Rank")))
 								.build();
 					}
-					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") == true)) {
+					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled"))) {
 						page1.add(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Rank")) + "\n")
 								.clickEvent(ClickAction.Run_Command, "/bookgui " + BookGUIFileUtils.cfg.getString("BookGUI.Rank2.RankName"))
 								.hoverEvent(HoverAction.Show_Text, "§fClick here to be show as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Rank")))
 								.build();
 					}
-					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") == true)) {
+					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled"))) {
 						page1.add(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Rank")) + "\n")
 								.clickEvent(ClickAction.Run_Command, "/bookgui " + BookGUIFileUtils.cfg.getString("BookGUI.Rank3.RankName"))
 								.hoverEvent(HoverAction.Show_Text, "§fClick here to be show as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Rank")))
 								.build();
 					}
-					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") == true)) {
+					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled"))) {
 						page1.add(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Rank"))+ "\n")
 								.clickEvent(ClickAction.Run_Command, "/bookgui " + BookGUIFileUtils.cfg.getString("BookGUI.Rank4.RankName"))
 								.hoverEvent(HoverAction.Show_Text, "§fClick here to be show as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Rank")))
 								.build();
 					}
-					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") == true)) {
+					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled"))) {
 						page1.add(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Rank")) + "\n")
 								.clickEvent(ClickAction.Run_Command, "/bookgui " + BookGUIFileUtils.cfg.getString("BookGUI.Rank5.RankName"))
 								.hoverEvent(HoverAction.Show_Text, "§fClick here to be show as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Rank")))
 								.build();
 					}
-					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") == true)) {
+					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled"))) {
 						page1.add(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Rank")) + "\n")
 								.clickEvent(ClickAction.Run_Command, "/bookgui " + BookGUIFileUtils.cfg.getString("BookGUI.Rank6.RankName"))
 								.hoverEvent(HoverAction.Show_Text, "§fClick here to be show as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Rank")))
 								.build();
 					}
-					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled") == true)) {
+					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled"))) {
 						page1.add(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank7.Rank")) + "\n")
 								.clickEvent(ClickAction.Run_Command, "/bookgui " + BookGUIFileUtils.cfg.getString("BookGUI.Rank7.RankName"))
 								.hoverEvent(HoverAction.Show_Text, "§fClick here to be show as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank7.Rank")))
 								.build();
 					}
-					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank8.Enabled") == true)) {
+					if((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank8.Enabled"))) {
 						page1.add(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank8.Rank")) + "\n")
 								.clickEvent(ClickAction.Run_Command, "/bookgui " + BookGUIFileUtils.cfg.getString("BookGUI.Rank8.RankName"))
 								.hoverEvent(HoverAction.Show_Text, "§fClick here to be show as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank8.Rank")))
@@ -153,7 +153,7 @@ public class BookGUICommand_1_8_R1 implements CommandExecutor {
 							}
 						}
 						
-						while (nickNameIsInUse == true) {
+						while (nickNameIsInUse ) {
 							nickNameIsInUse = false;
 							name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 							

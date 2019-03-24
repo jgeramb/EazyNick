@@ -53,17 +53,6 @@ import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.NickNameFileUtils;
 import net.dev.nickplugin.utils.ReflectUtils;
 import net.dev.nickplugin.utils.Utils;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_10_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_11_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_12_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_13_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_13_R2;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_7_R4;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_8_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_8_R2;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_8_R3;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_9_R1;
-import net.dev.nickplugin.utils.nickutils.NickManager_1_9_R2;
 
 public class Main extends JavaPlugin {
 
@@ -149,7 +138,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_7_R4";
-					Utils.field = NickManager_1_7_R4.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class,
+					Utils.field = ReflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class,
 							"name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
@@ -159,7 +148,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_8_R1";
-					Utils.field = NickManager_1_8_R1.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R2")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_8_R2());
@@ -168,7 +157,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_8_R2";
-					Utils.field = NickManager_1_8_R2.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R3")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_8_R3());
@@ -177,7 +166,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_8_R3";
-					Utils.field = NickManager_1_8_R3.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_9_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_9_R1());
@@ -186,7 +175,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_9_R1";
-					Utils.field = NickManager_1_9_R1.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_9_R2")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_9_R2());
@@ -195,7 +184,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_9_R2";
-					Utils.field = NickManager_1_9_R2.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_10_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_10_R1());
@@ -204,7 +193,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_10_R1";
-					Utils.field = NickManager_1_10_R1.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_11_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_11_R1());
@@ -213,7 +202,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_11_R1";
-					Utils.field = NickManager_1_11_R1.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_12_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_12_R1());
@@ -222,7 +211,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_12_R1";
-					Utils.field = NickManager_1_12_R1.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand_1_13());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_13_R1());
@@ -231,7 +220,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener_1_13(), this);
 
 					version = "1_13_R1";
-					Utils.field = NickManager_1_13_R1.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R2")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand_1_13());
 					getCommand("bookgui").setExecutor(new BookGUICommand_1_13_R2());
@@ -240,7 +229,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().registerEvents(new NickListener_1_13(), this);
 
 					version = "1_13_R2";
-					Utils.field = NickManager_1_13_R2.getField(GameProfile.class, "name");
+					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				}
 				
 				getCommand("eazynick").setExecutor(new NickHelpCommand());
@@ -272,7 +261,7 @@ public class Main extends JavaPlugin {
 			Utils.sendConsole("	§7Loading §e" + version + " §7...");
 			Utils.sendConsole("	§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
-			if (FileUtils.cfg.getBoolean("BungeeCord") == true) {
+			if (FileUtils.cfg.getBoolean("BungeeCord")) {
 				mysql = new MySQL(FileUtils.cfg.getString("BungeeMySQL.hostname"),
 						FileUtils.cfg.getString("BungeeMySQL.port"), FileUtils.cfg.getString("BungeeMySQL.database"),
 						FileUtils.cfg.getString("BungeeMySQL.username"),
@@ -299,11 +288,11 @@ public class Main extends JavaPlugin {
 
 		Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 
-		if (FileUtils.cfg.getBoolean("AutoUpdater") == true) {
+		if (FileUtils.cfg.getBoolean("AutoUpdater")) {
 			SpigotUpdater.checkForUpdates();
 		}
 
-		if (isCancelled == true) {
+		if (isCancelled ) {
 			Bukkit.getPluginManager().disablePlugin(this);
 		}
 	}
@@ -313,7 +302,7 @@ public class Main extends JavaPlugin {
 		Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 		Utils.sendConsole("	§7Disabling System...");
 
-		if (FileUtils.cfg.getBoolean("BungeeCord") == true) {
+		if (FileUtils.cfg.getBoolean("BungeeCord")) {
 			mysql.disconnect();
 		}
 

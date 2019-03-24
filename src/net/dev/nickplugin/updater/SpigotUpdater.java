@@ -37,7 +37,7 @@ public class SpigotUpdater {
 		if (newVersion > Double.valueOf(Main.getPlugin(Main.class).getDescription().getVersion()).doubleValue()) {
 			System.out.println("[Updater] Found a new version (" + newVersion + ")");
 
-			if (FileUtils.cfg.getBoolean("AutoUpdater") == true) {
+			if (FileUtils.cfg.getBoolean("AutoUpdater")) {
 				System.out.println("[Updater] Starting download...");
 
 				try {
@@ -87,7 +87,7 @@ public class SpigotUpdater {
 		if (newVersion > Double.valueOf(Main.getPlugin(Main.class).getDescription().getVersion()).doubleValue()) {
 			p.sendMessage(Utils.PREFIX + "§3Updater §8» §rFound a new version (" + newVersion + ")");
 
-			if (FileUtils.cfg.getBoolean("AutoUpdater") == true) {
+			if (FileUtils.cfg.getBoolean("AutoUpdater")) {
 				p.sendMessage(Utils.PREFIX + "§3Updater §8» §rStarting download...");
 
 				try {

@@ -22,7 +22,7 @@ public class ChangeSkinCommand implements CommandExecutor {
 			if(p.hasPermission("nick.skin") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.skin")) {
 				NickManager api = new NickManager(p);
 				
-				if((Utils.canUseNick.get(p.getUniqueId()) == true)) {
+				if((Utils.canUseNick.get(p.getUniqueId()))) {
 					if(args.length >= 1) {
 						String name = args[0];
 						api.changeSkin(name);

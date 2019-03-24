@@ -75,49 +75,49 @@ public class BookNickCommand implements CommandExecutor {
 									if(!(Utils.blackList.contains(name.toUpperCase()))) {
 										String groupName = "";
 										
-										if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") == true)) {
+										if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled"))) {
 											prefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.Prefix"));
 											suffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.Suffix"));
 											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.TagPrefix"));
 											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.TagSuffix"));
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.PermissionsEx.GroupName");
-										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank2.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") == true)) {
+										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank2.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled"))) {
 											prefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.Prefix"));
 											suffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.Suffix"));
 											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.TagPrefix"));
 											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.TagSuffix"));
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.PermissionsEx.GroupName");
-										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank3.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") == true)) {
+										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank3.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled"))) {
 											prefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.Prefix"));
 											suffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.Suffix"));
 											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.TagPrefix"));
 											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.TagSuffix"));
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.PermissionsEx.GroupName");
-										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank4.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") == true)) {
+										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank4.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled"))) {
 											prefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.Prefix"));
 											suffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.Suffix"));
 											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.TagPrefix"));
 											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.TagSuffix"));
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.PermissionsEx.GroupName");
-										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank5.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") == true)) {
+										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank5.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled"))) {
 											prefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.Prefix"));
 											suffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.Suffix"));
 											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.TagPrefix"));
 											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.TagSuffix"));
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.PermissionsEx.GroupName");
-										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") == true)) {
+										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled"))) {
 											prefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.Prefix"));
 											suffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.Suffix"));
 											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.TagPrefix"));
 											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.TagSuffix"));
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.PermissionsEx.GroupName");
-										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank7.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled") == true)) {
+										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank7.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled"))) {
 											prefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank7.Prefix"));
 											suffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank7.Suffix"));
 											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank7.TagPrefix"));
 											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank7.TagSuffix"));
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.PermissionsEx.GroupName");
-										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank8.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank8.Enabled") == true)) {
+										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank8.RankName")) && (BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank8.Enabled"))) {
 											prefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank8.Prefix"));
 											suffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank8.Suffix"));
 											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank8.TagPrefix"));
@@ -151,7 +151,7 @@ public class BookNickCommand implements CommandExecutor {
 										
 										api.nickPlayer(name, skinName);
 										
-										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored") == true) {
+										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 											if(!(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))) {
 												Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
 											} else {
@@ -165,11 +165,11 @@ public class BookNickCommand implements CommandExecutor {
 											sbtm.createTeam();
 										}
 										
-										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored") == true) {
+										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
 											p.setDisplayName(prefix + name + suffix);
 										}
 										
-										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored") == true) {
+										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
 											api.setPlayerListName(prefix + name + suffix);
 										}
 										
@@ -219,11 +219,11 @@ public class BookNickCommand implements CommandExecutor {
 										if(Utils.cloudNetStatus())
 											api.changeCloudNET(prefix, suffix);
 										
-										if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+										if(FileUtils.cfg.getBoolean("BungeeCord")) {
 											String oldPermissionsExRank = "";
 											
 											if(Utils.permissionsExStatus()) {
-												if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking") == true) {
+												if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
 													if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId())) {
 														oldPermissionsExRank = Utils.oldPermissionsExGroups.get(p.getUniqueId()).toString();
 													}

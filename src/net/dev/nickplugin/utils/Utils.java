@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -16,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.Scoreboard;
 
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
@@ -91,13 +89,6 @@ public class Utils {
 	public static HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
 	public static HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
 	
-	public static HashMap<UUID, Double> health = new HashMap<>();
-	public static HashMap<UUID, Integer> food = new HashMap<>();
-	public static HashMap<UUID, Integer> heldItemSlots = new HashMap<>();
-	public static HashMap<UUID, ItemStack[]> armor = new HashMap<>();
-	public static HashMap<UUID, HashMap<Integer, ItemStack>> items = new HashMap<>();
-	public static HashMap<UUID, Location> locations = new HashMap<>();
-	public static HashMap<UUID, Scoreboard> scoreBoards = new HashMap<>();
 	public static HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
 	public static HashMap<UUID, String> nameCache = new HashMap<>();
 	public static ArrayList<String> scoreboardTeamContents = new ArrayList<>();

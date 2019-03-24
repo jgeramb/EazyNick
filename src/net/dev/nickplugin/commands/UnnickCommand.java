@@ -32,7 +32,7 @@ public class UnnickCommand implements CommandExecutor {
 			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
 				NickManager api = new NickManager(p);
 				
-				if((Utils.canUseNick.get(p.getUniqueId()) == true)) {
+				if((Utils.canUseNick.get(p.getUniqueId()))) {
 					if(Utils.nickedPlayers.contains(p.getUniqueId())) {
 						api.unnickPlayer();
 						
@@ -64,7 +64,7 @@ public class UnnickCommand implements CommandExecutor {
 							}
 						}
 						
-						if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored") == true) {
+						if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 							if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
 								ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
 								
@@ -76,7 +76,7 @@ public class UnnickCommand implements CommandExecutor {
 							}
 						}
 						
-						if(FileUtils.cfg.getBoolean("BungeeCord") == true) {
+						if(FileUtils.cfg.getBoolean("BungeeCord")) {
 							MySQLPlayerDataManager.removeData(p.getUniqueId());
 						}
 						

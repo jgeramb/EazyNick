@@ -45,64 +45,62 @@ public class ScoreboardTeamManager {
 	}
 	
 	public void destroyTeam() {
-		if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-			try {
-				packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
-				
-				if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-					if(Main.version.equalsIgnoreCase("1_13_R1")) {
-						try {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "i", 1);
-						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "j", 1);
-						}
-					} else if(Main.version.equalsIgnoreCase("1_13_R2")) {
-						try {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "i", 1);
-						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "j", 1);
-						}
-					} else {
-						try {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", teamName);
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "h", 1);
-						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", teamName);
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "i", 1);
-						}
+		try {
+			packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
+			
+			if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
+				if(Main.version.equalsIgnoreCase("1_13_R1")) {
+					try {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "i", 1);
+					} catch (Exception ex) {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "j", 1);
+					}
+				} else if(Main.version.equalsIgnoreCase("1_13_R2")) {
+					try {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "i", 1);
+					} catch (Exception ex) {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "j", 1);
 					}
 				} else {
 					try {
 						ReflectUtils.setField(packet, "a", teamName);
 						ReflectUtils.setField(packet, "b", teamName);
-						ReflectUtils.setField(packet, "f", 1);
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "h", 1);
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", teamName);
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "i", 1);
 					}
 				}
-				
-				for(Player t : Bukkit.getOnlinePlayers()) {
-					sendPacket(t, packet);
+			} else {
+				try {
+					ReflectUtils.setField(packet, "a", teamName);
+					ReflectUtils.setField(packet, "b", teamName);
+					ReflectUtils.setField(packet, "f", 1);
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
+			
+			for(Player t : Bukkit.getOnlinePlayers()) {
+				sendPacket(t, packet);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -118,85 +116,83 @@ public class ScoreboardTeamManager {
 	}
 
 	public void createTeam() {
-		if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-			try {
-				packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
-				
-				if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-					if(Main.version.equalsIgnoreCase("1_13_R1")) {
-						try {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
-							ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R1(prefix));
-							ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R1(suffix));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "g", Utils.scoreboardTeamContents);
-							ReflectUtils.setField(packet, "i", 0);
-						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
-							ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R1(prefix));
-							ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R1(suffix));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "h", Utils.scoreboardTeamContents);
-							ReflectUtils.setField(packet, "j", 0);
-						}
-					} else if(Main.version.equalsIgnoreCase("1_13_R2")) {
-						try {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
-							ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R2(prefix));
-							ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R2(suffix));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "g", Utils.scoreboardTeamContents);
-							ReflectUtils.setField(packet, "i", 0);
-						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
-							ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R2(prefix));
-							ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R2(suffix));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "h", Utils.scoreboardTeamContents);
-							ReflectUtils.setField(packet, "j", 0);
-						}
-					} else {
-						try {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", teamName);
-							ReflectUtils.setField(packet, "c", prefix);
-							ReflectUtils.setField(packet, "d", suffix);
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "g", Utils.scoreboardTeamContents);
-							ReflectUtils.setField(packet, "h", 0);
-						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", teamName);
-							ReflectUtils.setField(packet, "c", prefix);
-							ReflectUtils.setField(packet, "d", suffix);
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "h", Utils.scoreboardTeamContents);
-							ReflectUtils.setField(packet, "i", 0);
-						}
+		try {
+			packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
+			
+			if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
+				if(Main.version.equalsIgnoreCase("1_13_R1")) {
+					try {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
+						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R1(prefix));
+						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R1(suffix));
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "g", Utils.scoreboardTeamContents);
+						ReflectUtils.setField(packet, "i", 0);
+					} catch (Exception ex) {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
+						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R1(prefix));
+						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R1(suffix));
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "h", Utils.scoreboardTeamContents);
+						ReflectUtils.setField(packet, "j", 0);
+					}
+				} else if(Main.version.equalsIgnoreCase("1_13_R2")) {
+					try {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
+						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R2(prefix));
+						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R2(suffix));
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "g", Utils.scoreboardTeamContents);
+						ReflectUtils.setField(packet, "i", 0);
+					} catch (Exception ex) {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
+						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R2(prefix));
+						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R2(suffix));
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "h", Utils.scoreboardTeamContents);
+						ReflectUtils.setField(packet, "j", 0);
 					}
 				} else {
-					ReflectUtils.setField(packet, "a", teamName);
-					ReflectUtils.setField(packet, "b", teamName);
-					ReflectUtils.setField(packet, "c", prefix);
-					ReflectUtils.setField(packet, "d", suffix);
-					ReflectUtils.setField(packet, "e", Utils.scoreboardTeamContents);
-					ReflectUtils.setField(packet, "f", 0);
+					try {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", teamName);
+						ReflectUtils.setField(packet, "c", prefix);
+						ReflectUtils.setField(packet, "d", suffix);
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "g", Utils.scoreboardTeamContents);
+						ReflectUtils.setField(packet, "h", 0);
+					} catch (Exception ex) {
+						ReflectUtils.setField(packet, "a", teamName);
+						ReflectUtils.setField(packet, "b", teamName);
+						ReflectUtils.setField(packet, "c", prefix);
+						ReflectUtils.setField(packet, "d", suffix);
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "h", Utils.scoreboardTeamContents);
+						ReflectUtils.setField(packet, "i", 0);
+					}
 				}
-				
-				for(Player t : Bukkit.getOnlinePlayers()) {
-					sendPacket(t, packet);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+			} else {
+				ReflectUtils.setField(packet, "a", teamName);
+				ReflectUtils.setField(packet, "b", teamName);
+				ReflectUtils.setField(packet, "c", prefix);
+				ReflectUtils.setField(packet, "d", suffix);
+				ReflectUtils.setField(packet, "e", Utils.scoreboardTeamContents);
+				ReflectUtils.setField(packet, "f", 0);
 			}
+			
+			for(Player t : Bukkit.getOnlinePlayers()) {
+				sendPacket(t, packet);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) {
-			if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored") == true) {
+			if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
 				String nameFormatChat = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") + p.getName() + FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix"));
 				
 				p.setDisplayName(nameFormatChat);
@@ -207,7 +203,7 @@ public class ScoreboardTeamManager {
 				NametagEdit.getApi().setSuffix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix")));
 			}
 		} else {
-			if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored") == true) {
+			if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
 				String nameFormatChat = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix") + p.getName() + FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix"));
 				
 				p.setDisplayName(nameFormatChat);
