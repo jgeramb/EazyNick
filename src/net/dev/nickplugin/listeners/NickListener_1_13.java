@@ -286,7 +286,7 @@ public class NickListener_1_13 implements Listener {
 									public void run() {
 										p.chat("/renick " + nickName);
 									}
-								}, 5);
+								}, 10);
 							}
 						}
 					} else {
@@ -366,7 +366,7 @@ public class NickListener_1_13 implements Listener {
 							public void run() {
 								p.chat("/nick " + joinNickName);
 							}
-						}, 5);
+						}, 10);
 					}
 				} else if (FileUtils.cfg.getBoolean("DiconnectUnnick") == false) {
 					if (!(api.isNicked())) {
@@ -380,7 +380,7 @@ public class NickListener_1_13 implements Listener {
 									api.unnickPlayer();
 									p.chat("/renick " + name);
 								}
-							}, 5);
+							}, 10);
 						}
 					}
 				}
