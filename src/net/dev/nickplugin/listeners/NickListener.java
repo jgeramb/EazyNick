@@ -64,8 +64,7 @@ public class NickListener implements Listener {
 					e.setJoinMessage("§e" + p.getName() + " joined the game");
 				}
 
-				e.setJoinMessage(
-						e.getJoinMessage().replace(p.getName(), MySQLNickManager.getNickName(p.getUniqueId())));
+				e.setJoinMessage(e.getJoinMessage().replace(p.getName(), MySQLNickManager.getNickName(p.getUniqueId())));
 			} else if (Utils.playerNicknames.containsKey(p.getUniqueId())) {
 				if (e.getJoinMessage().contains("formerly known as")) {
 					e.setJoinMessage("§e" + p.getName() + " joined the game");
@@ -384,7 +383,7 @@ public class NickListener implements Listener {
 					}
 				}
 			}
-		}, 5);
+		}, 10);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
