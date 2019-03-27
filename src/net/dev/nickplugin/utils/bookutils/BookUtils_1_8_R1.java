@@ -46,7 +46,6 @@ public class BookUtils_1_8_R1 {
 		return book;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static void open(Player p, ItemStack book, boolean addStats) {
 		EntityPlayer player = ((CraftPlayer) p).getHandle();
 		org.bukkit.inventory.ItemStack hand = p.getItemInHand();

@@ -97,7 +97,6 @@ public class Utils {
 		Bukkit.getConsoleSender().sendMessage(PREFIX + msg);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static ItemStack createItem(Material mat, int amount, int metaData, String displayName, String lore,
 			boolean enchantedItem) {
 		ItemStack is = new ItemStack(mat, amount, (byte) metaData);
@@ -119,7 +118,6 @@ public class Utils {
 		return is;
 	}
 
-	@SuppressWarnings("deprecation")
 	public static ItemStack createItem(Material mat, int amount, int metaData, String displayName) {
 		ItemStack is = new ItemStack(mat, amount, (byte) metaData);
 		ItemMeta m = is.getItemMeta();
@@ -130,7 +128,6 @@ public class Utils {
 		return is;
 	}
 
-	@SuppressWarnings("deprecation")
 	public static ItemStack createSkull(int amount, String displayName, String owner) {
 		ItemStack is = new ItemStack(Material.getMaterial("SKULL_ITEM"), amount, (byte) 3);
 		SkullMeta m = (SkullMeta) is.getItemMeta();

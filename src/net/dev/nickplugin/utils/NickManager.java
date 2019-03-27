@@ -31,7 +31,6 @@ import fr.xephi.authme.api.v3.AuthMeApi;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
-@SuppressWarnings("deprecation")
 public class NickManager {
 
 	private Player p;

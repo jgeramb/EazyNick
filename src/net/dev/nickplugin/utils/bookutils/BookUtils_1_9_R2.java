@@ -10,7 +10,6 @@ import net.minecraft.server.v1_9_R2.EnumHand;
 
 public class BookUtils_1_9_R2 {
 
-	@SuppressWarnings("deprecation")
 	public static void open(Player p, ItemStack book, boolean addStats) {
 		EntityPlayer player = ((CraftPlayer) p).getHandle();
 		org.bukkit.inventory.ItemStack hand = p.getItemInHand();

@@ -16,7 +16,6 @@ import net.dev.nickplugin.utils.Utils;
 
 public class ToggleBungeeNickCommand implements CommandExecutor {
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(sender instanceof Player) {

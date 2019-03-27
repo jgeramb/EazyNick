@@ -6,7 +6,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 public class Utils_1_13 {
 
-	@SuppressWarnings("deprecation")
 	public static ItemStack createSkull(int amount, String displayName, String owner) {
 		ItemStack is = new ItemStack(Material.LEGACY_SKULL_ITEM, amount, (byte) 3);
 		SkullMeta m = (SkullMeta) is.getItemMeta();

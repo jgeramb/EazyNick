@@ -2,9 +2,9 @@ package net.dev.nickplugin.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -59,15 +59,12 @@ public class MySQL {
 		
 		new FutureTask<>(new Runnable() {
 			
-			PreparedStatement ps;
-			
 			@Override
 			public void run() {
 				try {
-					ps = con.prepareStatement(sql);
-
-					ps.executeUpdate();
-					ps.close();
+					Statement s = con.createStatement();
+					s.executeUpdate(sql);
+					s.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -81,13 +78,12 @@ public class MySQL {
 		try {
 			final FutureTask<ResultSet> task = new FutureTask<ResultSet>(new Callable<ResultSet>() {
 				
-				PreparedStatement ps;
-				
 				@Override
 				public ResultSet call() throws Exception {
-					ps = con.prepareStatement(qry);
+					Statement s = con.createStatement();
+					ResultSet rs = s.executeQuery(qry);
 					
-					return ps.executeQuery();
+					return rs;
 				}
 			});
 			

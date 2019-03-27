@@ -139,7 +139,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.FixSkin", "&4Your skin has been fixed &asuccessfully &4!");
 			cfg.addDefault("Messages.ResetSkin", "&4Your skin has been reset &asuccessfully&4!");
 			cfg.addDefault("Messages.ResetName", "&4Your name has been reset &asuccessfully&4!");
-			cfg.addDefault("Messages.BungeeAutoNickEnabled", "&4The automatic nickname was &activated");
+			cfg.addDefault("Messages.BungeeAutoNickEnabled", "&4The automatic nickname was &aactivated");
 			cfg.addDefault("Messages.BungeeAutoNickDisabled", "&4The automatic nickname was &cdeactivated");
 			cfg.addDefault("Messages.WorldChangeAutoNickEnabled", "&4The automatic nickname was &aactivated");
 			cfg.addDefault("Messages.WorldChangeAutoNickDisabled", "&4The automatic nickname was &cdeactivated");

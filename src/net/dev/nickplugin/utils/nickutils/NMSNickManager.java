@@ -172,7 +172,7 @@ public class NMSNickManager {
 		} 
 	}
 	
-	@SuppressWarnings({ "deprecation" })
+	@SuppressWarnings({ })
 	public static void updatePlayer(Player p) {
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);

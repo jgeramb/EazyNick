@@ -24,7 +24,6 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class UnnickCommand implements CommandExecutor {
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(sender instanceof Player) {
