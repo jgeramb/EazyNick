@@ -14,6 +14,7 @@ import com.nametagedit.plugin.NametagEdit;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.BookGUIFileUtils;
 import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
@@ -233,18 +234,18 @@ public class BookNickCommand implements CommandExecutor {
 											MySQLPlayerDataManager.insertData(p.getUniqueId(), oldPermissionsExRank, prefix, suffix, prefix, suffix, tagPrefix, tagSuffix);
 										}
 										
-										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.Nick").replace("%name%", name)));
+										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Nick").replace("%name%", name)));
 									} else {
-										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NickTooLong")));
+										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
 									}
 								} else {
 									p.sendMessage(Utils.NO_PERM);
 								}
 							} else {
-								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.PlayerWithThisNameIsOnServer")));
+								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsOnServer")));
 							}
 						} else {
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
+							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
 						}
 					}
 				}

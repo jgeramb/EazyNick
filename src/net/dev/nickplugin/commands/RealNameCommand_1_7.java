@@ -7,7 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_7;
 
@@ -24,12 +24,12 @@ public class RealNameCommand_1_7 implements CommandExecutor {
 					
 					if(t != null) {
 						if(Utils.nickedPlayers.contains(p.getUniqueId())) {
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.RealName").replace("%realName%", UUIDFetcher_1_7.getName(t.getUniqueId()))));
+							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.RealName").replace("%realName%", UUIDFetcher_1_7.getName(t.getUniqueId()))));
 						} else {
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.PlayerNotNicked")));
+							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotNicked")));
 						}
 					} else {
-						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.PlayerNotFound")));
+						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotFound")));
 					}					
 				}
 			} else {

@@ -53,17 +53,17 @@ public class PagesHandler<T> {
 	}
 
 	public void createPage(Player p, int page) {
-		Inventory inv = Bukkit.createInventory(null, 45, ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickNameGUI.InventoryTitle")).replace("%currentPage%", "" + (page + 1)));
+		Inventory inv = Bukkit.createInventory(null, 45, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.InventoryTitle")).replace("%currentPage%", "" + (page + 1)));
 		
 		for (T nickName : getPage(page)) {
 			if(Main.version.equalsIgnoreCase("1_13_R1"))
-				inv.setItem(inv.firstEmpty(), Utils_1_13.createSkull(1, ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickNameGUI.NickNameSkull.DisplayName")).replace("%nickName%", (String) nickName), (String) nickName));
+				inv.setItem(inv.firstEmpty(), Utils_1_13.createSkull(1, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.NickNameSkull.DisplayName")).replace("%nickName%", (String) nickName), (String) nickName));
 			else
-				inv.setItem(inv.firstEmpty(), Utils.createSkull(1, ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickNameGUI.NickNameSkull.DisplayName")).replace("%nickName%", (String) nickName), (String) nickName));
+				inv.setItem(inv.firstEmpty(), Utils.createSkull(1, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.NickNameSkull.DisplayName")).replace("%nickName%", (String) nickName), (String) nickName));
 		}
 
-		inv.setItem(38, Utils.createItem(Material.ARROW, 1, 0, ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickNameGUI.BackItem.DisplayName"))));
-		inv.setItem(42, Utils.createItem(Material.ARROW, 1, 0, ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickNameGUI.NextItem.DisplayName"))));
+		inv.setItem(38, Utils.createItem(Material.ARROW, 1, 0, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.BackItem.DisplayName"))));
+		inv.setItem(42, Utils.createItem(Material.ARROW, 1, 0, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.NextItem.DisplayName"))));
 		
 		p.openInventory(inv);
 	}

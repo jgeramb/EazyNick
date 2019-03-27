@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import net.dev.nickplugin.sql.MySQLNickManager;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
@@ -140,18 +141,18 @@ public class ChangeNameCommand implements CommandExecutor {
 											api.refreshPlayer();
 										}
 										
-										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NameChanged").replace("%nickName%", name)));
+										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameChanged").replace("%nickName%", name)));
 									} else {
-										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NameNotAllowed")));
+										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
 									}
 								} else {
-									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NickTooLong")));
+									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
 								}
 							} else {
-								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.PlayerWithThisNameIsOnServer")));
+								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsOnServer")));
 							}
 						} else {
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
+							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
 						}
 					} else {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
@@ -179,11 +180,11 @@ public class ChangeNameCommand implements CommandExecutor {
 							api.setName(name);
 							api.refreshPlayer();
 							
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NameChanged").replace("%nickName%", name)));
+							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameChanged").replace("%nickName%", name)));
 						}
 					}
 				} else {
-					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NickDelay")));
+					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
 				}
 			} else {
 				p.sendMessage(Utils.NO_PERM);

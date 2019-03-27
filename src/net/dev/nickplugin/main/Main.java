@@ -50,6 +50,7 @@ import net.dev.nickplugin.sql.MySQL;
 import net.dev.nickplugin.updater.SpigotUpdater;
 import net.dev.nickplugin.utils.BookGUIFileUtils;
 import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.NickNameFileUtils;
 import net.dev.nickplugin.utils.ReflectUtils;
 import net.dev.nickplugin.utils.Utils;
@@ -100,9 +101,9 @@ public class Main extends JavaPlugin {
 			Utils.worldBlackList = new ArrayList<>(toAdd);
 		}
 
-		Utils.PREFIX = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.Prefix")) + " ";
-		Utils.NO_PERM = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NoPerm"));
-		Utils.NOT_PLAYER = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NotPlayer"));
+		Utils.PREFIX = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Prefix")) + " ";
+		Utils.NO_PERM = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoPerm"));
+		Utils.NOT_PLAYER = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotPlayer"));
 
 		Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 		Utils.sendConsole("	§7Starting system...");

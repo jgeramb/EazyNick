@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import net.dev.nickplugin.sql.MySQLNickManager;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
-import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.Utils;
 
@@ -37,7 +37,7 @@ public class ResetNameCommand implements CommandExecutor {
 				MySQLPlayerDataManager.removeData(p.getUniqueId());
 				MySQLNickManager.removePlayer(p.getUniqueId());
 				
-				p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.ResetName")));
+				p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ResetName")));
 			} else {
 				p.sendMessage(Utils.NO_PERM);
 			}

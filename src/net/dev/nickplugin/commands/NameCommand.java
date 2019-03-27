@@ -6,7 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.Utils;
 
@@ -21,9 +21,9 @@ public class NameCommand implements CommandExecutor {
 				NickManager api = new NickManager(p);
 				
 				if(api.isNicked()) {
-					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.Name").replace("%name%", api.getNickName())));
+					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Name").replace("%name%", api.getNickName())));
 				} else {
-					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NotNicked")));
+					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
 				}
 			} else {
 				p.sendMessage(Utils.NO_PERM);

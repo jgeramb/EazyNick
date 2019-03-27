@@ -15,6 +15,7 @@ import com.nametagedit.plugin.NametagEdit;
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
@@ -97,7 +98,7 @@ public class ReNickCommand implements CommandExecutor {
 							Utils.ultraPermsSuffixes.remove(p.getUniqueId());
 						}
 						
-						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.Unnick")));
+						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Unnick")));
 					} else {
 						if(args.length == 0) {
 							String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
@@ -300,7 +301,7 @@ public class ReNickCommand implements CommandExecutor {
 								MySQLPlayerDataManager.insertData(p.getUniqueId(), oldPermissionsExRank, prefix, suffix, prefix, suffix, prefix, suffix);
 							}
 							
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.ActiveNick").replace("%name%", name)));
+							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ActiveNick").replace("%name%", name)));
 						} else {
 							if(p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")) {
 								String name = args[0].replace("\"", "");
@@ -327,11 +328,11 @@ public class ReNickCommand implements CommandExecutor {
 											
 											for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
 												if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
-													playerWithNameIsKnown= true;
+													playerWithNameIsKnown = true;
 												}
 											}
 											
-											if(FileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers") == false && playerWithNameIsKnown) {
+											if(!(FileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown) {
 												isCancelled = true;
 											} else {
 												isCancelled = false;
@@ -509,21 +510,21 @@ public class ReNickCommand implements CommandExecutor {
 														MySQLPlayerDataManager.insertData(p.getUniqueId(), oldPermissionsExRank, prefix, suffix, prefix, suffix, prefix, suffix);
 													}
 													
-													p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.ActiveNick").replace("%name%", name)));
+													p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ActiveNick").replace("%name%", name)));
 												} else {
-													p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.CanNotNickAsSelf")));
+													p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.CanNotNickAsSelf")));
 												}
 											} else {
-												p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.PlayerWithThisNameIsKnown")));
+												p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsKnown")));
 											}
 										} else {
-											p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
+											p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
 										}
 									} else {
-										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NameNotAllowed")));
+										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
 									}
 								} else {
-									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NickTooLong")));
+									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
 								}
 							} else {
 								p.sendMessage(Utils.NO_PERM);
@@ -531,7 +532,7 @@ public class ReNickCommand implements CommandExecutor {
 						}
 					}
 				} else {
-					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Messages.NickDelay")));
+					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
 				}
 			} else {
 				p.sendMessage(Utils.NO_PERM);

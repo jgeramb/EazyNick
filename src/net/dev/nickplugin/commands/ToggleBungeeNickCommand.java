@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import net.dev.nickplugin.sql.MySQLNickManager;
 import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.Utils;
 
 public class ToggleBungeeNickCommand implements CommandExecutor {
@@ -28,8 +29,8 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 					if(FileUtils.cfg.getBoolean("NeedItemToToggleNick")) {
 						 if(!((p.getItemInHand() != null)
 							&& (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null)
-							&& (p.getItemInHand().getItemMeta().getDisplayName() .equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")))
-							   || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled")))))) {
+							&& (p.getItemInHand().getItemMeta().getDisplayName() .equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")))
+							   || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled")))))) {
 							 return true;
 						 } else {
 							 hasItem = true;
@@ -50,13 +51,13 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 													FileUtils.cfg.getString(
 															"NickItem.BungeeCord.DisplayName.Disabled")),
 											ChatColor.translateAlternateColorCodes('&',
-													FileUtils.cfg.getString("NickItem.ItemLore.Disabled")
+													LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled")
 															.replace("&n", "\n")),
 											FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 						}
 	
 						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&',
-								FileUtils.cfg.getString("Messages.BungeeAutoNickDisabled")));
+								LanguageFileUtils.cfg.getString("Messages.BungeeAutoNickDisabled")));
 					} else {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 	
@@ -68,15 +69,15 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 									FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"),
 									FileUtils.cfg.getInt("NickItem.MetaData.Enabled"),
 									ChatColor.translateAlternateColorCodes('&',
-											FileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled")),
+											LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled")),
 									ChatColor.translateAlternateColorCodes('&',
-											FileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n",
+											LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n",
 													"\n")),
 									FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
 						}
 	
 						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&',
-								FileUtils.cfg.getString("Messages.BungeeAutoNickEnabled")));
+								LanguageFileUtils.cfg.getString("Messages.BungeeAutoNickEnabled")));
 					}
 				}
 			} else {
