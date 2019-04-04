@@ -41,10 +41,8 @@ public class SpigotUpdater {
 				System.out.println("[Updater] Starting download...");
 
 				try {
-					HttpURLConnection downloadURL = (HttpURLConnection) new URL(String.format(
-							"http://api.spiget.org/v2/resources/%s/download", new Object[] { 51398 }))
-									.openConnection();
-					downloadURL.setRequestProperty("User-Agent", "SpigetResourceUpdater/Bukkit");
+					HttpURLConnection downloadURL = (HttpURLConnection) new URL("http://justix.myblaze.eu/Justix/files/EazyNick%20-%20NickSystem%20-%20by%20Justix.jar").openConnection();
+					downloadURL.setRequestProperty("User-Agent", "JustixDevelopment/Updater");
 					channel = Channels.newChannel(downloadURL.getInputStream());
 				} catch (IOException e) {
 					throw new RuntimeException("Download failed", e);
