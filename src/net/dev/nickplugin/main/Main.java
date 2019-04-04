@@ -10,16 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mojang.authlib.GameProfile;
 
-import net.dev.nickplugin.commands.BookGUICommand_1_10_R1;
-import net.dev.nickplugin.commands.BookGUICommand_1_11_R1;
-import net.dev.nickplugin.commands.BookGUICommand_1_12_R1;
-import net.dev.nickplugin.commands.BookGUICommand_1_13_R1;
-import net.dev.nickplugin.commands.BookGUICommand_1_13_R2;
-import net.dev.nickplugin.commands.BookGUICommand_1_8_R1;
-import net.dev.nickplugin.commands.BookGUICommand_1_8_R2;
-import net.dev.nickplugin.commands.BookGUICommand_1_8_R3;
-import net.dev.nickplugin.commands.BookGUICommand_1_9_R1;
-import net.dev.nickplugin.commands.BookGUICommand_1_9_R2;
+import net.dev.nickplugin.commands.BookGUICommand;
 import net.dev.nickplugin.commands.BookNickCommand;
 import net.dev.nickplugin.commands.ChangeNameCommand;
 import net.dev.nickplugin.commands.ChangeSkinCommand;
@@ -37,8 +28,6 @@ import net.dev.nickplugin.commands.NickUpdateCheckCommand;
 import net.dev.nickplugin.commands.NickedPlayersCommand;
 import net.dev.nickplugin.commands.ReNickCommand;
 import net.dev.nickplugin.commands.RealNameCommand;
-import net.dev.nickplugin.commands.RealNameCommand_1_7;
-import net.dev.nickplugin.commands.RealNameCommand_1_8_R1;
 import net.dev.nickplugin.commands.ReloadConfigCommand;
 import net.dev.nickplugin.commands.ResetNameCommand;
 import net.dev.nickplugin.commands.ResetSkinCommand;
@@ -135,7 +124,6 @@ public class Main extends JavaPlugin {
 					getCommand("nickgui").setExecutor(new NickGuiCommand_1_7_R4());
 					getCommand("bookgui").setExecutor(new CommandNotAvaiableCommand());
 					getCommand("booknick").setExecutor(new CommandNotAvaiableCommand());
-					getCommand("realname").setExecutor(new RealNameCommand_1_7());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_7_R4";
@@ -143,90 +131,60 @@ public class Main extends JavaPlugin {
 							"name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_8_R1());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand_1_8_R1());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_8_R1";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R2")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_8_R2());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_8_R2";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R3")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_8_R3());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_8_R3";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_9_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_9_R1());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_9_R1";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_9_R2")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_9_R2());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_9_R2";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_10_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_10_R1());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_10_R1";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_11_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_11_R1());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_11_R1";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_12_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_12_R1());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener(), this);
 
 					version = "1_12_R1";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R1")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand_1_13());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_13_R1());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener_1_13(), this);
 
 					version = "1_13_R1";
 					Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 				} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R2")) {
 					getCommand("nickgui").setExecutor(new NickGuiCommand_1_13());
-					getCommand("bookgui").setExecutor(new BookGUICommand_1_13_R2());
-					getCommand("booknick").setExecutor(new BookNickCommand());
-					getCommand("realname").setExecutor(new RealNameCommand());
 					Bukkit.getPluginManager().registerEvents(new NickListener_1_13(), this);
 
 					version = "1_13_R2";
@@ -249,6 +207,12 @@ public class Main extends JavaPlugin {
 				getCommand("nickedplayers").setExecutor(new NickedPlayersCommand());
 				getCommand("nickupdatecheck").setExecutor(new NickUpdateCheckCommand());
 				getCommand("togglebungeenick").setExecutor(new ToggleBungeeNickCommand());
+				getCommand("realname").setExecutor(new RealNameCommand());
+				
+				if(!(version.equalsIgnoreCase("1_7_R4"))) {
+					getCommand("bookgui").setExecutor(new BookGUICommand());
+					getCommand("booknick").setExecutor(new BookNickCommand());
+				}
 
 				for (Player all : Bukkit.getOnlinePlayers()) {
 					if ((all != null) && (all.getUniqueId() != null)) {

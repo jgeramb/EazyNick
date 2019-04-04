@@ -16,10 +16,15 @@ import com.nametagedit.plugin.NametagEdit;
 
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.sql.MySQLNickManager;
-import net.dev.nickplugin.utils.nickutils.NMSNickManager;
-import net.dev.nickplugin.utils.nickutils.UUIDFetcher;
-import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_7;
-import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_8_R1;
+import net.dev.nickplugin.sql.MySQLPlayerDataManager;
+import net.dev.nickplugin.utils.nickUtils.NMSNickManager;
+import net.dev.nickplugin.utils.nickUtils.UUIDFetcher;
+import net.dev.nickplugin.utils.nickUtils.UUIDFetcher_1_7;
+import net.dev.nickplugin.utils.nickUtils.UUIDFetcher_1_8_R1;
+import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
+
+import me.TechsCode.UltraPermissions.UltraPermissions;
+import me.TechsCode.UltraPermissions.storage.objects.User;
 
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.bridge.CloudServer;
@@ -28,6 +33,7 @@ import de.dytanic.cloudnet.lib.player.permission.PermissionEntity;
 import fr.xephi.authme.AuthMe;
 import fr.xephi.authme.api.NewAPI;
 import fr.xephi.authme.api.v3.AuthMeApi;
+import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -150,6 +156,9 @@ public class NickManager {
 	}
 
 	public void nickPlayer(String nickName) {
+		Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
+		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
+		
 		p.setCustomName(nickName);
 		
 		MySQLNickManager.addPlayer(p.getUniqueId(), nickName);
@@ -237,6 +246,61 @@ public class NickManager {
 		Utils.oldDisplayNames.remove(p.getUniqueId());
 		Utils.oldPlayerListNames.remove(p.getUniqueId());
 
+		if(Utils.cloudNetStatus())
+			resetCloudNET();
+		
+		if(Utils.luckPermsStatus()) {
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset prefix.99." + Utils.luckPermsPrefixes.get(p.getUniqueId()));
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset suffix.99." + Utils.luckPermsSuffixes.get(p.getUniqueId()));
+		
+			Utils.luckPermsPrefixes.remove(p.getUniqueId());
+			Utils.luckPermsSuffixes.remove(p.getUniqueId());
+		}
+		
+		if(Utils.nameTagEditStatus()) {
+			NametagEdit.getApi().reloadNametag(p);
+		}
+		
+		if(Utils.permissionsExStatus()) {
+			PermissionUser user = PermissionsEx.getUser(p);
+		
+			if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
+				if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId())) {
+					user.setGroups(Utils.oldPermissionsExGroups.get(p.getUniqueId()));
+				}
+			} else {
+				user.setPrefix(Utils.oldPermissionsExPrefixes.get(p.getUniqueId()), p.getWorld().getName());
+				user.setSuffix(Utils.oldPermissionsExSuffixes.get(p.getUniqueId()), p.getWorld().getName());
+			}
+		}
+		
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
+				ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
+				
+				sbtm.removePlayerFromTeam();
+				sbtm.destroyTeam();
+				sbtm.createTeam();
+				
+				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
+			}
+		}
+		
+		if(FileUtils.cfg.getBoolean("BungeeCord")) {
+			MySQLPlayerDataManager.removeData(p.getUniqueId());
+		}
+		
+		if(Utils.ultraPermissionsStatus()) {
+			User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+			
+			user.setPrefix(Utils.ultraPermsPrefixes.get(p.getUniqueId()));
+			user.setSuffix(Utils.ultraPermsSuffixes.get(p.getUniqueId()));
+			user.save();
+			
+			Utils.ultraPermsPrefixes.remove(p.getUniqueId());
+			Utils.ultraPermsSuffixes.remove(p.getUniqueId());
+		}
+		
 		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
@@ -443,6 +507,92 @@ public class NickManager {
 	
 	public String getOldPlayerListName() {
 		return Utils.oldPlayerListNames.containsKey(p.getUniqueId()) ? Utils.oldPlayerListNames.get(p.getUniqueId()) : p.getDisplayName();
+	}
+
+	public void updateLuckPerms(String prefix, String suffix) {
+		if(Utils.luckPermsStatus()) {
+			Utils.luckPermsPrefixes.put(p.getUniqueId(), prefix);
+			Utils.luckPermsSuffixes.put(p.getUniqueId(), suffix);
+
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set prefix.99." + prefix);
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set suffix.99." + suffix);
+		}
+	}
+
+	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix) {
+		if(Utils.cloudNetStatus()) {
+			changeCloudNET(tagPrefix, tagSuffix);
+		}
+
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+			if(!(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))) {
+				Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
+			} else {
+				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
+				Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
+			}
+			
+			ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
+			
+			sbtm.destroyTeam();
+			sbtm.createTeam();
+		}
+		
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
+			setPlayerListName(tabPrefix + p.getName() + tabSuffix);
+		
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored"))
+			p.setDisplayName(chatPrefix + p.getName() + chatSuffix);
+		
+		if(Utils.nameTagEditStatus()) {
+			NametagEdit.getApi().setPrefix(p.getPlayer(), tabSuffix);
+			NametagEdit.getApi().setSuffix(p.getPlayer(), tabPrefix);
+		}
+		
+		if(Utils.ultraPermissionsStatus()) {
+			if(Utils.ultraPermsPrefixes.containsKey(p.getUniqueId()) || Utils.ultraPermsSuffixes.containsKey(p.getUniqueId())) {
+				Utils.ultraPermsPrefixes.remove(p.getUniqueId());
+				Utils.ultraPermsSuffixes.remove(p.getUniqueId());
+			}
+			
+			User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+			
+			Utils.ultraPermsPrefixes.put(p.getUniqueId(), user.getPrefix());
+			Utils.ultraPermsSuffixes.put(p.getUniqueId(), user.getSuffix());
+			
+			user.setPrefix(tabPrefix);
+			user.setSuffix(tabSuffix);
+			user.save();
+		}
+		
+		if(Utils.permissionsExStatus()) {
+			PermissionUser user = PermissionsEx.getUser(p);
+		
+			if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
+				String groupNames = "";
+
+				for (PermissionGroup group : user.getGroups()) {
+					groupNames += (" " + group.getName());
+				}
+				
+				if(!(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId()))) {
+					Utils.oldPermissionsExGroups.put(p.getUniqueId(), groupNames.trim().split(" "));
+				}
+				
+				user.setGroups(new String[] { ((Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")) });
+			} else {
+				Utils.oldPermissionsExPrefixes.put(p.getUniqueId(), user.getPrefix());
+				Utils.oldPermissionsExSuffixes.put(p.getUniqueId(), user.getSuffix());
+				
+				if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) {
+					user.setPrefix(tabPrefix, p.getWorld().getName());
+					user.setSuffix(tabSuffix, p.getWorld().getName());
+				} else {
+					user.setPrefix(tabPrefix, p.getWorld().getName());
+					user.setSuffix(tabSuffix, p.getWorld().getName());
+				}
+			}
+		}
 	}
 
 }

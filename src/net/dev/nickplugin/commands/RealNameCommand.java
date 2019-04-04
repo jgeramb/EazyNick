@@ -8,8 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.dev.nickplugin.utils.LanguageFileUtils;
+import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.Utils;
-import net.dev.nickplugin.utils.nickutils.UUIDFetcher;
 
 public class RealNameCommand implements CommandExecutor {
 
@@ -24,7 +24,7 @@ public class RealNameCommand implements CommandExecutor {
 					
 					if(t != null) {
 						if(Utils.nickedPlayers.contains(t.getUniqueId())) {
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.RealName").replace("%realName%", UUIDFetcher.getName(t.getUniqueId()))));
+							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.RealName").replace("%realName%", new NickManager(t).getRealName())));
 						} else {
 							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotNicked")));
 						}

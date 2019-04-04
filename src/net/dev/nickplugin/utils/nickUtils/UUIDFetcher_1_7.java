@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils.nickutils; 
+package net.dev.nickplugin.utils.nickUtils; 
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -9,15 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
-import org.bukkit.craftbukkit.libs.com.google.gson.GsonBuilder;
-
-import com.mojang.util.UUIDTypeAdapter;
-
 import net.dev.nickplugin.utils.NickNameFileUtils;
 import net.dev.nickplugin.utils.Utils;
+import net.minecraft.util.com.google.gson.Gson;
+import net.minecraft.util.com.google.gson.GsonBuilder;
+import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
 
-public class UUIDFetcher_1_8_R1 {
+public class UUIDFetcher_1_7 {
    
    private static Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
    
@@ -42,7 +40,7 @@ public class UUIDFetcher_1_8_R1 {
 	   try {
 		   HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, timestamp/1000)).openConnection();
 		   connection.setReadTimeout(5000);
-		   UUIDFetcher_1_8_R1 data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher_1_8_R1.class);
+		   UUIDFetcher_1_7 data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher_1_7.class);
 	         
 		   uuidCache.put(name, data.id);
 		   nameCache.put(data.id, data.name);
@@ -79,8 +77,8 @@ public class UUIDFetcher_1_8_R1 {
 	   try {
 		   HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
 		   connection.setReadTimeout(5000);
-		   UUIDFetcher_1_8_R1[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher_1_8_R1[].class);
-		   UUIDFetcher_1_8_R1 currentNameData = nameHistory[nameHistory.length - 1];
+		   UUIDFetcher_1_7[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher_1_7[].class);
+		   UUIDFetcher_1_7 currentNameData = nameHistory[nameHistory.length - 1];
 		   uuidCache.put(currentNameData.name.toLowerCase(), uuid);
 		   nameCache.put(uuid, currentNameData.name);
          

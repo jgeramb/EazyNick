@@ -44,6 +44,16 @@ public class ReflectUtils {
 		return null;
 	}
 	
+	public static Class<?> getCraftClass(String className) {
+		try {
+			return Class.forName("org.bukkit.craftbukkit." + getVersion() + "." + className);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	public static String getVersion() {
 		return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 	}

@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils.nickutils;
+package net.dev.nickplugin.utils.nickUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils.anvilutils;
+package net.dev.nickplugin.utils.anvilUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -19,25 +19,23 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.utils.ReflectUtils;
 
 public class AnvilGUI {
+	
 	private Player player;
 	public AnvilClickEventHandler handler;
-	private static Class<?> BlockPosition;
-	private static Class<?> PacketPlayOutOpenWindow;
-	private static Class<?> ContainerAnvil;
-	private static Class<?> ChatMessage;
-	private static Class<?> EntityHuman;
+	private static Class<?> blockPosition;
+	private static Class<?> containerAnvil;
+	private static Class<?> entityHuman;
 	private HashMap<AnvilSlot, ItemStack> items = new HashMap<AnvilSlot, ItemStack>();
 	private Inventory inv;
 	private Listener listener;
 
 	private void loadClasses() {
-		BlockPosition = NMSManager.get().getNMSClass("BlockPosition");
-		PacketPlayOutOpenWindow = NMSManager.get().getNMSClass("PacketPlayOutOpenWindow");
-		ContainerAnvil = NMSManager.get().getNMSClass("ContainerAnvil");
-		EntityHuman = NMSManager.get().getNMSClass("EntityHuman");
-		ChatMessage = NMSManager.get().getNMSClass("ChatMessage");
+		blockPosition = ReflectUtils.getNMSClass("BlockPosition");
+		containerAnvil = ReflectUtils.getNMSClass("ContainerAnvil");
+		entityHuman = ReflectUtils.getNMSClass("EntityHuman");
 	}
 
 	public AnvilGUI(final Player player, final AnvilClickEventHandler handler) {
@@ -118,48 +116,74 @@ public class AnvilGUI {
 		player.setLevel(player.getLevel() + 1);
 
 		try {
-			Object p = NMSManager.get().getHandle(player);
+			Object p = player.getClass().getMethod("getHandle").invoke(player);
+			Object container = containerAnvil.getConstructor(ReflectUtils.getNMSClass("PlayerInventory"), ReflectUtils.getNMSClass("World"), blockPosition, entityHuman).newInstance(getPlayerField(player, "inventory"), getPlayerField(player, "world"), blockPosition.getConstructor(int.class, int.class, int.class).newInstance(0, 0, 0), p);
+			ReflectUtils.getField(ReflectUtils.getNMSClass("Container"), "checkReachable").set(container, false);
 
-			Object container = ContainerAnvil
-					.getConstructor(NMSManager.get().getNMSClass("PlayerInventory"),
-							NMSManager.get().getNMSClass("World"), BlockPosition, EntityHuman)
-					.newInstance(NMSManager.get().getPlayerField(player, "inventory"),
-							NMSManager.get().getPlayerField(player, "world"),
-							BlockPosition.getConstructor(int.class, int.class, int.class).newInstance(0, 0, 0), p);
-			NMSManager.get().getField(NMSManager.get().getNMSClass("Container"), "checkReachable").set(container,
-					false);
-
-			Object bukkitView = NMSManager.get().invokeMethod("getBukkitView", container);
-			inv = (Inventory) NMSManager.get().invokeMethod("getTopInventory", bukkitView);
+			Object bukkitView = invokeMethod("getBukkitView", container);
+			inv = (Inventory) invokeMethod("getTopInventory", bukkitView);
 
 			for (AnvilSlot slot : items.keySet()) {
 				inv.setItem(slot.getSlot(), items.get(slot));
 			}
 
-			int c = (int) NMSManager.get().invokeMethod("nextContainerCounter", p);
+			int c = (int) invokeMethod("nextContainerCounter", p);
 
-			Constructor<?> chatMessageConstructor = ChatMessage.getConstructor(String.class, Object[].class);
-			Object playerConnection = NMSManager.get().getPlayerField(player, "playerConnection");
-			Object packet = PacketPlayOutOpenWindow.getConstructor(int.class, String.class,
-					NMSManager.get().getNMSClass("IChatBaseComponent"), int.class).newInstance(c, "minecraft:anvil",
+			Constructor<?> chatMessageConstructor = ReflectUtils.getNMSClass("ChatMessage").getConstructor(String.class, Object[].class);
+			Object playerConnection = getPlayerField(player, "playerConnection");
+			Object packet = ReflectUtils.getNMSClass("PacketPlayOutOpenWindow").getConstructor(int.class, String.class,
+					ReflectUtils.getNMSClass("IChatBaseComponent"), int.class).newInstance(c, "minecraft:anvil",
 							chatMessageConstructor.newInstance("Repairing", new Object[] {}), 0);
 
-			Method sendPacket = NMSManager.get().getMethod("sendPacket", playerConnection.getClass(),
-					PacketPlayOutOpenWindow);
+			Method sendPacket = getMethod("sendPacket", playerConnection.getClass(), ReflectUtils.getNMSClass("Packet"));
 			sendPacket.invoke(playerConnection, packet);
 
-			Field activeContainerField = NMSManager.get().getField(EntityHuman, "activeContainer");
+			Field activeContainerField = ReflectUtils.getField(entityHuman, "activeContainer");
+			
 			if (activeContainerField != null) {
 				activeContainerField.set(p, container);
 
-				NMSManager.get().getField(NMSManager.get().getNMSClass("Container"), "windowId")
+				ReflectUtils.getField(ReflectUtils.getNMSClass("Container"), "windowId")
 						.set(activeContainerField.get(p), c);
 
-				NMSManager.get().getMethod("addSlotListener", activeContainerField.get(p).getClass(), p.getClass())
-						.invoke(activeContainerField.get(p), p);
+				activeContainerField.get(p).getClass().getMethod("addSlotListener", ReflectUtils.getNMSClass("ICrafting")).invoke(activeContainerField.get(p), p);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private Method getMethod(String name, Class<?> clazz, Class<?>... args) {
+		try {
+			Method method = clazz.getMethod(name, args);
+			
+			return method;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	private Object invokeMethod(String name, Object clazz) {
+		try {
+			return clazz.getClass().getMethod(name).invoke(clazz);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	private Object getPlayerField(Player p, String name) {
+		try {
+			Object getHandle = p.getClass().getMethod("getHandle").invoke(p);
+			
+			return getHandle.getClass().getField(name).get(getHandle);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			return null;
 		}
 	}
 

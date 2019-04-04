@@ -1,17 +1,16 @@
-package net.dev.nickplugin.utils.bookutils;
+package net.dev.nickplugin.utils.bookUtils;
 
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftMetaBook;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
+import net.dev.nickplugin.utils.ReflectUtils;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import net.minecraft.server.v1_10_R1.IChatBaseComponent;
 
-public class BookBuilder_1_10_R1 {
+public class NMSBookBuilder {
 	
 	@SuppressWarnings("unchecked")
 	public static ItemStack create(String title, TextComponent... texts) {
@@ -21,7 +20,7 @@ public class BookBuilder_1_10_R1 {
 		m.setAuthor("");
 		
 		try {
-			List<IChatBaseComponent> list = (List<IChatBaseComponent>) CraftMetaBook.class.getDeclaredField("pages").get(m);
+			List<Object> list = (List<Object>) ReflectUtils.getField(ReflectUtils.getCraftClass("inventory.CraftMetaBook"), "pages").get(m);
 			
 			TextComponent text = new TextComponent("");
 			for (TextComponent tc : texts) text.addExtra(tc);
@@ -36,8 +35,14 @@ public class BookBuilder_1_10_R1 {
 		return is;
 	}
 	
-	public static IChatBaseComponent toIChatBaseComponent(TextComponent tc) {
-		return IChatBaseComponent.ChatSerializer.a(ComponentSerializer.toString(tc));
+	public static Object toIChatBaseComponent(TextComponent tc) {
+		try {
+			Class<?> chatSerializer = ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
+			
+			return chatSerializer.getMethod("a", String.class).invoke(chatSerializer, ComponentSerializer.toString(tc));
+		} catch (Exception e) {
+			return null;
+		}
 	}
 	
 }
