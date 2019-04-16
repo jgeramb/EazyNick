@@ -47,7 +47,7 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 											FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"),
 											FileUtils.cfg.getInt("NickItem.MetaData.Disabled"),
 											ChatColor.translateAlternateColorCodes('&',
-													LanguageFileUtils.cfg.getString(
+													FileUtils.cfg.getString(
 															"NickItem.BungeeCord.DisplayName.Disabled")),
 											ChatColor.translateAlternateColorCodes('&',
 													LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled")
