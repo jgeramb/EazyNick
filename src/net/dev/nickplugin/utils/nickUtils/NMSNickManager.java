@@ -204,10 +204,10 @@ public class NMSNickManager {
 			
 			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
-					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit"))));
+					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
 			} else {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick"))
-					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit"))));
+					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
 			}
 			
 			sendPacket(p, packetEntityDestroy);
@@ -238,10 +238,10 @@ public class NMSNickManager {
 					
 					if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
 						if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
-							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Join"))));
+							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
 					} else {
 						if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick"))
-							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Join"))));
+							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
 					}
 				}
 			}, 5 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(6)) : 0));
