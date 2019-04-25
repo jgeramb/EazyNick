@@ -10,39 +10,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mojang.authlib.GameProfile;
 
-import net.dev.nickplugin.commands.BookGUICommand;
-import net.dev.nickplugin.commands.BookNickCommand;
-import net.dev.nickplugin.commands.ChangeNameCommand;
-import net.dev.nickplugin.commands.ChangeSkinCommand;
-import net.dev.nickplugin.commands.CommandNotAvaiableCommand;
-import net.dev.nickplugin.commands.FixSkinCommand;
-import net.dev.nickplugin.commands.NameCommand;
-import net.dev.nickplugin.commands.NickCommand;
-import net.dev.nickplugin.commands.NickGuiCommand;
-import net.dev.nickplugin.commands.NickGuiCommand_1_13;
-import net.dev.nickplugin.commands.NickGuiCommand_1_7_R4;
-import net.dev.nickplugin.commands.NickHelpCommand;
-import net.dev.nickplugin.commands.NickListCommand;
-import net.dev.nickplugin.commands.NickOtherCommand;
-import net.dev.nickplugin.commands.NickUpdateCheckCommand;
-import net.dev.nickplugin.commands.NickedPlayersCommand;
-import net.dev.nickplugin.commands.ReNickCommand;
-import net.dev.nickplugin.commands.RealNameCommand;
-import net.dev.nickplugin.commands.ReloadConfigCommand;
-import net.dev.nickplugin.commands.ResetNameCommand;
-import net.dev.nickplugin.commands.ResetSkinCommand;
-import net.dev.nickplugin.commands.ToggleBungeeNickCommand;
-import net.dev.nickplugin.commands.UnnickCommand;
-import net.dev.nickplugin.listeners.NickListener;
-import net.dev.nickplugin.listeners.NickListener_1_13;
-import net.dev.nickplugin.sql.MySQL;
-import net.dev.nickplugin.updater.SpigotUpdater;
-import net.dev.nickplugin.utils.BookGUIFileUtils;
-import net.dev.nickplugin.utils.FileUtils;
-import net.dev.nickplugin.utils.LanguageFileUtils;
-import net.dev.nickplugin.utils.NickNameFileUtils;
-import net.dev.nickplugin.utils.ReflectUtils;
-import net.dev.nickplugin.utils.Utils;
+import net.dev.nickplugin.commands.*;
+import net.dev.nickplugin.listeners.*;
+import net.dev.nickplugin.placeholders.*;
+import net.dev.nickplugin.sql.*;
+import net.dev.nickplugin.updater.*;
+import net.dev.nickplugin.utils.*;
 
 public class Main extends JavaPlugin {
 
@@ -222,7 +195,7 @@ public class Main extends JavaPlugin {
 					}
 				}
 			}
-
+			
 			Utils.sendConsole("	§7Loading §e" + version + " §7...");
 			Utils.sendConsole("	§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
@@ -240,7 +213,7 @@ public class Main extends JavaPlugin {
 								+ "TabPrefix varchar(64), TabSuffix varchar(64), "
 								+ "TagPrefix varchar(64), TagSuffix varchar(64))");
 			}
-
+			
 			Utils.sendConsole("	§7");
 			Utils.sendConsole("	§7API-Mode§8: §3" + FileUtils.cfg.getBoolean("APIMode"));
 			Utils.sendConsole("	§7Plugin by§8: §3"
@@ -257,9 +230,23 @@ public class Main extends JavaPlugin {
 			SpigotUpdater.checkForUpdates();
 		}
 
-		if (isCancelled ) {
+		if (isCancelled) {
 			Bukkit.getPluginManager().disablePlugin(this);
 		}
+		
+		Main plugin = this;
+		
+		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
+			
+			@Override
+			public void run() {
+				if(Utils.placeholderAPIStatus()) {
+					new PlaceHolderHook(plugin).hook();
+					
+					Utils.sendConsole("§7Placeholders loaded successfully!");
+				}
+			}
+		}, 20);
 	}
 
 	@Override

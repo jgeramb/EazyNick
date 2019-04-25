@@ -31,6 +31,10 @@ public class Utils {
 	public static Field field;
 	public static PagesHandler<String> nickNamesHandler;
 
+	public static boolean placeholderAPIStatus() {
+		return (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null);
+	}
+	
 	public static boolean cloudNetStatus() {
 		return (Bukkit.getPluginManager().getPlugin("CloudNetAPI") != null);
 	}

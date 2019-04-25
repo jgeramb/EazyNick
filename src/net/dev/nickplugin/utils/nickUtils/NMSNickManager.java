@@ -5,8 +5,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -200,6 +202,14 @@ public class NMSNickManager {
 			
 			Object packetNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer);
 			
+			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
+				if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
+					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit"))));
+			} else {
+				if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick"))
+					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit"))));
+			}
+			
 			sendPacket(p, packetEntityDestroy);
 			sendPacket(p, packetPlayOutPlayerInfoRemove);
 			
@@ -225,11 +235,27 @@ public class NMSNickManager {
 				public void run() {
 					sendPacket(p, packetPlayOutPlayerInfoAdd);
 					sendPacketExceptSelf(p, packetNamedEntitySpawn);
+					
+					if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
+						if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
+							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Join"))));
+					} else {
+						if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick"))
+							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Join"))));
+					}
 				}
-			}, 5);
+			}, 5 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(6)) : 0));
 			
 			if(!((Main.version == "1_7_R4") || (Main.version == "1_8_R1") || (Main.version == "1_8_R2")))
 				updatePlayerCache(p);
+			
+			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
+				if(FileUtils.cfg.getBoolean("NickCommands.OnNick"))
+					Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, FileUtils.cfg.getString("NickCommands.Nick"));
+			} else {
+				if(FileUtils.cfg.getBoolean("NickCommands.OnUnnick"))
+					Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, FileUtils.cfg.getString("NickCommands.Unnick"));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
