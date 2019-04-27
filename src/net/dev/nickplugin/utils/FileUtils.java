@@ -3,6 +3,7 @@ package net.dev.nickplugin.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -80,8 +81,8 @@ public class FileUtils {
 		cfg.addDefault("NickCommands.SendAsConsole", false);
 		cfg.addDefault("NickCommands.OnNick", false);
 		cfg.addDefault("NickCommands.OnUnnick", false);
-		cfg.addDefault("NickCommands.Nick", "/yourCommandOnNick");
-		cfg.addDefault("NickCommands.Unnick", "/yourCommandOnUnnick");
+		cfg.addDefault("NickCommands.Nick", Arrays.asList("/yourCommandOnNick"));
+		cfg.addDefault("NickCommands.Unnick", Arrays.asList("/yourCommandOnUnnick"));
 		
 		cfg.addDefault("NickItem.getOnJoin", true);
 		cfg.addDefault("NickItem.InventorySettings.PlayersCanDropItem", false);

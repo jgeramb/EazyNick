@@ -2,6 +2,7 @@ package net.dev.nickplugin.utils.nickUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -15,11 +16,13 @@ import org.bukkit.entity.Player;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import net.dev.nickplugin.api.NickManager;
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.ReflectUtils;
 import net.dev.nickplugin.utils.Utils;
 
-public class NMSNickManager {
+public class NMSNickManager extends ReflectUtils {
 
 	public static void updatePlayerListName(Player p, String name) {
 		try {
@@ -204,7 +207,7 @@ public class NMSNickManager {
 			
 			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
-					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
+					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit").replace("%displayName%", Utils.oldDisplayNames.get(p.getUniqueId())).replace("%name%", new NickManager(p).getRealName()))));
 			} else {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick"))
 					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
@@ -236,6 +239,18 @@ public class NMSNickManager {
 					sendPacket(p, packetPlayOutPlayerInfoAdd);
 					sendPacketExceptSelf(p, packetNamedEntitySpawn);
 					
+					try {
+						Object packetEntityLook = ((Main.version.startsWith("1_7") || Main.version.equalsIgnoreCase("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
+						Object packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
+						setField(packetHeadRotation, "a", p.getEntityId());
+						setField(packetHeadRotation, "b", (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)));
+						
+						sendPacketExceptSelf(p, packetEntityLook);
+						sendPacketExceptSelf(p, packetHeadRotation);
+					} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+						e.printStackTrace();
+					}
+					
 					if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
 						if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
 							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
@@ -251,10 +266,10 @@ public class NMSNickManager {
 			
 			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
 				if(FileUtils.cfg.getBoolean("NickCommands.OnNick"))
-					Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, FileUtils.cfg.getString("NickCommands.Nick"));
+					FileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
 			} else {
 				if(FileUtils.cfg.getBoolean("NickCommands.OnUnnick"))
-					Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, FileUtils.cfg.getString("NickCommands.Unnick"));
+					FileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -328,28 +343,4 @@ public class NMSNickManager {
 		}
 	}
 	
-	public static Class<?> getNMSClass(String name) {
-		try {
-			return Class.forName("net.minecraft.server." + getVersion() + "." + name);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	public static Class<?> getCraftClass(String name) {
-		try {
-			return Class.forName("org.bukkit.craftbukkit." + getVersion() + "." + name);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-
-	public static String getVersion() {
-		return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-	}
-
 }

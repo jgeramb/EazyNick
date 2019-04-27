@@ -24,12 +24,14 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.nametagedit.plugin.NametagEdit;
 
+import net.dev.nickplugin.api.NickManager;
+import net.dev.nickplugin.api.PlayerNickEvent;
+import net.dev.nickplugin.api.PlayerUnnickEvent;
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.sql.MySQLNickManager;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
-import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
@@ -41,6 +43,53 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class NickListener implements Listener {
 
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onNick(PlayerNickEvent e) {
+		if(!(e.isCancelled())) {
+			Player p = e.getPlayer();
+			NickManager api = new NickManager(p);
+			
+			api.updateLuckPerms(e.getTagPrefix(), e.getTagSuffix());
+			api.nickPlayer(e.getNickName(), e.getSkinName());
+			api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix());
+			
+			Utils.canUseNick.put(p.getUniqueId(), false);
+			Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+				
+				@Override
+				public void run() {
+					
+					Utils.canUseNick.put(p.getUniqueId(), true);
+				}
+			}, FileUtils.cfg.getLong("Settings.NickDelay") * 20);
+			
+			if(FileUtils.cfg.getBoolean("BungeeCord")) {
+				String oldPermissionsExRank = "";
+				
+				if(Utils.permissionsExStatus()) {
+					if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId())) {
+						oldPermissionsExRank = Utils.oldPermissionsExGroups.get(p.getUniqueId()).toString();
+					}
+				}
+				
+				MySQLPlayerDataManager.insertData(p.getUniqueId(), oldPermissionsExRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
+			}
+			
+			p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", e.getNickName())));
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onUnnick(PlayerUnnickEvent e) {
+		if(!(e.isCancelled())) {
+			Player p = e.getPlayer();
+			
+			new NickManager(p).unnickPlayer();
+			
+			p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Unnick")));
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
@@ -680,7 +729,7 @@ public class NickListener implements Listener {
 										LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
 							}
 						} else {
-							if (e.getCurrentItem().getType().equals(Material.getMaterial("SKULL_ITEM"))) {
+							if (e.getCurrentItem().getType().equals(Material.getMaterial(Main.version.startsWith("1_13") ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
 								String nickName = "";
 								String skullOwner = ((SkullMeta) e.getCurrentItem().getItemMeta()).getOwner();
 
@@ -790,7 +839,23 @@ public class NickListener implements Listener {
 	@EventHandler
 	public void onCommandPreprocess(PlayerCommandPreprocessEvent e) {
 		Player p = e.getPlayer();
-
+		String msg = e.getMessage();
+		
+		for (Player all : Bukkit.getOnlinePlayers()) {
+			NickManager api = new NickManager(all);
+			
+			if(api.isNicked()) {
+				String realName = api.getRealName().toLowerCase();
+				
+				msg = msg.toLowerCase();
+				
+				if(msg.contains(realName))
+					msg = msg.replaceAll(realName, realName + "§r");
+			}
+		}
+		
+		e.setMessage(msg);
+		
 		if (e.getMessage().toLowerCase().startsWith("/help nick")
 				|| e.getMessage().toLowerCase().startsWith("/help eazynick")
 				|| e.getMessage().toLowerCase().startsWith("/? nick")

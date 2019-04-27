@@ -3,7 +3,7 @@ package net.dev.nickplugin.placeholders;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import net.dev.nickplugin.utils.NickManager;
+import net.dev.nickplugin.api.NickManager;
 
 import me.clip.placeholderapi.external.EZPlaceholderHook;
 

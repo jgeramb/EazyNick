@@ -1,13 +1,14 @@
 package net.dev.nickplugin.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.dev.nickplugin.api.PlayerUnnickEvent;
 import net.dev.nickplugin.utils.LanguageFileUtils;
-import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.Utils;
 
 public class UnnickCommand implements CommandExecutor {
@@ -18,13 +19,9 @@ public class UnnickCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
-				NickManager api = new NickManager(p);
-				
 				if((Utils.canUseNick.get(p.getUniqueId()))) {
 					if(Utils.nickedPlayers.contains(p.getUniqueId())) {
-						api.unnickPlayer();
-						
-						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Unnick")));
+						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					} else {
 						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
 					}

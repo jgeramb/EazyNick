@@ -10,8 +10,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.dev.nickplugin.api.NickManager;
 import net.dev.nickplugin.utils.BookGUIFileUtils;
-import net.dev.nickplugin.utils.NickManager;
 import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.anvilUtils.AnvilGUI;
 import net.dev.nickplugin.utils.bookUtils.NMSBookBuilder;

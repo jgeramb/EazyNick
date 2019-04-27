@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils;
+package net.dev.nickplugin.api;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +17,10 @@ import com.nametagedit.plugin.NametagEdit;
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.sql.MySQLNickManager;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
+import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
+import net.dev.nickplugin.utils.StringUtils;
+import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.nickUtils.NMSNickManager;
 import net.dev.nickplugin.utils.nickUtils.UUIDFetcher;
 import net.dev.nickplugin.utils.nickUtils.UUIDFetcher_1_7;
@@ -27,7 +31,6 @@ import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.storage.objects.User;
 
 import de.dytanic.cloudnet.api.CloudAPI;
-import de.dytanic.cloudnet.bridge.CloudServer;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
 import de.dytanic.cloudnet.lib.player.permission.PermissionEntity;
 import fr.xephi.authme.AuthMe;
@@ -117,13 +120,6 @@ public class NickManager {
 			user.setSuffix(Utils.oldPermissionsExSuffixes.get(p.getUniqueId()), p.getWorld().getName());
 		}
 		
-		if(Utils.cloudNetStatus()) {
-			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
-			
-			CloudServer.getInstance().updateNameTags(p);
-			CloudAPI.getInstance().updatePlayer(cloudPlayer);
-		}
-		
 		performAuthMeLogin();
 		
 		if(Utils.datenschutzStatus()) {
@@ -156,43 +152,13 @@ public class NickManager {
 	}
 
 	public void nickPlayer(String nickName) {
-		Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
-		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
-		
-		p.setCustomName(nickName);
-		
-		MySQLNickManager.addPlayer(p.getUniqueId(), nickName);
-		
-		setName(new StringUtils(nickName).removeColorCodes().getString());
-		changeSkin(new StringUtils(nickName).removeColorCodes().getString());
-		updatePlayer();
-		
-		Utils.nickedPlayers.add(p.getUniqueId());
-		Utils.playerNicknames.put(p.getUniqueId(), nickName);
-		
-		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
-			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
-				ItemStack item = p.getInventory().getItem(slot);
-				
-				if((item != null) && !(item.getType().equals(Material.AIR)) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&',
-							LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")))) {
-						p.getInventory().setItem(slot,
-								Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")),
-										FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"),
-										FileUtils.cfg.getInt("NickItem.MetaData.Enabled"),
-										ChatColor.translateAlternateColorCodes('&',
-												LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled")),
-										ChatColor.translateAlternateColorCodes('&',
-												LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")),
-										FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
-					}
-				}
-			}
-		}
+		nickPlayer(nickName, nickName);
 	}
 	
 	public void nickPlayer(String nickName, String skinName) {
+		Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
+		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
+		
 		p.setCustomName(nickName);
 		
 		MySQLNickManager.addPlayer(p.getUniqueId(), nickName);
@@ -359,9 +325,6 @@ public class NickManager {
 			entity.setPrefix(prefix);
 			entity.setSuffix(suffix);
 		}
-		
-		CloudServer.getInstance().updateNameTags(p);
-		CloudAPI.getInstance().updatePlayer(cloudPlayer);
 	}
 	
 	public void resetCloudNET() {
@@ -380,9 +343,6 @@ public class NickManager {
 				Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
 			}
 		}
-		
-		CloudServer.getInstance().updateNameTags(p);
-		CloudAPI.getInstance().updatePlayer(cloudPlayer);
 	}
 	
 	public String getChatPrefix() {
