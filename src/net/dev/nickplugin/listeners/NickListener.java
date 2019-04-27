@@ -90,7 +90,7 @@ public class NickListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		NickManager api = new NickManager(p);
@@ -435,7 +435,7 @@ public class NickListener implements Listener {
 		}, 5);
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onQuit(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
 		
@@ -513,7 +513,7 @@ public class NickListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 
@@ -647,7 +647,7 @@ public class NickListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onInventoryClick(InventoryClickEvent e) {
 		if (e.getWhoClicked() instanceof Player) {
 			Player p = (Player) e.getWhoClicked();
@@ -749,7 +749,7 @@ public class NickListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onDeath(PlayerDeathEvent e) {
 		Player p = e.getEntity();
 
@@ -776,7 +776,7 @@ public class NickListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onChat(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
 

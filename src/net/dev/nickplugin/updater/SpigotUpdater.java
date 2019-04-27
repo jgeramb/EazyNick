@@ -41,7 +41,7 @@ public class SpigotUpdater {
 				System.out.println("[Updater] Starting download...");
 
 				try {
-					HttpURLConnection downloadURL = (HttpURLConnection) new URL("http://justix.myblaze.eu/Justix/files/EazyNick - NickSystem - by Justix.jar").openConnection();
+					HttpURLConnection downloadURL = (HttpURLConnection) new URL("http://myblaze.eu/Justix/files/EazyNick - NickSystem - by Justix.jar").openConnection();
 					downloadURL.setRequestProperty("User-Agent", "JustixDevelopment/Updater");
 					channel = Channels.newChannel(downloadURL.getInputStream());
 				} catch (IOException e) {

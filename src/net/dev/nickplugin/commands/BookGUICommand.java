@@ -59,13 +59,13 @@ public class BookGUICommand implements CommandExecutor {
 					
 					NMSBookUtils.open(p, NMSBookBuilder.create("Ranks", 
 							new TextComponent("§0Let's get you set up\nwith your nickname!\nFirst, you'll need to choose which §0§lRANK§0\nyou would like to be\nshown as when nicked.\n\n"),
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled"))) ? option1 : new TextComponent(""), 
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled"))) ? option2 : new TextComponent(""), 
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled"))) ? option3 : new TextComponent(""), 
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled"))) ? option4 : new TextComponent(""), 
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled"))) ? option5 : new TextComponent(""),
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled"))) ? option6 : new TextComponent(""),
-							((BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled"))) ? option7 : new TextComponent("")));
+							(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission")))) ? option1 : new TextComponent(""), 
+							(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission")))) ? option2 : new TextComponent(""), 
+							(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission")))) ? option3 : new TextComponent(""), 
+							(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission")))) ? option4 : new TextComponent(""), 
+							(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission")))) ? option5 : new TextComponent(""),
+							(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission")))) ? option6 : new TextComponent(""),
+							(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank7.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank7.Permission")))) ? option7 : new TextComponent("")));
 				} else if(args.length == 1) {
 					String arrow = "§0\u27A4";
 					TextComponent option1 = new TextComponent(arrow + " §0My normal skin\n§0");

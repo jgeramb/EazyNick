@@ -55,12 +55,12 @@ public class NickCommand implements CommandExecutor {
 							String suffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
 							
 							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, name,
-									prefix,
-									suffix,
 									ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix")),
 									ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix")),
 									ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")),
 									ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")),
+									prefix,
+									suffix,
 									false, (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
 						} else {
 							if(p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")) {
@@ -100,9 +100,6 @@ public class NickCommand implements CommandExecutor {
 											
 											if(!(isCancelled)) {
 												if(!(name.equalsIgnoreCase(p.getName()))) {
-													Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
-													Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
-													
 													name = ChatColor.translateAlternateColorCodes('&', name);
 													
 													boolean serverFull = Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers();

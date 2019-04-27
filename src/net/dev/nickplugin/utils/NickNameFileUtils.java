@@ -946,7 +946,6 @@ public class NickNameFileUtils {
 		list.add("tiuri730");
 		list.add("piyrwouteq");
 		list.add("iRushTheWorld");
-		list.add("ii{i(DELTA)i}ii");
 		list.add("roflcopter");
 		list.add("gnomar97");
 		list.add("blazinchief");

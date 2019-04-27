@@ -29,6 +29,7 @@ import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.storage.objects.User;
+import me.neznamy.tab.bukkit.api.TABAPI;
 
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
@@ -85,25 +86,8 @@ public class NickManager {
 	}
 	
 	public void refreshPlayer() {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer")) {
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
 			NMSNickManager.updatePlayer(p);
-		}
-		
-		if(Main.version == "1_7_R4") {
-			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
-			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
-			
-			if(nameFormatTab.length() <= 16) {
-				p.setDisplayName(nameFormatChat);
-				setPlayerListName(nameFormatTab);
-			} else {
-				p.setDisplayName(nameFormatChat);
-				setPlayerListName(p.getName());
-			}
-		} else {
-			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
-		}
 	}
 	
 	public void setName(String nickName) {
@@ -206,12 +190,20 @@ public class NickManager {
 		changeSkin(nickName);
 		updatePlayer();
 		
-		p.setDisplayName(Utils.oldDisplayNames.get(p.getUniqueId()));
-		setPlayerListName(Utils.oldPlayerListNames.get(p.getUniqueId()));
+		p.setDisplayName(getOldDisplayName());
+		setPlayerListName(getOldPlayerListName());
 		
 		Utils.oldDisplayNames.remove(p.getUniqueId());
 		Utils.oldPlayerListNames.remove(p.getUniqueId());
 
+		if(Utils.tabStatus()) {
+			TABAPI.removeTemporaryTabPrefix(p);
+			TABAPI.removeTemporaryTabSuffix(p);
+			TABAPI.removeTemporaryTagPrefix(p);
+			TABAPI.removeTemporaryTagSuffix(p);
+
+		}
+		
 		if(Utils.cloudNetStatus())
 			resetCloudNET();
 		
@@ -424,11 +416,11 @@ public class NickManager {
 	}
 	
 	public String getOldDisplayName() {
-		return Utils.oldDisplayNames.containsKey(p.getUniqueId()) ? Utils.oldDisplayNames.get(p.getUniqueId()) : p.getDisplayName();
+		return Utils.oldDisplayNames.containsKey(p.getUniqueId()) ? Utils.oldDisplayNames.get(p.getUniqueId()) : p.getName();
 	}
 	
 	public String getOldPlayerListName() {
-		return Utils.oldPlayerListNames.containsKey(p.getUniqueId()) ? Utils.oldPlayerListNames.get(p.getUniqueId()) : p.getDisplayName();
+		return Utils.oldPlayerListNames.containsKey(p.getUniqueId()) ? Utils.oldPlayerListNames.get(p.getUniqueId()) : p.getName();
 	}
 
 	public void updateLuckPerms(String prefix, String suffix) {
@@ -446,17 +438,20 @@ public class NickManager {
 	}
 	
 	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String groupName) {
+		this.chatPrefix = chatPrefix;
+		this.chatSuffix = chatSuffix;
+		this.tabPrefix = tabPrefix;
+		this.tabSuffix = tabSuffix;
+		
 		if(Utils.cloudNetStatus()) {
 			changeCloudNET(tagPrefix, tagSuffix);
 		}
 
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
-			if(!(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))) {
-				Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
-			} else {
+			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))
 				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
-				Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
-			}
+				
+			Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
 			
 			ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
 			
@@ -518,6 +513,13 @@ public class NickManager {
 					user.setSuffix(tabSuffix, p.getWorld().getName());
 				}
 			}
+		}
+		
+		if(Utils.tabStatus()) {
+			TABAPI.setTabPrefixTemporarily(p, tabPrefix);
+			TABAPI.setTabSuffixTemporarily(p, tabSuffix);
+			TABAPI.setTagPrefixTemporarily(p, tagPrefix);
+			TABAPI.setTagSuffixTemporarily(p, tagSuffix);
 		}
 	}
 	

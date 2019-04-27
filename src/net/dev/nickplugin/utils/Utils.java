@@ -72,6 +72,14 @@ public class Utils {
 
 		return false;
 	}
+	
+	public static boolean tabStatus() {
+		return (Bukkit.getPluginManager().getPlugin("TAB") != null);
+	}
+	
+	public static boolean deluxeChatStatus() {
+		return (Bukkit.getPluginManager().getPlugin("DeluxeChat") != null);
+	}
 
 	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();
 	public static ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();

@@ -28,13 +28,14 @@ public class NMSNickManager extends ReflectUtils {
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 			Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
+			String playerName = (String) entityPlayer.getClass().getMethod("getName").invoke(entityPlayer);
 			
 			if(name == null)
-				name = (String) entityPlayer.getClass().getMethod("getName").invoke(entityPlayer);
+				name = playerName;
 			
 			Field f = getNMSClass("EntityPlayer").getDeclaredField("listName");
 			f.setAccessible(true);
-			f.set(entityPlayer, ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, name))[0]);
+			f.set(entityPlayer, name.equals(playerName) ? null : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, name))[0]);
 			f.setAccessible(false);
 
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
@@ -44,13 +45,15 @@ public class NMSNickManager extends ReflectUtils {
 			Object packet = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray);
 			
 			for(Player all : Bukkit.getOnlinePlayers()) {
-				if(!(all.getUniqueId().equals(p.getUniqueId()))) {
-					if(!(all.hasPermission("nick.bypass"))) {
-						sendPacketNMS(all, packet);
-					}
-				} else {
-					if(FileUtils.cfg.getBoolean("SeeNickSelf")) {
-						sendPacketNMS(all, packet);
+				if(all.canSee(p)) {
+					if(!(all.getUniqueId().equals(p.getUniqueId()))) {
+						if(!(all.hasPermission("nick.bypass"))) {
+							sendPacketNMS(all, packet);
+						}
+					} else {
+						if(FileUtils.cfg.getBoolean("SeeNickSelf")) {
+							sendPacketNMS(all, packet);
+						}
 					}
 				}
 			}
@@ -62,7 +65,7 @@ public class NMSNickManager extends ReflectUtils {
 	public static void updatePlayerListName_1_7_R4(Player p, String name) {
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
-			
+
 			if (name.length() > 16)
 				name = name.substring(0, 16);
 				
@@ -77,31 +80,33 @@ public class NMSNickManager extends ReflectUtils {
 			Object packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 			
 			for(Player all : Bukkit.getOnlinePlayers()) {
-				if(!(all.getUniqueId().equals(p.getUniqueId()))) {
-					if(!(all.hasPermission("nick.bypass"))) {
-						Object entityPlayerAll = all.getClass().getMethod("getHandle").invoke(all);
-						Object playerConenction = entityPlayerAll.getClass().getDeclaredField("playerConnection").get(entityPlayerAll);
-						Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
-						int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
-						
-						if (version < 28) {
-							sendPacketNMS(all, packetPlayOutPlayerInfoRemove);
-							sendPacketNMS(all, packetPlayOutPlayerInfoAdd);
-						} else {
-							sendPacketNMS(all, packet);
+				if(all.canSee(p)) {
+					if(!(all.getUniqueId().equals(p.getUniqueId()))) {
+						if(!(all.hasPermission("nick.bypass"))) {
+							Object entityPlayerAll = all.getClass().getMethod("getHandle").invoke(all);
+							Object playerConenction = entityPlayerAll.getClass().getDeclaredField("playerConnection").get(entityPlayerAll);
+							Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
+							int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
+							
+							if (version < 28) {
+								sendPacketNMS(all, packetPlayOutPlayerInfoRemove);
+								sendPacketNMS(all, packetPlayOutPlayerInfoAdd);
+							} else {
+								sendPacketNMS(all, packet);
+							}
 						}
-					}
-				} else {
-					if(FileUtils.cfg.getBoolean("SeeNickSelf")) {
-						Object playerConenction = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
-						Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
-						int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
-						
-						if (version < 28) {
-							sendPacketNMS(all, packetPlayOutPlayerInfoRemove);
-							sendPacketNMS(all, packetPlayOutPlayerInfoAdd);
-						} else {
-							sendPacketNMS(all, packet);
+					} else {
+						if(FileUtils.cfg.getBoolean("SeeNickSelf")) {
+							Object playerConenction = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
+							Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
+							int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
+							
+							if (version < 28) {
+								sendPacketNMS(all, packetPlayOutPlayerInfoRemove);
+								sendPacketNMS(all, packetPlayOutPlayerInfoAdd);
+							} else {
+								sendPacketNMS(all, packet);
+							}
 						}
 					}
 				}

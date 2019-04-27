@@ -1,14 +1,10 @@
 package net.dev.nickplugin.utils.scoreboard;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import com.nametagedit.plugin.NametagEdit;
 
 import net.dev.nickplugin.api.NickManager;
 import net.dev.nickplugin.main.Main;
-import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.ReflectUtils;
 import net.dev.nickplugin.utils.Utils;
 
@@ -189,30 +185,6 @@ public class ScoreboardTeamManager {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
-		if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) {
-			if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-				String nameFormatChat = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") + p.getName() + FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix"));
-				
-				p.setDisplayName(nameFormatChat);
-			}
-			
-			if(Utils.nameTagEditStatus()) {
-				NametagEdit.getApi().setPrefix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix")));
-				NametagEdit.getApi().setSuffix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix")));
-			}
-		} else {
-			if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-				String nameFormatChat = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix") + p.getName() + FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix"));
-				
-				p.setDisplayName(nameFormatChat);
-			}
-			
-			if(Utils.nameTagEditStatus()) {
-				NametagEdit.getApi().setPrefix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")));
-				NametagEdit.getApi().setSuffix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")));
-			}
 		}
 	}
 	
