@@ -9,23 +9,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nametagedit.plugin.NametagEdit;
-
 import net.dev.nickplugin.api.NickManager;
-import net.dev.nickplugin.sql.MySQLPlayerDataManager;
+import net.dev.nickplugin.api.PlayerNickEvent;
 import net.dev.nickplugin.utils.BookGUIFileUtils;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
-import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
-
-import me.TechsCode.UltraPermissions.UltraPermissions;
-import me.TechsCode.UltraPermissions.storage.objects.User;
-
-import ru.tehkode.permissions.PermissionGroup;
-import ru.tehkode.permissions.PermissionUser;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class BookNickCommand implements CommandExecutor {
 
@@ -127,107 +117,7 @@ public class BookNickCommand implements CommandExecutor {
 											skinName = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 										}
 										
-										if(Utils.luckPermsStatus()) {
-											if(Utils.luckPermsPrefixes.containsKey(p.getUniqueId()) || Utils.luckPermsSuffixes.containsKey(p.getUniqueId())) {
-												Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset prefix.99." + Utils.luckPermsPrefixes.get(p.getUniqueId()));
-												Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset suffix.99." + Utils.luckPermsSuffixes.get(p.getUniqueId()));
-											
-												Utils.luckPermsPrefixes.remove(p.getUniqueId());
-												Utils.luckPermsSuffixes.remove(p.getUniqueId());
-											}
-											
-											Utils.luckPermsPrefixes.put(p.getUniqueId(), prefix);
-											Utils.luckPermsSuffixes.put(p.getUniqueId(), suffix);
-											
-											Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set prefix.99." + prefix);
-											Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set suffix.99." + suffix);
-										}
-										
-										api.nickPlayer(name, skinName);
-										
-										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
-											if(!(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))) {
-												Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
-											} else {
-												Utils.scoreboardTeamManagers.remove(p.getUniqueId());
-												Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
-											}
-											
-											ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
-											
-											sbtm.destroyTeam();
-											sbtm.createTeam();
-										}
-										
-										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-											p.setDisplayName(prefix + name + suffix);
-										}
-										
-										if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-											api.setPlayerListName(prefix + name + suffix);
-										}
-										
-										if(Utils.nameTagEditStatus()) {
-											NametagEdit.getApi().setPrefix(p, prefix);
-											NametagEdit.getApi().setSuffix(p, suffix);
-										}
-										
-										if(Utils.ultraPermissionsStatus()) {
-											if(Utils.ultraPermsPrefixes.containsKey(p.getUniqueId()) || Utils.ultraPermsSuffixes.containsKey(p.getUniqueId())) {
-												Utils.ultraPermsPrefixes.remove(p.getUniqueId());
-												Utils.ultraPermsSuffixes.remove(p.getUniqueId());
-											}
-											
-											User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
-											
-											Utils.ultraPermsPrefixes.put(p.getUniqueId(), user.getPrefix());
-											Utils.ultraPermsSuffixes.put(p.getUniqueId(), user.getSuffix());
-											
-											user.setPrefix(prefix);
-											user.setSuffix(suffix);
-											user.save();
-										}
-										
-										if(Utils.permissionsExStatus()) {
-											PermissionUser user = PermissionsEx.getUser(p);
-										
-											if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
-												String groupNames = "";
-			
-												for (PermissionGroup group : user.getGroups()) {
-													groupNames += (" " + group.getName());
-												}
-			
-												Utils.oldPermissionsExGroups.put(p.getUniqueId(), groupNames.trim().split(" "));
-			
-												user.setGroups(new String[] { groupName });
-											} else {
-												Utils.oldPermissionsExPrefixes.put(p.getUniqueId(), user.getPrefix());
-												Utils.oldPermissionsExSuffixes.put(p.getUniqueId(), user.getSuffix());
-												
-												user.setPrefix(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")), p.getWorld().getName());
-												user.setSuffix(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")), p.getWorld().getName());
-											}
-										}
-										
-										if(Utils.cloudNetStatus())
-											api.changeCloudNET(prefix, suffix);
-										
-										if(FileUtils.cfg.getBoolean("BungeeCord")) {
-											String oldPermissionsExRank = "";
-											
-											if(Utils.permissionsExStatus()) {
-												if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
-													if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId())) {
-														oldPermissionsExRank = Utils.oldPermissionsExGroups.get(p.getUniqueId()).toString();
-													}
-												}
-											}
-											
-											MySQLPlayerDataManager.insertData(p.getUniqueId(), oldPermissionsExRank, prefix, suffix, prefix, suffix, tagPrefix, tagSuffix);
-										}
-										
-										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Nick").replace("%name%", name)));
+										Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, prefix, suffix, prefix, suffix, tagPrefix, tagSuffix, false, groupName));
 									} else {
 										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
 									}

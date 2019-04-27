@@ -307,44 +307,6 @@ public class NickManager {
 		return realName;
 	}
 	
-	public void changeCloudNET(String prefix, String suffix) {
-		CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
-		
-		if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
-			PermissionEntity entity = cloudPlayer.getPermissionEntity();
-			
-			if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId()))
-				Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
-			
-			if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId()))
-				Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
-			
-			Utils.oldCloudNETPrefixes.put(p.getUniqueId(), entity.getPrefix());
-			Utils.oldCloudNETSuffixes.put(p.getUniqueId(), entity.getSuffix());
-			
-			entity.setPrefix(prefix);
-			entity.setSuffix(suffix);
-		}
-	}
-	
-	public void resetCloudNET() {
-		CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
-		
-		if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
-			PermissionEntity entity = cloudPlayer.getPermissionEntity();
-			
-			if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId())) {
-				entity.setPrefix(Utils.oldCloudNETPrefixes.get(p.getUniqueId()));
-				Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
-			}
-			
-			if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId())) {
-				entity.setSuffix(Utils.oldCloudNETSuffixes.get(p.getUniqueId()));
-				Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
-			}
-		}
-	}
-	
 	public String getChatPrefix() {
 		return chatPrefix;
 	}
@@ -478,8 +440,12 @@ public class NickManager {
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set suffix.99." + suffix);
 		}
 	}
-
+	
 	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix) {
+		updatePrefixSuffix(tagPrefix, tagSuffix, chatPrefix, chatSuffix, tabPrefix, tabSuffix, "NONE");
+	}
+	
+	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String groupName) {
 		if(Utils.cloudNetStatus()) {
 			changeCloudNET(tagPrefix, tagSuffix);
 		}
@@ -528,7 +494,7 @@ public class NickManager {
 		if(Utils.permissionsExStatus()) {
 			PermissionUser user = PermissionsEx.getUser(p);
 		
-			if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
+			if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
 				String groupNames = "";
 
 				for (PermissionGroup group : user.getGroups()) {
@@ -539,7 +505,7 @@ public class NickManager {
 					Utils.oldPermissionsExGroups.put(p.getUniqueId(), groupNames.trim().split(" "));
 				}
 				
-				user.setGroups(new String[] { ((Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")) });
+				user.setGroups(new String[] { groupName });
 			} else {
 				Utils.oldPermissionsExPrefixes.put(p.getUniqueId(), user.getPrefix());
 				Utils.oldPermissionsExSuffixes.put(p.getUniqueId(), user.getSuffix());
@@ -551,6 +517,44 @@ public class NickManager {
 					user.setPrefix(tabPrefix, p.getWorld().getName());
 					user.setSuffix(tabSuffix, p.getWorld().getName());
 				}
+			}
+		}
+	}
+	
+	public void changeCloudNET(String prefix, String suffix) {
+		CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
+		
+		if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
+			PermissionEntity entity = cloudPlayer.getPermissionEntity();
+			
+			if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId()))
+				Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
+			
+			if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId()))
+				Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
+			
+			Utils.oldCloudNETPrefixes.put(p.getUniqueId(), entity.getPrefix());
+			Utils.oldCloudNETSuffixes.put(p.getUniqueId(), entity.getSuffix());
+			
+			entity.setPrefix(prefix);
+			entity.setSuffix(suffix);
+		}
+	}
+	
+	public void resetCloudNET() {
+		CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
+		
+		if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
+			PermissionEntity entity = cloudPlayer.getPermissionEntity();
+			
+			if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId())) {
+				entity.setPrefix(Utils.oldCloudNETPrefixes.get(p.getUniqueId()));
+				Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
+			}
+			
+			if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId())) {
+				entity.setSuffix(Utils.oldCloudNETSuffixes.get(p.getUniqueId()));
+				Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
 			}
 		}
 	}

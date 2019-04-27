@@ -10,20 +10,24 @@ public class PlayerNickEvent extends Event implements Cancellable {
 	private static HandlerList handlers = new HandlerList();
 	private boolean cancelled = false;
 	private Player p;
-	private String nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix;
+	private String nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName;
 	private boolean isJoinNick;
 	
-	public PlayerNickEvent(Player p, String nickName, String skinName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, boolean isJoinNick) {
+	public PlayerNickEvent(Player p, String nickName, String skinName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, boolean isJoinNick, String groupName) {
 		this.p = p;
+		
 		this.nickName = nickName;
 		this.skinName = skinName;
+		
 		this.chatPrefix = chatPrefix;
 		this.chatSuffix = chatSuffix;
 		this.tabPrefix = tabPrefix;
 		this.tabSuffix = tabSuffix;
 		this.tagPrefix = tagPrefix;
 		this.tagSuffix = tagSuffix;
+		
 		this.isJoinNick = isJoinNick;
+		this.groupName = groupName;
 	}
 	
 	public Player getPlayer() {
@@ -96,6 +100,10 @@ public class PlayerNickEvent extends Event implements Cancellable {
 	
 	public boolean isJoinNick() {
 		return isJoinNick;
+	}
+	
+	public String getGroupName() {
+		return groupName;
 	}
 
 	public static HandlerList getHandlerList() {

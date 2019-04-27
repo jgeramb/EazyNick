@@ -51,7 +51,7 @@ public class NickListener implements Listener {
 			
 			api.updateLuckPerms(e.getTagPrefix(), e.getTagSuffix());
 			api.nickPlayer(e.getNickName(), e.getSkinName());
-			api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix());
+			api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getGroupName());
 			
 			Utils.canUseNick.put(p.getUniqueId(), false);
 			Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
