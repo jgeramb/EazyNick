@@ -88,8 +88,8 @@ public class Main extends JavaPlugin {
 						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_11_R1")
 						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_12_R1")
 						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R2"))
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_14_R1")) {
+						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R2")
+						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_14_R1"))) {
 					Utils.sendConsole("	§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 					Utils.sendConsole("	§7");
 					Utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
