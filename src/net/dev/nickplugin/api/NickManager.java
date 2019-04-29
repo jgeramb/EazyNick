@@ -29,6 +29,8 @@ import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.storage.objects.User;
+import me.lucko.luckperms.LuckPerms;
+import me.lucko.luckperms.api.LuckPermsApi;
 import me.neznamy.tab.bukkit.api.TABAPI;
 
 import de.dytanic.cloudnet.api.CloudAPI;
@@ -95,13 +97,6 @@ public class NickManager {
 		
 		if(Utils.nameTagEditStatus()) {
 			NametagEdit.getApi().reloadNametag(p);
-		}
-		
-		if(Utils.permissionsExStatus()) {
-			PermissionUser user = PermissionsEx.getUser(p);
-			
-			user.setPrefix(Utils.oldPermissionsExPrefixes.get(p.getUniqueId()), p.getWorld().getName());
-			user.setSuffix(Utils.oldPermissionsExSuffixes.get(p.getUniqueId()), p.getWorld().getName());
 		}
 		
 		performAuthMeLogin();
@@ -204,16 +199,8 @@ public class NickManager {
 
 		}
 		
-		if(Utils.cloudNetStatus())
-			resetCloudNET();
-		
-		if(Utils.luckPermsStatus()) {
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset prefix.99." + Utils.luckPermsPrefixes.get(p.getUniqueId()));
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset suffix.99." + Utils.luckPermsSuffixes.get(p.getUniqueId()));
-		
-			Utils.luckPermsPrefixes.remove(p.getUniqueId());
-			Utils.luckPermsSuffixes.remove(p.getUniqueId());
-		}
+		resetCloudNET();
+		resetLuckPerms();
 		
 		if(Utils.nameTagEditStatus()) {
 			NametagEdit.getApi().reloadNametag(p);
@@ -428,8 +415,24 @@ public class NickManager {
 			Utils.luckPermsPrefixes.put(p.getUniqueId(), prefix);
 			Utils.luckPermsSuffixes.put(p.getUniqueId(), suffix);
 
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set prefix.99." + prefix);
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission set suffix.99." + suffix);
+			LuckPermsApi api = LuckPerms.getApi();
+			me.lucko.luckperms.api.User user = api.getUser(p.getUniqueId());
+			user.setPermission(api.getNodeFactory().makePrefixNode(100, prefix).build());
+			user.setPermission(api.getNodeFactory().makeSuffixNode(100, suffix).build());
+			api.getUserManager().saveUser(user);
+		}
+	}
+	
+	public void resetLuckPerms() {
+		if(Utils.luckPermsStatus()) {
+			LuckPermsApi api = LuckPerms.getApi();
+			me.lucko.luckperms.api.User user = api.getUser(p.getUniqueId());
+			user.unsetPermission(api.getNodeFactory().makePrefixNode(100, Utils.luckPermsPrefixes.get(p.getUniqueId())).build());
+			user.unsetPermission(api.getNodeFactory().makeSuffixNode(100, Utils.luckPermsSuffixes.get(p.getUniqueId())).build());
+			api.getUserManager().saveUser(user);
+			
+			Utils.luckPermsPrefixes.remove(p.getUniqueId());
+			Utils.luckPermsSuffixes.remove(p.getUniqueId());
 		}
 	}
 	
@@ -443,9 +446,7 @@ public class NickManager {
 		this.tabPrefix = tabPrefix;
 		this.tabSuffix = tabSuffix;
 		
-		if(Utils.cloudNetStatus()) {
-			changeCloudNET(tagPrefix, tagSuffix);
-		}
+		changeCloudNET(tagPrefix, tagSuffix);
 
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))
@@ -524,39 +525,43 @@ public class NickManager {
 	}
 	
 	public void changeCloudNET(String prefix, String suffix) {
-		CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
-		
-		if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
-			PermissionEntity entity = cloudPlayer.getPermissionEntity();
+		if(Utils.cloudNetStatus()) {
+			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
 			
-			if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId()))
-				Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
-			
-			if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId()))
-				Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
-			
-			Utils.oldCloudNETPrefixes.put(p.getUniqueId(), entity.getPrefix());
-			Utils.oldCloudNETSuffixes.put(p.getUniqueId(), entity.getSuffix());
-			
-			entity.setPrefix(prefix);
-			entity.setSuffix(suffix);
+			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
+				PermissionEntity entity = cloudPlayer.getPermissionEntity();
+				
+				if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId()))
+					Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
+				
+				if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId()))
+					Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
+				
+				Utils.oldCloudNETPrefixes.put(p.getUniqueId(), entity.getPrefix());
+				Utils.oldCloudNETSuffixes.put(p.getUniqueId(), entity.getSuffix());
+				
+				entity.setPrefix(prefix);
+				entity.setSuffix(suffix);
+			}
 		}
 	}
 	
 	public void resetCloudNET() {
-		CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
-		
-		if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
-			PermissionEntity entity = cloudPlayer.getPermissionEntity();
+		if(Utils.cloudNetStatus()) {
+			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
 			
-			if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId())) {
-				entity.setPrefix(Utils.oldCloudNETPrefixes.get(p.getUniqueId()));
-				Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
-			}
-			
-			if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId())) {
-				entity.setSuffix(Utils.oldCloudNETSuffixes.get(p.getUniqueId()));
-				Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
+			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
+				PermissionEntity entity = cloudPlayer.getPermissionEntity();
+				
+				if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId())) {
+					entity.setPrefix(Utils.oldCloudNETPrefixes.get(p.getUniqueId()));
+					Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
+				}
+				
+				if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId())) {
+					entity.setSuffix(Utils.oldCloudNETSuffixes.get(p.getUniqueId()));
+					Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
+				}
 			}
 		}
 	}

@@ -22,8 +22,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import com.nametagedit.plugin.NametagEdit;
-
 import net.dev.nickplugin.api.NickManager;
 import net.dev.nickplugin.api.PlayerNickEvent;
 import net.dev.nickplugin.api.PlayerUnnickEvent;
@@ -35,9 +33,6 @@ import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
-import de.dytanic.cloudnet.api.CloudAPI;
-import de.dytanic.cloudnet.bridge.CloudServer;
-import de.dytanic.cloudnet.lib.player.CloudPlayer;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -67,9 +62,10 @@ public class NickListener implements Listener {
 				String oldPermissionsExRank = "";
 				
 				if(Utils.permissionsExStatus()) {
-					if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId())) {
+					if(e.isJoinNick())
+						oldPermissionsExRank = e.getGroupName();
+					else if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId()))
 						oldPermissionsExRank = Utils.oldPermissionsExGroups.get(p.getUniqueId()).toString();
-					}
 				}
 				
 				MySQLPlayerDataManager.insertData(p.getUniqueId(), oldPermissionsExRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
@@ -137,187 +133,6 @@ public class NickListener implements Listener {
 							NickManager nickAPI = new NickManager(t);
 							nickAPI.unnickPlayer();
 							nickAPI.nickPlayer(nickName);
-						}
-					}
-				}
-				
-				if (MySQLPlayerDataManager.isRegistered(p.getUniqueId())) {
-					Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
-					Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
-
-					if (Utils.permissionsExStatus()) {
-						if (!(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId()))) {
-							Utils.oldPermissionsExGroups.put(p.getUniqueId(),
-									MySQLPlayerDataManager.getOldPermissionsExRankAsStringArray(p.getUniqueId()));
-						}
-					}
-
-					if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
-						if (!(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))) {
-							if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
-								Utils.scoreboardTeamManagers.put(p.getUniqueId(),
-										new ScoreboardTeamManager(p, MySQLNickManager.getNickName(p.getUniqueId()),
-												MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
-												MySQLPlayerDataManager.getTagSuffix(p.getUniqueId())));
-							} else {
-								Utils.scoreboardTeamManagers.put(p.getUniqueId(),
-										new ScoreboardTeamManager(p, p.getName(),
-												MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
-												MySQLPlayerDataManager.getTagSuffix(p.getUniqueId())));
-							}
-						} else {
-							Utils.scoreboardTeamManagers.remove(p.getUniqueId());
-
-							if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
-								Utils.scoreboardTeamManagers.put(p.getUniqueId(),
-										new ScoreboardTeamManager(p, MySQLNickManager.getNickName(p.getUniqueId()),
-												MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
-												MySQLPlayerDataManager.getTagSuffix(p.getUniqueId())));
-							} else {
-								Utils.scoreboardTeamManagers.put(p.getUniqueId(),
-										new ScoreboardTeamManager(p, p.getName(),
-												MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
-												MySQLPlayerDataManager.getTagSuffix(p.getUniqueId())));
-							}
-						}
-
-						ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
-
-						sbtm.destroyTeam();
-						sbtm.createTeam();
-					}
-
-					if (Utils.nameTagEditStatus()) {
-						NametagEdit.getApi().setPrefix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&',
-								FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix")));
-						NametagEdit.getApi().setSuffix(p.getPlayer(), ChatColor.translateAlternateColorCodes('&',
-								FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix")));
-					}
-
-					if (!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-								p.setDisplayName(MySQLPlayerDataManager.getChatPrefix(p.getUniqueId())
-										+ MySQLNickManager.getNickName(p.getUniqueId())
-										+ MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()));
-							}
-
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								api.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId())
-										+ MySQLNickManager.getNickName(p.getUniqueId())
-										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()));
-							}
-						} else if (Utils.playerNicknames.containsKey(p.getUniqueId())) {
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-								p.setDisplayName(MySQLPlayerDataManager.getChatPrefix(p.getUniqueId())
-										+ Utils.playerNicknames.get(p.getUniqueId())
-										+ MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()));
-							}
-
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								api.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId())
-										+ Utils.playerNicknames.get(p.getUniqueId())
-										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()));
-							}
-						} else {
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-								p.setDisplayName(MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()) + p.getName()
-										+ MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()));
-							}
-
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								api.setPlayerListName(MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()) + p.getName()
-										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()));
-							}
-						}
-					} else {
-						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-								String format = MySQLPlayerDataManager.getChatPrefix(p.getUniqueId())
-										+ MySQLNickManager.getNickName(p.getUniqueId())
-										+ MySQLPlayerDataManager.getChatSuffix(p.getUniqueId());
-
-								if (format.length() <= 16) {
-									p.setDisplayName(format);
-								} else {
-									p.setDisplayName(MySQLNickManager.getNickName(p.getUniqueId()));
-								}
-							}
-
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								String format = MySQLPlayerDataManager.getTabPrefix(p.getUniqueId())
-										+ MySQLNickManager.getNickName(p.getUniqueId())
-										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId());
-
-								if (format.length() <= 16) {
-									api.setPlayerListName(format);
-								} else {
-									api.setPlayerListName(MySQLNickManager.getNickName(p.getUniqueId()));
-								}
-							}
-						} else if (Utils.playerNicknames.containsKey(p.getUniqueId())) {
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-								String format = MySQLPlayerDataManager.getChatPrefix(p.getUniqueId())
-										+ Utils.playerNicknames.get(p.getUniqueId())
-										+ MySQLPlayerDataManager.getChatSuffix(p.getUniqueId());
-
-								if (format.length() <= 16) {
-									p.setDisplayName(format);
-								} else {
-									p.setDisplayName(Utils.playerNicknames.get(p.getUniqueId()));
-								}
-
-								p.setDisplayName(MySQLPlayerDataManager.getChatPrefix(p.getUniqueId())
-										+ Utils.playerNicknames.get(p.getUniqueId())
-										+ MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()));
-							}
-
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								String format = MySQLPlayerDataManager.getTabPrefix(p.getUniqueId())
-										+ Utils.playerNicknames.get(p.getUniqueId())
-										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId());
-
-								if (format.length() <= 16) {
-									api.setPlayerListName(format);
-								} else {
-									api.setPlayerListName(Utils.playerNicknames.get(p.getUniqueId()));
-								}
-							}
-						} else {
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored")) {
-								String format = MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()) + p.getName()
-										+ MySQLPlayerDataManager.getChatSuffix(p.getUniqueId());
-
-								if (format.length() <= 16) {
-									p.setDisplayName(format);
-								} else {
-									p.setDisplayName(p.getName());
-								}
-							}
-
-							if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-								String format = MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()) + p.getName()
-										+ MySQLPlayerDataManager.getTabSuffix(p.getUniqueId());
-
-								if (format.length() <= 16) {
-									api.setPlayerListName(format);
-								} else {
-									api.setPlayerListName(p.getName());
-								}
-							}
-						}
-					}
-				}
-
-				for (Player all : Bukkit.getOnlinePlayers()) {
-					NickManager apiAll = new NickManager(all);
-
-					if (apiAll.isNicked()) {
-						if (Utils.scoreboardTeamManagers.containsKey(all.getUniqueId())) {
-							ScoreboardTeamManager sbtmAll = Utils.scoreboardTeamManagers.get(all.getUniqueId());
-
-							sbtmAll.destroyTeam();
-							sbtmAll.createTeam();
 						}
 					}
 				}
@@ -446,15 +261,8 @@ public class NickListener implements Listener {
 			NickManager api = new NickManager(p);
 
 			if (api.isNicked()) {
-				if (Utils.luckPermsStatus()) {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + api.getRealName()
-							+ " permission unset prefix.99." + Utils.luckPermsPrefixes.get(p.getUniqueId()));
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + api.getRealName()
-							+ " permission unset suffix.99." + Utils.luckPermsSuffixes.get(p.getUniqueId()));
-
-					Utils.luckPermsPrefixes.remove(p.getUniqueId());
-					Utils.luckPermsSuffixes.remove(p.getUniqueId());
-				}
+				api.resetCloudNET();
+				api.resetLuckPerms();
 
 				if (Utils.permissionsExStatus()) {
 					PermissionUser user = PermissionsEx.getUser(p);
@@ -497,17 +305,6 @@ public class NickListener implements Listener {
 							Utils.scoreboardTeamManagers.remove(p.getUniqueId());
 						}
 					}
-				}
-
-				if (Utils.cloudNetStatus()) {
-					CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
-
-					CloudServer.getInstance().updateNameTags(p);
-					CloudAPI.getInstance().updatePlayer(cloudPlayer);
-				}
-
-				if (Utils.nameTagEditStatus()) {
-					NametagEdit.getApi().reloadNametag(p);
 				}
 			}
 		}

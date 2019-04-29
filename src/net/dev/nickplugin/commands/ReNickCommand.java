@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 
 import net.dev.nickplugin.api.PlayerNickEvent;
 import net.dev.nickplugin.api.PlayerUnnickEvent;
+import net.dev.nickplugin.sql.MySQLNickManager;
+import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.StringUtils;
@@ -24,32 +26,41 @@ public class ReNickCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
-				if((Utils.canUseNick.get(p.getUniqueId()))) {
-					if(Utils.nickedPlayers.contains(p.getUniqueId())) {
-						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
-					} else {
-						if(args.length == 0) {
-							String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
-							boolean nickNameIsInUse = false;
+			if(MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
+				if(Utils.nickedPlayers.contains(p.getUniqueId())) {
+					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
+				} else {
+					if(args.length == 0) {
+						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
+						boolean nickNameIsInUse = false;
+						
+						for (String nickName : Utils.playerNicknames.values()) {
+							if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
+								nickNameIsInUse = true;
+							}
+						}
+						
+						while (nickNameIsInUse ) {
+							nickNameIsInUse = false;
+							name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 							
 							for (String nickName : Utils.playerNicknames.values()) {
 								if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
 									nickNameIsInUse = true;
 								}
 							}
-							
-							while (nickNameIsInUse ) {
-								nickNameIsInUse = false;
-								name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
-								
-								for (String nickName : Utils.playerNicknames.values()) {
-									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
-										nickNameIsInUse = true;
-									}
-								}
-							}
+						}
 
+						if(MySQLPlayerDataManager.isRegistered(p.getUniqueId())) {
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, name,
+									MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()),
+									MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()),
+									MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()),
+									MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()),
+									MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
+									MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
+									true, "NONE"));
+						} else {
 							boolean serverFull = Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers();
 							String prefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Prefix")));
 							String suffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
@@ -62,104 +73,92 @@ public class ReNickCommand implements CommandExecutor {
 									prefix,
 									suffix,
 									true, (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
-						} else {
-							if(p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")) {
-								String name = args[0].replace("\"", "");
-								boolean isCancelled;
-								
-								if(new StringUtils(name).removeColorCodes().getString().length() <= 16) {
-									if(!(Utils.blackList.contains(args[0].toUpperCase()))) {
-										boolean nickNameIsInUse = false;
+						}
+					} else {
+						if(p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")) {
+							String name = args[0].replace("\"", "");
+							boolean isCancelled;
+							
+							if(new StringUtils(name).removeColorCodes().getString().length() <= 16) {
+								if(!(Utils.blackList.contains(args[0].toUpperCase()))) {
+									boolean nickNameIsInUse = false;
+									
+									for (String nickName : Utils.playerNicknames.values()) {
+										if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
+											nickNameIsInUse = true;
+										}
+									}
+
+									if(!(nickNameIsInUse)) {
+										boolean playerWithNameIsKnown = false;
 										
-										for (String nickName : Utils.playerNicknames.values()) {
-											if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
-												nickNameIsInUse = true;
+										for (Player all : Bukkit.getOnlinePlayers()) {
+											if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
+												playerWithNameIsKnown = true;
 											}
 										}
-
-										if(!(nickNameIsInUse)) {
-											boolean playerWithNameIsKnown = false;
-											
-											for (Player all : Bukkit.getOnlinePlayers()) {
-												if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
-													playerWithNameIsKnown = true;
-												}
+										
+										for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+											if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
+												playerWithNameIsKnown = true;
 											}
-											
-											for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
-												if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
-													playerWithNameIsKnown = true;
-												}
-											}
-											
-											if(!(FileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown) {
-												isCancelled = true;
-											} else {
-												isCancelled = false;
-											}
-											
-											if(!(isCancelled)) {
-												if(!(name.equalsIgnoreCase(p.getName()))) {
-													name = ChatColor.translateAlternateColorCodes('&', name);
-													
-													boolean serverFull = Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers();
-													String nameWhithoutColors = ChatColor.stripColor(name);
-													String[] prefixSuffix = name.split(nameWhithoutColors);
-													String chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix;
-													
-													if(prefixSuffix.length >= 1) {
-														chatPrefix = ChatColor.translateAlternateColorCodes('&', prefixSuffix[0]);
-														
-														if(chatPrefix.length() > 16)
-															chatPrefix = chatPrefix.substring(0, 16);
-														
-														if(prefixSuffix.length >= 2) {
-															chatSuffix = ChatColor.translateAlternateColorCodes('&', prefixSuffix[1]);
-															
-															if(chatSuffix.length() > 16)
-																chatSuffix = chatSuffix.substring(0, 16);
-														} else
-															chatSuffix = "§r";
-														
-														tabPrefix = chatPrefix;
-														tabSuffix = chatSuffix;
-														tagPrefix = chatPrefix;
-														tagSuffix = chatSuffix;
-													} else {
-														chatPrefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix")));
-														chatSuffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix")));
-														tabPrefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")));
-														tabSuffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")));
-														tagPrefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Prefix")));
-														tagSuffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
-													}
-													
-													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, true, (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
+										}
+										
+										if(!(FileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown) {
+											isCancelled = true;
+										} else {
+											isCancelled = false;
+										}
+										
+										if(!(isCancelled)) {
+											if(!(name.equalsIgnoreCase(p.getName()))) {
+												name = ChatColor.translateAlternateColorCodes('&', name);
+												
+												if(MySQLPlayerDataManager.isRegistered(p.getUniqueId())) {
+													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, name,
+															MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()),
+															MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()),
+															MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()),
+															MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()),
+															MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
+															MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
+															true, MySQLPlayerDataManager.getOldPermissionsExRank(p.getUniqueId())));
 												} else {
-													p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.CanNotNickAsSelf")));
+													boolean serverFull = Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers();
+													String prefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Prefix")));
+													String suffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
+													
+													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, name,
+															ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix")),
+															ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix")),
+															ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")),
+															ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")),
+															prefix,
+															suffix,
+															true, (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
 												}
 											} else {
-												p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsKnown")));
+												p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.CanNotNickAsSelf")));
 											}
 										} else {
-											p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
+											p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsKnown")));
 										}
 									} else {
-										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
+										p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
 									}
 								} else {
-									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
+									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
 								}
 							} else {
-								p.sendMessage(Utils.NO_PERM);
+								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
 							}
+						} else {
+							p.sendMessage(Utils.NO_PERM);
 						}
 					}
-				} else {
-					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
 				}
 			} else {
-				p.sendMessage(Utils.NO_PERM);
+				p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
 			}
 		} else {
 			Utils.sendConsole(Utils.NOT_PLAYER);

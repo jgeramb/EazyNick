@@ -6,30 +6,9 @@ import java.util.UUID;
 
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
-import net.dev.nickplugin.utils.Utils;
 
 public class MySQLPlayerDataManager {
 
-	public static String[] getOldPermissionsExRankAsStringArray(UUID uuid) {
-		if(Main.mysql.isConnected()) {
-			if(Utils.permissionsExStatus()) {
-				if(isRegistered(uuid)) {
-					try {
-						ResultSet rs = Main.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-						
-						if(rs.next()) {
-							return rs.getString("OldPermissionsExRank").split(" ");
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	
-		return (new String[] { "" });
-	}
-	
 	public static String getOldPermissionsExRank(UUID uuid) {
 		if(Main.mysql.isConnected()) {
 			if(isRegistered(uuid)) {
@@ -44,7 +23,7 @@ public class MySQLPlayerDataManager {
 				}
 			}
 		}
-		
+	
 		return "";
 	}
 	

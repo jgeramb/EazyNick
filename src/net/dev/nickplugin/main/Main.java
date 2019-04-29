@@ -162,7 +162,6 @@ public class Main extends JavaPlugin {
 						getCommand("eazynick").setExecutor(new NickHelpCommand());
 						getCommand("nickother").setExecutor(new NickOtherCommand());
 						getCommand("changeskin").setExecutor(new ChangeSkinCommand());
-						getCommand("changename").setExecutor(new ChangeNameCommand());
 						getCommand("nicklist").setExecutor(new NickListCommand());
 						getCommand("nick").setExecutor(new NickCommand());
 						getCommand("unnick").setExecutor(new UnnickCommand());

@@ -1,6 +1,5 @@
 package net.dev.nickplugin.commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,15 +24,8 @@ public class ResetNameCommand implements CommandExecutor {
 				
 				api.setName(api.getRealName());
 				api.refreshPlayer();
-				
-				if(Utils.luckPermsStatus()) {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset prefix.99." + Utils.luckPermsPrefixes.get(p.getUniqueId()));
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " permission unset suffix.99." + Utils.luckPermsSuffixes.get(p.getUniqueId()));
-				
-					Utils.luckPermsPrefixes.remove(p.getUniqueId());
-					Utils.luckPermsSuffixes.remove(p.getUniqueId());
-				}
-				
+				api.resetLuckPerms();
+
 				MySQLPlayerDataManager.removeData(p.getUniqueId());
 				MySQLNickManager.removePlayer(p.getUniqueId());
 				
