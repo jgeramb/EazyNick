@@ -100,64 +100,14 @@ public class Main extends JavaPlugin {
 				} else {
 					if (FileUtils.cfg.getBoolean("APIMode") == false) {
 						if (ReflectUtils.getVersion().equalsIgnoreCase("v1_7_R4")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand_1_7_R4());
 							getCommand("bookgui").setExecutor(new CommandNotAvaiableCommand());
 							getCommand("booknick").setExecutor(new CommandNotAvaiableCommand());
 
-							version = "1_7_R4";
-							Utils.field = ReflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class,
-									"name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R1")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-							version = "1_8_R1";
+							Utils.field = ReflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "name");
+						} else
 							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R2")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-							version = "1_8_R2";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R3")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-							version = "1_8_R3";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_9_R1")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-							version = "1_9_R1";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_9_R2")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-							version = "1_9_R2";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_10_R1")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-							version = "1_10_R1";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_11_R1")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-							version = "1_11_R1";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_12_R1")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-							version = "1_12_R1";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R1")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand_1_13());
-
-							version = "1_13_R1";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						} else if (ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R2")) {
-							getCommand("nickgui").setExecutor(new NickGuiCommand_1_13());
-
-							version = "1_13_R2";
-							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
-						}
+						
+						version = ReflectUtils.getVersion().substring(1, ReflectUtils.getVersion().length());
 						
 						getCommand("eazynick").setExecutor(new NickHelpCommand());
 						getCommand("nickother").setExecutor(new NickOtherCommand());
@@ -175,7 +125,8 @@ public class Main extends JavaPlugin {
 						getCommand("nickupdatecheck").setExecutor(new NickUpdateCheckCommand());
 						getCommand("togglebungeenick").setExecutor(new ToggleBungeeNickCommand());
 						getCommand("realname").setExecutor(new RealNameCommand());
-						
+						getCommand("nickgui").setExecutor(new NickGuiCommand());
+
 						if(!(version.equalsIgnoreCase("1_7_R4"))) {
 							getCommand("bookgui").setExecutor(new BookGUICommand());
 							getCommand("booknick").setExecutor(new BookNickCommand());

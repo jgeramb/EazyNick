@@ -141,7 +141,7 @@ public class Utils {
 	}
 
 	public static ItemStack createSkull(int amount, String displayName, String owner) {
-		ItemStack is = new ItemStack(Material.getMaterial("SKULL_ITEM"), amount, (byte) 3);
+		ItemStack is = new ItemStack(Material.getMaterial(Main.version.startsWith("1_1") ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"), amount, (byte) 3);
 		SkullMeta m = (SkullMeta) is.getItemMeta();
 		m.setDisplayName(displayName);
 		m.setOwner(owner);

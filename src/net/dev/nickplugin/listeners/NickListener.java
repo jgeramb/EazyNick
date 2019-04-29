@@ -475,7 +475,7 @@ public class NickListener implements Listener {
 					}
 				}
 
-				if (e.getInventory().getName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&',
+				if (e.getView().getTitle().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&',
 						LanguageFileUtils.cfg.getString("NickGUI.InventoryTitle")))) {
 					e.setCancelled(true);
 
@@ -496,7 +496,7 @@ public class NickListener implements Listener {
 							.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.InventoryTitle"))
 							.replace("%currentPage%", shownPage);
 
-					if (e.getInventory().getName().equalsIgnoreCase(inventoryName)) {
+					if (e.getView().getTitle().equalsIgnoreCase(inventoryName)) {
 						Integer page = Utils.nickNameListPage.get(p.getUniqueId());
 						e.setCancelled(true);
 
@@ -526,7 +526,7 @@ public class NickListener implements Listener {
 										LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
 							}
 						} else {
-							if (e.getCurrentItem().getType().equals(Material.getMaterial(Main.version.startsWith("1_13") ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
+							if (e.getCurrentItem().getType().equals(Material.getMaterial(Main.version.startsWith("1_1") ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
 								String nickName = "";
 								String skullOwner = ((SkullMeta) e.getCurrentItem().getItemMeta()).getOwner();
 
