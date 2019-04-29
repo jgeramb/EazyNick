@@ -24,9 +24,8 @@ public class NickedPlayersCommand implements CommandExecutor {
 				for (Player all : Bukkit.getOnlinePlayers()) {
 					NickManager api = new NickManager(all);
 					
-					if(api.isNicked()) {
+					if(api.isNicked())
 						playerIsNicked = true;
-					}
 				}
 				
 				if(playerIsNicked) {
@@ -35,9 +34,8 @@ public class NickedPlayersCommand implements CommandExecutor {
 					for (Player all : Bukkit.getOnlinePlayers()) {
 						NickManager api = new NickManager(all);
 						
-						if(api.isNicked()) {
+						if(api.isNicked())
 							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickedPlayers.PlayerINFO")).replace("%realName%", api.getRealName()).replace("%nickName%", api.getNickName()));
-						}
 					}
 				} else {
 					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickedPlayers.NoPlayerIsNicked")));

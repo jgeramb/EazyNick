@@ -98,9 +98,8 @@ public class MySQL {
 	}
 	
 	private void checkConnection() {
-		if(!(isConnected())) {
+		if(!(isConnected()))
 			connect();
-		}
 	}
 
 	public Connection getConnection() {

@@ -46,9 +46,9 @@ public class GameProfileBuilder_1_7 {
 	}
    
 	public static GameProfile fetch(UUID uuid, boolean forceNew) throws IOException {
-		if(!forceNew && cache.containsKey(uuid) && cache.get(uuid).isValid()) {
+		if(!forceNew && cache.containsKey(uuid) && cache.get(uuid).isValid())
 			return cache.get(uuid).profile;
-		} else {
+		else {
 			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(SERVICE_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
 			connection.setReadTimeout(5000);
          
@@ -60,9 +60,8 @@ public class GameProfileBuilder_1_7 {
 				
 				return result;
 			} else {
-				if(!forceNew && cache.containsKey(uuid)) {
+				if(!forceNew && cache.containsKey(uuid))
 					return cache.get(uuid).profile;
-				}
             
 			JsonObject error = (JsonObject) new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine());
             throw new IOException(error.get("error").getAsString() + ": " + error.get("errorMessage").getAsString());
@@ -83,9 +82,12 @@ public class GameProfileBuilder_1_7 {
 		args.add(UUIDTypeAdapter.fromUUID(uuid));
 		args.add(name);
 		args.add(skinUrl);
-		if(cape) args.add(capeUrl);
-      
+		
+		if(cape)
+			args.add(capeUrl);
+		
 		profile.getProperties().put("textures", new Property("textures", Base64Coder.encodeString(String.format(cape ? JSON_CAPE : JSON_SKIN, args.toArray(new Object[args.size()])))));
+		
 		return profile;
 	}
    
@@ -102,28 +104,32 @@ public class GameProfileBuilder_1_7 {
 			String name = object.has("name") ? object.getAsJsonPrimitive("name").getAsString() : null;
 			GameProfile profile = new GameProfile(id, name);
          
-			if(object.has("properties")) {
-				for (Entry<String, Property> prop : ((PropertyMap) context.deserialize(object.get("properties"), PropertyMap.class)).entries()) {
+			if(object.has("properties"))
+				for (Entry<String, Property> prop : ((PropertyMap) context.deserialize(object.get("properties"), PropertyMap.class)).entries())
 					profile.getProperties().put(prop.getKey(), prop.getValue());
-				}
-			}
 			
 			return profile;
 		}
 		
 		@Override
-		public net.minecraft.util.com.google.gson.JsonElement serialize(GameProfile profile, Type type, JsonSerializationContext context) {
-    	  		JsonObject result = new JsonObject();
-    	  	
-    	  		if(profile.getId() != null) result.add("id", context.serialize(profile.getId()));
-    	  		if(profile.getName() != null) result.addProperty("name", profile.getName());
-    	  		if(!profile.getProperties().isEmpty()) result.add("properties", context.serialize(profile.getProperties()));
-    	  	
-    	  		return result;
+		public JsonElement serialize(GameProfile profile, Type type, JsonSerializationContext context) {
+	  		JsonObject result = new JsonObject();
+	  	
+	  		if(profile.getId() != null)
+	  			result.add("id", context.serialize(profile.getId()));
+	  		
+	  		if(profile.getName() != null)
+	  			result.addProperty("name", profile.getName());
+	  		
+	  		if(!profile.getProperties().isEmpty())
+	  			result.add("properties", context.serialize(profile.getProperties()));
+	  	
+	  		return result;
 		}
 	}
    
-	private static class CachedProfile {    
+	private static class CachedProfile { 
+		
 		private long timestamp = System.currentTimeMillis();
 		private GameProfile profile;
       
@@ -134,5 +140,7 @@ public class GameProfileBuilder_1_7 {
 		public boolean isValid() {
 			return cacheTime < 0 ? true : (System.currentTimeMillis() - timestamp) < cacheTime;
 		}
+		
 	}
+	
 }

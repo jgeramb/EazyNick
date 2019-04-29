@@ -61,9 +61,8 @@ public class NickHelpCommand implements CommandExecutor {
 						p.sendMessage(Utils.PREFIX + "§7/nickupdatecheck §8» §eUpdate check");
 						p.sendMessage(Utils.PREFIX + "§7/reloadconfig §8» §eConfig reload");
 						p.sendMessage(Utils.PREFIX + "§7/eazynick [1-4] §8» §ePlugin help");
-					} else {
+					} else
 						p.sendMessage(Utils.PREFIX + "§cPage not found!");
-					}
 				}
 			} else {
 				p.sendMessage(Utils.PREFIX + "§7===== §8[ §5" + desc.getName() + " §8] §7=====");

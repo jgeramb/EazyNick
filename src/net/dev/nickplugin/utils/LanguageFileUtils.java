@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 import net.dev.nickplugin.main.Main;
 
@@ -23,9 +24,8 @@ public class LanguageFileUtils {
 	}
 
 	public static void setupFiles() {
-		if (!(folder.exists())) {
+		if (!(folder.exists()))
 			folder.mkdir();
-		}
 
 		if (!(file.exists())) {
 			try {
@@ -34,6 +34,15 @@ public class LanguageFileUtils {
 				ex.printStackTrace();
 			}
 		}
+		
+		PluginDescriptionFile desc = Main.getPlugin(Main.class).getDescription();
+		
+		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
+				+ "\n"
+				+ "\nColorCodes can be found here: http://minecraft.tools/en/color-code.php"
+				+ "\nSpigot-Materials: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html"
+				+ "\nResource-Page: " + desc.getWebsite()
+				+ "\n");
 		
 		if(file.getName().contains("de_DE")) {
 			cfg.addDefault("NickItem.ItemLore.Enabled", "&7Rechtsklick um den AutoNick zu &cdeaktivieren");

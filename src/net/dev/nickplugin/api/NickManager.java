@@ -61,30 +61,27 @@ public class NickManager {
 			@Override
 			public void run() {
 				if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-					if(Main.version == "1_7_R4") {
+					if(Main.version == "1_7_R4")
 						NMSNickManager.updatePlayerListName_1_7_R4(p, name);
-					} else {
+					else
 						NMSNickManager.updatePlayerListName(p, name);
-					}
 				}
 			}
 		}, 5);
 	}
 	
 	public void changeSkin(String skinName) {
-		if(Main.version == "1_7_R4") {
+		if(Main.version == "1_7_R4")
 			NMSNickManager.updateSkin_1_7_R4(p, skinName);
-		} else if(Main.version == "1_8_R1") {
+		else if(Main.version == "1_8_R1")
 			NMSNickManager.updateSkin_1_8_R1(p, skinName);
-		} else {
+		else
 			NMSNickManager.updateSkin(p, skinName);
-		}
 	}
 	
 	public void updatePlayer() {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer")) {
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
 			NMSNickManager.updatePlayer(p);
-		}
 	}
 	
 	public void refreshPlayer() {
@@ -94,10 +91,6 @@ public class NickManager {
 	
 	public void setName(String nickName) {
 		NMSNickManager.updateName(p, nickName);
-		
-		if(Utils.nameTagEditStatus()) {
-			NametagEdit.getApi().reloadNametag(p);
-		}
 		
 		performAuthMeLogin();
 		
@@ -138,7 +131,8 @@ public class NickManager {
 		Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
 		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
 		
-		p.setCustomName(nickName);
+		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
+			p.setCustomName(nickName);
 		
 		MySQLNickManager.addPlayer(p.getUniqueId(), nickName);
 		
@@ -153,19 +147,9 @@ public class NickManager {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
-				if((item != null) && !(item.getType().equals(Material.AIR)) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&',
-							LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")))) {
-						p.getInventory().setItem(slot,
-								Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")),
-										FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"),
-										FileUtils.cfg.getInt("NickItem.MetaData.Enabled"),
-										ChatColor.translateAlternateColorCodes('&',
-												LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled")),
-										ChatColor.translateAlternateColorCodes('&',
-												LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")),
-										FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
-					}
+				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
+					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled"))))
+						p.getInventory().setItem(slot, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
 				}
 			}
 		}
@@ -174,7 +158,8 @@ public class NickManager {
 	public void unnickPlayer() {
 		String nickName = getRealName();
 		
-		p.setCustomName(nickName);
+		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
+			p.setCustomName(nickName);
 		
 		MySQLNickManager.removePlayer(p.getUniqueId());
 		
@@ -196,23 +181,17 @@ public class NickManager {
 			TABAPI.removeTemporaryTabSuffix(p);
 			TABAPI.removeTemporaryTagPrefix(p);
 			TABAPI.removeTemporaryTagSuffix(p);
-
 		}
 		
 		resetCloudNET();
 		resetLuckPerms();
 		
-		if(Utils.nameTagEditStatus()) {
-			NametagEdit.getApi().reloadNametag(p);
-		}
-		
 		if(Utils.permissionsExStatus()) {
 			PermissionUser user = PermissionsEx.getUser(p);
 		
 			if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
-				if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId())) {
+				if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId()))
 					user.setGroups(Utils.oldPermissionsExGroups.get(p.getUniqueId()));
-				}
 			} else {
 				user.setPrefix(Utils.oldPermissionsExPrefixes.get(p.getUniqueId()), p.getWorld().getName());
 				user.setSuffix(Utils.oldPermissionsExSuffixes.get(p.getUniqueId()), p.getWorld().getName());
@@ -250,19 +229,9 @@ public class NickManager {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
-				if((item != null) && !(item.getType().equals(Material.AIR)) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&',
-							LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled")))) {
-						p.getInventory().setItem(slot,
-								Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")),
-										FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"),
-										FileUtils.cfg.getInt("NickItem.MetaData.Disabled"),
-										ChatColor.translateAlternateColorCodes('&',
-												LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")),
-										ChatColor.translateAlternateColorCodes('&',
-												LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")),
-										FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
-					}
+				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
+					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled"))))
+						p.getInventory().setItem(slot, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 				}
 			}
 		}
@@ -274,13 +243,12 @@ public class NickManager {
 		if(!(Bukkit.getOnlineMode()) && Utils.nameCache.containsKey(p.getUniqueId()))
 			realName = Utils.nameCache.get(p.getUniqueId());
 		else {
-			if(Main.version.equalsIgnoreCase("1_7_R4")) {
+			if(Main.version.equalsIgnoreCase("1_7_R4"))
 				realName = UUIDFetcher_1_7.getName(p.getUniqueId());
-			} else if(Main.version.equalsIgnoreCase("1_8_R1")) {
+			else if(Main.version.equalsIgnoreCase("1_8_R1"))
 				realName = UUIDFetcher_1_8_R1.getName(p.getUniqueId());
-			} else {
+			else
 				realName = UUIDFetcher.getName(p.getUniqueId());
-			}
 		}
 		
 		return realName;
@@ -493,13 +461,11 @@ public class NickManager {
 			if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
 				String groupNames = "";
 
-				for (PermissionGroup group : user.getGroups()) {
+				for (PermissionGroup group : user.getGroups())
 					groupNames += (" " + group.getName());
-				}
 				
-				if(!(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId()))) {
+				if(!(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId())))
 					Utils.oldPermissionsExGroups.put(p.getUniqueId(), groupNames.trim().split(" "));
-				}
 				
 				user.setGroups(new String[] { groupName });
 			} else {

@@ -20,6 +20,7 @@ public class SpigotUpdater {
 
 	public static void checkForUpdates() {
 		System.out.println("[Updater] Checking for updates...");
+		
 		ReadableByteChannel channel = null;
 		double newVersion = 0.0;
 		
@@ -68,6 +69,7 @@ public class SpigotUpdater {
 	
 	public static void checkForUpdates(Player p) {
 		p.sendMessage(Utils.PREFIX + "§3Updater §8» §rChecking for updates...");
+		
 		ReadableByteChannel channel = null;
 		double newVersion = 0.0;
 		

@@ -32,30 +32,23 @@ public class BookNickCommand implements CommandExecutor {
 						String chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "";
 						String name = args[2];
 						String skinName = "";
-						boolean isCancelled;
+						boolean isCancelled = false;
 						
 						boolean nickNameIsInUse = false;
 						
-						for (String nickName : Utils.playerNicknames.values()) {
-							if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
+						for (String nickName : Utils.playerNicknames.values())
+							if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 								nickNameIsInUse = true;
-							}
-						}
 	
 						if(!(nickNameIsInUse)) {
 							boolean playerWithNameIsOnline = false;
 							
-							for (Player all : Bukkit.getOnlinePlayers()) {
-								if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase())) {
+							for (Player all : Bukkit.getOnlinePlayers())
+								if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 									playerWithNameIsOnline = true;
-								}
-							}
 							
-							if(((FileUtils.cfg.getBoolean("AllowPlayersToNickAsOnlinePlayers")) == false) && playerWithNameIsOnline) {
+							if(((FileUtils.cfg.getBoolean("AllowPlayersToNickAsOnlinePlayers")) == false) && playerWithNameIsOnline)
 								isCancelled = true;
-							} else {
-								isCancelled = false;
-							}
 							
 							if(!(isCancelled)) {
 								if(new StringUtils(name).removeColorCodes().getString().length() <= 16) {

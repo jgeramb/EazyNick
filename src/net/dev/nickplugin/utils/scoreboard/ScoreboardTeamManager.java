@@ -1,5 +1,7 @@
 package net.dev.nickplugin.utils.scoreboard;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -24,9 +26,8 @@ public class ScoreboardTeamManager {
 		this.suffix = suffix;
 		this.teamName = new NickManager(p).getRealName();
 		
-		if(!(Utils.scoreboardTeamContents.contains(p.getName()))) {
+		if(!(Utils.scoreboardTeamContents.contains(p.getName())))
 			Utils.scoreboardTeamContents.add(p.getName());
-		}
 	}
 	
 	public ScoreboardTeamManager(Player p, String name, String prefix, String suffix) {
@@ -35,9 +36,8 @@ public class ScoreboardTeamManager {
 		this.suffix = suffix;
 		this.teamName = new NickManager(p).getRealName();
 		
-		if(!(Utils.scoreboardTeamContents.contains(name))) {
+		if(!(Utils.scoreboardTeamContents.contains(name)))
 			Utils.scoreboardTeamContents.add(name);
-		}
 	}
 	
 	public void destroyTeam() {
@@ -45,27 +45,15 @@ public class ScoreboardTeamManager {
 			packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
 			
 			if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-				if(Main.version.equalsIgnoreCase("1_13_R1")) {
+				if(Main.version.startsWith("1_1")) {
 					try {
 						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
 						ReflectUtils.setField(packet, "e", "ALWAYS");
 						ReflectUtils.setField(packet, "i", 1);
 					} catch (Exception ex) {
 						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "j", 1);
-					}
-				} else if(Main.version.equalsIgnoreCase("1_13_R2")) {
-					try {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "i", 1);
-					} catch (Exception ex) {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
 						ReflectUtils.setField(packet, "e", "ALWAYS");
 						ReflectUtils.setField(packet, "j", 1);
 					}
@@ -101,14 +89,14 @@ public class ScoreboardTeamManager {
 	}
 
 
-	@SuppressWarnings("static-access")
-	private net.minecraft.server.v1_13_R1.IChatBaseComponent getAsIChatBaseComponent_1_13_R1(String txt) {
-		return new net.minecraft.server.v1_13_R1.IChatBaseComponent.ChatSerializer().a("{\"text\":\"" + txt + "\"}");
-	}
-	
-	@SuppressWarnings("static-access")
-	private net.minecraft.server.v1_13_R2.IChatBaseComponent getAsIChatBaseComponent_1_13_R2(String txt) {
-		return new net.minecraft.server.v1_13_R2.IChatBaseComponent.ChatSerializer().a("{\"text\":\"" + txt + "\"}");
+	private Object getAsIChatBaseComponent(String txt) {
+		try {
+			return ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(ReflectUtils.getNMSClass("IChatBaseComponent"), "{\"text\":\"" + txt + "\"}");
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 	public void createTeam() {
@@ -116,38 +104,20 @@ public class ScoreboardTeamManager {
 			packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
 			
 			if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-				if(Main.version.equalsIgnoreCase("1_13_R1")) {
+				if(Main.version.startsWith("1_1")) {
 					try {
 						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
-						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R1(prefix));
-						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R1(suffix));
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
+						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent(prefix));
+						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent(suffix));
 						ReflectUtils.setField(packet, "e", "ALWAYS");
 						ReflectUtils.setField(packet, "g", Utils.scoreboardTeamContents);
 						ReflectUtils.setField(packet, "i", 0);
 					} catch (Exception ex) {
 						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R1(teamName));
-						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R1(prefix));
-						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R1(suffix));
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "h", Utils.scoreboardTeamContents);
-						ReflectUtils.setField(packet, "j", 0);
-					}
-				} else if(Main.version.equalsIgnoreCase("1_13_R2")) {
-					try {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
-						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R2(prefix));
-						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R2(suffix));
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "g", Utils.scoreboardTeamContents);
-						ReflectUtils.setField(packet, "i", 0);
-					} catch (Exception ex) {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent_1_13_R2(teamName));
-						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent_1_13_R2(prefix));
-						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent_1_13_R2(suffix));
+						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
+						ReflectUtils.setField(packet, "c", getAsIChatBaseComponent(prefix));
+						ReflectUtils.setField(packet, "d", getAsIChatBaseComponent(suffix));
 						ReflectUtils.setField(packet, "e", "ALWAYS");
 						ReflectUtils.setField(packet, "h", Utils.scoreboardTeamContents);
 						ReflectUtils.setField(packet, "j", 0);

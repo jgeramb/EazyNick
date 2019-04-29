@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 import net.dev.nickplugin.main.Main;
 
@@ -25,9 +26,8 @@ public class NickNameFileUtils {
 	}
 
 	public static void setupFiles() {
-		if (!(folder.exists())) {
+		if (!(folder.exists()))
 			folder.mkdir();
-		}
 
 		if (!(file.exists())) {
 			try {
@@ -37,10 +37,13 @@ public class NickNameFileUtils {
 			}
 		}
 
-		cfg.options().header("This plugin was coded by Justix - YouTube: https://www.youtube.com/c/JustixDevelopment "
-				+ "\n" + "\nColorCodes can be found here: http://minecraft.tools/en/color-code.php "
-				+ "\nSpigot-Materials: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html "
-				+ "\nResource-Page: https://www.spigotmc.org/resources/eazynick-nicksystem-api-src-bungeecord-multiworld-1-7-10-1-12-2.51398/ "
+		PluginDescriptionFile desc = Main.getPlugin(Main.class).getDescription();
+		
+		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
+				+ "\n"
+				+ "\nColorCodes can be found here: http://minecraft.tools/en/color-code.php"
+				+ "\nSpigot-Materials: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html"
+				+ "\nResource-Page: " + desc.getWebsite()
 				+ "\n");
 
 		List<String> list = new ArrayList<>();

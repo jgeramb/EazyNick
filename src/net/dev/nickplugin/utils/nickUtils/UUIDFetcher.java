@@ -33,32 +33,30 @@ public class UUIDFetcher {
    
    public static UUID getUUIDAt(String name, long timestamp) {
 	   name = name.toLowerCase();
-	   if(uuidCache.containsKey(name)) {
+	   
+	   if(uuidCache.containsKey(name))
 		   return uuidCache.get(name);
-	   }
 	      
 	   try {
 		   HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, timestamp/1000)).openConnection();
 		   connection.setReadTimeout(5000);
+		   
 		   UUIDFetcher data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher.class);
 	         
 		   uuidCache.put(name, data.id);
 		   nameCache.put(data.id, data.name);
+		   
 		   return data.id;
 	   } catch (Exception e) {
-		   for(String nickName : Utils.nickNames) {
-			   if(name.equalsIgnoreCase(nickName)) {
+		   for(String nickName : Utils.nickNames)
+			   if(name.equalsIgnoreCase(nickName))
 				   Utils.nickNames.remove(nickName);
-			   }
-		   }
 		   
 		   List<String> list = NickNameFileUtils.cfg.getStringList("NickNames");
 		   
-		   for(String nickName : list) {
-			   if(name.equalsIgnoreCase(nickName)) {
+		   for(String nickName : list)
+			   if(name.equalsIgnoreCase(nickName))
 				   list.remove(nickName);
-			   }
-		   }
 		   
 		   NickNameFileUtils.cfg.set("NickNames", list);
 		   NickNameFileUtils.saveFile();
@@ -70,13 +68,13 @@ public class UUIDFetcher {
    }
    
    public static String getName(UUID uuid) {
-	   if(nameCache.containsKey(uuid)) {
+	   if(nameCache.containsKey(uuid))
 		   return nameCache.get(uuid);
-	   }
       
 	   try {
 		   HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
 		   connection.setReadTimeout(5000);
+		   
 		   UUIDFetcher[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher[].class);
 		   UUIDFetcher currentNameData = nameHistory[nameHistory.length - 1];
 		   uuidCache.put(currentNameData.name.toLowerCase(), uuid);
@@ -88,4 +86,5 @@ public class UUIDFetcher {
       
 	   return null;
    }
+   
 }

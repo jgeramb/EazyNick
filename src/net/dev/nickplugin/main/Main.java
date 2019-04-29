@@ -88,23 +88,20 @@ public class Main extends JavaPlugin {
 						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_11_R1")
 						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_12_R1")
 						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R2"))) {
+						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R2"))
+						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_14_R1")) {
 					Utils.sendConsole("	§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 					Utils.sendConsole("	§7");
-					Utils.sendConsole("	§7Plugin by§8: §3"
-							+ getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+					Utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
 					Utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
 					Utils.sendConsole("	§7Plugin-State§8: §cCANCELLED");
 
 					plugin.isCancelled = true;
 				} else {
 					if (FileUtils.cfg.getBoolean("APIMode") == false) {
-						if (ReflectUtils.getVersion().equalsIgnoreCase("v1_7_R4")) {
-							getCommand("bookgui").setExecutor(new CommandNotAvaiableCommand());
-							getCommand("booknick").setExecutor(new CommandNotAvaiableCommand());
-
+						if (ReflectUtils.getVersion().equalsIgnoreCase("v1_7_R4"))
 							Utils.field = ReflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "name");
-						} else
+						else
 							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 						
 						version = ReflectUtils.getVersion().substring(1, ReflectUtils.getVersion().length());
@@ -130,6 +127,9 @@ public class Main extends JavaPlugin {
 						if(!(version.equalsIgnoreCase("1_7_R4"))) {
 							getCommand("bookgui").setExecutor(new BookGUICommand());
 							getCommand("booknick").setExecutor(new BookNickCommand());
+						} else {
+							getCommand("bookgui").setExecutor(new CommandNotAvaiableCommand());
+							getCommand("booknick").setExecutor(new CommandNotAvaiableCommand());
 						}
 						
 						Bukkit.getPluginManager().registerEvents(new NickListener(), plugin);
@@ -147,24 +147,16 @@ public class Main extends JavaPlugin {
 					Utils.sendConsole("	§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
 					if (FileUtils.cfg.getBoolean("BungeeCord")) {
-						mysql = new MySQL(FileUtils.cfg.getString("BungeeMySQL.hostname"),
-								FileUtils.cfg.getString("BungeeMySQL.port"), FileUtils.cfg.getString("BungeeMySQL.database"),
-								FileUtils.cfg.getString("BungeeMySQL.username"),
-								FileUtils.cfg.getString("BungeeMySQL.password"));
+						mysql = new MySQL(FileUtils.cfg.getString("BungeeMySQL.hostname"), FileUtils.cfg.getString("BungeeMySQL.port"), FileUtils.cfg.getString("BungeeMySQL.database"), FileUtils.cfg.getString("BungeeMySQL.username"), FileUtils.cfg.getString("BungeeMySQL.password"));
 						mysql.connect();
 
 						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NAME varchar(64))");
-						mysql.update(
-								"CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), OldPermissionsExRank varchar(64), "
-										+ "ChatPrefix varchar(64), ChatSuffix varchar(64), "
-										+ "TabPrefix varchar(64), TabSuffix varchar(64), "
-										+ "TagPrefix varchar(64), TagSuffix varchar(64))");
+						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), OldPermissionsExRank varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
 					}
 					
 					Utils.sendConsole("	§7");
 					Utils.sendConsole("	§7API-Mode§8: §3" + FileUtils.cfg.getBoolean("APIMode"));
-					Utils.sendConsole("	§7Plugin by§8: §3"
-							+ getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+					Utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
 					Utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
 					Utils.sendConsole("	§7Plugin-State§8: §aENABLED");
 					Utils.sendConsole("	§7");
@@ -173,13 +165,11 @@ public class Main extends JavaPlugin {
 
 				Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 
-				if (FileUtils.cfg.getBoolean("AutoUpdater")) {
+				if (FileUtils.cfg.getBoolean("AutoUpdater"))
 					SpigotUpdater.checkForUpdates();
-				}
 
-				if (isCancelled) {
+				if (isCancelled)
 					Bukkit.getPluginManager().disablePlugin(plugin);
-				}
 				
 				if(Utils.placeholderAPIStatus()) {
 					new PlaceHolderHook(plugin).hook();
@@ -201,14 +191,12 @@ public class Main extends JavaPlugin {
 		Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 		Utils.sendConsole("	§7Disabling System...");
 
-		if (FileUtils.cfg.getBoolean("BungeeCord")) {
+		if (FileUtils.cfg.getBoolean("BungeeCord"))
 			mysql.disconnect();
-		}
 
 		Utils.sendConsole("	§7System disabled §asuccessfully§7!");
 		Utils.sendConsole("	§7");
-		Utils.sendConsole(
-				"	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+		Utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
 		Utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
 		Utils.sendConsole("	§7Plugin-State§8: §cDISABLED");
 		Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");

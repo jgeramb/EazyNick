@@ -41,9 +41,8 @@ public class NickOtherCommand implements CommandExecutor {
 										
 										t.removeAttachment(pa);
 										t.recalculatePermissions();
-									} else {
+									} else
 										t.chat("/nick " + name);
-									}
 								} else {
 									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
 								}
@@ -59,9 +58,8 @@ public class NickOtherCommand implements CommandExecutor {
 									
 									t.removeAttachment(pa);
 									t.recalculatePermissions();
-								} else {
+								} else
 									t.chat("/nick");
-								}
 							}
 						} else {
 							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Other.Unnick")).replace("%playerName%", t.getName()));
@@ -75,9 +73,8 @@ public class NickOtherCommand implements CommandExecutor {
 								
 								t.removeAttachment(pa);
 								t.recalculatePermissions();
-							} else {
+							} else
 								t.chat("/unnick");
-							}
 						}
 					} else {
 						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotFound")));

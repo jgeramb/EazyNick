@@ -17,15 +17,13 @@ public class NickListCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.gui") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui")) {
-				if(Utils.nickedPlayers.contains(p.getUniqueId())) {
-					p.chat("/nick");
-				}
+				if(Utils.nickedPlayers.contains(p.getUniqueId()))
+					p.chat("/unnick");
 				
 				Utils.nickNamesHandler = new PagesHandler(36);
 
-				for (String name : Utils.nickNames) {
+				for (String name : Utils.nickNames)
 					Utils.nickNamesHandler.addObject(name);
-				}
 				
 				Utils.nickNamesHandler.createPage(p, 0);
 				Utils.nickNameListPage.put(p.getUniqueId(), 0);

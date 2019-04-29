@@ -109,8 +109,7 @@ public class Utils {
 		Bukkit.getConsoleSender().sendMessage(PREFIX + msg);
 	}
 
-	public static ItemStack createItem(Material mat, int amount, int metaData, String displayName, String lore,
-			boolean enchantedItem) {
+	public static ItemStack createItem(Material mat, int amount, int metaData, String displayName, String lore, boolean enchantedItem) {
 		ItemStack is = new ItemStack(mat, amount, (byte) metaData);
 		ItemMeta m = is.getItemMeta();
 		m.setDisplayName(displayName.trim());
