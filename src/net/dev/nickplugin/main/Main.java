@@ -104,7 +104,7 @@ public class Main extends JavaPlugin {
 						else
 							Utils.field = ReflectUtils.getField(GameProfile.class, "name");
 						
-						version = ReflectUtils.getVersion().substring(1, ReflectUtils.getVersion().length());
+						version = ReflectUtils.getVersion().substring(1);
 						
 						getCommand("eazynick").setExecutor(new NickHelpCommand());
 						getCommand("nickother").setExecutor(new NickOtherCommand());

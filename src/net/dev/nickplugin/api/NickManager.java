@@ -61,7 +61,7 @@ public class NickManager {
 			@Override
 			public void run() {
 				if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-					if(Main.version == "1_7_R4")
+					if(Main.version.equals("1_7_R4"))
 						NMSNickManager.updatePlayerListName_1_7_R4(p, name);
 					else
 						NMSNickManager.updatePlayerListName(p, name);
@@ -71,9 +71,9 @@ public class NickManager {
 	}
 	
 	public void changeSkin(String skinName) {
-		if(Main.version == "1_7_R4")
+		if(Main.version.equals("1_7_R4"))
 			NMSNickManager.updateSkin_1_7_R4(p, skinName);
-		else if(Main.version == "1_8_R1")
+		else if(Main.version.equals("1_8_R1"))
 			NMSNickManager.updateSkin_1_8_R1(p, skinName);
 		else
 			NMSNickManager.updateSkin(p, skinName);
@@ -261,7 +261,7 @@ public class NickManager {
 	public void setChatPrefix(String chatPrefix) {
 		this.chatPrefix = ChatColor.translateAlternateColorCodes('&', chatPrefix);
 		
-		if(Main.version == "1_7_R4") {
+		if(Main.version.equals("1_7_R4")) {
 			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
 			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
 			
@@ -285,7 +285,7 @@ public class NickManager {
 	public void setChatSuffix(String chatSuffix) {
 		this.chatSuffix = ChatColor.translateAlternateColorCodes('&', chatSuffix);
 		
-		if(Main.version == "1_7_R4") {
+		if(Main.version.equals("1_7_R4")) {
 			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
 			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
 			
@@ -309,7 +309,7 @@ public class NickManager {
 	public void setTabPrefix(String tabPrefix) {
 		this.tabPrefix = ChatColor.translateAlternateColorCodes('&', tabPrefix);
 		
-		if(Main.version == "1_7_R4") {
+		if(Main.version.equals("1_7_R4")) {
 			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
 			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
 			
@@ -333,7 +333,7 @@ public class NickManager {
 	public void setTabSuffix(String tabSuffix) {
 		this.tabSuffix = ChatColor.translateAlternateColorCodes('&', tabSuffix);
 		
-		if(Main.version == "1_7_R4") {
+		if(Main.version.equals("1_7_R4")) {
 			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
 			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
 			

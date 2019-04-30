@@ -116,7 +116,7 @@ public class NickListener implements Listener {
 
 		Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
 
-			@Override
+			@EventHandler
 			public void run() {
 				if(p.hasPermission("nick.bypass")) {
 					for (UUID uuid : Utils.nickedPlayers) {
@@ -374,7 +374,7 @@ public class NickListener implements Listener {
 							} else
 								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
 						} else {
-							if (e.getCurrentItem().getType().equals(Material.getMaterial(Main.version.startsWith("1_1") ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
+							if (e.getCurrentItem().getType().equals(Material.getMaterial((Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
 								String nickName = "";
 								String skullOwner = ((SkullMeta) e.getCurrentItem().getItemMeta()).getOwner();
 
