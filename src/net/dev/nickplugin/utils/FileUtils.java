@@ -74,7 +74,7 @@ public class FileUtils {
 		cfg.addDefault("RandomDisguiseDelay", true);
 		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
 
-		cfg.addDefault("BypassFormat", true);
+		cfg.addDefault("BypassFormat.Show", true);
 		cfg.addDefault("BypassFormat.NameTagPrefix", "&dNICKED &7| &d");
 		cfg.addDefault("BypassFormat.NameTagSuffix", "&r");
 		

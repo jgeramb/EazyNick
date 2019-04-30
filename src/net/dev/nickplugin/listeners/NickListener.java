@@ -1,7 +1,6 @@
 package net.dev.nickplugin.listeners;
 
 import java.util.Random;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -118,20 +117,6 @@ public class NickListener implements Listener {
 
 			@EventHandler
 			public void run() {
-				if(p.hasPermission("nick.bypass")) {
-					for (UUID uuid : Utils.nickedPlayers) {
-						Player t = Bukkit.getPlayer(uuid);
-						
-						if(t != null) {
-							String nickName = t.getName();
-							
-							NickManager nickAPI = new NickManager(t);
-							nickAPI.unnickPlayer();
-							nickAPI.nickPlayer(nickName);
-						}
-					}
-				}
-
 				if (FileUtils.cfg.getBoolean("BungeeCord")) {
 					if (FileUtils.cfg.getBoolean("LobbyMode") == false) {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {

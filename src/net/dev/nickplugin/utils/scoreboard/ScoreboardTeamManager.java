@@ -2,7 +2,6 @@ package net.dev.nickplugin.utils.scoreboard;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -34,8 +33,14 @@ public class ScoreboardTeamManager {
 		if(!(Utils.scoreboardTeamContents.containsKey(teamName)))
 			Utils.scoreboardTeamContents.put(teamName, new ArrayList<String>());
 		
-		if(!(Utils.scoreboardTeamContents.get(teamName).contains(p.getName())))
-			Utils.scoreboardTeamContents.get(teamName).add(p.getName());
+		NickManager api = new NickManager(p);
+		
+		if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getNickName())))
+			Utils.scoreboardTeamContents.get(teamName).add(api.getNickName());
+		
+		if(FileUtils.cfg.getBoolean("BypassFormat.Show"))
+			if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getRealName())))
+				Utils.scoreboardTeamContents.get(teamName).add(api.getRealName());
 	}
 	
 	public ScoreboardTeamManager(Player p, String name, String prefix, String suffix) {
@@ -49,6 +54,12 @@ public class ScoreboardTeamManager {
 		
 		if(!(Utils.scoreboardTeamContents.get(teamName).contains(name)))
 			Utils.scoreboardTeamContents.get(teamName).add(name);
+
+		NickManager api = new NickManager(p);
+		
+		if(FileUtils.cfg.getBoolean("BypassFormat.Show"))
+			if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getRealName())))
+				Utils.scoreboardTeamContents.get(teamName).add(api.getRealName());
 	}
 	
 	public void destroyTeam() {
@@ -118,10 +129,9 @@ public class ScoreboardTeamManager {
 				String suffixForPlayer = suffix;
 				List<String> contents = Utils.scoreboardTeamContents.get(teamName);
 				
-				if(t.hasPermission("nick.bypass") && FileUtils.cfg.getBoolean("BypassFormat")) {
+				if(t.hasPermission("nick.bypass") && FileUtils.cfg.getBoolean("BypassFormat.Show")) {
 					prefixForPlayer = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("BypassFormat.NameTagPrefix"));
 					suffixForPlayer = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("BypassFormat.NameTagSuffix"));
-					contents = Arrays.asList(teamName);
 				}
 				
 				if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
@@ -179,8 +189,13 @@ public class ScoreboardTeamManager {
 	}
 	
 	public void removePlayerFromTeam() {
-		if(Utils.scoreboardTeamContents.get(teamName).contains(p.getName()))
-			Utils.scoreboardTeamContents.get(teamName).remove(p.getName());
+		NickManager api = new NickManager(p);
+		
+		if(Utils.scoreboardTeamContents.get(teamName).contains(api.getNickName()))
+			Utils.scoreboardTeamContents.get(teamName).remove(api.getNickName());
+		
+		if(Utils.scoreboardTeamContents.get(teamName).contains(api.getRealName()))
+			Utils.scoreboardTeamContents.get(teamName).remove(api.getRealName());
 	}
 	
 	private void sendPacket(Player p, Object packet) {
