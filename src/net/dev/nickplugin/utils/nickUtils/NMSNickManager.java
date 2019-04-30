@@ -28,7 +28,7 @@ public class NMSNickManager extends ReflectUtils {
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 			Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
-			String playerName = new NickManager(p).getRealName();
+			String playerName = (String) entityPlayer.getClass().getMethod("getName").invoke(entityPlayer);
 			
 			if(name == null)
 				name = playerName;
@@ -209,13 +209,14 @@ public class NMSNickManager extends ReflectUtils {
 			}
 			
 			Object packetNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer);
+			NickManager api = new NickManager(p);
 			
 			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
-					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit").replace("%displayName%", Utils.oldDisplayNames.get(p.getUniqueId())).replace("%name%", new NickManager(p).getRealName()))));
+					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit").replace("%displayName%", Utils.oldDisplayNames.get(p.getUniqueId())).replace("%name%", api.getRealName()))));
 			} else {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick"))
-					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
+					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName()))));
 			}
 			
 			sendPacket(p, packetEntityDestroy);

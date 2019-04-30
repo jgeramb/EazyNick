@@ -31,7 +31,7 @@ public class NickOtherCommand implements CommandExecutor {
 									
 									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Other.SelectedNick")).replace("%playerName%", t.getName()).replace("%nickName%", ChatColor.translateAlternateColorCodes('&', name)));
 									
-									if(!(t.hasPermission("nick.use"))) {
+									if((!(t.hasPermission("nick.use")) && !(Utils.hasLuckPermsPermission(t.getUniqueId(), "nick.use"))) || !(t.hasPermission("nick.customnickname")) && !(Utils.hasLuckPermsPermission(t.getUniqueId(), "nick.customnickname"))) {
 										PermissionAttachment pa = t.addAttachment(Main.getPlugin(Main.class));
 										pa.setPermission("nick.use", true);
 										pa.setPermission("nick.customnickname", true);
@@ -49,7 +49,7 @@ public class NickOtherCommand implements CommandExecutor {
 							} else {
 								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Other.RandomNick")).replace("%playerName%", t.getName()));
 								
-								if(!(t.hasPermission("nick.use"))) {
+								if(!(t.hasPermission("nick.use")) && !(Utils.hasLuckPermsPermission(t.getUniqueId(), "nick.use"))) {
 									PermissionAttachment pa = t.addAttachment(Main.getPlugin(Main.class));
 									pa.setPermission("nick.use", true);
 									t.recalculatePermissions();
@@ -64,7 +64,7 @@ public class NickOtherCommand implements CommandExecutor {
 						} else {
 							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Other.Unnick")).replace("%playerName%", t.getName()));
 							
-							if(!(t.hasPermission("nick.use"))) {
+							if(!(t.hasPermission("nick.use")) && !(Utils.hasLuckPermsPermission(t.getUniqueId(), "nick.use"))) {
 								PermissionAttachment pa = t.addAttachment(Main.getPlugin(Main.class));
 								pa.setPermission("nick.use", true);
 								t.recalculatePermissions();

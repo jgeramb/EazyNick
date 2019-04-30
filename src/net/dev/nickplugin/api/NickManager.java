@@ -29,6 +29,7 @@ import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.storage.objects.User;
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucko.luckperms.LuckPerms;
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.neznamy.tab.bukkit.api.TABAPI;
@@ -129,7 +130,7 @@ public class NickManager {
 	
 	public void nickPlayer(String nickName, String skinName) {
 		Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
-		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
+		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName().isEmpty() ? null : p.getPlayerListName());
 		
 		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
@@ -163,19 +164,19 @@ public class NickManager {
 		
 		MySQLNickManager.removePlayer(p.getUniqueId());
 		
-		Utils.nickedPlayers.remove(p.getUniqueId());
-		Utils.playerNicknames.remove(p.getUniqueId());
-		
-		setName(nickName);
-		changeSkin(nickName);
-		updatePlayer();
-		
 		p.setDisplayName(getOldDisplayName());
 		setPlayerListName(getOldPlayerListName());
 		
 		Utils.oldDisplayNames.remove(p.getUniqueId());
 		Utils.oldPlayerListNames.remove(p.getUniqueId());
-
+		
+		setName(nickName);
+		changeSkin(nickName);
+		updatePlayer();
+		
+		Utils.nickedPlayers.remove(p.getUniqueId());
+		Utils.playerNicknames.remove(p.getUniqueId());
+		
 		if(Utils.tabStatus()) {
 			TABAPI.removeTemporaryTabPrefix(p);
 			TABAPI.removeTemporaryTabSuffix(p);
@@ -409,6 +410,15 @@ public class NickManager {
 	}
 	
 	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String groupName) {
+		if(Utils.placeholderAPIStatus()) {
+			tagPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+			tagSuffix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+			chatPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+			chatSuffix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+			tabPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+			tabSuffix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+		}
+		
 		this.chatPrefix = chatPrefix;
 		this.chatSuffix = chatSuffix;
 		this.tabPrefix = tabPrefix;

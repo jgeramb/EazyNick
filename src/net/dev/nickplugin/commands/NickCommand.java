@@ -9,9 +9,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
 
 import net.dev.nickplugin.api.PlayerNickEvent;
 import net.dev.nickplugin.api.PlayerUnnickEvent;
+import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.StringUtils;
@@ -30,34 +32,48 @@ public class NickCommand implements CommandExecutor {
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					} else {
 						if(args.length == 0) {
-							String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
-							boolean nickNameIsInUse = false;
-							
-							for (String nickName : Utils.playerNicknames.values())
-								if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-									nickNameIsInUse = true;
-							
-							while (nickNameIsInUse ) {
-								nickNameIsInUse = false;
-								name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
+							if(FileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
+								if(!(p.hasPermission("nick.gui")) && !(Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui"))) {
+									PermissionAttachment pa = p.addAttachment(Main.getPlugin(Main.class));
+									pa.setPermission("nick.gui", true);
+									p.recalculatePermissions();
+									
+									p.chat("/nicklist");
+									
+									p.removeAttachment(pa);
+									p.recalculatePermissions();
+								} else
+									p.chat("/nicklist");
+							} else {
+								String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
+								boolean nickNameIsInUse = false;
 								
 								for (String nickName : Utils.playerNicknames.values())
 									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 										nickNameIsInUse = true;
+								
+								while (nickNameIsInUse ) {
+									nickNameIsInUse = false;
+									name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
+									
+									for (String nickName : Utils.playerNicknames.values())
+										if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+											nickNameIsInUse = true;
+								}
+	
+								boolean serverFull = Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers();
+								String prefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Prefix")));
+								String suffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
+								
+								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, name,
+										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix")),
+										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix")),
+										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")),
+										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")),
+										prefix,
+										suffix,
+										false, (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
 							}
-
-							boolean serverFull = Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers();
-							String prefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Prefix")));
-							String suffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
-							
-							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, name,
-									ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix")),
-									ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix")),
-									ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")),
-									ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")),
-									prefix,
-									suffix,
-									false, (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
 						} else {
 							if(p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")) {
 								String name = args[0].replace("\"", "");

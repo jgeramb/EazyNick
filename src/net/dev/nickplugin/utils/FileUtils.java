@@ -72,12 +72,17 @@ public class FileUtils {
 		cfg.addDefault("SwitchPermissionsExGroupByNicking", false);
 		cfg.addDefault("ServerIsUsingCloudNETPrefixes", false);
 		cfg.addDefault("RandomDisguiseDelay", true);
+		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
 
+		cfg.addDefault("BypassFormat", true);
+		cfg.addDefault("BypassFormat.NameTagPrefix", "&dNICKED &7| &d");
+		cfg.addDefault("BypassFormat.NameTagSuffix", "&r");
+		
 		cfg.addDefault("NickMessage.OnNnick", true);
 		cfg.addDefault("NickMessage.OnUnnick", true);
 		cfg.addDefault("NickMessage.Nick.Quit", "&8[&c-&8] &7%name%");
-		cfg.addDefault("NickMessage.Nick.Join", "&8[&a+&8] &7%displayName%");
-		cfg.addDefault("NickMessage.Unnick.Quit", "&8[&c-&8] &7%name%");
+		cfg.addDefault("NickMessage.Nick.Join", "&8[&a+&8] &7%name%");
+		cfg.addDefault("NickMessage.Unnick.Quit", "&8[&c-&8] &7%displayName%");
 		cfg.addDefault("NickMessage.Unnick.Join", "&8[&a+&8] &7%displayName%");
 		
 		cfg.addDefault("NickCommands.SendAsConsole", false);
