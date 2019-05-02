@@ -184,6 +184,9 @@ public class NMSNickManager extends ReflectUtils {
 	
 	@SuppressWarnings({ })
 	public static void updatePlayer(Player p) {
+		NickManager api = new NickManager(p);
+		boolean onNick = !(api.isNicked());
+		
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 			Object worldClient = entityPlayer.getClass().getMethod("getWorld").invoke(entityPlayer);
@@ -209,11 +212,10 @@ public class NMSNickManager extends ReflectUtils {
 			}
 			
 			Object packetNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer);
-			NickManager api = new NickManager(p);
 			
-			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
+			if(onNick) {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
-					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit").replace("%displayName%", Utils.oldDisplayNames.get(p.getUniqueId())).replace("%name%", api.getRealName()))));
+					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getRealName()))));
 			} else {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick"))
 					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName()))));
@@ -262,7 +264,7 @@ public class NMSNickManager extends ReflectUtils {
 						e.printStackTrace();
 					}
 					
-					if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
+					if(onNick) {
 						if(FileUtils.cfg.getBoolean("NickMessage.OnNnick"))
 							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
 					} else {
@@ -270,7 +272,7 @@ public class NMSNickManager extends ReflectUtils {
 							Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()))));
 					}
 				}
-			}, 5 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(6)) : 0));
+			}, 5 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
 			
 			if(!(Main.version.equals("1_7_R4") || Main.version.equals("1_8_R1") || Main.version.equals("1_8_R2")))
 				updatePlayerCache(p);

@@ -71,15 +71,16 @@ public class FileUtils {
 		cfg.addDefault("AllowPlayersToNickAsKnownPlayers", false);
 		cfg.addDefault("SwitchPermissionsExGroupByNicking", false);
 		cfg.addDefault("ServerIsUsingCloudNETPrefixes", false);
-		cfg.addDefault("RandomDisguiseDelay", true);
+		cfg.addDefault("RandomDisguiseDelay", false);
 		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
+		cfg.addDefault("OpenBookGUIOnNickCommand", false);
 
 		cfg.addDefault("BypassFormat.Show", true);
 		cfg.addDefault("BypassFormat.NameTagPrefix", "&dNICKED &7| &d");
 		cfg.addDefault("BypassFormat.NameTagSuffix", "&r");
 		
-		cfg.addDefault("NickMessage.OnNnick", true);
-		cfg.addDefault("NickMessage.OnUnnick", true);
+		cfg.addDefault("NickMessage.OnNnick", false);
+		cfg.addDefault("NickMessage.OnUnnick", false);
 		cfg.addDefault("NickMessage.Nick.Quit", "&8[&c-&8] &7%name%");
 		cfg.addDefault("NickMessage.Nick.Join", "&8[&a+&8] &7%name%");
 		cfg.addDefault("NickMessage.Unnick.Quit", "&8[&c-&8] &7%displayName%");
@@ -91,7 +92,7 @@ public class FileUtils {
 		cfg.addDefault("NickCommands.Nick", Arrays.asList("/yourCommandOnNick"));
 		cfg.addDefault("NickCommands.Unnick", Arrays.asList("/yourCommandOnUnnick"));
 		
-		cfg.addDefault("NickItem.getOnJoin", true);
+		cfg.addDefault("NickItem.getOnJoin", false);
 		cfg.addDefault("NickItem.InventorySettings.PlayersCanDropItem", false);
 		cfg.addDefault("NickItem.InventorySettings.PlayersCanMoveItem", true);
 		cfg.addDefault("NickItem.Slot", 5);

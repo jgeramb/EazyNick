@@ -110,7 +110,7 @@ public class Main extends JavaPlugin {
 						getCommand("nickother").setExecutor(new NickOtherCommand());
 						getCommand("changeskin").setExecutor(new ChangeSkinCommand());
 						getCommand("nicklist").setExecutor(new NickListCommand());
-						getCommand("nick").setExecutor(new NickCommand());
+						getCommand("nick").setExecutor(FileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand") ? new BookGUICommand() : new NickCommand());
 						getCommand("unnick").setExecutor(new UnnickCommand());
 						getCommand("name").setExecutor(new NameCommand());
 						getCommand("reloadconfig").setExecutor(new ReloadConfigCommand());

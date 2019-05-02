@@ -57,18 +57,12 @@ public class NickManager {
 	}
 	
 	public void setPlayerListName(String name) {
-		Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
-			
-			@Override
-			public void run() {
-				if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-					if(Main.version.equals("1_7_R4"))
-						NMSNickManager.updatePlayerListName_1_7_R4(p, name);
-					else
-						NMSNickManager.updatePlayerListName(p, name);
-				}
-			}
-		}, 5);
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
+			if(Main.version.equals("1_7_R4"))
+				NMSNickManager.updatePlayerListName_1_7_R4(p, name);
+			else
+				NMSNickManager.updatePlayerListName(p, name);
+		}
 	}
 	
 	public void changeSkin(String skinName) {
@@ -130,7 +124,7 @@ public class NickManager {
 	
 	public void nickPlayer(String nickName, String skinName) {
 		Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
-		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName().isEmpty() ? null : p.getPlayerListName());
+		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
 		
 		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
@@ -164,16 +158,22 @@ public class NickManager {
 		
 		MySQLNickManager.removePlayer(p.getUniqueId());
 		
-		p.setDisplayName(getOldDisplayName());
-		setPlayerListName(getOldPlayerListName());
-		
-		Utils.oldDisplayNames.remove(p.getUniqueId());
-		Utils.oldPlayerListNames.remove(p.getUniqueId());
-		
 		setName(nickName);
 		changeSkin(nickName);
 		updatePlayer();
 		
+		Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+			
+			@Override
+			public void run() {
+				p.setDisplayName(getOldDisplayName());
+				setPlayerListName(getOldPlayerListName());
+				
+				Utils.oldDisplayNames.remove(p.getUniqueId());
+				Utils.oldPlayerListNames.remove(p.getUniqueId());
+			}
+		}, 5 + 1 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+
 		Utils.nickedPlayers.remove(p.getUniqueId());
 		Utils.playerNicknames.remove(p.getUniqueId());
 		
