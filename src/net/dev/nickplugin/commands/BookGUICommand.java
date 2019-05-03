@@ -146,10 +146,10 @@ public class BookGUICommand implements CommandExecutor {
 					}
 				}
 			} else {
-				p.sendMessage(Utils.NO_PERM);
+				p.sendMessage(Utils.noPerm);
 			}
 		} else {
-			Utils.sendConsole(Utils.NOT_PLAYER);
+			Utils.sendConsole(Utils.notPlayer);
 		}
 		
 		return true;

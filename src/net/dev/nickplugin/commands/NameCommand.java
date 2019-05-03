@@ -21,15 +21,15 @@ public class NameCommand implements CommandExecutor {
 				NickManager api = new NickManager(p);
 				
 				if(api.isNicked()) {
-					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Name").replace("%name%", api.getNickName())));
+					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Name").replace("%name%", api.getNickName())));
 				} else {
-					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
+					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
 				}
 			} else {
-				p.sendMessage(Utils.NO_PERM);
+				p.sendMessage(Utils.noPerm);
 			}
 		} else {
-			Utils.sendConsole(Utils.NOT_PLAYER);
+			Utils.sendConsole(Utils.notPlayer);
 		}
 		
 		return true;

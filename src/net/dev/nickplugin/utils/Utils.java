@@ -24,9 +24,9 @@ import me.lucko.luckperms.api.Node;
 
 public class Utils {
 
-	public static String PREFIX;
-	public static String NO_PERM;
-	public static String NOT_PLAYER;
+	public static String prefix;
+	public static String noPerm;
+	public static String notPlayer;
 
 	public static Field field;
 	public static PagesHandler<String> nickNamesHandler;
@@ -106,7 +106,7 @@ public class Utils {
 	public static HashMap<UUID, String> nameCache = new HashMap<>();
 
 	public static void sendConsole(String msg) {
-		Bukkit.getConsoleSender().sendMessage(PREFIX + msg);
+		Bukkit.getConsoleSender().sendMessage(prefix + msg);
 	}
 
 	public static ItemStack createItem(Material mat, int amount, int metaData, String displayName, String lore, boolean enchantedItem) {

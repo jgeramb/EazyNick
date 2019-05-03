@@ -23,16 +23,16 @@ public class UnnickCommand implements CommandExecutor {
 					if(Utils.nickedPlayers.contains(p.getUniqueId())) {
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					} else {
-						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
+						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
 					}
 				} else {
-					p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
+					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
 				}
 			} else {
-				p.sendMessage(Utils.NO_PERM);
+				p.sendMessage(Utils.noPerm);
 			}
 		} else {
-			Utils.sendConsole(Utils.NOT_PLAYER);
+			Utils.sendConsole(Utils.notPlayer);
 		}
 		
 		return true;

@@ -24,19 +24,19 @@ public class RealNameCommand implements CommandExecutor {
 					
 					if(t != null) {
 						if(Utils.nickedPlayers.contains(t.getUniqueId())) {
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.RealName").replace("%realName%", new NickManager(t).getRealName())));
+							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.RealName").replace("%realName%", new NickManager(t).getRealName())));
 						} else {
-							p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotNicked")));
+							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotNicked")));
 						}
 					} else {
-						p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotFound")));
+						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotFound")));
 					}					
 				}
 			} else {
-				p.sendMessage(Utils.NO_PERM);
+				p.sendMessage(Utils.noPerm);
 			}
 		} else {
-			Utils.sendConsole(Utils.NOT_PLAYER);
+			Utils.sendConsole(Utils.notPlayer);
 		}
 		
 		return true;

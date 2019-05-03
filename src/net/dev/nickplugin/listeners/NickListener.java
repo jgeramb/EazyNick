@@ -69,7 +69,7 @@ public class NickListener implements Listener {
 				MySQLPlayerDataManager.insertData(p.getUniqueId(), oldPermissionsExRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
 			}
 			
-			p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", e.getNickName())));
+			p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", e.getNickName())));
 		}
 	}
 	
@@ -80,7 +80,7 @@ public class NickListener implements Listener {
 			
 			new NickManager(p).unnickPlayer();
 			
-			p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Unnick")));
+			p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Unnick")));
 		}
 	}
 	
@@ -273,7 +273,7 @@ public class NickListener implements Listener {
 								Utils.nickOnWorldChangePlayers.add(p.getUniqueId());
 								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Enabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
 
-								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&',
+								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&',
 										LanguageFileUtils.cfg.getString("Messages.WorldChangeAutoNickEnabled")));
 							} else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Enabled")))) {
 								e.setCancelled(true);
@@ -281,7 +281,7 @@ public class NickListener implements Listener {
 								Utils.nickOnWorldChangePlayers.remove(p.getUniqueId());
 								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 
-								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.WorldChangeAutoNickDisabled")));
+								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.WorldChangeAutoNickDisabled")));
 							}
 						}
 
@@ -348,16 +348,16 @@ public class NickListener implements Listener {
 								Utils.nickNamesHandler.createPage(p, page - 1);
 								Utils.nickNameListPage.put(p.getUniqueId(), page - 1);
 							} else
-								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
+								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
 						} else if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.NextItem.DisplayName")))) {
 							if (page < (Utils.nickNamesHandler.getPages().size() - 1)) {
 								if (page != 99) {
 									Utils.nickNamesHandler.createPage(p, page + 1);
 									Utils.nickNameListPage.put(p.getUniqueId(), page + 1);
 								} else
-									p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePagesCanBeLoaded")));
+									p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePagesCanBeLoaded")));
 							} else
-								p.sendMessage(Utils.PREFIX + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
+								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
 						} else {
 							if (e.getCurrentItem().getType().equals(Material.getMaterial((Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
 								String nickName = "";

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -17,6 +19,7 @@ import com.nametagedit.plugin.NametagEdit;
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.sql.MySQLNickManager;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
+import net.dev.nickplugin.utils.ActionBarUtils;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.StringUtils;
@@ -137,6 +140,23 @@ public class NickManager {
 		
 		Utils.nickedPlayers.add(p.getUniqueId());
 		Utils.playerNicknames.put(p.getUniqueId(), nickName);
+		
+		if(FileUtils.cfg.getBoolean("NickActionBarMessage")) {
+			new Timer().schedule(new TimerTask() {
+				
+				UUID uuid = p.getUniqueId();
+				
+				@Override
+				public void run() {
+					if(Utils.nickedPlayers.contains(uuid))
+						ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix)), 20);
+					else {
+						ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
+						cancel();
+					}
+				}
+			}, 0, 1000);
+		}
 		
 		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {

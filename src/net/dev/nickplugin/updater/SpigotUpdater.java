@@ -68,7 +68,7 @@ public class SpigotUpdater {
 	}
 	
 	public static void checkForUpdates(Player p) {
-		p.sendMessage(Utils.PREFIX + "§3Updater §8» §rChecking for updates...");
+		p.sendMessage(Utils.prefix + "§3Updater §8» §rChecking for updates...");
 		
 		ReadableByteChannel channel = null;
 		double newVersion = 0.0;
@@ -85,10 +85,10 @@ public class SpigotUpdater {
 		}
 
 		if (newVersion > Double.valueOf(Main.getPlugin(Main.class).getDescription().getVersion()).doubleValue()) {
-			p.sendMessage(Utils.PREFIX + "§3Updater §8» §rFound a new version (" + newVersion + ")");
+			p.sendMessage(Utils.prefix + "§3Updater §8» §rFound a new version (" + newVersion + ")");
 
 			if (FileUtils.cfg.getBoolean("AutoUpdater")) {
-				p.sendMessage(Utils.PREFIX + "§3Updater §8» §rStarting download...");
+				p.sendMessage(Utils.prefix + "§3Updater §8» §rStarting download...");
 
 				try {
 					HttpURLConnection downloadURL = (HttpURLConnection) new URL(String.format(
@@ -109,12 +109,12 @@ public class SpigotUpdater {
 					throw new RuntimeException("File could not be saved", e);
 				}
 
-				p.sendMessage(Utils.PREFIX + "§3Updater §8» §rSuccessfully updated plugin to version " + newVersion + ". Please restart/reload your server");
+				p.sendMessage(Utils.prefix + "§3Updater §8» §rSuccessfully updated plugin to version " + newVersion + ". Please restart/reload your server");
 			} else {
-				p.sendMessage(Utils.PREFIX + "§3Updater §8» §rDownload the update here: https://www.spigotmc.org/resources/eazynick-nicksystem-api-src-bungeecord-multiworld-1-7-10-1-12-2.51398/");
+				p.sendMessage(Utils.prefix + "§3Updater §8» §rDownload the update here: https://www.spigotmc.org/resources/eazynick-nicksystem-api-src-bungeecord-multiworld-1-7-10-1-12-2.51398/");
 			}
 		} else {
-			p.sendMessage(Utils.PREFIX + "§3Updater §8» §rNo new version available");
+			p.sendMessage(Utils.prefix + "§3Updater §8» §rNo new version available");
 		}
 	}
 

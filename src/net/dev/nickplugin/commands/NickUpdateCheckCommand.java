@@ -18,10 +18,10 @@ public class NickUpdateCheckCommand implements CommandExecutor {
 			if(p.hasPermission("nick.checkforupdates") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.checkforupdates")) {
 				SpigotUpdater.checkForUpdates(p);
 			} else {
-				p.sendMessage(Utils.NO_PERM);
+				p.sendMessage(Utils.noPerm);
 			}
 		} else {
-			Utils.sendConsole(Utils.NOT_PLAYER);
+			Utils.sendConsole(Utils.notPlayer);
 		}
 		
 		return true;

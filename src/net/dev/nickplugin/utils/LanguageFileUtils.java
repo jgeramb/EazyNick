@@ -45,6 +45,8 @@ public class LanguageFileUtils {
 				+ "\n");
 		
 		if(file.getName().contains("de_DE")) {
+			cfg.addDefault("NickActionBarMessage", "%prefix%&4Du spielst als&8: &6%nickName%");
+			
 			cfg.addDefault("NickItem.ItemLore.Enabled", "&7Rechtsklick um den AutoNick zu &cdeaktivieren");
 			cfg.addDefault("NickItem.ItemLore.Disabled", "&7Rechtsklick um den AutoNick zu &aaktivieren");
 	
@@ -64,7 +66,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("NickNameGUI.NextItem.DisplayName", "&7Weiter &8[&e-->&8]");
 			cfg.addDefault("NickNameGUI.NickNameSkull.DisplayName", "&e&l%nickName%");
 			
-			cfg.addDefault("Messages.Prefix", "&8[&5NICK&8]");
+			cfg.addDefault("Messages.prefix", "&8[&5NICK&8]");
 			cfg.addDefault("Messages.Nick", "&4Du spielst als&8: &6%name%");
 			cfg.addDefault("Messages.Unnick", "&4Dein Nickname wurde entfernt");
 			cfg.addDefault("Messages.Name", "&4Aktueller Nickname&8: &6%name%");
@@ -92,15 +94,17 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.FixSkin", "&4Dein Skin wurde &aerfolgreich &4gefixxt!");
 			cfg.addDefault("Messages.ResetSkin", "&4Dein Skin wurde &aerfolgreich &4zurueckgesetzt!");
 			cfg.addDefault("Messages.ResetName", "&4Dein Name wurde &aerfolgreich &4zurueckgesetzt!");
-			cfg.addDefault("Messages.BungeeAutoNickEnabled", "&4Der automatische Nickname wurde &aaktiviert");
-			cfg.addDefault("Messages.BungeeAutoNickDisabled", "&4Der automatische Nickname wurde &cdeaktiviert");
-			cfg.addDefault("Messages.WorldChangeAutoNickEnabled", "&4Der automatische Nickname wurde &aaktiviert");
-			cfg.addDefault("Messages.WorldChangeAutoNickDisabled", "&4Der automatische Nickname wurde &cdeaktiviert");
+			cfg.addDefault("Messages.BungeeAutoNickEnabled", "&4Der automatische Nickname wurde &aAktiviert");
+			cfg.addDefault("Messages.BungeeAutoNickDisabled", "&4Der automatische Nickname wurde &cDeaktiviert");
+			cfg.addDefault("Messages.WorldChangeAutoNickEnabled", "&4Der automatische Nickname wurde &aAktiviert");
+			cfg.addDefault("Messages.WorldChangeAutoNickDisabled", "&4Der automatische Nickname wurde &cDeaktiviert");
 			cfg.addDefault("Messages.ActiveNick", "&4Aktueller Nickname&8: &6%name%");
 			cfg.addDefault("Messages.NickedPlayers.CurrentNickedPlayers", "&4Hier ist eine Liste von &eallen genickten Spielern&8:");
 			cfg.addDefault("Messages.NickedPlayers.PlayerINFO", "&5%realName% &7-> &3%nickName%");
 			cfg.addDefault("Messages.NickedPlayers.NoPlayerIsNicked", "&cDerzeit ist &4&lkein Spieler genickt");
 		} else {
+			cfg.addDefault("NickActionBarMessage.Text", "%prefix%&4You are currently playing as&8: &6%nickName%");
+			
 			cfg.addDefault("NickItem.ItemLore.Enabled", "&7Rightclick to &cdeactivate &7the automatic nickname");
 			cfg.addDefault("NickItem.ItemLore.Disabled", "&7Rightclick to &aactivate &7the automatic nickname");
 	
@@ -120,7 +124,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("NickNameGUI.NextItem.DisplayName", "&7Next &8[&e-->&8]");
 			cfg.addDefault("NickNameGUI.NickNameSkull.DisplayName", "&e&l%nickName%");
 			
-			cfg.addDefault("Messages.Prefix", "&8[&5NICK&8]");
+			cfg.addDefault("Messages.prefix", "&8[&5NICK&8]");
 			cfg.addDefault("Messages.Nick", "&4You are now playing as&8: &6%name%");
 			cfg.addDefault("Messages.Unnick", "&4Your nickname has been reset");
 			cfg.addDefault("Messages.Name", "&4Current nickname&8: &6%name%");

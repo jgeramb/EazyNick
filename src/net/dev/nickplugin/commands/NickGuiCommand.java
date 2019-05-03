@@ -30,10 +30,10 @@ public class NickGuiCommand implements CommandExecutor {
 				
 				p.openInventory(inv);
 			} else {
-				p.sendMessage(Utils.NO_PERM);
+				p.sendMessage(Utils.noPerm);
 			}
 		} else {
-			Utils.sendConsole(Utils.NOT_PLAYER);
+			Utils.sendConsole(Utils.notPlayer);
 		}
 		
 		return true;
