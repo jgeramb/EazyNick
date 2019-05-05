@@ -172,7 +172,7 @@ public class Main extends JavaPlugin {
 					Bukkit.getPluginManager().disablePlugin(plugin);
 				
 				if(Utils.placeholderAPIStatus()) {
-					new PlaceHolderHook(plugin).hook();
+					new PlaceHolderExpansion(plugin).register();
 					
 					Utils.sendConsole("§7Placeholders loaded successfully!");
 				}
