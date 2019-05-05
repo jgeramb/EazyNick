@@ -110,7 +110,7 @@ public class FileUtils {
 		cfg.addDefault("NickItem.Enchanted.Disabled", false);
 
 		cfg.addDefault("Settings.NickDelay", (long) 0.5);
-		cfg.addDefault("Settings.ChatFormat", "%prefix%%displayName%%suffix%&7: &r%message%");
+		cfg.addDefault("Settings.ChatFormat", "%prefix%%playerName%%suffix%&7: &r%message%");
 		cfg.addDefault("Settings.NameChangeOptions.RefreshPlayer", true);
 		cfg.addDefault("Settings.NameChangeOptions.DisplayNameColored", true);
 		cfg.addDefault("Settings.NameChangeOptions.PlayerListNameColored", true);

@@ -417,16 +417,17 @@ public class NickListener implements Listener {
 				String format;
 
 				if (FileUtils.cfg.getBoolean("ReplaceNickedChatFormat")) {
-					format = ChatColor.translateAlternateColorCodes('&',
-							FileUtils.cfg.getString("Settings.ChatFormat"));
+					format = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.ChatFormat"));
 					format = format.replace("%displayName%", p.getDisplayName());
 					format = format.replace("%nickName%", api.getNickName());
-					format = format.replace("%playerName%", api.getRealName());
+					format = format.replace("%playerName%", p.getName());
 					format = format.replace("%prefix%", api.getChatPrefix());
 					format = format.replace("%suffix%", api.getChatSuffix());
 					format = format.replace("%message%", e.getMessage());
 				} else
 					format = e.getFormat().replace("%1$s", p.getDisplayName()).replace("%2$s", e.getMessage());
+				
+				e.setFormat(format);
 				
 				Bukkit.getConsoleSender().sendMessage(format);
 

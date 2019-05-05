@@ -3,6 +3,7 @@ package net.dev.nickplugin.api;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,10 +51,10 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 public class NickManager {
 
 	private Player p;
-	private String chatPrefix = "";
-	private String chatSuffix = "";
-	private String tabPrefix = "";
-	private String tabSuffix = "";
+	private static HashMap<UUID, String> chatPrefixes = new HashMap<>();
+	private static HashMap<UUID, String> chatSuffixes = new HashMap<>();
+	private static HashMap<UUID, String> tabPrefixes = new HashMap<>();
+	private static HashMap<UUID, String> tabSuffixes = new HashMap<>();
 	
 	public NickManager(Player p) {
 		this.p = p;
@@ -148,12 +149,15 @@ public class NickManager {
 				
 				@Override
 				public void run() {
-					if(Utils.nickedPlayers.contains(uuid))
-						ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix)), 20);
-					else {
-						ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
+					if(Main.getPlugin(Main.class).isEnabled()) {
+						if(Utils.nickedPlayers.contains(uuid))
+							ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix)), 20);
+						else {
+							ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
+							cancel();
+						}
+					} else
 						cancel();
-					}
 				}
 			}, 0, 1000);
 		}
@@ -196,6 +200,18 @@ public class NickManager {
 
 		Utils.nickedPlayers.remove(p.getUniqueId());
 		Utils.playerNicknames.remove(p.getUniqueId());
+		
+		if(chatPrefixes.containsKey(p.getUniqueId()))
+			chatPrefixes.remove(p.getUniqueId());
+			
+		if(chatSuffixes.containsKey(p.getUniqueId()))
+			chatSuffixes.remove(p.getUniqueId());
+		
+		if(tabPrefixes.containsKey(p.getUniqueId()))
+			tabPrefixes.remove(p.getUniqueId());
+		
+		if(tabSuffixes.containsKey(p.getUniqueId()))
+			tabSuffixes.remove(p.getUniqueId());
 		
 		if(Utils.tabStatus()) {
 			TABAPI.removeTemporaryTabPrefix(p);
@@ -276,98 +292,110 @@ public class NickManager {
 	}
 	
 	public String getChatPrefix() {
-		return chatPrefix;
+		return chatPrefixes.containsKey(p.getUniqueId()) ? chatPrefixes.get(p.getUniqueId()) : "";
 	}
 
 	public void setChatPrefix(String chatPrefix) {
-		this.chatPrefix = ChatColor.translateAlternateColorCodes('&', chatPrefix);
+		if(chatPrefixes.containsKey(p.getUniqueId()))
+			chatPrefixes.remove(p.getUniqueId());
+		
+		chatPrefixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatPrefix));
 		
 		if(Main.version.equals("1_7_R4")) {
-			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
-			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
+			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
+			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
 				setPlayerListName(nameFormatTab);
 			} else {
-				p.setDisplayName(nameFormatChat);
+				p.setDisplayName(nameFormatChat.substring(0, 16));
 				setPlayerListName(p.getName());
 			}
 		} else {
-			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			p.setDisplayName(chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId()));
+			setPlayerListName(tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId()));
 		}
 	}
 
 	public String getChatSuffix() {
-		return chatSuffix;
+		return chatSuffixes.containsKey(p.getUniqueId()) ? chatSuffixes.get(p.getUniqueId()) : "";
 	}
 
 	public void setChatSuffix(String chatSuffix) {
-		this.chatSuffix = ChatColor.translateAlternateColorCodes('&', chatSuffix);
+		if(chatSuffixes.containsKey(p.getUniqueId()))
+			chatSuffixes.remove(p.getUniqueId());
+		
+		chatSuffixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatSuffix));
 		
 		if(Main.version.equals("1_7_R4")) {
-			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
-			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
+			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
+			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
 				setPlayerListName(nameFormatTab);
 			} else {
-				p.setDisplayName(nameFormatChat);
+				p.setDisplayName(nameFormatChat.substring(0, 16));
 				setPlayerListName(p.getName());
 			}
 		} else {
-			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			p.setDisplayName(chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId()));
+			setPlayerListName(tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId()));
 		}
 	}
 
 	public String getTabPrefix() {
-		return tabPrefix;
+		return tabPrefixes.containsKey(p.getUniqueId()) ? tabPrefixes.get(p.getUniqueId()) : "";
 	}
 
 	public void setTabPrefix(String tabPrefix) {
-		this.tabPrefix = ChatColor.translateAlternateColorCodes('&', tabPrefix);
+		if(tabPrefixes.containsKey(p.getUniqueId()))
+			tabPrefixes.remove(p.getUniqueId());
+		
+		tabPrefixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabPrefix));
 		
 		if(Main.version.equals("1_7_R4")) {
-			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
-			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
+			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
+			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
 				setPlayerListName(nameFormatTab);
 			} else {
-				p.setDisplayName(nameFormatChat);
+				p.setDisplayName(nameFormatChat.substring(0, 16));
 				setPlayerListName(p.getName());
 			}
 		} else {
-			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			p.setDisplayName(chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId()));
+			setPlayerListName(tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId()));
 		}
 	}
 
 	public String getTabSuffix() {
-		return tabSuffix;
+		return tabSuffixes.containsKey(p.getUniqueId()) ? tabSuffixes.get(p.getUniqueId()) : "";
 	}
 
 	public void setTabSuffix(String tabSuffix) {
-		this.tabSuffix = ChatColor.translateAlternateColorCodes('&', tabSuffix);
+		if(tabSuffixes.containsKey(p.getUniqueId()))
+			tabSuffixes.remove(p.getUniqueId());
+		
+		tabSuffixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabSuffix));
 		
 		if(Main.version.equals("1_7_R4")) {
-			String nameFormatChat = this.chatPrefix + p.getName() + this.chatSuffix;
-			String nameFormatTab = this.tabPrefix + p.getName() + this.tabSuffix;
+			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
+			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
 				setPlayerListName(nameFormatTab);
 			} else {
-				p.setDisplayName(nameFormatChat);
+				p.setDisplayName(nameFormatChat.substring(0, 16));
 				setPlayerListName(p.getName());
 			}
 		} else {
-			p.setDisplayName(this.chatPrefix + p.getName() + this.chatSuffix);
-			setPlayerListName(this.tabPrefix + p.getName() + this.tabSuffix);
+			p.setDisplayName(chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId()));
+			setPlayerListName(tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId()));
 		}
 	}
 
@@ -439,10 +467,22 @@ public class NickManager {
 			tabSuffix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
 		}
 		
-		this.chatPrefix = chatPrefix;
-		this.chatSuffix = chatSuffix;
-		this.tabPrefix = tabPrefix;
-		this.tabSuffix = tabSuffix;
+		if(chatPrefixes.containsKey(p.getUniqueId()))
+			chatPrefixes.remove(p.getUniqueId());
+			
+		if(chatSuffixes.containsKey(p.getUniqueId()))
+			chatSuffixes.remove(p.getUniqueId());
+		
+		if(tabPrefixes.containsKey(p.getUniqueId()))
+			tabPrefixes.remove(p.getUniqueId());
+		
+		if(tabSuffixes.containsKey(p.getUniqueId()))
+			tabSuffixes.remove(p.getUniqueId());
+		
+		chatPrefixes.put(p.getUniqueId(), chatPrefix);
+		chatSuffixes.put(p.getUniqueId(), chatSuffix);
+		tabPrefixes.put(p.getUniqueId(), tabPrefix);
+		tabSuffixes.put(p.getUniqueId(), tabSuffix);
 		
 		changeCloudNET(tagPrefix, tagSuffix);
 
@@ -453,9 +493,31 @@ public class NickManager {
 			Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
 			
 			ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
+			UUID uuid = p.getUniqueId();
+			String finalTabPrefix = tabPrefix;
+			String finalTabSuffix = tabSuffix;
 			
-			sbtm.destroyTeam();
-			sbtm.createTeam();
+			new Timer().schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					if(Main.getPlugin(Main.class).isEnabled()) {
+						if(Utils.nickedPlayers.contains(uuid)) {
+							sbtm.destroyTeam();
+							sbtm.createTeam();
+							
+							if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
+								setPlayerListName(finalTabPrefix + p.getName() + finalTabSuffix);
+						} else {
+							sbtm.destroyTeam();
+							cancel();
+						}
+					} else {
+						sbtm.destroyTeam();
+						cancel();
+					}
+				}
+			}, 1000, 1000);
 		}
 		
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
