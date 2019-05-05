@@ -458,15 +458,17 @@ public class NickManager {
 	}
 	
 	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String groupName) {
+		System.out.println("'" + chatPrefix + "' '" + chatSuffix + "' '" + tabPrefix + "' '" + tabSuffix + "' '" + tagPrefix + "' '" + tagSuffix + "'");
+		
 		if(Utils.placeholderAPIStatus()) {
 			tagPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
-			tagSuffix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
-			chatPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
-			chatSuffix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
-			tabPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
-			tabSuffix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+			tagSuffix = PlaceholderAPI.setPlaceholders(p, tagSuffix);
+			chatPrefix = PlaceholderAPI.setPlaceholders(p, chatPrefix);
+			chatSuffix = PlaceholderAPI.setPlaceholders(p, chatSuffix);
+			tabPrefix = PlaceholderAPI.setPlaceholders(p, tabPrefix);
+			tabSuffix = PlaceholderAPI.setPlaceholders(p, tabSuffix);
 		}
-		
+
 		if(chatPrefixes.containsKey(p.getUniqueId()))
 			chatPrefixes.remove(p.getUniqueId());
 			
