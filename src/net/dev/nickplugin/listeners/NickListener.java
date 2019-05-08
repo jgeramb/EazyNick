@@ -474,9 +474,7 @@ public class NickListener implements Listener {
 			NickManager api = new NickManager(all);
 			
 			if(api.isNicked()) {
-				String realName = api.getRealName().toLowerCase();
-				
-				msg = msg.toLowerCase();
+				String realName = api.getRealName();
 				
 				if(msg.contains(realName))
 					msg = msg.replaceAll(realName, realName + "§r");
@@ -485,18 +483,12 @@ public class NickListener implements Listener {
 		
 		e.setMessage(msg);
 		
-		if (e.getMessage().toLowerCase().startsWith("/help nick")
-				|| e.getMessage().toLowerCase().startsWith("/help eazynick")
-				|| e.getMessage().toLowerCase().startsWith("/? nick")
-				|| e.getMessage().toLowerCase().startsWith("/? eazynick")) {
-			if (p.hasPermission("bukkit.command.help")
-					|| Utils.hasLuckPermsPermission(p.getUniqueId(), "bukkit.command.help")) {
+		if (e.getMessage().toLowerCase().startsWith("/help nick") || e.getMessage().toLowerCase().startsWith("/help eazynick") || e.getMessage().toLowerCase().startsWith("/? nick") || e.getMessage().toLowerCase().startsWith("/? eazynick")) {
+			if (p.hasPermission("bukkit.command.help") || Utils.hasLuckPermsPermission(p.getUniqueId(), "bukkit.command.help")) {
 				e.setCancelled(true);
 
-				p.sendMessage("§e--------- §fHelp: " + Main.getPlugin(Main.class).getDescription().getName()
-						+ " §e----------------------");
-				p.sendMessage("§7Below is a list of all " + Main.getPlugin(Main.class).getDescription().getName()
-						+ " commands:");
+				p.sendMessage("§e--------- §fHelp: " + Main.getPlugin(Main.class).getDescription().getName() + " §e----------------------");
+				p.sendMessage("§7Below is a list of all " + Main.getPlugin(Main.class).getDescription().getName() + " commands:");
 				p.sendMessage("§6/eazynick: §r" + Main.getPlugin(Main.class).getCommand("eazynick").getDescription());
 			}
 		}

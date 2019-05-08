@@ -103,7 +103,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.NickedPlayers.PlayerINFO", "&5%realName% &7-> &3%nickName%");
 			cfg.addDefault("Messages.NickedPlayers.NoPlayerIsNicked", "&cDerzeit ist &4&lkein Spieler genickt");
 		} else {
-			cfg.addDefault("NickActionBarMessage.Text", "%prefix%&4You are currently playing as&8: &6%nickName%");
+			cfg.addDefault("NickActionBarMessage", "%prefix%&4You are currently playing as&8: &6%nickName%");
 			
 			cfg.addDefault("NickItem.ItemLore.Enabled", "&7Rightclick to &cdeactivate &7the automatic nickname");
 			cfg.addDefault("NickItem.ItemLore.Disabled", "&7Rightclick to &aactivate &7the automatic nickname");

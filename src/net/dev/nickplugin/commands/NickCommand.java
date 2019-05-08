@@ -32,7 +32,19 @@ public class NickCommand implements CommandExecutor {
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					} else {
 						if(args.length == 0) {
-							if(FileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
+							if(FileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand")) {
+								if(!(p.hasPermission("nick.gui")) && !(Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui"))) {
+									PermissionAttachment pa = p.addAttachment(Main.getPlugin(Main.class));
+									pa.setPermission("nick.gui", true);
+									p.recalculatePermissions();
+									
+									p.chat("/bookgui");
+									
+									p.removeAttachment(pa);
+									p.recalculatePermissions();
+								} else
+									p.chat("/bookgui");
+							} else if(FileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
 								if(!(p.hasPermission("nick.gui")) && !(Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui"))) {
 									PermissionAttachment pa = p.addAttachment(Main.getPlugin(Main.class));
 									pa.setPermission("nick.gui", true);

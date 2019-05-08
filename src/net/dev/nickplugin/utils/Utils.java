@@ -80,6 +80,10 @@ public class Utils {
 	public static boolean deluxeChatStatus() {
 		return (Bukkit.getPluginManager().getPlugin("DeluxeChat") != null);
 	}
+	
+	public static boolean chatControlProStatus() {
+		return (Bukkit.getPluginManager().getPlugin("ChatControl") != null);
+	}
 
 	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();
 	public static ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();
