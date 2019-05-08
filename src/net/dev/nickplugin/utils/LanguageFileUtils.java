@@ -103,7 +103,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.NickedPlayers.PlayerINFO", "&5%realName% &7-> &3%nickName%");
 			cfg.addDefault("Messages.NickedPlayers.NoPlayerIsNicked", "&cDerzeit ist &4&lkein Spieler genickt");
 		} else {
-			cfg.addDefault("NickActionBarMessage", "%prefix%&4You are currently playing as&8: &6%nickName%");
+			cfg.addDefault("NickActionBarMessage", "%prefix%&4You are playing as&8: &6%nickName%");
 			
 			cfg.addDefault("NickItem.ItemLore.Enabled", "&7Rightclick to &cdeactivate &7the automatic nickname");
 			cfg.addDefault("NickItem.ItemLore.Disabled", "&7Rightclick to &aactivate &7the automatic nickname");
@@ -125,7 +125,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("NickNameGUI.NickNameSkull.DisplayName", "&e&l%nickName%");
 			
 			cfg.addDefault("Messages.prefix", "&8[&5NICK&8]");
-			cfg.addDefault("Messages.Nick", "&4You are now playing as&8: &6%name%");
+			cfg.addDefault("Messages.Nick", "&4You are playing as&8: &6%name%");
 			cfg.addDefault("Messages.Unnick", "&4Your nickname has been reset");
 			cfg.addDefault("Messages.Name", "&4Current nickname&8: &6%name%");
 			cfg.addDefault("Messages.SkinChanged", "&4You have received a new skin&7: &6%skinName%");
