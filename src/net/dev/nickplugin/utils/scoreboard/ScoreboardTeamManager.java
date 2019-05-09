@@ -2,6 +2,7 @@ package net.dev.nickplugin.utils.scoreboard;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -130,6 +131,7 @@ public class ScoreboardTeamManager {
 				List<String> contents = Utils.scoreboardTeamContents.get(teamName);
 				
 				if(t.hasPermission("nick.bypass") && FileUtils.cfg.getBoolean("BypassFormat.Show")) {
+					contents = Arrays.asList(new NickManager(p).getRealName());
 					prefixForPlayer = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("BypassFormat.NameTagPrefix"));
 					suffixForPlayer = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("BypassFormat.NameTagSuffix"));
 				}

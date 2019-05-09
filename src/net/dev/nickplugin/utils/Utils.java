@@ -74,7 +74,7 @@ public class Utils {
 	}
 	
 	public static boolean tabStatus() {
-		return (Bukkit.getPluginManager().getPlugin("TAB") != null);
+		return (Bukkit.getPluginManager().getPlugin("TAB") != null) && (Bukkit.getPluginManager().getPlugin("TAB").getDescription().getAuthors().contains("NEZNAMY"));
 	}
 	
 	public static boolean deluxeChatStatus() {
