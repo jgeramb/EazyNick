@@ -32,6 +32,8 @@ import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -426,6 +428,9 @@ public class NickListener implements Listener {
 					format = format.replace("%message%", e.getMessage());
 				} else
 					format = e.getFormat().replace("%1$s", p.getDisplayName()).replace("%2$s", e.getMessage());
+				
+				if(Utils.placeholderAPIStatus())
+					format = PlaceholderAPI.setPlaceholders(p, format);
 				
 				e.setFormat(format);
 				

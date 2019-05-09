@@ -83,11 +83,6 @@ public class NickManager {
 			NMSNickManager.updatePlayer(p);
 	}
 	
-	public void refreshPlayer() {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			NMSNickManager.updatePlayer(p);
-	}
-	
 	public void setName(String nickName) {
 		NMSNickManager.updateName(p, nickName);
 		

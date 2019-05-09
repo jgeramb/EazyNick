@@ -49,18 +49,14 @@ public class NickHelpCommand implements CommandExecutor {
 						p.sendMessage(Utils.prefix + "§7");
 						p.sendMessage(Utils.prefix + "§aMore help§8: §7/eazynick 3");
 					} else if(args[0].equalsIgnoreCase("3")) {
-						p.sendMessage(Utils.prefix + "§7/changename §8» §eRandom name");
-						p.sendMessage(Utils.prefix + "§7/changename [name] §8» §eStated name");
 						p.sendMessage(Utils.prefix + "§7/resetname §8» §eReset name");
 						p.sendMessage(Utils.prefix + "§7/changeskin §8» §eRandom skin");
 						p.sendMessage(Utils.prefix + "§7/changeskin [name] §8» §eStated skin");
 						p.sendMessage(Utils.prefix + "§7/resetskin §8» §eReset skin");
-						p.sendMessage(Utils.prefix + "§7");
-						p.sendMessage(Utils.prefix + "§aMore help§8: §7/eazynick 4");
-					} else if(args[0].equalsIgnoreCase("4")) {
 						p.sendMessage(Utils.prefix + "§7/nickupdatecheck §8» §eUpdate check");
 						p.sendMessage(Utils.prefix + "§7/reloadconfig §8» §eConfig reload");
-						p.sendMessage(Utils.prefix + "§7/eazynick [1-4] §8» §ePlugin help");
+						p.sendMessage(Utils.prefix + "§7");
+						p.sendMessage(Utils.prefix + "§7/eazynick [1-3] §8» §ePlugin help");
 					} else
 						p.sendMessage(Utils.prefix + "§cPage not found!");
 				}

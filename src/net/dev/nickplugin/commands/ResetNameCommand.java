@@ -21,10 +21,8 @@ public class ResetNameCommand implements CommandExecutor {
 			
 			if(p.hasPermission("nick.name") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.name")) {
 				NickManager api = new NickManager(p);
-				
 				api.setName(api.getRealName());
-				api.refreshPlayer();
-				api.resetLuckPerms();
+				api.updatePlayer();
 
 				MySQLPlayerDataManager.removeData(p.getUniqueId());
 				MySQLNickManager.removePlayer(p.getUniqueId());

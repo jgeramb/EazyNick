@@ -21,6 +21,7 @@ public class ResetSkinCommand implements CommandExecutor {
 				NickManager api = new NickManager(p);
 				
 				api.changeSkin(api.getRealName());
+				api.updatePlayer();
 				
 				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ResetSkin")));
 			} else {

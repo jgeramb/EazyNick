@@ -20,16 +20,19 @@ public class ChangeSkinCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.skin") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.skin")) {
-				NickManager api = new NickManager(p);
-				
 				if((Utils.canUseNick.get(p.getUniqueId()))) {
+					NickManager api = new NickManager(p);
+					
 					if(args.length >= 1) {
 						String name = args[0];
+						
 						api.changeSkin(name);
+						api.updatePlayer();
 						
 						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.SkinChanged").replace("%skinName%", name)));
 					} else {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
+						
 						api.changeSkin(name);		
 						
 						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.SkinChanged").replace("%skinName%", name)));

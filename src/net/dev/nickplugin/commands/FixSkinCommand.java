@@ -19,8 +19,8 @@ public class FixSkinCommand implements CommandExecutor {
 			
 			if(p.hasPermission("nick.fixskin") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.fixskin")) {
 				NickManager api = new NickManager(p);
-				
-				api.refreshPlayer();
+				api.updatePlayer();
+
 				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.FixSkin")));
 			} else {
 				p.sendMessage(Utils.noPerm);
