@@ -453,8 +453,6 @@ public class NickManager {
 	}
 	
 	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String groupName) {
-		System.out.println("'" + chatPrefix + "' '" + chatSuffix + "' '" + tabPrefix + "' '" + tabSuffix + "' '" + tagPrefix + "' '" + tagSuffix + "'");
-		
 		if(Utils.placeholderAPIStatus()) {
 			tagPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
 			tagSuffix = PlaceholderAPI.setPlaceholders(p, tagSuffix);

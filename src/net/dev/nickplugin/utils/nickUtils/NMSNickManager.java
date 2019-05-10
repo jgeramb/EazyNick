@@ -309,9 +309,8 @@ public class NMSNickManager extends ReflectUtils {
 					toRemove.add(cachedName);
 			}
 			
-			for (String string : toRemove) {
+			for (String string : toRemove)
 				map.remove(string);
-			}
 			
 			map.put(p.getName(), p.getClass().getMethod("getHandle").invoke(p));
 			
