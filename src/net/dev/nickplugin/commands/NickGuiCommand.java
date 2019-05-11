@@ -9,8 +9,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import net.dev.nickplugin.utils.*;
-import net.dev.nickplugin.main.*;
+import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.utils.LanguageFileUtils;
+import net.dev.nickplugin.utils.Utils;
 
 public class NickGuiCommand implements CommandExecutor {
 

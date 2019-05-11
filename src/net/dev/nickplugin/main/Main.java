@@ -10,12 +10,37 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mojang.authlib.GameProfile;
 
-import net.dev.nickplugin.commands.*;
-import net.dev.nickplugin.listeners.*;
-import net.dev.nickplugin.placeholders.*;
-import net.dev.nickplugin.sql.*;
-import net.dev.nickplugin.updater.*;
-import net.dev.nickplugin.utils.*;
+import net.dev.nickplugin.commands.BookGUICommand;
+import net.dev.nickplugin.commands.BookNickCommand;
+import net.dev.nickplugin.commands.ChangeSkinCommand;
+import net.dev.nickplugin.commands.CommandNotAvaiableCommand;
+import net.dev.nickplugin.commands.FixSkinCommand;
+import net.dev.nickplugin.commands.NameCommand;
+import net.dev.nickplugin.commands.NickCommand;
+import net.dev.nickplugin.commands.NickGuiCommand;
+import net.dev.nickplugin.commands.NickHelpCommand;
+import net.dev.nickplugin.commands.NickListCommand;
+import net.dev.nickplugin.commands.NickOtherCommand;
+import net.dev.nickplugin.commands.NickUpdateCheckCommand;
+import net.dev.nickplugin.commands.NickedPlayersCommand;
+import net.dev.nickplugin.commands.ReNickCommand;
+import net.dev.nickplugin.commands.RealNameCommand;
+import net.dev.nickplugin.commands.ReloadConfigCommand;
+import net.dev.nickplugin.commands.ResetNameCommand;
+import net.dev.nickplugin.commands.ResetSkinCommand;
+import net.dev.nickplugin.commands.ToggleBungeeNickCommand;
+import net.dev.nickplugin.commands.UnnickCommand;
+import net.dev.nickplugin.listeners.DeluxeChatHookListener;
+import net.dev.nickplugin.listeners.NickListener;
+import net.dev.nickplugin.placeholders.PlaceHolderExpansion;
+import net.dev.nickplugin.sql.MySQL;
+import net.dev.nickplugin.updater.SpigotUpdater;
+import net.dev.nickplugin.utils.BookGUIFileUtils;
+import net.dev.nickplugin.utils.FileUtils;
+import net.dev.nickplugin.utils.LanguageFileUtils;
+import net.dev.nickplugin.utils.NickNameFileUtils;
+import net.dev.nickplugin.utils.ReflectUtils;
+import net.dev.nickplugin.utils.Utils;
 
 public class Main extends JavaPlugin {
 

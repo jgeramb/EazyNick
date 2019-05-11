@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -34,25 +35,29 @@ public class BookNickCommand implements CommandExecutor {
 						String skinName = "";
 						boolean isCancelled = false;
 						
-						boolean nickNameIsInUse = false;
-						
-						for (String nickName : Utils.playerNicknames.values())
-							if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-								nickNameIsInUse = true;
-	
-						if(!(nickNameIsInUse)) {
-							boolean playerWithNameIsOnline = false;
-							
-							for (Player all : Bukkit.getOnlinePlayers())
-								if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-									playerWithNameIsOnline = true;
-							
-							if(((FileUtils.cfg.getBoolean("AllowPlayersToNickAsOnlinePlayers")) == false) && playerWithNameIsOnline)
-								isCancelled = true;
-							
-							if(!(isCancelled)) {
-								if(new StringUtils(name).removeColorCodes().getString().length() <= 16) {
-									if(!(Utils.blackList.contains(name.toUpperCase()))) {
+						if(new StringUtils(name).removeColorCodes().getString().length() <= 16) {
+							if(!(Utils.blackList.contains(args[0].toUpperCase()))) {
+								boolean nickNameIsInUse = false;
+								
+								for (String nickName : Utils.playerNicknames.values())
+									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+										nickNameIsInUse = true;
+
+								if(!(nickNameIsInUse)) {
+									boolean playerWithNameIsKnown = false;
+									
+									for (Player all : Bukkit.getOnlinePlayers())
+										if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+											playerWithNameIsKnown = true;
+									
+									for (OfflinePlayer all : Bukkit.getOfflinePlayers())
+										if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+											playerWithNameIsKnown = true;
+									
+									if(!(FileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+										isCancelled = true;
+									
+									if(!(isCancelled)) {
 										String groupName = "";
 										
 										if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.RankName")) && BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission")))) {
@@ -126,16 +131,16 @@ public class BookNickCommand implements CommandExecutor {
 										
 										Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, groupName));
 									} else {
-										p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
+										p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsKnown")));
 									}
 								} else {
-									p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
+									p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
 								}
 							} else {
-								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsOnServer")));
+								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
 							}
 						} else {
-							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
+							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
 						}
 					}
 				}
