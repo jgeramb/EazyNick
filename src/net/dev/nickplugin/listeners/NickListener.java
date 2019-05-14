@@ -410,42 +410,38 @@ public class NickListener implements Listener {
 	public void onChat(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
 
-		if (!(e.isCancelled())) {
-			NickManager api = new NickManager(p);
-
-			if (api.isNicked()) {
-				e.setCancelled(true);
-				
-				String format;
-
-				if (FileUtils.cfg.getBoolean("ReplaceNickedChatFormat")) {
-					format = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.ChatFormat"));
+		if (FileUtils.cfg.getBoolean("ReplaceNickedChatFormat")) {
+			if (!(e.isCancelled())) {
+				NickManager api = new NickManager(p);
+	
+				if (api.isNicked()) {
+					e.setCancelled(true);
+					
+					String format = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.ChatFormat"));
 					format = format.replace("%displayName%", p.getDisplayName());
 					format = format.replace("%nickName%", api.getNickName());
 					format = format.replace("%playerName%", p.getName());
 					format = format.replace("%prefix%", api.getChatPrefix());
 					format = format.replace("%suffix%", api.getChatSuffix());
 					format = format.replace("%message%", e.getMessage());
-				} else
-					format = e.getFormat().replace("%1$s", p.getDisplayName()).replace("%2$s", e.getMessage());
-				
-				if(Utils.placeholderAPIStatus())
-					format = PlaceholderAPI.setPlaceholders(p, format);
-				
-				e.setFormat(format);
-				
-				Bukkit.getConsoleSender().sendMessage(format);
-
-				for (Player all : Bukkit.getOnlinePlayers()) {
-					if (all.getName().equalsIgnoreCase(p.getName())) {
-						if (FileUtils.cfg.getBoolean("SeeNickSelf"))
-							all.sendMessage(format);
-						else
+					
+					if(Utils.placeholderAPIStatus())
+						format = PlaceholderAPI.setPlaceholders(p, format);
+					
+					e.setFormat(format);
+					
+					Bukkit.getConsoleSender().sendMessage(format);
+	
+					for (Player all : Bukkit.getOnlinePlayers()) {
+						if (all.getName().equalsIgnoreCase(p.getName())) {
+							if (FileUtils.cfg.getBoolean("SeeNickSelf"))
+								all.sendMessage(format);
+							else
+								all.sendMessage(format.replace(p.getDisplayName(), api.getOldDisplayName()));
+						} else if (all.hasPermission("nick.bypass"))
 							all.sendMessage(format.replace(p.getDisplayName(), api.getOldDisplayName()));
-					} else if (all.hasPermission("nick.bypass")) {
-						all.sendMessage(format.replace(p.getDisplayName(), api.getOldDisplayName()));
-					} else {
-						all.sendMessage(format);
+						else
+							all.sendMessage(format);
 					}
 				}
 			}
