@@ -18,11 +18,25 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 	@Override
 	public String onPlaceholderRequest(Player p, String identifier) {
 		if(p != null) {
+			NickManager api = new NickManager(p);
+			
 			if(identifier.equals("is_nicked") || identifier.equals("is_disguised"))
-				return String.valueOf(new NickManager(p).isNicked());
+				return String.valueOf(api.isNicked());
 			
 			if(identifier.equals("display_name"))
 				return p.getName();
+			
+			if(identifier.equals("chat_prefix"))
+				return api.getChatPrefix();
+			
+			if(identifier.equals("chat_suffix"))
+				return api.getChatSuffix();
+			
+			if(identifier.equals("tab_prefix"))
+				return api.getTabPrefix();
+			
+			if(identifier.equals("tab_suffix"))
+				return api.getTabSuffix();
 		}
 		
 		return null;
