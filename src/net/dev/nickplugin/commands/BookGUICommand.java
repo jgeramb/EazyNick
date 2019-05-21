@@ -93,7 +93,7 @@ public class BookGUICommand implements CommandExecutor {
 					if(FileUtils.cfg.getBoolean("AllowBookGUICustomName"))
 						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need\n§0to choose the §0§lNAME §0to use!\n§0\n§0"), option1, option2, new TextComponent("§0\n§0To go back to being\n§0your usual self, type:\n§0§l/unnick")));
 					else
-						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need\n§0to choose the §0§lNAME §0to use!\n§0\n§0"), option1, new TextComponent("§0\n§0To go back to being\n§0your usual self, type:\n§0§l/unnick")));
+						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need\n§0to choose the §0§lNAME §0to use!\n§0\n§0"), option2, new TextComponent("§0\n§0To go back to being\n§0your usual self, type:\n§0§l/unnick")));
 				} else {
 					if(args[2].equalsIgnoreCase("RANDOM")) {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
