@@ -63,6 +63,10 @@ public class Utils {
 		return (Bukkit.getPluginManager().getPlugin("UltraPermissions") != null);
 	}
 	
+	public static boolean vaultStatus() {
+		return (Bukkit.getPluginManager().getPlugin("Vault") != null);
+	}
+	
 	public static boolean authMeReloadedStatus(String version) {
 		Plugin plugin = Bukkit.getPluginManager().getPlugin("AuthMe");
 		

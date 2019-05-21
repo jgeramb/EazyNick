@@ -1,11 +1,11 @@
 name: EazyNick
-version: 1.191
+version: 1.192
 author: Justix
 main: net.dev.nickplugin.main.Main
 description: This plugin allows you to change your identity (skin, name, nametag, tabname, chatname)
 website: https://www.spigotmc.org/resources/eazynick-autonicksystem-api-src-bungeecord-multiworld-1-7-10-1-13-1.51398/
 api-versions: [1.13, 1.14]
-softdepend: [PlaceholderAPI, DeluxeChat]
+softdepend: [PlaceholderAPI, DeluxeChat, Vault]
 
 commands:
       nick:

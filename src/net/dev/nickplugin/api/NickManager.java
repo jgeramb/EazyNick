@@ -30,6 +30,7 @@ import net.dev.nickplugin.utils.nickUtils.UUIDFetcher;
 import net.dev.nickplugin.utils.nickUtils.UUIDFetcher_1_7;
 import net.dev.nickplugin.utils.nickUtils.UUIDFetcher_1_8_R1;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
+import net.milkbowl.vault.chat.Chat;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.storage.objects.User;
@@ -287,7 +288,7 @@ public class NickManager {
 	}
 	
 	public String getChatPrefix() {
-		return chatPrefixes.containsKey(p.getUniqueId()) ? chatPrefixes.get(p.getUniqueId()) : "";
+		return chatPrefixes.containsKey(p.getUniqueId()) ? chatPrefixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultChat")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
 	}
 
 	public void setChatPrefix(String chatPrefix) {
@@ -314,7 +315,7 @@ public class NickManager {
 	}
 
 	public String getChatSuffix() {
-		return chatSuffixes.containsKey(p.getUniqueId()) ? chatSuffixes.get(p.getUniqueId()) : "";
+		return chatSuffixes.containsKey(p.getUniqueId()) ? chatSuffixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultChat")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
 	}
 
 	public void setChatSuffix(String chatSuffix) {

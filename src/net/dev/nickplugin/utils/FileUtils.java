@@ -75,6 +75,7 @@ public class FileUtils {
 		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
 		cfg.addDefault("AllowBookGUICustomName", true);
+		cfg.addDefault("ServerIsUsingVaultChat", false);
 
 		cfg.addDefault("NickActionBarMessage", false);
 		
