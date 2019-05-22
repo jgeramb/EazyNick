@@ -288,7 +288,7 @@ public class NickManager {
 	}
 	
 	public String getChatPrefix() {
-		return chatPrefixes.containsKey(p.getUniqueId()) ? chatPrefixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultChat")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
+		return chatPrefixes.containsKey(p.getUniqueId()) ? chatPrefixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
 	}
 
 	public void setChatPrefix(String chatPrefix) {
@@ -315,7 +315,7 @@ public class NickManager {
 	}
 
 	public String getChatSuffix() {
-		return chatSuffixes.containsKey(p.getUniqueId()) ? chatSuffixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultChat")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
+		return chatSuffixes.containsKey(p.getUniqueId()) ? chatSuffixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
 	}
 
 	public void setChatSuffix(String chatSuffix) {
@@ -342,7 +342,7 @@ public class NickManager {
 	}
 
 	public String getTabPrefix() {
-		return tabPrefixes.containsKey(p.getUniqueId()) ? tabPrefixes.get(p.getUniqueId()) : "";
+		return tabPrefixes.containsKey(p.getUniqueId()) ? tabPrefixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
 	}
 
 	public void setTabPrefix(String tabPrefix) {
@@ -369,7 +369,7 @@ public class NickManager {
 	}
 
 	public String getTabSuffix() {
-		return tabSuffixes.containsKey(p.getUniqueId()) ? tabSuffixes.get(p.getUniqueId()) : "";
+		return tabSuffixes.containsKey(p.getUniqueId()) ? tabSuffixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
 	}
 
 	public void setTabSuffix(String tabSuffix) {
@@ -582,7 +582,7 @@ public class NickManager {
 		if(Utils.cloudNetStatus()) {
 			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
 			
-			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
+			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
 				PermissionEntity entity = cloudPlayer.getPermissionEntity();
 				
 				if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId()))
@@ -604,7 +604,7 @@ public class NickManager {
 		if(Utils.cloudNetStatus()) {
 			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
 			
-			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixes")) {
+			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
 				PermissionEntity entity = cloudPlayer.getPermissionEntity();
 				
 				if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId())) {

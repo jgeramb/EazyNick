@@ -70,12 +70,12 @@ public class FileUtils {
 		cfg.addDefault("AllowPlayersToNickAsOnlinePlayers", false);
 		cfg.addDefault("AllowPlayersToNickAsKnownPlayers", false);
 		cfg.addDefault("SwitchPermissionsExGroupByNicking", false);
-		cfg.addDefault("ServerIsUsingCloudNETPrefixes", false);
+		cfg.addDefault("ServerIsUsingCloudNETPrefixesAndSuffixes", false);
+		cfg.addDefault("ServerIsUsingVaultPrefixesAndSuffixes", false);
 		cfg.addDefault("RandomDisguiseDelay", false);
 		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
 		cfg.addDefault("AllowBookGUICustomName", true);
-		cfg.addDefault("ServerIsUsingVaultChat", false);
 
 		cfg.addDefault("NickActionBarMessage", false);
 		
