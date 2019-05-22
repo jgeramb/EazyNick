@@ -171,12 +171,19 @@ public class NickManager {
 	}
 	
 	public void unnickPlayer() {
+		if(FileUtils.cfg.getBoolean("BungeeCord")) {
+			MySQLNickManager.removePlayer(p.getUniqueId());
+			MySQLPlayerDataManager.removeData(p.getUniqueId());
+		}
+		
+		unnickPlayerWithoutRemovingMySQL();
+	}
+	
+	public void unnickPlayerWithoutRemovingMySQL() {
 		String nickName = getRealName();
 		
 		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
-		
-		MySQLNickManager.removePlayer(p.getUniqueId());
 		
 		setName(nickName);
 		changeSkin(nickName);
@@ -241,10 +248,6 @@ public class NickManager {
 				
 				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
 			}
-		}
-		
-		if(FileUtils.cfg.getBoolean("BungeeCord")) {
-			MySQLPlayerDataManager.removeData(p.getUniqueId());
 		}
 		
 		if(Utils.ultraPermissionsStatus()) {

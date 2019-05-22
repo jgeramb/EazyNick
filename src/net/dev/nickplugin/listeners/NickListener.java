@@ -119,6 +119,27 @@ public class NickListener implements Listener {
 
 			@EventHandler
 			public void run() {
+				if(p.hasPermission("nick.bypass")) {
+					for (Player all : Bukkit.getOnlinePlayers()) {
+						NickManager apiAll = new NickManager(all);
+						
+						if (apiAll.isNicked()) {
+							String name = apiAll.getNickName();
+
+							Utils.joinNicking.add(all.getUniqueId());
+							
+							Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+
+								@Override
+								public void run() {
+									apiAll.unnickPlayerWithoutRemovingMySQL();
+									all.chat("/renick " + name);
+								}
+							}, 10);
+						}
+					}
+				}
+				
 				if (FileUtils.cfg.getBoolean("BungeeCord")) {
 					if (FileUtils.cfg.getBoolean("LobbyMode") == false) {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
@@ -183,29 +204,8 @@ public class NickListener implements Listener {
 
 								@Override
 								public void run() {
-									api.unnickPlayer();
+									api.unnickPlayerWithoutRemovingMySQL();
 									p.chat("/renick " + name);
-								}
-							}, 10);
-						}
-					}
-				}
-				
-				if(p.hasPermission("nick.bypass")) {
-					for (Player all : Bukkit.getOnlinePlayers()) {
-						NickManager apiAll = new NickManager(all);
-						
-						if (apiAll.isNicked()) {
-							String name = apiAll.getNickName();
-
-							Utils.joinNicking.add(all.getUniqueId());
-							
-							Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
-
-								@Override
-								public void run() {
-									apiAll.unnickPlayer();
-									all.chat("/renick " + name);
 								}
 							}, 10);
 						}
