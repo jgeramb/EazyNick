@@ -584,6 +584,7 @@ public class NickManager {
 			
 			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
 				PermissionEntity entity = cloudPlayer.getPermissionEntity();
+				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
 				
 				if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId()))
 					Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
@@ -591,11 +592,18 @@ public class NickManager {
 				if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId()))
 					Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
 				
+				if(Utils.oldCloudNETTagIDS.containsKey(p.getUniqueId()))
+					Utils.oldCloudNETTagIDS.remove(p.getUniqueId());
+				
 				Utils.oldCloudNETPrefixes.put(p.getUniqueId(), entity.getPrefix());
 				Utils.oldCloudNETSuffixes.put(p.getUniqueId(), entity.getSuffix());
+				Utils.oldCloudNETTagIDS.put(p.getUniqueId(), highestPermissionGroup.getTagId());
 				
 				entity.setPrefix(prefix);
 				entity.setSuffix(suffix);
+				highestPermissionGroup.setPrefix(prefix);
+				highestPermissionGroup.setSuffix(suffix);
+				highestPermissionGroup.setTagId(Integer.MAX_VALUE);
 			}
 		}
 	}
@@ -606,15 +614,23 @@ public class NickManager {
 			
 			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
 				PermissionEntity entity = cloudPlayer.getPermissionEntity();
+				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
 				
 				if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId())) {
 					entity.setPrefix(Utils.oldCloudNETPrefixes.get(p.getUniqueId()));
+					highestPermissionGroup.setPrefix(Utils.oldCloudNETPrefixes.get(p.getUniqueId()));
 					Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
 				}
 				
 				if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId())) {
 					entity.setSuffix(Utils.oldCloudNETSuffixes.get(p.getUniqueId()));
+					highestPermissionGroup.setSuffix(Utils.oldCloudNETSuffixes.get(p.getUniqueId()));
 					Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
+				}
+				
+				if(Utils.oldCloudNETTagIDS.containsKey(p.getUniqueId())) {
+					highestPermissionGroup.setTagId(Utils.oldCloudNETTagIDS.get(p.getUniqueId()));
+					Utils.oldCloudNETTagIDS.remove(p.getUniqueId());
 				}
 			}
 		}
