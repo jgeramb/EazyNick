@@ -172,17 +172,40 @@ public class NickListener implements Listener {
 							}
 						}, 10);
 					}
-				} else if (FileUtils.cfg.getBoolean("DiconnectUnnick") == false) {
-					if (!(api.isNicked())) {
+				} else if (!(FileUtils.cfg.getBoolean("DiconnectUnnick"))) {
+					if (api.isNicked()) {
 						if (Utils.playerNicknames.containsKey(p.getUniqueId())) {
 							String name = Utils.playerNicknames.get(p.getUniqueId());
 
+							Utils.joinNicking.add(p.getUniqueId());
+							
 							Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
 
 								@Override
 								public void run() {
 									api.unnickPlayer();
 									p.chat("/renick " + name);
+								}
+							}, 10);
+						}
+					}
+				}
+				
+				if(p.hasPermission("nick.bypass")) {
+					for (Player all : Bukkit.getOnlinePlayers()) {
+						NickManager apiAll = new NickManager(all);
+						
+						if (apiAll.isNicked()) {
+							String name = apiAll.getNickName();
+
+							Utils.joinNicking.add(all.getUniqueId());
+							
+							Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+
+								@Override
+								public void run() {
+									apiAll.unnickPlayer();
+									all.chat("/renick " + name);
 								}
 							}, 10);
 						}
