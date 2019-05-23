@@ -26,7 +26,7 @@ public class ActionBarUtils {
 					public void run() {
 						i++;
 
-						if (i == time)
+						if ((i == time) || (p == null))
 							cancel();
 						else
 							sendPacket(p, chatPacket);
