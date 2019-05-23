@@ -124,7 +124,7 @@ public class BookNickCommand implements CommandExecutor {
 										if(args[1].equalsIgnoreCase("DEFAULT")) {
 											skinName = api.getRealName();
 										} else if(args[1].equalsIgnoreCase("NORMAL")) {
-											skinName = ((new Random().nextInt(2)) == 1) ? "Steve" : "Alex";
+											skinName = (new Random().nextBoolean()) ? "Steve" : "Alex";
 										} else if(args[1].equalsIgnoreCase("RANDOM")) {
 											skinName = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 										}

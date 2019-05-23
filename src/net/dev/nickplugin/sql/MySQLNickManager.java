@@ -67,10 +67,7 @@ public class MySQLNickManager {
 				try {
 					ResultSet rs = Main.mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next()) {
-						if(rs.getString("NAME") != null)
-							return true;
-					}
+					return rs.next();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}

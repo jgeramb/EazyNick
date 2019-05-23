@@ -99,8 +99,6 @@ public class NickListener implements Listener {
 		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(p.getName());
 
-		String joinNickName = NickManager.getRandomName();
-
 		if (e.getJoinMessage() != null && e.getJoinMessage() != "") {
 			if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 				if (e.getJoinMessage().contains("formerly known as"))
@@ -140,17 +138,42 @@ public class NickListener implements Listener {
 					}
 				}
 				
+				if (FileUtils.cfg.getBoolean("JoinNick")) {
+					if (!(api.isNicked())) {
+						Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+
+							@Override
+							public void run() {
+								p.chat("/nick");
+							}
+						}, 10);
+					}
+				} else if (!(FileUtils.cfg.getBoolean("DiconnectUnnick"))) {
+					if (api.isNicked()) {
+						Utils.joinNicking.add(p.getUniqueId());
+						
+						Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+
+							@Override
+							public void run() {
+								api.unnickPlayerWithoutRemovingMySQL();
+								p.chat("/renick");
+							}
+						}, 10);
+						
+						return;
+					}
+				}
+				
 				if (FileUtils.cfg.getBoolean("BungeeCord")) {
 					if (FileUtils.cfg.getBoolean("LobbyMode") == false) {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (!(api.isNicked())) {
-								String nickName = MySQLNickManager.getNickName(p.getUniqueId());
-
 								Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
 
 									@Override
 									public void run() {
-										p.chat("/renick " + nickName);
+										p.chat("/renick");
 									}
 								}, 10);
 							}
@@ -181,35 +204,6 @@ public class NickListener implements Listener {
 								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 							else
 								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
-						}
-					}
-				}
-
-				if (FileUtils.cfg.getBoolean("JoinNick")) {
-					if (!(api.isNicked())) {
-						Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
-
-							@Override
-							public void run() {
-								p.chat("/nick " + joinNickName);
-							}
-						}, 10);
-					}
-				} else if (!(FileUtils.cfg.getBoolean("DiconnectUnnick"))) {
-					if (api.isNicked()) {
-						if (Utils.playerNicknames.containsKey(p.getUniqueId())) {
-							String name = Utils.playerNicknames.get(p.getUniqueId());
-
-							Utils.joinNicking.add(p.getUniqueId());
-							
-							Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
-
-								@Override
-								public void run() {
-									api.unnickPlayerWithoutRemovingMySQL();
-									p.chat("/renick " + name);
-								}
-							}, 10);
 						}
 					}
 				}
