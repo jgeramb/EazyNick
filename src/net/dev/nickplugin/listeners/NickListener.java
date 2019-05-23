@@ -158,8 +158,10 @@ public class NickListener implements Listener {
 					} else {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (FileUtils.cfg.getBoolean("GetNewNickOnEveryServerSwitch")) {
+								String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
+								
 								MySQLNickManager.removePlayer(p.getUniqueId());
-								MySQLNickManager.addPlayer(p.getUniqueId(), Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size()))));
+								MySQLNickManager.addPlayer(p.getUniqueId(), name, name);
 							}
 						}
 					}

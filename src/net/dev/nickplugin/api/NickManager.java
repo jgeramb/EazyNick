@@ -129,7 +129,7 @@ public class NickManager {
 		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
 		
-		MySQLNickManager.addPlayer(p.getUniqueId(), nickName);
+		MySQLNickManager.addPlayer(p.getUniqueId(), nickName, skinName);
 		
 		setName(new StringUtils(nickName).removeColorCodes().getString());
 		changeSkin(new StringUtils(skinName).removeColorCodes().getString());

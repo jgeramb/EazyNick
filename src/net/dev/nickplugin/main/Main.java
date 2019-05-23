@@ -175,7 +175,7 @@ public class Main extends JavaPlugin {
 						mysql = new MySQL(FileUtils.cfg.getString("BungeeMySQL.hostname"), FileUtils.cfg.getString("BungeeMySQL.port"), FileUtils.cfg.getString("BungeeMySQL.database"), FileUtils.cfg.getString("BungeeMySQL.username"), FileUtils.cfg.getString("BungeeMySQL.password"));
 						mysql.connect();
 
-						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NAME varchar(64))");
+						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NICKNAME varchar(64), SKINNAME varchar(64))");
 						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), OldPermissionsExRank varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
 					}
 					
