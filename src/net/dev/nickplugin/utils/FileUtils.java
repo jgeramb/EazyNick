@@ -77,10 +77,10 @@ public class FileUtils {
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
 		cfg.addDefault("AllowBookGUICustomName", true);
 
-		cfg.addDefault("NickActionBarMessage", false);
+		cfg.addDefault("NickActionBarMessage", true);
 		
 		cfg.addDefault("BypassFormat.Show", true);
-		cfg.addDefault("BypassFormat.NameTagPrefix", "&dNICKED &7| &d");
+		cfg.addDefault("BypassFormat.NameTagPrefix", "&dBYPASS &7| &d");
 		cfg.addDefault("BypassFormat.NameTagSuffix", "&r");
 		
 		cfg.addDefault("NickMessage.OnNnick", false);

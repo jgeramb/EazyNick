@@ -11,11 +11,11 @@ public class ActionBarUtils {
 	
 	public static void sendActionBar(Player p, String text, int time) {
 		try {
-			if (ReflectUtils.getVersion().contains("v1_7_") || ReflectUtils.getVersion().contains("v1_8_")) {
+			if (Main.version.startsWith("1_7_") || Main.version.startsWith("1_8_")) {
 				Class<?> mainChatPacket = ReflectUtils.getNMSClass("PacketPlayOutChat");
 				Class<?> chatSerializer = ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 
-				Object chatText = chatSerializer.getMethod("a", new Class[] { String.class }).invoke(chatSerializer, new Object[] { "{\"text\":\"" + text.replace("&", "§") + "\"}" });
+				Object chatText = chatSerializer.getMethod("a", new Class[] { String.class }).invoke(chatSerializer, new Object[] { "{\"text\":\"" + text + "\"}" });
 				Object chatPacket = mainChatPacket.getConstructor(new Class[] { ReflectUtils.getNMSClass("IChatBaseComponent"), byte.class }).newInstance(new Object[] { chatText, (byte) 2 });
 
 				new BukkitRunnable() {
@@ -33,7 +33,7 @@ public class ActionBarUtils {
 					}
 				}.runTaskTimer(Main.getPlugin(Main.class), 1, 1);
 			} else {
-				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text.replace("&", "§")));
+				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -45,10 +45,13 @@ public class ActionBarUtils {
 	}
 	
 	private static void sendPacket(Player p, Object packet) {
+		if(packet == null)
+			return;
+		
 		try {
-			Object playerHandle = p.getClass().getMethod("getHandle", new Class[0]).invoke(p, new Object[0]);
-			Object playerConnection = playerHandle.getClass().getField("playerConnection").get(playerHandle);
-			playerConnection.getClass().getMethod("sendPacket", new Class[] { ReflectUtils.getNMSClass("Packet") }).invoke(playerConnection, new Object[] { packet });
+			Object handle = p.getClass().getMethod("getHandle").invoke(p);
+			Object playerConnection = handle.getClass().getDeclaredField("playerConnection").get(handle);
+			playerConnection.getClass().getMethod("sendPacket", ReflectUtils.getNMSClass("Packet")).invoke(playerConnection, packet);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
