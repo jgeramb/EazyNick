@@ -90,7 +90,7 @@ public class BookGUICommand implements CommandExecutor {
 					option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " RANDOM"));
 					option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§0§fClick here to use a random name") }));
 
-					if(FileUtils.cfg.getBoolean("AllowBookGUICustomName"))
+					if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")))
 						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need\n§0to choose the §0§lNAME §0to use!\n§0\n§0"), option1, option2, new TextComponent("§0\n§0To go back to being\n§0your usual self, type:\n§0§l/unnick")));
 					else
 						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need\n§0to choose the §0§lNAME §0to use!\n§0\n§0"), option2, new TextComponent("§0\n§0To go back to being\n§0your usual self, type:\n§0§l/unnick")));
@@ -122,12 +122,12 @@ public class BookGUICommand implements CommandExecutor {
 						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " ENTERNAME"));
 						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§0§fClick here to enter a name") }));
 						
-						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName"))
+						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")))
 							NMSBookUtils.open(p, NMSBookBuilder.create("RandomNick", new TextComponent("§0We've generated a\n§0random username for\n§0you:\n§0§l" + name + "\n§0\n§0"), option1, option2, option3));
 						else
 							NMSBookUtils.open(p, NMSBookBuilder.create("RandomNick", new TextComponent("§0We've generated a\n§0random username for\n§0you:\n§0§l" + name + "\n§0\n§0"), option1, option2));
 					} else if(args[2].equalsIgnoreCase("ENTERNAME")) {
-						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName")) {
+						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname"))) {
 							AnvilGUI gui = new AnvilGUI(p, new AnvilGUI.AnvilClickEventHandler() {
 	
 								@Override
