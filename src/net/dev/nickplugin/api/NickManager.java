@@ -80,8 +80,12 @@ public class NickManager {
 	}
 	
 	public void updatePlayer() {
+		updatePlayer(false);
+	}
+	
+	private void updatePlayer(boolean forceUpdate) {
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			NMSNickManager.updatePlayer(p);
+			NMSNickManager.updatePlayer(p, true);
 	}
 	
 	public void setName(String nickName) {
@@ -187,7 +191,7 @@ public class NickManager {
 		
 		setName(nickName);
 		changeSkin(nickName);
-		updatePlayer();
+		updatePlayer(true);
 		
 		Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
 			

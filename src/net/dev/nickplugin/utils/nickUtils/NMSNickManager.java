@@ -183,7 +183,7 @@ public class NMSNickManager extends ReflectUtils {
 	}
 	
 	@SuppressWarnings({ })
-	public static void updatePlayer(Player p) {
+	public static void updatePlayer(Player p, boolean forceUpdate) {
 		NickManager api = new NickManager(p);
 		boolean onNick = !(api.isNicked());
 		
@@ -221,8 +221,8 @@ public class NMSNickManager extends ReflectUtils {
 					Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName()))));
 			}
 			
-			sendPacket(p, packetEntityDestroy);
-			sendPacket(p, packetPlayOutPlayerInfoRemove);
+			sendPacket(p, packetEntityDestroy, forceUpdate);
+			sendPacket(p, packetPlayOutPlayerInfoRemove, forceUpdate);
 			
 			Object packetRespawnPlayer = null;
 
@@ -249,8 +249,8 @@ public class NMSNickManager extends ReflectUtils {
 				
 				@Override
 				public void run() {
-					sendPacket(p, packetPlayOutPlayerInfoAdd);
-					sendPacketExceptSelf(p, packetNamedEntitySpawn);
+					sendPacket(p, packetPlayOutPlayerInfoAdd, forceUpdate);
+					sendPacketExceptSelf(p, packetNamedEntitySpawn, forceUpdate);
 					
 					try {
 						Object packetEntityLook = ((Main.version.equals("1_7_R4") || Main.version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
@@ -258,8 +258,8 @@ public class NMSNickManager extends ReflectUtils {
 						setField(packetHeadRotation, "a", p.getEntityId());
 						setField(packetHeadRotation, "b", (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)));
 						
-						sendPacketExceptSelf(p, packetEntityLook);
-						sendPacketExceptSelf(p, packetHeadRotation);
+						sendPacketExceptSelf(p, packetEntityLook, forceUpdate);
+						sendPacketExceptSelf(p, packetHeadRotation, forceUpdate);
 					} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 						e.printStackTrace();
 					}
@@ -321,26 +321,23 @@ public class NMSNickManager extends ReflectUtils {
 		}
 	}
 	
-	public static void sendPacket(Player p, Object packet) {
+	public static void sendPacket(Player p, Object packet, boolean forceUpdate) {
 		for (Player all : Bukkit.getOnlinePlayers()) {
 			if(!(all.getUniqueId().equals(p.getUniqueId()))) {
-				if(!(all.hasPermission("nick.bypass"))) {
+				if(!(all.hasPermission("nick.bypass")) || forceUpdate)
 					sendPacketNMS(all, packet);
-				}
 			} else {
-				if(FileUtils.cfg.getBoolean("SeeNickSelf")) {
+				if(FileUtils.cfg.getBoolean("SeeNickSelf") || forceUpdate)
 					sendPacketNMS(all, packet);
-				}
 			}
 		}
 	}
 	
-	public static void sendPacketExceptSelf(Player p, Object packet) {
+	public static void sendPacketExceptSelf(Player p, Object packet, boolean forceUpdate) {
 		for (Player all : Bukkit.getOnlinePlayers()) {
 			if(!(all.getUniqueId().equals(p.getUniqueId()))) {
-				if(!(all.hasPermission("nick.bypass"))) {
+				if(!(all.hasPermission("nick.bypass")) || forceUpdate)
 					sendPacketNMS(all, packet);
-				}
 			}
 		}
 	}
