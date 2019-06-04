@@ -191,6 +191,7 @@ public class NMSNickManager extends ReflectUtils {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 			Object worldClient = entityPlayer.getClass().getMethod("getWorld").invoke(entityPlayer);
 			Object worldData = worldClient.getClass().getMethod("getWorldData").invoke(worldClient);
+			Object worldProvider = worldClient.getClass().getMethod("getWorldProvider").invoke(worldClient);
 			Object interactManager = entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer);
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
@@ -226,10 +227,8 @@ public class NMSNickManager extends ReflectUtils {
 			
 			Object packetRespawnPlayer = null;
 
-			if(Main.version.startsWith("1_14")) {
-				Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
-				
-				packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldClient.getClass().getDeclaredField("dimension").get(craftWorld), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
+			if(Main.version.equals("1_14_R1")) {
+				packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldProvider.getClass().getMethod("getDimensionManager").invoke(worldProvider), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
 			} else if(Main.version.equals("1_13_R2")) {
 				Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
 				
