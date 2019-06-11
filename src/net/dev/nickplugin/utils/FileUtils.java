@@ -117,18 +117,18 @@ public class FileUtils {
 		cfg.addDefault("Settings.NameChangeOptions.DisplayNameColored", true);
 		cfg.addDefault("Settings.NameChangeOptions.PlayerListNameColored", true);
 		cfg.addDefault("Settings.NameChangeOptions.NameTagColored", true);
-		cfg.addDefault("Settings.NickFormat.Chat.prefix", "&8");
+		cfg.addDefault("Settings.NickFormat.Chat.Prefix", "&8");
 		cfg.addDefault("Settings.NickFormat.Chat.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.PlayerList.prefix", "&8");
+		cfg.addDefault("Settings.NickFormat.PlayerList.Prefix", "&8");
 		cfg.addDefault("Settings.NickFormat.PlayerList.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.NameTag.prefix", "&8");
+		cfg.addDefault("Settings.NickFormat.NameTag.Prefix", "&8");
 		cfg.addDefault("Settings.NickFormat.NameTag.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.PermissionsEx.GroupName", "Spieler");
-		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.prefix", "&6");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Prefix", "&6");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.prefix", "&6");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Prefix", "&6");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.prefix", "&6");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Prefix", "&6");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName", "Premium");
 
