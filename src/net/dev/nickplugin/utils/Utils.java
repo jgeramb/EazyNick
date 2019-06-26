@@ -128,10 +128,8 @@ public class Utils {
 		if (enchantedItem) {
 			m.addEnchant(Enchantment.DURABILITY, 1, true);
 
-			if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-				m.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES,
-						ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE });
-			}
+			if(!(Main.version.equalsIgnoreCase("1_7_R4")) && !(Bukkit.getVersion().contains("1.14.3")))
+				m.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE });
 		}
 
 		is.setItemMeta(m);
@@ -169,6 +167,19 @@ public class Utils {
 		}
 		
 		return false;
+	}
+
+	public static int getOnlinePlayers() {
+		if(Main.version.equals("1_7_R4")) {
+			try {
+				return Bukkit.getOnlinePlayers().getClass().getField("length").getInt(Bukkit.getOnlinePlayers());
+			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+				e.printStackTrace();
+			}
+		} else
+			return Bukkit.getOnlinePlayers().size();
+		
+		return 0;
 	}
 
 }

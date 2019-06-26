@@ -1,5 +1,6 @@
 package net.dev.nickplugin.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -11,12 +12,12 @@ public class ActionBarUtils {
 	
 	public static void sendActionBar(Player p, String text, int time) {
 		try {
-			if (Main.version.startsWith("1_7_") || Main.version.startsWith("1_8_")) {
+			if (Main.version.startsWith("1_7_") || Main.version.startsWith("1_8_") || Bukkit.getVersion().contains("1.14.3")) {
 				Class<?> mainChatPacket = ReflectUtils.getNMSClass("PacketPlayOutChat");
 				Class<?> chatSerializer = ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 
 				Object chatText = chatSerializer.getMethod("a", new Class[] { String.class }).invoke(chatSerializer, new Object[] { "{\"text\":\"" + text + "\"}" });
-				Object chatPacket = mainChatPacket.getConstructor(new Class[] { ReflectUtils.getNMSClass("IChatBaseComponent"), byte.class }).newInstance(new Object[] { chatText, (byte) 2 });
+				Object chatPacket = mainChatPacket.getConstructor(new Class[] { ReflectUtils.getNMSClass("IChatBaseComponent"), Bukkit.getVersion().contains("1.14.3") ? ChatMessageType.class : byte.class }).newInstance(new Object[] { chatText, Bukkit.getVersion().contains("1.14.3") ? ChatMessageType.ACTION_BAR : (byte) 2 });
 
 				new BukkitRunnable() {
 
@@ -32,9 +33,8 @@ public class ActionBarUtils {
 							sendPacket(p, chatPacket);
 					}
 				}.runTaskTimer(Main.getPlugin(Main.class), 1, 1);
-			} else {
+			} else
 				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

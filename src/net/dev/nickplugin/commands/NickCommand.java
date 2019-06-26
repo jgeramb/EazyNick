@@ -73,7 +73,7 @@ public class NickCommand implements CommandExecutor {
 											nickNameIsInUse = true;
 								}
 	
-								boolean serverFull = Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers();
+								boolean serverFull = Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
 								String prefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Prefix")));
 								String suffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
 								
@@ -84,7 +84,7 @@ public class NickCommand implements CommandExecutor {
 										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")),
 										prefix,
 										suffix,
-										false, (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
+										false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
 							}
 						} else {
 							if(p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")) {
@@ -117,7 +117,7 @@ public class NickCommand implements CommandExecutor {
 												if(!(name.equalsIgnoreCase(p.getName()))) {
 													name = ChatColor.translateAlternateColorCodes('&', name);
 													
-													boolean serverFull = Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers();
+													boolean serverFull = Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
 													String nameWhithoutColors = ChatColor.stripColor(name);
 													String[] prefixSuffix = name.split(nameWhithoutColors);
 													String chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix;
@@ -149,7 +149,7 @@ public class NickCommand implements CommandExecutor {
 														tagSuffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
 													}
 													
-													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
+													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
 												} else {
 													p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.CanNotNickAsSelf")));
 												}

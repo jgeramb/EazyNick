@@ -567,7 +567,7 @@ public class NickManager {
 				Utils.oldPermissionsExPrefixes.put(p.getUniqueId(), user.getPrefix());
 				Utils.oldPermissionsExSuffixes.put(p.getUniqueId(), user.getSuffix());
 				
-				if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers()) {
+				if(Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) {
 					user.setPrefix(tabPrefix, p.getWorld().getName());
 					user.setSuffix(tabSuffix, p.getWorld().getName());
 				} else {
