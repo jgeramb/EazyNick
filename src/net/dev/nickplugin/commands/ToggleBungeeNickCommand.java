@@ -50,12 +50,10 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.BungeeAutoNickEnabled")));
 					}
 				}
-			} else {
+			} else
 				p.sendMessage(Utils.noPerm);
-			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}

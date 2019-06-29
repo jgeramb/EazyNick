@@ -11,8 +11,8 @@ import net.dev.nickplugin.main.Main;
 
 public class BookGUIFileUtils {
 
-	public static File folder = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/");
-	public static File file = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/bookgui.yml");
+	public static File folder = new File("plugins/" + Main.getInstance().getDescription().getName() + "/");
+	public static File file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/bookgui.yml");
 	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 	
 	public static void saveFile() {
@@ -35,7 +35,7 @@ public class BookGUIFileUtils {
 			}
 		}
 
-		PluginDescriptionFile desc = Main.getPlugin(Main.class).getDescription();
+		PluginDescriptionFile desc = Main.getInstance().getDescription();
 		
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"
@@ -45,7 +45,7 @@ public class BookGUIFileUtils {
 				+ "\n");
 
 		cfg.addDefault("BookGUI.Rank1.Enabled", true);
-		cfg.addDefault("BookGUI.Rank1.Rank", "&8Player");
+		cfg.addDefault("BookGUI.Rank1.Rank", "&8DEFAULT");
 		cfg.addDefault("BookGUI.Rank1.RankName", "DEFAULT");
 		cfg.addDefault("BookGUI.Rank1.Permission", "NONE");
 		cfg.addDefault("BookGUI.Rank2.Enabled", true);
@@ -69,7 +69,7 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.Rank6.RankName", "MVPPLUS");
 		cfg.addDefault("BookGUI.Rank6.Permission", "nick.rank.6");
 		cfg.addDefault("BookGUI.Rank7.Enabled", true);
-		cfg.addDefault("BookGUI.Rank7.Rank", "&bMVP&c++");
+		cfg.addDefault("BookGUI.Rank7.Rank", "&6MVP&c++");
 		cfg.addDefault("BookGUI.Rank7.RankName", "MVPPLUSPLUS");
 		cfg.addDefault("BookGUI.Rank7.Permission", "nick.rank.7");
 
@@ -121,11 +121,11 @@ public class BookGUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank6.TagSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank6.PermissionsEx.GroupName", "MVPPlus");
 		
-		cfg.addDefault("Settings.NickFormat.Rank7.ChatPrefix", "&b[MVP&c++&b] ");
+		cfg.addDefault("Settings.NickFormat.Rank7.ChatPrefix", "&6[MVP&c++&6] ");
 		cfg.addDefault("Settings.NickFormat.Rank7.ChatSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank7.TabPrefix", "&bMVP&c++ &7| &b");
+		cfg.addDefault("Settings.NickFormat.Rank7.TabPrefix", "&6MVP&c++ &6| &6");
 		cfg.addDefault("Settings.NickFormat.Rank7.TabSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank7.TagPrefix", "&b[MVP&c++&b] ");
+		cfg.addDefault("Settings.NickFormat.Rank7.TagPrefix", "&6[MVP&c++&6] ");
 		cfg.addDefault("Settings.NickFormat.Rank7.TagSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank7.PermissionsEx.GroupName", "MVPPlusPlus");
 

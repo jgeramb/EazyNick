@@ -31,6 +31,34 @@ public class Utils {
 	public static Field field;
 	public static PagesHandler<String> nickNamesHandler;
 
+	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();
+	public static ArrayList<UUID> joinNicking = new ArrayList<>();
+	public static ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();
+	public static HashMap<UUID, String> playerNicknames = new HashMap<>();
+	public static List<String> nickNames = new ArrayList<>();
+	public static List<String> blackList = new ArrayList<>();
+	public static List<String> worldBlackList = new ArrayList<>();
+	public static HashMap<UUID, String> oldDisplayNames = new HashMap<>();
+	public static HashMap<UUID, String> oldPlayerListNames = new HashMap<>();
+	public static HashMap<UUID, Boolean> canUseNick = new HashMap<>();
+	public static HashMap<UUID, Integer> nickNameListPage = new HashMap<>();
+	public static HashMap<UUID, String> oldPermissionsExPrefixes = new HashMap<>();
+	public static HashMap<UUID, String> oldPermissionsExSuffixes = new HashMap<>();
+	public static HashMap<UUID, String> oldCloudNETPrefixes = new HashMap<>();
+	public static HashMap<UUID, String> oldCloudNETSuffixes = new HashMap<>();
+	public static HashMap<UUID, Integer> oldCloudNETTagIDS = new HashMap<>();
+	public static HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
+	public static HashMap<UUID, String> luckPermsPrefixes = new HashMap<>();
+	public static HashMap<UUID, String> luckPermsSuffixes = new HashMap<>();
+	public static HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
+	public static HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
+	
+	public static HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
+	public static HashMap<String, ArrayList<String>> scoreboardTeamContents = new HashMap<>();
+	public static HashMap<UUID, String> nameCache = new HashMap<>();
+	public static HashMap<UUID, String> lastSkinNames = new HashMap<>();
+	public static HashMap<UUID, String> lastNickNames = new HashMap<>();
+
 	public static boolean placeholderAPIStatus() {
 		return (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null);
 	}
@@ -70,10 +98,11 @@ public class Utils {
 	public static boolean authMeReloadedStatus(String version) {
 		Plugin plugin = Bukkit.getPluginManager().getPlugin("AuthMe");
 		
-		if(plugin != null)
+		if(plugin != null) {
 			if(plugin.getDescription().getMain().equalsIgnoreCase("fr.xephi.authme.AuthMe"))
 				return plugin.getDescription().getVersion().contains(version);
-
+		}
+			
 		return false;
 	}
 	
@@ -88,33 +117,7 @@ public class Utils {
 	public static boolean chatControlProStatus() {
 		return (Bukkit.getPluginManager().getPlugin("ChatControl") != null);
 	}
-
-	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();
-	public static ArrayList<UUID> joinNicking = new ArrayList<>();
-	public static ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();
-	public static HashMap<UUID, String> playerNicknames = new HashMap<>();
-	public static List<String> nickNames = new ArrayList<>();
-	public static List<String> blackList = new ArrayList<>();
-	public static List<String> worldBlackList = new ArrayList<>();
-	public static HashMap<UUID, String> oldDisplayNames = new HashMap<>();
-	public static HashMap<UUID, String> oldPlayerListNames = new HashMap<>();
-	public static HashMap<UUID, Boolean> canUseNick = new HashMap<>();
-	public static HashMap<UUID, Integer> nickNameListPage = new HashMap<>();
-	public static HashMap<UUID, String> oldPermissionsExPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> oldPermissionsExSuffixes = new HashMap<>();
-	public static HashMap<UUID, String> oldCloudNETPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> oldCloudNETSuffixes = new HashMap<>();
-	public static HashMap<UUID, Integer> oldCloudNETTagIDS = new HashMap<>();
-	public static HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
-	public static HashMap<UUID, String> luckPermsPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> luckPermsSuffixes = new HashMap<>();
-	public static HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
 	
-	public static HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
-	public static HashMap<String, ArrayList<String>> scoreboardTeamContents = new HashMap<>();
-	public static HashMap<UUID, String> nameCache = new HashMap<>();
-
 	public static void sendConsole(String msg) {
 		Bukkit.getConsoleSender().sendMessage(prefix + msg);
 	}
@@ -160,9 +163,8 @@ public class Utils {
 	public static boolean hasLuckPermsPermission(UUID uuid, String permission) {
 		if(luckPermsStatus()) {
 			for (Node perm : LuckPerms.getApi().getUser(uuid).getPermissions()) {
-				if(perm.toString().toLowerCase().equals(permission.toLowerCase())) {
+				if(perm.toString().toLowerCase().equals(permission.toLowerCase()))
 					return true;
-				}
 			}
 		}
 		

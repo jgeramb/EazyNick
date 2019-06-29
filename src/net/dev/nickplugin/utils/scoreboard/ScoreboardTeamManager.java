@@ -39,9 +39,10 @@ public class ScoreboardTeamManager {
 		if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getNickName())))
 			Utils.scoreboardTeamContents.get(teamName).add(api.getNickName());
 		
-		if(FileUtils.cfg.getBoolean("BypassFormat.Show"))
+		if(FileUtils.cfg.getBoolean("BypassFormat.Show")) {
 			if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getRealName())))
 				Utils.scoreboardTeamContents.get(teamName).add(api.getRealName());
+		}
 	}
 	
 	public ScoreboardTeamManager(Player p, String name, String prefix, String suffix) {
@@ -58,9 +59,10 @@ public class ScoreboardTeamManager {
 
 		NickManager api = new NickManager(p);
 		
-		if(FileUtils.cfg.getBoolean("BypassFormat.Show"))
+		if(FileUtils.cfg.getBoolean("BypassFormat.Show")) {
 			if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getRealName())))
 				Utils.scoreboardTeamContents.get(teamName).add(api.getRealName());
+		}
 	}
 	
 	public void destroyTeam() {

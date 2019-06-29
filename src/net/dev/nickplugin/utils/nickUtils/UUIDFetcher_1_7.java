@@ -48,15 +48,17 @@ public class UUIDFetcher_1_7 {
 		   
 		   return data.id;
 	   } catch (Exception e) {
-		   for(String nickName : Utils.nickNames)
+		   for(String nickName : Utils.nickNames) {
 			   if(name.equalsIgnoreCase(nickName))
 				   Utils.nickNames.remove(nickName);
+		   }
 		   
 		   List<String> list = NickNameFileUtils.cfg.getStringList("NickNames");
 		   
-		   for(String nickName : list)
+		   for(String nickName : list) {
 			   if(name.equalsIgnoreCase(nickName))
 				   list.remove(nickName);
+		   }
 		   
 		   NickNameFileUtils.cfg.set("NickNames", list);
 		   NickNameFileUtils.saveFile();
@@ -86,4 +88,5 @@ public class UUIDFetcher_1_7 {
       
 	   return null;
    }
+   
 }

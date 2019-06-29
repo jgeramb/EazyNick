@@ -52,12 +52,10 @@ public class ReloadConfigCommand implements CommandExecutor {
 				Utils.notPlayer = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotPlayer"));
 				
 				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ReloadConfig")));
-			} else {
+			} else
 				p.sendMessage(Utils.noPerm);
-			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}

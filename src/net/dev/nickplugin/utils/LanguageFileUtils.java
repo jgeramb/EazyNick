@@ -11,8 +11,8 @@ import net.dev.nickplugin.main.Main;
 
 public class LanguageFileUtils {
 
-	public static File folder = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/lang/");
-	public static File file = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/lang/de_DE.yml");
+	public static File folder = new File("plugins/" + Main.getInstance().getDescription().getName() + "/lang/");
+	public static File file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/lang/de_DE.yml");
 	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 	
 	public static void saveFile() {
@@ -35,7 +35,7 @@ public class LanguageFileUtils {
 			}
 		}
 		
-		PluginDescriptionFile desc = Main.getPlugin(Main.class).getDescription();
+		PluginDescriptionFile desc = Main.getInstance().getDescription();
 		
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"
@@ -66,7 +66,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("NickNameGUI.NextItem.DisplayName", "&7Weiter &8[&e-->&8]");
 			cfg.addDefault("NickNameGUI.NickNameSkull.DisplayName", "&e&l%nickName%");
 			
-			cfg.addDefault("Messages.Prefix", "&8[&5NICK&8]");
+			cfg.addDefault("Messages.Prefix", "&8[&5NICK&8] ");
 			cfg.addDefault("Messages.Nick", "&4Du spielst als&8: &6%name%");
 			cfg.addDefault("Messages.Unnick", "&4Dein Nickname wurde entfernt");
 			cfg.addDefault("Messages.Name", "&4Aktueller Nickname&8: &6%name%");
@@ -124,7 +124,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("NickNameGUI.NextItem.DisplayName", "&7Next &8[&e-->&8]");
 			cfg.addDefault("NickNameGUI.NickNameSkull.DisplayName", "&e&l%nickName%");
 			
-			cfg.addDefault("Messages.Prefix", "&8[&5NICK&8]");
+			cfg.addDefault("Messages.Prefix", "&8[&5NICK&8] ");
 			cfg.addDefault("Messages.Nick", "&4You are playing as&8: &6%name%");
 			cfg.addDefault("Messages.Unnick", "&4Your nickname has been reset");
 			cfg.addDefault("Messages.Name", "&4Current nickname&8: &6%name%");

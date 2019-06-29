@@ -149,7 +149,7 @@ public class NickManager {
 				
 				@Override
 				public void run() {
-					if(Main.getPlugin(Main.class).isEnabled()) {
+					if(Main.getInstance().isEnabled()) {
 						if(Utils.nickedPlayers.contains(uuid))
 							ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix)), 20);
 						else {
@@ -193,7 +193,7 @@ public class NickManager {
 		changeSkin(nickName);
 		updatePlayer(true);
 		
-		Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 			
 			@Override
 			public void run() {
@@ -504,7 +504,7 @@ public class NickManager {
 				
 				@Override
 				public void run() {
-					if(Main.getPlugin(Main.class).isEnabled()) {
+					if(Main.getInstance().isEnabled()) {
 						if(Utils.nickedPlayers.contains(uuid)) {
 							sbtm.destroyTeam();
 							sbtm.createTeam();

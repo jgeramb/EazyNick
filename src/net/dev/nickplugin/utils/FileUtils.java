@@ -14,8 +14,8 @@ import net.dev.nickplugin.main.Main;
 
 public class FileUtils {
 
-	public static File folder = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/");
-	public static File file = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/setup.yml");
+	public static File folder = new File("plugins/" + Main.getInstance().getDescription().getName() + "/");
+	public static File file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/setup.yml");
 	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 	
 	public static void saveFile() {
@@ -38,7 +38,7 @@ public class FileUtils {
 			}
 		}
 
-		PluginDescriptionFile desc = Main.getPlugin(Main.class).getDescription();
+		PluginDescriptionFile desc = Main.getInstance().getDescription();
 		
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"
@@ -75,6 +75,7 @@ public class FileUtils {
 		cfg.addDefault("RandomDisguiseDelay", false);
 		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
+		cfg.addDefault("UseSignGUIForCustomName", true);
 		cfg.addDefault("AllowBookGUICustomName", true);
 
 		cfg.addDefault("NickActionBarMessage", true);
@@ -146,7 +147,7 @@ public class FileUtils {
 		cfg.options().copyHeader(true);
 		saveFile();
 		
-		LanguageFileUtils.file = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/lang/" + cfg.getString("Language") + ".yml");
+		LanguageFileUtils.file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/lang/" + cfg.getString("Language") + ".yml");
 		LanguageFileUtils.cfg = YamlConfiguration.loadConfiguration(LanguageFileUtils.file);
 		LanguageFileUtils.setupFiles();
 	}

@@ -32,7 +32,7 @@ public class ActionBarUtils {
 						else
 							sendPacket(p, chatPacket);
 					}
-				}.runTaskTimer(Main.getPlugin(Main.class), 1, 1);
+				}.runTaskTimer(Main.getInstance(), 1, 1);
 			} else
 				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
 		} catch (Exception e) {

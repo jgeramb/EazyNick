@@ -23,7 +23,9 @@ public class NMSBookBuilder {
 			List<Object> list = (List<Object>) ReflectUtils.getField(ReflectUtils.getCraftClass("inventory.CraftMetaBook"), "pages").get(m);
 			
 			TextComponent text = new TextComponent("");
-			for (TextComponent tc : texts) text.addExtra(tc);
+			
+			for (TextComponent tc : texts)
+				text.addExtra(tc);
 			
 			list.add(toIChatBaseComponent(text));
 		} catch (Exception e) {

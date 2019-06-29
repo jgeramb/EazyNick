@@ -35,7 +35,7 @@ public class SpigotUpdater {
 			e.printStackTrace();
 		}
 
-		if (newVersion > Double.valueOf(Main.getPlugin(Main.class).getDescription().getVersion()).doubleValue()) {
+		if (newVersion > Double.valueOf(Main.getInstance().getDescription().getVersion()).doubleValue()) {
 			System.out.println("[Updater] Found a new version (" + newVersion + ")");
 
 			if (FileUtils.cfg.getBoolean("AutoUpdater")) {
@@ -59,12 +59,10 @@ public class SpigotUpdater {
 				}
 
 				System.out.println("[Updater] Successfully updated plugin to version " + newVersion + ". Please reload/restart your server now.");
-			} else {
+			} else
 				System.out.println("[Updater] Download the update here: https://www.spigotmc.org/resources/eazynick-nicksystem-api-src-bungeecord-multiworld-1-7-10-1-12-2.51398/");
-			}
-		} else {
+		} else
 			System.out.println("[Updater] No new version available");
-		}
 	}
 	
 	public static void checkForUpdates(Player p) {
@@ -84,7 +82,7 @@ public class SpigotUpdater {
 			e.printStackTrace();
 		}
 
-		if (newVersion > Double.valueOf(Main.getPlugin(Main.class).getDescription().getVersion()).doubleValue()) {
+		if (newVersion > Double.valueOf(Main.getInstance().getDescription().getVersion()).doubleValue()) {
 			p.sendMessage(Utils.prefix + "§3Updater §8» §rFound a new version (" + newVersion + ")");
 
 			if (FileUtils.cfg.getBoolean("AutoUpdater")) {
@@ -108,12 +106,10 @@ public class SpigotUpdater {
 				}
 
 				p.sendMessage(Utils.prefix + "§3Updater §8» §rSuccessfully updated plugin to version " + newVersion + ". Please restart/reload your server");
-			} else {
+			} else
 				p.sendMessage(Utils.prefix + "§3Updater §8» §rDownload the update here: https://www.spigotmc.org/resources/eazynick-nicksystem-api-src-bungeecord-multiworld-1-7-10-1-12-2.51398/");
-			}
-		} else {
+		} else
 			p.sendMessage(Utils.prefix + "§3Updater §8» §rNo new version available");
-		}
 	}
 
 }

@@ -62,12 +62,12 @@ public class GameProfileBuilder {
 			} else {
 				if(!forceNew && cache.containsKey(uuid))
 					return cache.get(uuid).profile;
+			}
             
 			JsonObject error = (JsonObject) new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine());
             throw new IOException(error.get("error").getAsString() + ": " + error.get("errorMessage").getAsString());
-         }
-      }
-   }
+		}
+	}
    
 	public static GameProfile getProfile(UUID uuid, String name, String skin) {
 		return getProfile(uuid, name, skin, null);
@@ -104,10 +104,11 @@ public class GameProfileBuilder {
 			String name = object.has("name") ? object.getAsJsonPrimitive("name").getAsString() : null;
 			GameProfile profile = new GameProfile(id, name);
          
-			if(object.has("properties"))
+			if(object.has("properties")) {
 				for (Entry<String, Property> prop : ((PropertyMap) context.deserialize(object.get("properties"), PropertyMap.class)).entries())
 					profile.getProperties().put(prop.getKey(), prop.getValue());
-			
+			}
+				
 			return profile;
 		}
 		
@@ -121,7 +122,7 @@ public class GameProfileBuilder {
 	  		if(profile.getName() != null)
 	  			result.addProperty("name", profile.getName());
 	  		
-	  		if(!profile.getProperties().isEmpty())
+	  		if(!(profile.getProperties().isEmpty()))
 	  			result.add("properties", context.serialize(profile.getProperties()));
 	  	
 	  		return result;

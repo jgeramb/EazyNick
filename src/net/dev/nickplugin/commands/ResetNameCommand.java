@@ -28,12 +28,10 @@ public class ResetNameCommand implements CommandExecutor {
 				MySQLNickManager.removePlayer(p.getUniqueId());
 				
 				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ResetName")));
-			} else {
+			} else
 				p.sendMessage(Utils.noPerm);
-			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}

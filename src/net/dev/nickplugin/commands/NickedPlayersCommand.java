@@ -37,15 +37,12 @@ public class NickedPlayersCommand implements CommandExecutor {
 						if(api.isNicked())
 							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickedPlayers.PlayerINFO")).replace("%realName%", api.getRealName()).replace("%nickName%", api.getNickName()));
 					}
-				} else {
+				} else
 					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickedPlayers.NoPlayerIsNicked")));
-				}
-			} else {
+			} else
 				p.sendMessage(Utils.noPerm);
-			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}

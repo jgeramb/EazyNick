@@ -13,8 +13,8 @@ import net.dev.nickplugin.main.Main;
 
 public class NickNameFileUtils {
 
-	public static File folder = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/");
-	public static File file = new File("plugins/" + Main.getPlugin(Main.class).getDescription().getName() + "/nickNames.yml");
+	public static File folder = new File("plugins/" + Main.getInstance().getDescription().getName() + "/");
+	public static File file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/nickNames.yml");
 	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 	
 	public static void saveFile() {
@@ -37,7 +37,7 @@ public class NickNameFileUtils {
 			}
 		}
 
-		PluginDescriptionFile desc = Main.getPlugin(Main.class).getDescription();
+		PluginDescriptionFile desc = Main.getInstance().getDescription();
 		
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"

@@ -47,11 +47,16 @@ public class Main extends JavaPlugin {
 	public static File pluginFile;
 	public static MySQL mysql;
 	public static String version = "XX_XX_RXX";
-	public boolean isCancelled;
+	private static boolean isCancelled;
+	private static Main instance;
+	
+	public static Main getInstance() {
+		return instance;
+	}
 
 	@Override
 	public void onEnable() {
-		Main plugin = this;
+		instance = this;
 		
 		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
 			
@@ -77,9 +82,8 @@ public class Main extends JavaPlugin {
 				if (Utils.blackList.size() >= 1) {
 					ArrayList<String> toAdd = new ArrayList<>();
 					
-					for (String blackListName : Utils.blackList) {
+					for (String blackListName : Utils.blackList)
 						toAdd.add(blackListName.toUpperCase());
-					}
 					
 					Utils.blackList = new ArrayList<>(toAdd);
 				}
@@ -87,14 +91,13 @@ public class Main extends JavaPlugin {
 				if (Utils.worldBlackList.size() >= 1) {
 					ArrayList<String> toAdd = new ArrayList<>();
 					
-					for (String blackListWorld : Utils.worldBlackList) {
+					for (String blackListWorld : Utils.worldBlackList)
 						toAdd.add(blackListWorld.toUpperCase());
-					}
 					
 					Utils.worldBlackList = new ArrayList<>(toAdd);
 				}
 
-				Utils.prefix = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Prefix")) + " ";
+				Utils.prefix = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Prefix"));
 				Utils.noPerm = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoPerm"));
 				Utils.notPlayer = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotPlayer"));
 
@@ -121,7 +124,7 @@ public class Main extends JavaPlugin {
 					Utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
 					Utils.sendConsole("	§7Plugin-State§8: §cCANCELLED");
 
-					plugin.isCancelled = true;
+					isCancelled = true;
 				} else {
 					if (FileUtils.cfg.getBoolean("APIMode") == false) {
 						if (ReflectUtils.getVersion().equalsIgnoreCase("v1_7_R4"))
@@ -157,13 +160,12 @@ public class Main extends JavaPlugin {
 							getCommand("booknick").setExecutor(new CommandNotAvaiableCommand());
 						}
 						
-						Bukkit.getPluginManager().registerEvents(new NickListener(), plugin);
+						Bukkit.getPluginManager().registerEvents(new NickListener(), instance);
 
 						for (Player all : Bukkit.getOnlinePlayers()) {
 							if ((all != null) && (all.getUniqueId() != null)) {
-								if (!(Utils.canUseNick.containsKey(all.getUniqueId()))) {
+								if (!(Utils.canUseNick.containsKey(all.getUniqueId())))
 									Utils.canUseNick.put(all.getUniqueId(), true);
-								}
 							}
 						}
 					}
@@ -194,16 +196,16 @@ public class Main extends JavaPlugin {
 					SpigotUpdater.checkForUpdates();
 
 				if (isCancelled)
-					Bukkit.getPluginManager().disablePlugin(plugin);
+					Bukkit.getPluginManager().disablePlugin(instance);
 				
 				if(Utils.placeholderAPIStatus()) {
-					new PlaceHolderExpansion(plugin).register();
+					new PlaceHolderExpansion(instance).register();
 					
 					Utils.sendConsole("§7Placeholders loaded successfully!");
 				}
 				
 				if(Utils.deluxeChatStatus()) {
-					Bukkit.getPluginManager().registerEvents(new DeluxeChatHookListener(), plugin);
+					Bukkit.getPluginManager().registerEvents(new DeluxeChatHookListener(), instance);
 					
 					Utils.sendConsole("§7DeluxeChat hooked successfully!");
 				}

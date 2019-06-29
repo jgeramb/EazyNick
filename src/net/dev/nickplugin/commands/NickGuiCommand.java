@@ -30,12 +30,10 @@ public class NickGuiCommand implements CommandExecutor {
 				inv.setItem(15, Utils.createItem(Material.getMaterial(Main.version.startsWith("1_7") ? "GLASS" : "BARRIER"), 1, 0, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickGUI.UnnickItem.DisplayName"))));
 				
 				p.openInventory(inv);
-			} else {
+			} else
 				p.sendMessage(Utils.noPerm);
-			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}

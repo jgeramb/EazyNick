@@ -20,20 +20,16 @@ public class UnnickCommand implements CommandExecutor {
 			
 			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
 				if((Utils.canUseNick.get(p.getUniqueId()))) {
-					if(Utils.nickedPlayers.contains(p.getUniqueId())) {
+					if(Utils.nickedPlayers.contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
-					} else {
+					else
 						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
-					}
-				} else {
+				} else
 					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
-				}
-			} else {
+			} else
 				p.sendMessage(Utils.noPerm);
-			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}

@@ -50,7 +50,7 @@ public class NickListener implements Listener {
 			api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getGroupName());
 			
 			Utils.canUseNick.put(p.getUniqueId(), false);
-			Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+			Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 				
 				@Override
 				public void run() {
@@ -113,7 +113,7 @@ public class NickListener implements Listener {
 			}
 		}
 
-		Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 
 			@EventHandler
 			public void run() {
@@ -126,7 +126,7 @@ public class NickListener implements Listener {
 
 							Utils.joinNicking.add(all.getUniqueId());
 							
-							Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+							Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 
 								@Override
 								public void run() {
@@ -140,7 +140,7 @@ public class NickListener implements Listener {
 				
 				if (FileUtils.cfg.getBoolean("JoinNick")) {
 					if (!(api.isNicked())) {
-						Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+						Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 
 							@Override
 							public void run() {
@@ -152,7 +152,7 @@ public class NickListener implements Listener {
 					if (api.isNicked()) {
 						Utils.joinNicking.add(p.getUniqueId());
 						
-						Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+						Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 
 							@Override
 							public void run() {
@@ -169,7 +169,7 @@ public class NickListener implements Listener {
 					if (FileUtils.cfg.getBoolean("LobbyMode") == false) {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (!(api.isNicked())) {
-								Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 
 									@Override
 									public void run() {
@@ -411,9 +411,9 @@ public class NickListener implements Listener {
 					e.setDeathMessage(null);
 
 					for (Player all : Bukkit.getOnlinePlayers()) {
-						if (all != p) {
+						if (all != p)
 							all.sendMessage(deathMessage);
-						} else {
+						else {
 							String msg = deathMessage;
 							msg = msg.replace(api.getNickFormat(), api.getOldDisplayName());
 
@@ -474,9 +474,9 @@ public class NickListener implements Listener {
 		if (!(Utils.worldBlackList.contains(p.getWorld().getName().toUpperCase()))) {
 			if (FileUtils.cfg.getBoolean("NickOnWorldChange")) {
 				if (Utils.nickOnWorldChangePlayers.contains(p.getUniqueId())) {
-					if (!(Utils.nickedPlayers.contains(p.getUniqueId()))) {
+					if (!(Utils.nickedPlayers.contains(p.getUniqueId())))
 						p.chat("/renick");
-					} else {
+					else {
 						p.chat("/unnick");
 						p.chat("/renick");
 					}
@@ -507,9 +507,9 @@ public class NickListener implements Listener {
 			if (p.hasPermission("bukkit.command.help") || Utils.hasLuckPermsPermission(p.getUniqueId(), "bukkit.command.help")) {
 				e.setCancelled(true);
 
-				p.sendMessage("§e--------- §fHelp: " + Main.getPlugin(Main.class).getDescription().getName() + " §e----------------------");
-				p.sendMessage("§7Below is a list of all " + Main.getPlugin(Main.class).getDescription().getName() + " commands:");
-				p.sendMessage("§6/eazynick: §r" + Main.getPlugin(Main.class).getCommand("eazynick").getDescription());
+				p.sendMessage("§e--------- §fHelp: " + Main.getInstance().getDescription().getName() + " §e----------------------");
+				p.sendMessage("§7Below is a list of all " + Main.getInstance().getDescription().getName() + " commands:");
+				p.sendMessage("§6/eazynick: §r" + Main.getInstance().getCommand("eazynick").getDescription());
 			}
 		}
 	}

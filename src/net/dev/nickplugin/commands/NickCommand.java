@@ -28,13 +28,13 @@ public class NickCommand implements CommandExecutor {
 			
 			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
 				if((Utils.canUseNick.get(p.getUniqueId()))) {
-					if(Utils.nickedPlayers.contains(p.getUniqueId())) {
+					if(Utils.nickedPlayers.contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
-					} else {
+					else {
 						if(args.length == 0) {
 							if(FileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand")) {
 								if(!(p.hasPermission("nick.gui")) && !(Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui"))) {
-									PermissionAttachment pa = p.addAttachment(Main.getPlugin(Main.class));
+									PermissionAttachment pa = p.addAttachment(Main.getInstance());
 									pa.setPermission("nick.gui", true);
 									p.recalculatePermissions();
 									
@@ -46,7 +46,7 @@ public class NickCommand implements CommandExecutor {
 									p.chat("/bookgui");
 							} else if(FileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
 								if(!(p.hasPermission("nick.gui")) && !(Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui"))) {
-									PermissionAttachment pa = p.addAttachment(Main.getPlugin(Main.class));
+									PermissionAttachment pa = p.addAttachment(Main.getInstance());
 									pa.setPermission("nick.gui", true);
 									p.recalculatePermissions();
 									
@@ -60,17 +60,19 @@ public class NickCommand implements CommandExecutor {
 								String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 								boolean nickNameIsInUse = false;
 								
-								for (String nickName : Utils.playerNicknames.values())
+								for (String nickName : Utils.playerNicknames.values()) {
 									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 										nickNameIsInUse = true;
+								}
 								
-								while (nickNameIsInUse ) {
+								while (nickNameIsInUse) {
 									nickNameIsInUse = false;
 									name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 									
-									for (String nickName : Utils.playerNicknames.values())
+									for (String nickName : Utils.playerNicknames.values()) {
 										if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 											nickNameIsInUse = true;
+									}
 								}
 	
 								boolean serverFull = Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
@@ -95,20 +97,23 @@ public class NickCommand implements CommandExecutor {
 									if(!(Utils.blackList.contains(args[0].toUpperCase()))) {
 										boolean nickNameIsInUse = false;
 										
-										for (String nickName : Utils.playerNicknames.values())
+										for (String nickName : Utils.playerNicknames.values()) {
 											if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 												nickNameIsInUse = true;
+										}
 
 										if(!(nickNameIsInUse)) {
 											boolean playerWithNameIsKnown = false;
 											
-											for (Player all : Bukkit.getOnlinePlayers())
+											for (Player all : Bukkit.getOnlinePlayers()) {
 												if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 													playerWithNameIsKnown = true;
-											
-											for (OfflinePlayer all : Bukkit.getOfflinePlayers())
+											}
+												
+											for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
 												if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 													playerWithNameIsKnown = true;
+											}
 											
 											if(!(FileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
 												isCancelled = true;
@@ -150,35 +155,26 @@ public class NickCommand implements CommandExecutor {
 													}
 													
 													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
-												} else {
+												} else
 													p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.CanNotNickAsSelf")));
-												}
-											} else {
+											} else
 												p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsKnown")));
-											}
-										} else {
+										} else
 											p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
-										}
-									} else {
+									} else
 										p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
-									}
-								} else {
+								} else
 									p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
-								}
-							} else {
+							} else
 								p.sendMessage(Utils.noPerm);
-							}
 						}
 					}
-				} else {
+				} else
 					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
-				}
-			} else {
+			} else
 				p.sendMessage(Utils.noPerm);
-			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}

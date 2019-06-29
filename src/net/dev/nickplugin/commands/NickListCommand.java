@@ -27,12 +27,10 @@ public class NickListCommand implements CommandExecutor {
 				
 				Utils.nickNamesHandler.createPage(p, 0);
 				Utils.nickNameListPage.put(p.getUniqueId(), 0);
-			} else {
+			} else
 				p.sendMessage(Utils.noPerm);
-			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}

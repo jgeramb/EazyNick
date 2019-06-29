@@ -60,9 +60,8 @@ public class AnvilGUI {
 							if (item.hasItemMeta()) {
 								ItemMeta meta = item.getItemMeta();
 
-								if (meta.hasDisplayName()) {
+								if (meta.hasDisplayName())
 									name = meta.getDisplayName();
-								}
 							}
 						}
 
@@ -70,13 +69,11 @@ public class AnvilGUI {
 
 						handler.onAnvilClick(clickEvent);
 
-						if (clickEvent.getWillClose()) {
+						if (clickEvent.getWillClose())
 							e.getWhoClicked().closeInventory();
-						}
 
-						if (clickEvent.getWillDestroy()) {
+						if (clickEvent.getWillDestroy())
 							destroy();
-						}
 					}
 				}
 			}
@@ -107,7 +104,7 @@ public class AnvilGUI {
 			
 		};
 
-		Bukkit.getPluginManager().registerEvents(listener, Main.getPlugin(Main.class));
+		Bukkit.getPluginManager().registerEvents(listener, Main.getInstance());
 	}
 
 	public Player getPlayer() {
@@ -210,9 +207,10 @@ public class AnvilGUI {
 		}
 
 		public static AnvilSlot bySlot(int slot) {
-			for (AnvilSlot anvilSlot : values())
+			for (AnvilSlot anvilSlot : values()) {
 				if (anvilSlot.getSlot() == slot)
 					return anvilSlot;
+			}
 
 			return null;
 		}

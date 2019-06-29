@@ -15,7 +15,7 @@ public class NickHelpCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
-			PluginDescriptionFile desc = Main.getPlugin(Main.class).getDescription();
+			PluginDescriptionFile desc = Main.getInstance().getDescription();
 			
 			if(p.hasPermission("nick.showHelp") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.showHelp")) {
 				p.sendMessage(Utils.prefix + "§7===== §8[ §5" + desc.getName() + " §8] §7=====");
@@ -67,9 +67,8 @@ public class NickHelpCommand implements CommandExecutor {
 				p.sendMessage(Utils.prefix + "§7Plugin by§8: §e" + desc.getAuthors());
 				p.sendMessage(Utils.prefix + "§7Resource page§8: §e" + desc.getWebsite());
 			}
-		} else {
+		} else
 			Utils.sendConsole(Utils.notPlayer);
-		}
 		
 		return true;
 	}
