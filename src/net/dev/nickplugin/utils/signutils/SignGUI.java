@@ -10,18 +10,21 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.ReflectUtils;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
 
 public class SignGUI implements Listener {
 
 	public static void open(Player p, String line1, String line2, String line3, String line4, EditCompleteListener listener) {
 		Block b = p.getWorld().getBlockAt(p.getLocation()).getRelative(BlockFace.UP);
-		b.setType(Material.SIGN_POST);
-		
-		Bukkit.getOnlinePlayers().stream().forEach(all -> all.sendBlockChange(b.getLocation(), Material.AIR, (byte) 0));
+		b.setType(Material.getMaterial(Main.version.startsWith("1_14") ? "OAK_SIGN" : (Main.version.startsWith("1_13") ? "SIGN" : "SIGN_POST")));
 		
 		Sign sign = (Sign) b.getState();
 		sign.setLine(0, line1);
@@ -35,10 +38,11 @@ public class SignGUI implements Listener {
 			@Override
 			public void run() {
 				try {
+					boolean useCraftBlockEntityState = Main.version.startsWith("1_14") || Main.version.startsWith("1_13") || Main.version.startsWith("1_12");
 					Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 					Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
 
-					Field tileField = sign.getClass().getDeclaredField("sign");
+					Field tileField = (useCraftBlockEntityState ? ReflectUtils.getCraftClass("block.CraftBlockEntityState") : sign.getClass()).getDeclaredField(useCraftBlockEntityState ? "tileEntity" : "sign");
 					tileField.setAccessible(true);
 					Object tileSign = tileField.get(sign);
 
@@ -46,24 +50,79 @@ public class SignGUI implements Listener {
 					editable.setAccessible(true);
 					editable.set(tileSign, true);
 
-					Field handler = tileSign.getClass().getDeclaredField("h");
+					Field handler = tileSign.getClass().getDeclaredField(Main.version.startsWith("1_14") ? "j" : (Main.version.startsWith("1_13") ? "g" : "h"));
 					handler.setAccessible(true);
 					handler.set(tileSign, entityPlayer);
 
 					playerConnection.getClass().getDeclaredMethod("sendPacket", ReflectUtils.getNMSClass("Packet")).invoke(playerConnection, ReflectUtils.getNMSClass("PacketPlayOutOpenSignEditor").getConstructor(ReflectUtils.getNMSClass("BlockPosition")).newInstance(ReflectUtils.getNMSClass("BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
 		            
-		            Bukkit.getPluginManager().registerEvents(new Listener() {
-		            	
-		            	@EventHandler
-		            	public void onSignChange(SignChangeEvent e) {
-		            		if(e.getPlayer().getUniqueId().equals(p.getUniqueId())) {
-		            			listener.onEditComplete(new EditCompleteEvent(e.getLines()));
-		            			
-		            			e.getBlock().setType(Material.AIR);
-		            		}
-		            	}
-		            	
+					Bukkit.getOnlinePlayers().stream().filter(all -> (all != p)).forEach(all -> all.sendBlockChange(b.getLocation(), Material.AIR, (byte) 0));
+					
+					Object networkManager = playerConnection.getClass().getDeclaredField("networkManager").get(playerConnection);
+					Channel channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
+					
+					Bukkit.getPluginManager().registerEvents(new Listener() {
+						
+						@EventHandler
+						public void onQuit(PlayerQuitEvent e) {
+							if(e.getPlayer() == p) {
+								if (channel.pipeline().get("PacketInjector") != null)
+									channel.pipeline().remove("PacketInjector");
+							}
+						}
+						
+						@EventHandler
+						public void onKick(PlayerKickEvent e) {
+							if(e.getPlayer() == p) {
+								if (channel.pipeline().get("PacketInjector") != null)
+									channel.pipeline().remove("PacketInjector");
+							}
+						}
+						
 					}, Main.getInstance());
+					
+					if (channel.pipeline().get("PacketInjector") == null) {
+						channel.pipeline().addBefore("packet_handler", "PacketInjector", new ChannelDuplexHandler() {
+							
+							@Override
+							public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+								if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
+									Object[] rawLines = (Object[]) ReflectUtils.getField(packet.getClass(), "b").get(packet);
+									
+									Bukkit.getScheduler().runTask(Main.getInstance(), new Runnable() {
+										
+										@Override
+										public void run() {
+											try {
+												String[] lines = new String[4];
+
+												if(Main.version.startsWith("1_8")) {
+													int i = 0;
+													
+													for (Object obj : lines) {
+														lines[i] = (String) obj.getClass().getMethod("getText").invoke(obj);
+														
+														i++;
+													}
+												} else
+													lines = (String[]) rawLines;
+												
+												b.setType(Material.AIR);
+												
+												if (channel.pipeline().get("PacketInjector") != null)
+													channel.pipeline().remove("PacketInjector");
+												
+												listener.onEditComplete(new EditCompleteEvent(lines));
+											} catch (Exception ex) {
+												ex.printStackTrace();
+											}
+										}
+									});
+								}
+							}
+							
+						});
+					}
 				} catch (Exception ex) {
 		        	ex.printStackTrace();
 		        }
