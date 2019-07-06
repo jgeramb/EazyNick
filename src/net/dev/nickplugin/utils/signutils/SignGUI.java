@@ -99,7 +99,7 @@ public class SignGUI implements Listener {
 												if(Main.version.startsWith("1_8")) {
 													int i = 0;
 													
-													for (Object obj : lines) {
+													for (Object obj : rawLines) {
 														lines[i] = (String) obj.getClass().getMethod("getText").invoke(obj);
 														
 														i++;
