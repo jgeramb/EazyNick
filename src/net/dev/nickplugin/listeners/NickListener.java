@@ -117,7 +117,7 @@ public class NickListener implements Listener {
 
 			@EventHandler
 			public void run() {
-				if(p.hasPermission("nick.bypass")) {
+				if(p.hasPermission("nick.bypass") && Main.mysql.isConnected()) {
 					for (Player all : Bukkit.getOnlinePlayers()) {
 						NickManager apiAll = new NickManager(all);
 						
@@ -131,7 +131,14 @@ public class NickListener implements Listener {
 								@Override
 								public void run() {
 									apiAll.unnickPlayerWithoutRemovingMySQL();
-									all.chat("/renick " + name);
+									
+									Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+
+										@Override
+										public void run() {
+											all.chat("/renick " + name);
+										}
+									}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 								}
 							}, 10);
 						}
@@ -157,7 +164,14 @@ public class NickListener implements Listener {
 							@Override
 							public void run() {
 								api.unnickPlayerWithoutRemovingMySQL();
-								p.chat("/renick");
+								
+								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+
+									@Override
+									public void run() {
+										p.chat("/renick");
+									}
+								}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 							}
 						}, 10);
 						
@@ -470,15 +484,31 @@ public class NickListener implements Listener {
 	@EventHandler
 	public void onWorldChanged(PlayerChangedWorldEvent e) {
 		Player p = e.getPlayer();
-
+		NickManager api = new NickManager(p);
+		
 		if (!(Utils.worldBlackList.contains(p.getWorld().getName().toUpperCase()))) {
 			if (FileUtils.cfg.getBoolean("NickOnWorldChange")) {
 				if (Utils.nickOnWorldChangePlayers.contains(p.getUniqueId())) {
-					if (!(Utils.nickedPlayers.contains(p.getUniqueId())))
+					if (!(api.isNicked()))
 						p.chat("/renick");
 					else {
 						p.chat("/unnick");
-						p.chat("/renick");
+						
+						Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+
+							@Override
+							public void run() {
+								api.unnickPlayer();
+								
+								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+
+									@Override
+									public void run() {
+										p.chat("/renick");
+									}
+								}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+							}
+						}, 10);
 					}
 				}
 			}
