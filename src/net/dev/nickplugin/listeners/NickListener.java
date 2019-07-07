@@ -124,8 +124,6 @@ public class NickListener implements Listener {
 						if (apiAll.isNicked()) {
 							String name = apiAll.getNickName();
 
-							Utils.joinNicking.add(all.getUniqueId());
-							
 							Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 
 								@Override
@@ -136,7 +134,14 @@ public class NickListener implements Listener {
 
 										@Override
 										public void run() {
-											all.chat("/renick " + name);
+											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, MySQLNickManager.getSkinName(p.getUniqueId()),
+													MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()),
+													MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()),
+													MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()),
+													MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()),
+													MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
+													MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
+													true, "NONE"));
 										}
 									}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 								}
@@ -157,8 +162,6 @@ public class NickListener implements Listener {
 					}
 				} else if (!(FileUtils.cfg.getBoolean("DiconnectUnnick"))) {
 					if (api.isNicked()) {
-						Utils.joinNicking.add(p.getUniqueId());
-						
 						Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 
 							@Override
@@ -169,7 +172,14 @@ public class NickListener implements Listener {
 
 									@Override
 									public void run() {
-										p.chat("/renick");
+										Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, api.getNickName(), MySQLNickManager.getSkinName(p.getUniqueId()),
+												MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()),
+												MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()),
+												MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()),
+												MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()),
+												MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
+												MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
+												true, "NONE"));
 									}
 								}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 							}
@@ -180,7 +190,7 @@ public class NickListener implements Listener {
 				}
 				
 				if (FileUtils.cfg.getBoolean("BungeeCord")) {
-					if (FileUtils.cfg.getBoolean("LobbyMode") == false) {
+					if (!(FileUtils.cfg.getBoolean("LobbyMode"))) {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (!(api.isNicked())) {
 								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
@@ -225,7 +235,7 @@ public class NickListener implements Listener {
 		}, 5);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
 		
@@ -261,7 +271,10 @@ public class NickListener implements Listener {
 				Utils.oldPlayerListNames.remove(p.getUniqueId());
 
 				if (FileUtils.cfg.getBoolean("BungeeCord")) {
-					if (!(MySQLNickManager.isPlayerNicked(p.getUniqueId())))
+					if (MySQLNickManager.isPlayerNicked(p.getUniqueId()))
+						MySQLNickManager.removePlayer(p.getUniqueId());
+					
+					if(MySQLPlayerDataManager.isRegistered(p.getUniqueId()))
 						MySQLPlayerDataManager.removeData(p.getUniqueId());
 				}
 

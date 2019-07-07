@@ -25,10 +25,7 @@ public class ReNickCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(MySQLNickManager.isPlayerNicked(p.getUniqueId()) || Utils.joinNicking.contains(p.getUniqueId())) {
-				if(Utils.joinNicking.contains(p.getUniqueId()))
-					Utils.joinNicking.remove(p.getUniqueId());
-				
+			if(MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 				if(Utils.nickedPlayers.contains(p.getUniqueId()))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 				else {

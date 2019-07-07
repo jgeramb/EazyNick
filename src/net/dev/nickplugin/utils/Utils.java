@@ -32,7 +32,6 @@ public class Utils {
 	public static PagesHandler<String> nickNamesHandler;
 
 	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();
-	public static ArrayList<UUID> joinNicking = new ArrayList<>();
 	public static ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();
 	public static HashMap<UUID, String> playerNicknames = new HashMap<>();
 	public static List<String> nickNames = new ArrayList<>();
