@@ -134,13 +134,13 @@ public class NickListener implements Listener {
 
 										@Override
 										public void run() {
-											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, MySQLNickManager.getSkinName(p.getUniqueId()),
-													MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()),
-													MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()),
-													MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()),
-													MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()),
-													MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
-													MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
+											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(all, name, MySQLNickManager.getSkinName(all.getUniqueId()),
+													MySQLPlayerDataManager.getChatPrefix(all.getUniqueId()),
+													MySQLPlayerDataManager.getChatSuffix(all.getUniqueId()),
+													MySQLPlayerDataManager.getTabPrefix(all.getUniqueId()),
+													MySQLPlayerDataManager.getTabSuffix(all.getUniqueId()),
+													MySQLPlayerDataManager.getTagPrefix(all.getUniqueId()),
+													MySQLPlayerDataManager.getTagSuffix(all.getUniqueId()),
 													true, "NONE"));
 										}
 									}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
@@ -156,7 +156,8 @@ public class NickListener implements Listener {
 
 							@Override
 							public void run() {
-								p.chat("/nick");
+								if(p.hasPermission("nick.use"))
+									p.chat("/nick");
 							}
 						}, 10);
 					}
