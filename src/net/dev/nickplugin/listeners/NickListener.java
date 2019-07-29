@@ -117,35 +117,37 @@ public class NickListener implements Listener {
 
 			@EventHandler
 			public void run() {
-				if(p.hasPermission("nick.bypass") && Main.mysql.isConnected()) {
-					for (Player all : Bukkit.getOnlinePlayers()) {
-						NickManager apiAll = new NickManager(all);
-						
-						if (apiAll.isNicked()) {
-							String name = apiAll.getNickName();
-
-							Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
-
-								@Override
-								public void run() {
-									apiAll.unnickPlayerWithoutRemovingMySQL();
-									
-									Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
-
-										@Override
-										public void run() {
-											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(all, name, MySQLNickManager.getSkinName(all.getUniqueId()),
-													MySQLPlayerDataManager.getChatPrefix(all.getUniqueId()),
-													MySQLPlayerDataManager.getChatSuffix(all.getUniqueId()),
-													MySQLPlayerDataManager.getTabPrefix(all.getUniqueId()),
-													MySQLPlayerDataManager.getTabSuffix(all.getUniqueId()),
-													MySQLPlayerDataManager.getTagPrefix(all.getUniqueId()),
-													MySQLPlayerDataManager.getTagSuffix(all.getUniqueId()),
-													true, "NONE"));
-										}
-									}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
-								}
-							}, 10);
+				if(p.hasPermission("nick.bypass")) {
+					if((Main.mysql != null) && Main.mysql.isConnected()) {
+						for (Player all : Bukkit.getOnlinePlayers()) {
+							NickManager apiAll = new NickManager(all);
+							
+							if (apiAll.isNicked()) {
+								String name = apiAll.getNickName();
+	
+								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+	
+									@Override
+									public void run() {
+										apiAll.unnickPlayerWithoutRemovingMySQL();
+										
+										Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+	
+											@Override
+											public void run() {
+												Bukkit.getPluginManager().callEvent(new PlayerNickEvent(all, name, MySQLNickManager.getSkinName(all.getUniqueId()),
+														MySQLPlayerDataManager.getChatPrefix(all.getUniqueId()),
+														MySQLPlayerDataManager.getChatSuffix(all.getUniqueId()),
+														MySQLPlayerDataManager.getTabPrefix(all.getUniqueId()),
+														MySQLPlayerDataManager.getTabSuffix(all.getUniqueId()),
+														MySQLPlayerDataManager.getTagPrefix(all.getUniqueId()),
+														MySQLPlayerDataManager.getTagSuffix(all.getUniqueId()),
+														true, "NONE"));
+											}
+										}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+									}
+								}, 10);
+							}
 						}
 					}
 				}
@@ -284,11 +286,9 @@ public class NickListener implements Listener {
 						if (Utils.scoreboardTeamContents.get(api.getRealName()).contains(api.getRealName())) {
 							ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
 
-							Utils.scoreboardTeamContents.remove(api.getRealName());
-
 							sbtm.destroyTeam();
-							sbtm.createTeam();
 
+							Utils.scoreboardTeamContents.remove(api.getRealName());
 							Utils.scoreboardTeamManagers.remove(p.getUniqueId());
 						}
 					}
@@ -530,7 +530,7 @@ public class NickListener implements Listener {
 	}
 
 	@EventHandler
-	public void onCommandPreprocess(PlayerCommandPreprocessEvent e) {
+	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent e) {
 		Player p = e.getPlayer();
 		String msg = e.getMessage();
 		
@@ -541,9 +541,12 @@ public class NickListener implements Listener {
 				String realName = api.getRealName();
 				
 				if(msg.contains(realName))
-					msg = msg.replaceAll(realName, realName + "§r");
+					msg = msg.replace(realName, realName + "§r");
 			}
 		}
+		
+		if(Utils.placeholderAPIStatus())
+			msg = PlaceholderAPI.setPlaceholders(p, msg);
 		
 		e.setMessage(msg);
 		

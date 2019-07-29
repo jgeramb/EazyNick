@@ -41,7 +41,7 @@ public class NMSNickManager extends ReflectUtils {
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 			
-			Class<?> enumPlayerInfoAction = (Main.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(Main.version.equals("1_11_R1") || Main.version.equals("1_12_R1") || Main.version.equals("1_13_R1") || Main.version.equals("1_13_R2") || Main.version.equals("1_14_R1")) ? 1 : 2]);
+			Class<?> enumPlayerInfoAction = (Main.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(Main.version.equals("1_11_R1") || Main.version.equals("1_12_R1") || Main.version.startsWith("1_13") || Main.version.equals("1_14_R1")) ? 1 : 2]);
 			Object packet = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray);
 			
 			for(Player all : Bukkit.getOnlinePlayers()) {
@@ -194,7 +194,7 @@ public class NMSNickManager extends ReflectUtils {
 				packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 				packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 			} else {
-				Class<?> enumPlayerInfoAction = (Main.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(Main.version.equals("1_11_R1") || Main.version.equals("1_12_R1") || Main.version.equals("1_13_R1") || Main.version.equals("1_13_R2") || Main.version.equals("1_14_R1")) ? 1 : 2]);;
+				Class<?> enumPlayerInfoAction = (Main.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(Main.version.equals("1_11_R1") || Main.version.equals("1_12_R1") || Main.version.startsWith("1_13_R1") || Main.version.equals("1_14_R1")) ? 1 : 2]);;
 				
 				packetPlayOutPlayerInfoRemove = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 				packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);

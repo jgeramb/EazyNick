@@ -248,7 +248,6 @@ public class NickManager {
 				
 				sbtm.removePlayerFromTeam();
 				sbtm.destroyTeam();
-				sbtm.createTeam();
 				
 				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
 			}
@@ -506,7 +505,6 @@ public class NickManager {
 				public void run() {
 					if(Main.getInstance().isEnabled()) {
 						if(Utils.nickedPlayers.contains(uuid)) {
-							sbtm.destroyTeam();
 							sbtm.createTeam();
 							
 							if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))

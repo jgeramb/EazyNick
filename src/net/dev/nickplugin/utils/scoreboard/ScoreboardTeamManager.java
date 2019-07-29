@@ -26,30 +26,17 @@ public class ScoreboardTeamManager {
 	private Object packet;
 	
 	public ScoreboardTeamManager(Player p, String prefix, String suffix) {
-		this.p = p;
-		this.prefix = prefix;
-		this.suffix = suffix;
-		this.teamName = new NickManager(p).getRealName();
-		
-		if(!(Utils.scoreboardTeamContents.containsKey(teamName)))
-			Utils.scoreboardTeamContents.put(teamName, new ArrayList<String>());
-		
-		NickManager api = new NickManager(p);
-		
-		if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getNickName())))
-			Utils.scoreboardTeamContents.get(teamName).add(api.getNickName());
-		
-		if(FileUtils.cfg.getBoolean("BypassFormat.Show")) {
-			if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getRealName())))
-				Utils.scoreboardTeamContents.get(teamName).add(api.getRealName());
-		}
+		this(p, new NickManager(p).getRealName(), prefix, suffix);
 	}
 	
 	public ScoreboardTeamManager(Player p, String name, String prefix, String suffix) {
 		this.p = p;
 		this.prefix = prefix;
 		this.suffix = suffix;
-		this.teamName = new NickManager(p).getRealName();
+		this.teamName = new NickManager(p).getRealName() + "_";
+		
+		if(this.teamName.length() > 16)
+			this.teamName = this.teamName.substring((this.teamName.length() - 1) - 16);
 		
 		if(!(Utils.scoreboardTeamContents.containsKey(teamName)))
 			Utils.scoreboardTeamContents.put(teamName, new ArrayList<String>());
@@ -70,30 +57,26 @@ public class ScoreboardTeamManager {
 			packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
 			
 			if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-				if(Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) {
-					try {
-						ReflectUtils.setField(packet, "a", teamName);
+				try {
+					ReflectUtils.setField(packet, "a", teamName);
+					
+					if(Main.version.startsWith("1_13") || Main.version.startsWith("1_14"))
 						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "i", 1);
-					} catch (Exception ex) {
-						ReflectUtils.setField(packet, "a", teamName);
+					else
+						ReflectUtils.setField(packet, "b", teamName);
+					
+					ReflectUtils.setField(packet, "e", "ALWAYS");
+					ReflectUtils.setField(packet, "i", 1);
+				} catch (Exception ex) {
+					ReflectUtils.setField(packet, "a", teamName);
+					
+					if(Main.version.startsWith("1_13") || Main.version.startsWith("1_14"))
 						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "j", 1);
-					}
-				} else {
-					try {
-						ReflectUtils.setField(packet, "a", teamName);
+					else
 						ReflectUtils.setField(packet, "b", teamName);
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "h", 1);
-					} catch (Exception ex) {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", teamName);
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "i", 1);
-					}
+					
+					ReflectUtils.setField(packet, "e", "ALWAYS");
+					ReflectUtils.setField(packet, "j", 1);
 				}
 			} else {
 				try {
@@ -139,42 +122,38 @@ public class ScoreboardTeamManager {
 				}
 				
 				if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-					if(Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) {
-						try {
-							ReflectUtils.setField(packet, "a", teamName);
+					try {
+						ReflectUtils.setField(packet, "a", teamName);
+						
+						if(Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) {
 							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
 							ReflectUtils.setField(packet, "c", getAsIChatBaseComponent(prefixForPlayer));
 							ReflectUtils.setField(packet, "d", getAsIChatBaseComponent(suffixForPlayer));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "g", contents);
-							ReflectUtils.setField(packet, "i", 0);
-						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
+						} else {
+							ReflectUtils.setField(packet, "b", teamName);
+							ReflectUtils.setField(packet, "c", prefixForPlayer);
+							ReflectUtils.setField(packet, "d", suffixForPlayer);
+						}
+							
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "g", contents);
+						ReflectUtils.setField(packet, "i", 0);
+					} catch (Exception ex) {
+						ReflectUtils.setField(packet, "a", teamName);
+						
+						if(Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) {
 							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
 							ReflectUtils.setField(packet, "c", getAsIChatBaseComponent(prefixForPlayer));
 							ReflectUtils.setField(packet, "d", getAsIChatBaseComponent(suffixForPlayer));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "h", contents);
-							ReflectUtils.setField(packet, "j", 0);
-						}
-					} else {
-						try {
-							ReflectUtils.setField(packet, "a", teamName);
+						} else {
 							ReflectUtils.setField(packet, "b", teamName);
 							ReflectUtils.setField(packet, "c", prefixForPlayer);
 							ReflectUtils.setField(packet, "d", suffixForPlayer);
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "g", contents);
-							ReflectUtils.setField(packet, "h", 0);
-						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", teamName);
-							ReflectUtils.setField(packet, "c", prefixForPlayer);
-							ReflectUtils.setField(packet, "d", suffixForPlayer);
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "h", contents);
-							ReflectUtils.setField(packet, "i", 0);
 						}
+						
+						ReflectUtils.setField(packet, "e", "ALWAYS");
+						ReflectUtils.setField(packet, "h", contents);
+						ReflectUtils.setField(packet, "j", 0);
 					}
 				} else {
 					ReflectUtils.setField(packet, "a", teamName);
