@@ -53,7 +53,7 @@ public class Utils {
 	public static HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
 	
 	public static HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
-	public static HashMap<String, ArrayList<String>> scoreboardTeamContents = new HashMap<>();
+	public static ArrayList<String> scoreboardTeamContents = new ArrayList<>();
 	public static HashMap<UUID, String> nameCache = new HashMap<>();
 	public static HashMap<UUID, String> lastSkinNames = new HashMap<>();
 	public static HashMap<UUID, String> lastNickNames = new HashMap<>();

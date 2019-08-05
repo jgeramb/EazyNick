@@ -1,7 +1,6 @@
 package net.dev.nickplugin.utils.scoreboard;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import net.dev.nickplugin.utils.Utils;
 
 public class ScoreboardTeamManager {
 
-	private String teamName;
+	private static String teamName = "Nicked";
 	
 	public Player p;
 	public String prefix;
@@ -33,22 +32,15 @@ public class ScoreboardTeamManager {
 		this.p = p;
 		this.prefix = prefix;
 		this.suffix = suffix;
-		this.teamName = new NickManager(p).getRealName() + "_";
 		
-		if(this.teamName.length() > 16)
-			this.teamName = this.teamName.substring((this.teamName.length() - 1) - 16);
-		
-		if(!(Utils.scoreboardTeamContents.containsKey(teamName)))
-			Utils.scoreboardTeamContents.put(teamName, new ArrayList<String>());
-		
-		if(!(Utils.scoreboardTeamContents.get(teamName).contains(name)))
-			Utils.scoreboardTeamContents.get(teamName).add(name);
+		if(!(Utils.scoreboardTeamContents.contains(name)))
+			Utils.scoreboardTeamContents.add(name);
 
 		NickManager api = new NickManager(p);
 		
 		if(FileUtils.cfg.getBoolean("BypassFormat.Show")) {
-			if(!(Utils.scoreboardTeamContents.get(teamName).contains(api.getRealName())))
-				Utils.scoreboardTeamContents.get(teamName).add(api.getRealName());
+			if(!(Utils.scoreboardTeamContents.contains(api.getRealName())))
+				Utils.scoreboardTeamContents.add(api.getRealName());
 		}
 	}
 	
@@ -113,7 +105,7 @@ public class ScoreboardTeamManager {
 				
 				String prefixForPlayer = prefix;
 				String suffixForPlayer = suffix;
-				List<String> contents = Utils.scoreboardTeamContents.get(teamName);
+				List<String> contents = Utils.scoreboardTeamContents;
 				
 				if(t.hasPermission("nick.bypass") && FileUtils.cfg.getBoolean("BypassFormat.Show")) {
 					contents = Arrays.asList(new NickManager(p).getRealName());
@@ -174,11 +166,11 @@ public class ScoreboardTeamManager {
 	public void removePlayerFromTeam() {
 		NickManager api = new NickManager(p);
 		
-		if(Utils.scoreboardTeamContents.get(teamName).contains(api.getNickName()))
-			Utils.scoreboardTeamContents.get(teamName).remove(api.getNickName());
+		if(Utils.scoreboardTeamContents.contains(api.getNickName()))
+			Utils.scoreboardTeamContents.remove(api.getNickName());
 		
-		if(Utils.scoreboardTeamContents.get(teamName).contains(api.getRealName()))
-			Utils.scoreboardTeamContents.get(teamName).remove(api.getRealName());
+		if(Utils.scoreboardTeamContents.contains(api.getRealName()))
+			Utils.scoreboardTeamContents.remove(api.getRealName());
 	}
 	
 	private void sendPacket(Player p, Object packet) {

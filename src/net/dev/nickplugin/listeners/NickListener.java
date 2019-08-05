@@ -283,12 +283,14 @@ public class NickListener implements Listener {
 
 				if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 					if (Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
-						if (Utils.scoreboardTeamContents.get(api.getRealName()).contains(api.getRealName())) {
+						if (Utils.scoreboardTeamContents.contains(api.getRealName())) {
 							ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
 
 							sbtm.destroyTeam();
 
-							Utils.scoreboardTeamContents.remove(api.getRealName());
+							if(Utils.scoreboardTeamContents.contains(api.getRealName()))
+								Utils.scoreboardTeamContents.remove(api.getRealName());
+							
 							Utils.scoreboardTeamManagers.remove(p.getUniqueId());
 						}
 					}
