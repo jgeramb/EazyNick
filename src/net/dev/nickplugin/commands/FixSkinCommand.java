@@ -17,7 +17,7 @@ public class FixSkinCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.fixskin") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.fixskin")) {
+			if(p.hasPermission("nick.fixskin")) {
 				NickManager api = new NickManager(p);
 				api.updatePlayer();
 

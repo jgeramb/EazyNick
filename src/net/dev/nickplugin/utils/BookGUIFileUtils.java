@@ -68,10 +68,6 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.Rank6.Rank", "&bMVP&c+");
 		cfg.addDefault("BookGUI.Rank6.RankName", "MVPPLUS");
 		cfg.addDefault("BookGUI.Rank6.Permission", "nick.rank.6");
-		cfg.addDefault("BookGUI.Rank7.Enabled", true);
-		cfg.addDefault("BookGUI.Rank7.Rank", "&6MVP&c++");
-		cfg.addDefault("BookGUI.Rank7.RankName", "MVPPLUSPLUS");
-		cfg.addDefault("BookGUI.Rank7.Permission", "nick.rank.7");
 
 		cfg.addDefault("Settings.NickFormat.Rank1.ChatPrefix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.ChatSuffix", "&r");
@@ -120,14 +116,6 @@ public class BookGUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank6.TagPrefix", "&b[MVP&c+&b] ");
 		cfg.addDefault("Settings.NickFormat.Rank6.TagSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank6.PermissionsEx.GroupName", "MVPPlus");
-		
-		cfg.addDefault("Settings.NickFormat.Rank7.ChatPrefix", "&6[MVP&c++&6] ");
-		cfg.addDefault("Settings.NickFormat.Rank7.ChatSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank7.TabPrefix", "&6MVP&c++ &6| &6");
-		cfg.addDefault("Settings.NickFormat.Rank7.TabSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank7.TagPrefix", "&6[MVP&c++&6] ");
-		cfg.addDefault("Settings.NickFormat.Rank7.TagSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank7.PermissionsEx.GroupName", "MVPPlusPlus");
 
 		cfg.options().copyDefaults(true);
 		cfg.options().copyHeader(true);

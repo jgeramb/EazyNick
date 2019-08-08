@@ -20,7 +20,7 @@ public class ReloadConfigCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.reload") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.reload")) {
+			if(p.hasPermission("nick.reload")) {
 				FileUtils.cfg = YamlConfiguration.loadConfiguration(FileUtils.file);
 				FileUtils.saveFile();
 				

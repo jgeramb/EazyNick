@@ -17,7 +17,7 @@ public class ResetSkinCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.skin") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.skin")) {
+			if(p.hasPermission("nick.skin")) {
 				NickManager api = new NickManager(p);
 				
 				api.changeSkin(api.getRealName());

@@ -29,7 +29,7 @@ public class BookGUICommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.gui") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui")) {
+			if(p.hasPermission("nick.gui")) {
 				if(new NickManager(p).isNicked())
 					p.chat("/unnick");
 				
@@ -61,9 +61,6 @@ public class BookGUICommand implements CommandExecutor {
 						TextComponent option6 = new TextComponent(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Rank")) + "\n");
 						option6.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank6.RankName")));
 						option6.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to be shown as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Rank"))) }));
-						TextComponent option7 = new TextComponent(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank7.Rank")) + "\n");
-						option7.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank7.RankName")));
-						option7.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to be shown as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank7.Rank"))) }));
 						
 						NMSBookUtils.open(p, NMSBookBuilder.create("Ranks", 
 								new TextComponent("§0Let's get you set up with your nickname! First, you'll need to choose which §lRANK §0you would like to be shown as when nicked.\n\n"),
@@ -72,8 +69,7 @@ public class BookGUICommand implements CommandExecutor {
 								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission")))) ? option3 : new TextComponent(""), 
 								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission")))) ? option4 : new TextComponent(""), 
 								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission")))) ? option5 : new TextComponent(""),
-								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission")))) ? option6 : new TextComponent(""),
-								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank7.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank7.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank7.Permission")))) ? option7 : new TextComponent("")));
+								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission")))) ? option6 : new TextComponent("")));
 					}
 				} else if(args.length == 2) {
 					TextComponent option1 = new TextComponent(arrow + " §0My normal skin\n");
@@ -109,7 +105,7 @@ public class BookGUICommand implements CommandExecutor {
 						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to reuse '" + Utils.lastNickNames.get(p.getUniqueId()) + "'") }));
 					}
 
-					if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")))
+					if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname")))
 						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need to choose the §0§lNAME §0to use!\n\n"), option1, option2, option3, new TextComponent("\n§0To go back to being your usual self, type:\n§l/nick reset")));
 					else
 						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need to choose the §0§lNAME §0to use!\n\n"), option2, option3, new TextComponent("\n§0To go back to being your usual self, type:\n§l/nick reset")));
@@ -141,12 +137,12 @@ public class BookGUICommand implements CommandExecutor {
 						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2]  + " ENTERNAME"));
 						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to enter a name") }));
 						
-						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")))
+						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname")))
 							NMSBookUtils.open(p, NMSBookBuilder.create("RandomNick", new TextComponent("§0We've generated a random username for you:\n§l" + name + "\n\n"), option1, option2, option3));
 						else
 							NMSBookUtils.open(p, NMSBookBuilder.create("RandomNick", new TextComponent("§0We've generated a random username for you:\n§l" + name + "\n\n"), option1, option2));
 					} else if(args[3].equalsIgnoreCase("ENTERNAME")) {
-						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname"))) {
+						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname"))) {
 							if(FileUtils.cfg.getBoolean("UseSignGUIForCustomName")) {
 								SignGUI.open(p, "", "^^^^^^^^^^^^^^^", "Enter your", "username here", new SignGUI.EditCompleteListener() {
 									

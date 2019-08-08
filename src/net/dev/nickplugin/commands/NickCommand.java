@@ -26,14 +26,14 @@ public class NickCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
+			if(p.hasPermission("nick.use")) {
 				if((Utils.canUseNick.get(p.getUniqueId()))) {
 					if(Utils.nickedPlayers.contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					else {
 						if(args.length == 0) {
 							if(FileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand")) {
-								if(!(p.hasPermission("nick.gui")) && !(Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui"))) {
+								if(!(p.hasPermission("nick.gui"))) {
 									PermissionAttachment pa = p.addAttachment(Main.getInstance());
 									pa.setPermission("nick.gui", true);
 									p.recalculatePermissions();
@@ -45,7 +45,7 @@ public class NickCommand implements CommandExecutor {
 								} else
 									p.chat("/bookgui");
 							} else if(FileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
-								if(!(p.hasPermission("nick.gui")) && !(Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui"))) {
+								if(!(p.hasPermission("nick.gui"))) {
 									PermissionAttachment pa = p.addAttachment(Main.getInstance());
 									pa.setPermission("nick.gui", true);
 									p.recalculatePermissions();
@@ -89,7 +89,7 @@ public class NickCommand implements CommandExecutor {
 										false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
 							}
 						} else {
-							if(p.hasPermission("nick.customnickname") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.customnickname")) {
+							if(p.hasPermission("nick.customnickname")) {
 								String name = args[0].replace("\"", "");
 								boolean isCancelled = false;
 								

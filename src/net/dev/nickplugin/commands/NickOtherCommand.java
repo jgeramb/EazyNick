@@ -19,7 +19,7 @@ public class NickOtherCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.other") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.other")) {
+			if(p.hasPermission("nick.other")) {
 				if(args.length >= 1) {
 					Player t = Bukkit.getPlayer(args[0]);
 					
@@ -31,7 +31,7 @@ public class NickOtherCommand implements CommandExecutor {
 									
 									p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Other.SelectedNick")).replace("%playerName%", t.getName()).replace("%nickName%", ChatColor.translateAlternateColorCodes('&', name)));
 									
-									if((!(t.hasPermission("nick.use")) && !(Utils.hasLuckPermsPermission(t.getUniqueId(), "nick.use"))) || !(t.hasPermission("nick.customnickname")) && !(Utils.hasLuckPermsPermission(t.getUniqueId(), "nick.customnickname"))) {
+									if((!(t.hasPermission("nick.use"))) || !(t.hasPermission("nick.customnickname"))) {
 										PermissionAttachment pa = t.addAttachment(Main.getInstance());
 										pa.setPermission("nick.use", true);
 										pa.setPermission("nick.customnickname", true);
@@ -49,7 +49,7 @@ public class NickOtherCommand implements CommandExecutor {
 							} else {
 								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Other.RandomNick")).replace("%playerName%", t.getName()));
 								
-								if(!(t.hasPermission("nick.use")) && !(Utils.hasLuckPermsPermission(t.getUniqueId(), "nick.use"))) {
+								if(!(t.hasPermission("nick.use"))) {
 									PermissionAttachment pa = t.addAttachment(Main.getInstance());
 									pa.setPermission("nick.use", true);
 									t.recalculatePermissions();
@@ -64,7 +64,7 @@ public class NickOtherCommand implements CommandExecutor {
 						} else {
 							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Other.Unnick")).replace("%playerName%", t.getName()));
 							
-							if(!(t.hasPermission("nick.use")) && !(Utils.hasLuckPermsPermission(t.getUniqueId(), "nick.use"))) {
+							if(!(t.hasPermission("nick.use"))) {
 								PermissionAttachment pa = t.addAttachment(Main.getInstance());
 								pa.setPermission("nick.use", true);
 								t.recalculatePermissions();

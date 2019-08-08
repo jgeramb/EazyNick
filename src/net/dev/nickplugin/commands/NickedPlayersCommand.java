@@ -18,7 +18,7 @@ public class NickedPlayersCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.nickedplayers") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.nickedplayers")) {
+			if(p.hasPermission("nick.nickedplayers")) {
 				boolean playerIsNicked = false;
 				
 				for (Player all : Bukkit.getOnlinePlayers()) {

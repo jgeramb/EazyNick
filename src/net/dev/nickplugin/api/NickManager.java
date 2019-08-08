@@ -150,19 +150,22 @@ public class NickManager {
 				@Override
 				public void run() {
 					if(Main.getInstance().isEnabled()) {
-						if(Utils.nickedPlayers.contains(uuid))
-							ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix)), 20);
-						else {
-							ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
+						if((p != null) && p.isOnline()) {
+							if(Utils.nickedPlayers.contains(uuid))
+								ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix)), 20);
+							else {
+								ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
+								cancel();
+							}
+						} else
 							cancel();
-						}
 					} else
 						cancel();
 				}
 			}, 0, 1000);
 		}
 		
-		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
+		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
@@ -202,6 +205,13 @@ public class NickManager {
 				
 				Utils.oldDisplayNames.remove(p.getUniqueId());
 				Utils.oldPlayerListNames.remove(p.getUniqueId());
+				
+				if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+					if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
+						Utils.scoreboardTeamManagers.get(p.getUniqueId()).destroyTeam();
+						Utils.scoreboardTeamManagers.remove(p.getUniqueId());
+					}
+				}
 			}
 		}, 5 + 1 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 
@@ -242,17 +252,6 @@ public class NickManager {
 			}
 		}
 		
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
-			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
-				ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
-				
-				sbtm.removePlayerFromTeam();
-				sbtm.destroyTeam();
-				
-				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
-			}
-		}
-		
 		if(Utils.ultraPermissionsStatus()) {
 			User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
 			
@@ -264,7 +263,7 @@ public class NickManager {
 			Utils.ultraPermsSuffixes.remove(p.getUniqueId());
 		}
 		
-		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.item"))) {
+		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
@@ -488,41 +487,10 @@ public class NickManager {
 		
 		changeCloudNET(tagPrefix, tagSuffix);
 
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
-			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))
-				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
-				
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored"))
 			Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
-			
-			ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
-			UUID uuid = p.getUniqueId();
-			String finalTabPrefix = tabPrefix;
-			String finalTabSuffix = tabSuffix;
-			
-			new Timer().schedule(new TimerTask() {
-				
-				@Override
-				public void run() {
-					if(Main.getInstance().isEnabled()) {
-						if(Utils.nickedPlayers.contains(uuid)) {
-							sbtm.createTeam();
-							
-							if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
-								setPlayerListName(finalTabPrefix + p.getName() + finalTabSuffix);
-						} else {
-							sbtm.destroyTeam();
-							cancel();
-						}
-					} else {
-						sbtm.destroyTeam();
-						cancel();
-					}
-				}
-			}, 1000, 1000);
-		}
 		
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
-			setPlayerListName(tabPrefix + p.getName() + tabSuffix);
+		setPlayerListName(tabPrefix + p.getName() + tabSuffix);
 		
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored"))
 			p.setDisplayName(chatPrefix + p.getName() + chatSuffix);

@@ -117,14 +117,21 @@ public class NickListener implements Listener {
 
 			@EventHandler
 			public void run() {
-				if(p.hasPermission("nick.bypass")) {
-					if((Main.mysql != null) && Main.mysql.isConnected()) {
-						for (Player all : Bukkit.getOnlinePlayers()) {
-							NickManager apiAll = new NickManager(all);
+				for (Player all : Bukkit.getOnlinePlayers()) {
+					NickManager apiAll = new NickManager(all);
+					
+					if (apiAll.isNicked()) {
+						if(Utils.scoreboardTeamManagers.containsKey(all.getUniqueId())) {
+							ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(all.getUniqueId());
 							
-							if (apiAll.isNicked()) {
-								String name = apiAll.getNickName();
-	
+							sbtm.destroyTeam();
+							sbtm.createTeam();
+						}
+
+						if(p.hasPermission("nick.bypass")) {
+							String name = apiAll.getNickName();
+							
+							if((Main.mysql != null) && Main.mysql.isConnected()) {
 								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 	
 									@Override
@@ -144,7 +151,7 @@ public class NickListener implements Listener {
 														MySQLPlayerDataManager.getTagSuffix(all.getUniqueId()),
 														true, "NONE"));
 											}
-										}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+										}, 15 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 									}
 								}, 10);
 							}
@@ -184,7 +191,7 @@ public class NickListener implements Listener {
 												MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
 												true, "NONE"));
 									}
-								}, 10 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+								}, 15 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 							}
 						}, 10);
 						
@@ -202,7 +209,7 @@ public class NickListener implements Listener {
 									public void run() {
 										p.chat("/renick");
 									}
-								}, 10);
+								}, 15);
 							}
 						}
 					} else {
@@ -283,16 +290,8 @@ public class NickListener implements Listener {
 
 				if (FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
 					if (Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
-						if (Utils.scoreboardTeamContents.contains(api.getRealName())) {
-							ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
-
-							sbtm.destroyTeam();
-
-							if(Utils.scoreboardTeamContents.contains(api.getRealName()))
-								Utils.scoreboardTeamContents.remove(api.getRealName());
-							
-							Utils.scoreboardTeamManagers.remove(p.getUniqueId());
-						}
+						Utils.scoreboardTeamManagers.get(p.getUniqueId()).destroyTeam();
+						Utils.scoreboardTeamManagers.remove(p.getUniqueId());
 					}
 				}
 			}
@@ -508,8 +507,6 @@ public class NickListener implements Listener {
 					if (!(api.isNicked()))
 						p.chat("/renick");
 					else {
-						p.chat("/unnick");
-						
 						Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
 
 							@Override
@@ -553,7 +550,7 @@ public class NickListener implements Listener {
 		e.setMessage(msg);
 		
 		if (e.getMessage().toLowerCase().startsWith("/help nick") || e.getMessage().toLowerCase().startsWith("/help eazynick") || e.getMessage().toLowerCase().startsWith("/? nick") || e.getMessage().toLowerCase().startsWith("/? eazynick")) {
-			if (p.hasPermission("bukkit.command.help") || Utils.hasLuckPermsPermission(p.getUniqueId(), "bukkit.command.help")) {
+			if (p.hasPermission("bukkit.command.help")) {
 				e.setCancelled(true);
 
 				p.sendMessage("§e--------- §fHelp: " + Main.getInstance().getDescription().getName() + " §e----------------------");

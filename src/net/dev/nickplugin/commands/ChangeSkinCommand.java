@@ -19,7 +19,7 @@ public class ChangeSkinCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.skin") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.skin")) {
+			if(p.hasPermission("nick.skin")) {
 				if((Utils.canUseNick.get(p.getUniqueId()))) {
 					NickManager api = new NickManager(p);
 					

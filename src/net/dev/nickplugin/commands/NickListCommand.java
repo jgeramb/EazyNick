@@ -16,7 +16,7 @@ public class NickListCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.gui") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui")) {
+			if(p.hasPermission("nick.gui")) {
 				if(Utils.nickedPlayers.contains(p.getUniqueId()))
 					p.chat("/unnick");
 				

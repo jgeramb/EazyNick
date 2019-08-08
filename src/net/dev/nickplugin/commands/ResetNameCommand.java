@@ -19,7 +19,7 @@ public class ResetNameCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.name") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.name")) {
+			if(p.hasPermission("nick.name")) {
 				NickManager api = new NickManager(p);
 				api.setName(api.getRealName());
 				api.updatePlayer();

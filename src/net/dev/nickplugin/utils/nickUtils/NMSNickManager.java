@@ -46,7 +46,7 @@ public class NMSNickManager extends ReflectUtils {
 			
 			for(Player all : Bukkit.getOnlinePlayers()) {
 				if(all.canSee(p))
-					sendPacket(p, packet, !(Utils.nickedPlayers.contains(p.getUniqueId())));
+					sendPacket(p, packet, !Utils.nickedPlayers.contains(p.getUniqueId()));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

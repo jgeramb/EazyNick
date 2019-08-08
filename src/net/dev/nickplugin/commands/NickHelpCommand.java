@@ -17,7 +17,7 @@ public class NickHelpCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			PluginDescriptionFile desc = Main.getInstance().getDescription();
 			
-			if(p.hasPermission("nick.showHelp") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.showHelp")) {
+			if(p.hasPermission("nick.showhelp")) {
 				p.sendMessage(Utils.prefix + "§7===== §8[ §5" + desc.getName() + " §8] §7=====");
 				
 				if(args.length == 0) {

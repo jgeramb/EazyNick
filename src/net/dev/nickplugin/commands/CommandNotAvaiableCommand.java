@@ -16,7 +16,7 @@ public class CommandNotAvaiableCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use"))
+			if(p.hasPermission("nick.use"))
 				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.CommandNotAvaiableForThatVersion")));
 			else
 				p.sendMessage(Utils.noPerm);

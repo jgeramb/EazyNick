@@ -1,5 +1,5 @@
 name: EazyNick
-version: 1.214
+version: 1.216
 author: Justix
 main: net.dev.nickplugin.main.Main
 description: This plugin allows you to change your identity (skin, name, nametag, tabname, chatname)
@@ -52,7 +52,7 @@ commands:
         description: Reloads the configuration file
         aliases:
         - reloadcfg
-        - rconfig
+        - rlcfg
       fixskin:
         description: Fixes your skin, if it was not loaded correctly
       renick:

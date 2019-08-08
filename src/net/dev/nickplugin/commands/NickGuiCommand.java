@@ -20,7 +20,7 @@ public class NickGuiCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.gui") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.gui")) {
+			if(p.hasPermission("nick.gui")) {
 				Inventory inv = Bukkit.createInventory(null, 27, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickGUI.InventoryTitle")));
 				
 				for (int i = 0; i < inv.getSize(); i++)

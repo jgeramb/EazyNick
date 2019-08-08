@@ -12,36 +12,23 @@ import net.dev.nickplugin.api.NickManager;
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.ReflectUtils;
-import net.dev.nickplugin.utils.Utils;
 
 public class ScoreboardTeamManager {
 
-	private static String teamName = "Nicked";
-	
 	public Player p;
 	public String prefix;
 	public String suffix;
 	
 	private Object packet;
+	private String teamName;
 	
 	public ScoreboardTeamManager(Player p, String prefix, String suffix) {
-		this(p, new NickManager(p).getRealName(), prefix, suffix);
-	}
-	
-	public ScoreboardTeamManager(Player p, String name, String prefix, String suffix) {
 		this.p = p;
 		this.prefix = prefix;
 		this.suffix = suffix;
+		this.teamName = new NickManager(p).getRealName();
 		
-		if(!(Utils.scoreboardTeamContents.contains(name)))
-			Utils.scoreboardTeamContents.add(name);
-
-		NickManager api = new NickManager(p);
-		
-		if(FileUtils.cfg.getBoolean("BypassFormat.Show")) {
-			if(!(Utils.scoreboardTeamContents.contains(api.getRealName())))
-				Utils.scoreboardTeamContents.add(api.getRealName());
-		}
+		createTeam();
 	}
 	
 	public void destroyTeam() {
@@ -88,30 +75,21 @@ public class ScoreboardTeamManager {
 	}
 
 
-	private Object getAsIChatBaseComponent(String txt) {
-		try {
-			return ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(ReflectUtils.getNMSClass("IChatBaseComponent"), "{\"text\":\"" + txt + "\"}");
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-
 	public void createTeam() {
 		try {
-			for(Player t : Bukkit.getOnlinePlayers()) {
+			for(Player all : Bukkit.getOnlinePlayers()) {
 				packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
 				
 				String prefixForPlayer = prefix;
 				String suffixForPlayer = suffix;
-				List<String> contents = Utils.scoreboardTeamContents;
+				List<String> contents;
 				
-				if(t.hasPermission("nick.bypass") && FileUtils.cfg.getBoolean("BypassFormat.Show")) {
+				if(all.hasPermission("nick.bypass") && FileUtils.cfg.getBoolean("BypassFormat.Show")) {
 					contents = Arrays.asList(new NickManager(p).getRealName());
 					prefixForPlayer = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("BypassFormat.NameTagPrefix"));
 					suffixForPlayer = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("BypassFormat.NameTagSuffix"));
-				}
+				} else
+					contents = Arrays.asList(p.getName());
 				
 				if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
 					try {
@@ -156,21 +134,21 @@ public class ScoreboardTeamManager {
 					ReflectUtils.setField(packet, "f", 0);
 				}
 			
-				sendPacket(t, packet);
+				sendPacket(all, packet);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void removePlayerFromTeam() {
-		NickManager api = new NickManager(p);
+	private Object getAsIChatBaseComponent(String txt) {
+		try {
+			return ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(ReflectUtils.getNMSClass("IChatBaseComponent"), "{\"text\":\"" + txt + "\"}");
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
 		
-		if(Utils.scoreboardTeamContents.contains(api.getNickName()))
-			Utils.scoreboardTeamContents.remove(api.getNickName());
-		
-		if(Utils.scoreboardTeamContents.contains(api.getRealName()))
-			Utils.scoreboardTeamContents.remove(api.getRealName());
+		return null;
 	}
 	
 	private void sendPacket(Player p, Object packet) {

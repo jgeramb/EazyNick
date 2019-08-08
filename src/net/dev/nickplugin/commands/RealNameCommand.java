@@ -18,7 +18,7 @@ public class RealNameCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.real") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.real")) {
+			if(p.hasPermission("nick.real")) {
 				if(args.length >= 1) {
 					Player t = Bukkit.getPlayer(args[0]);
 					

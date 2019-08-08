@@ -143,6 +143,9 @@ public class FileUtils {
 
 		cfg.addDefault("BlackList", blackList);
 
+		if(cfg.getBoolean("BungeeCord"))
+			cfg.set("DisconnectUnnick", false);
+		
 		cfg.options().copyDefaults(true);
 		cfg.options().copyHeader(true);
 		saveFile();

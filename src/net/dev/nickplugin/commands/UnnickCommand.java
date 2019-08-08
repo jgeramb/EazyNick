@@ -18,7 +18,7 @@ public class UnnickCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
+			if(p.hasPermission("nick.use")) {
 				if((Utils.canUseNick.get(p.getUniqueId()))) {
 					if(Utils.nickedPlayers.contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));

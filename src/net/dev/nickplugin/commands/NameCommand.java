@@ -17,7 +17,7 @@ public class NameCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.use") || Utils.hasLuckPermsPermission(p.getUniqueId(), "nick.use")) {
+			if(p.hasPermission("nick.use")) {
 				NickManager api = new NickManager(p);
 				
 				if(api.isNicked()) {
