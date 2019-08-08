@@ -29,7 +29,7 @@ public class ReNickCommand implements CommandExecutor {
 				if(Utils.nickedPlayers.contains(p.getUniqueId()))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 				else {
-					String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
+					String name = MySQLNickManager.getNickName(p.getUniqueId());
 					boolean isCancelled = false;
 					boolean nickNameIsInUse = false;
 					
@@ -38,7 +38,7 @@ public class ReNickCommand implements CommandExecutor {
 							nickNameIsInUse = true;
 					}
 					
-					while (nickNameIsInUse ) {
+					while (nickNameIsInUse) {
 						nickNameIsInUse = false;
 						name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 						

@@ -44,8 +44,8 @@ public class Utils {
 	public static HashMap<UUID, String> oldCloudNETSuffixes = new HashMap<>();
 	public static HashMap<UUID, Integer> oldCloudNETTagIDS = new HashMap<>();
 	public static HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
-	public static HashMap<UUID, String> luckPermsPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> luckPermsSuffixes = new HashMap<>();
+	public static HashMap<UUID, Object> luckPermsPrefixes = new HashMap<>();
+	public static HashMap<UUID, Object> luckPermsSuffixes = new HashMap<>();
 	public static HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
 	public static HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
 	

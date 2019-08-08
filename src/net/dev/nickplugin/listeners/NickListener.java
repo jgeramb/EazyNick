@@ -30,7 +30,6 @@ import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.Utils;
-import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 
@@ -117,41 +116,28 @@ public class NickListener implements Listener {
 
 			@EventHandler
 			public void run() {
-				for (Player all : Bukkit.getOnlinePlayers()) {
-					NickManager apiAll = new NickManager(all);
-					
-					if (apiAll.isNicked()) {
-						if(Utils.scoreboardTeamManagers.containsKey(all.getUniqueId())) {
-							ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(all.getUniqueId());
+				if(p.hasPermission("nick.bypass")) {
+					if((Main.mysql != null) && Main.mysql.isConnected()) {
+						for (Player all : Bukkit.getOnlinePlayers()) {
+							NickManager apiAll = new NickManager(all);
 							
-							sbtm.destroyTeam();
-							sbtm.createTeam();
-						}
+							if (apiAll.isNicked()) {
+								String name = apiAll.getNickName();
 
-						if(p.hasPermission("nick.bypass")) {
-							String name = apiAll.getNickName();
-							
-							if((Main.mysql != null) && Main.mysql.isConnected()) {
+								apiAll.unnickPlayerWithoutRemovingMySQL();
+								
 								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
-	
+
 									@Override
 									public void run() {
-										apiAll.unnickPlayerWithoutRemovingMySQL();
-										
-										Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
-	
-											@Override
-											public void run() {
-												Bukkit.getPluginManager().callEvent(new PlayerNickEvent(all, name, MySQLNickManager.getSkinName(all.getUniqueId()),
-														MySQLPlayerDataManager.getChatPrefix(all.getUniqueId()),
-														MySQLPlayerDataManager.getChatSuffix(all.getUniqueId()),
-														MySQLPlayerDataManager.getTabPrefix(all.getUniqueId()),
-														MySQLPlayerDataManager.getTabSuffix(all.getUniqueId()),
-														MySQLPlayerDataManager.getTagPrefix(all.getUniqueId()),
-														MySQLPlayerDataManager.getTagSuffix(all.getUniqueId()),
-														true, "NONE"));
-											}
-										}, 15 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+										Bukkit.getPluginManager().callEvent(new PlayerNickEvent(all, name, MySQLNickManager.getSkinName(all.getUniqueId()),
+												MySQLPlayerDataManager.getChatPrefix(all.getUniqueId()),
+												MySQLPlayerDataManager.getChatSuffix(all.getUniqueId()),
+												MySQLPlayerDataManager.getTabPrefix(all.getUniqueId()),
+												MySQLPlayerDataManager.getTabSuffix(all.getUniqueId()),
+												MySQLPlayerDataManager.getTagPrefix(all.getUniqueId()),
+												MySQLPlayerDataManager.getTagSuffix(all.getUniqueId()),
+												true, "NONE"));
 									}
 								}, 10);
 							}
@@ -165,42 +151,37 @@ public class NickListener implements Listener {
 
 							@Override
 							public void run() {
-								if(p.hasPermission("nick.use"))
-									p.chat("/nick");
+								p.chat("/nick");
 							}
 						}, 10);
 					}
 				} else if (!(FileUtils.cfg.getBoolean("DiconnectUnnick"))) {
-					if (api.isNicked()) {
-						Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
-
-							@Override
-							public void run() {
-								api.unnickPlayerWithoutRemovingMySQL();
-								
-								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
-
-									@Override
-									public void run() {
-										Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, api.getNickName(), MySQLNickManager.getSkinName(p.getUniqueId()),
-												MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()),
-												MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()),
-												MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()),
-												MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()),
-												MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
-												MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
-												true, "NONE"));
-									}
-								}, 15 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
-							}
-						}, 10);
-						
-						return;
+					if((Main.mysql != null) && Main.mysql.isConnected()) {
+						if (api.isNicked()) {
+							api.unnickPlayerWithoutRemovingMySQL();
+							
+							Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+	
+								@Override
+								public void run() {
+									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, api.getNickName(), MySQLNickManager.getSkinName(p.getUniqueId()),
+											MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()),
+											MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()),
+											MySQLPlayerDataManager.getTabPrefix(p.getUniqueId()),
+											MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()),
+											MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
+											MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
+											true, "NONE"));
+								}
+							}, 10);
+							
+							return;
+						}
 					}
 				}
 				
 				if (FileUtils.cfg.getBoolean("BungeeCord")) {
-					if (!(FileUtils.cfg.getBoolean("LobbyMode"))) {
+					if (FileUtils.cfg.getBoolean("LobbyMode") == false) {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (!(api.isNicked())) {
 								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {

@@ -37,6 +37,8 @@ import me.TechsCode.UltraPermissions.storage.objects.User;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucko.luckperms.LuckPerms;
 import me.lucko.luckperms.api.LuckPermsApi;
+import me.lucko.luckperms.api.Node;
+import me.lucko.luckperms.api.NodeFactory;
 import me.neznamy.tab.bukkit.api.TABAPI;
 
 import de.dytanic.cloudnet.api.CloudAPI;
@@ -205,13 +207,6 @@ public class NickManager {
 				
 				Utils.oldDisplayNames.remove(p.getUniqueId());
 				Utils.oldPlayerListNames.remove(p.getUniqueId());
-				
-				if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
-					if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
-						Utils.scoreboardTeamManagers.get(p.getUniqueId()).destroyTeam();
-						Utils.scoreboardTeamManagers.remove(p.getUniqueId());
-					}
-				}
 			}
 		}, 5 + 1 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 
@@ -249,6 +244,13 @@ public class NickManager {
 			} else {
 				user.setPrefix(Utils.oldPermissionsExPrefixes.get(p.getUniqueId()), p.getWorld().getName());
 				user.setSuffix(Utils.oldPermissionsExSuffixes.get(p.getUniqueId()), p.getWorld().getName());
+			}
+		}
+		
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
+				Utils.scoreboardTeamManagers.get(p.getUniqueId()).destroyTeam();
+				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
 			}
 		}
 		
@@ -430,27 +432,35 @@ public class NickManager {
 
 	public void updateLuckPerms(String prefix, String suffix) {
 		if(Utils.luckPermsStatus()) {
-			Utils.luckPermsPrefixes.put(p.getUniqueId(), prefix);
-			Utils.luckPermsSuffixes.put(p.getUniqueId(), suffix);
-
 			LuckPermsApi api = LuckPerms.getApi();
 			me.lucko.luckperms.api.User user = api.getUser(p.getUniqueId());
-			user.setPermission(api.getNodeFactory().makePrefixNode(100, prefix).build());
-			user.setPermission(api.getNodeFactory().makeSuffixNode(100, suffix).build());
-			api.getUserManager().saveUser(user);
+			NodeFactory nodeFactory = api.getNodeFactory();
+			Node prefixNode = nodeFactory.makePrefixNode(100, prefix).build();
+			Node suffixNode = nodeFactory.makeSuffixNode(100, suffix).build();
+			
+			if((prefixNode != null) && (suffixNode != null)) {
+				user.setPermission(prefixNode);
+				user.setPermission(suffixNode);
+				api.getUserManager().saveUser(user);
+				
+				Utils.luckPermsPrefixes.put(p.getUniqueId(), prefixNode);
+				Utils.luckPermsSuffixes.put(p.getUniqueId(), suffixNode);
+			}
 		}
 	}
 	
 	public void resetLuckPerms() {
 		if(Utils.luckPermsStatus()) {
-			LuckPermsApi api = LuckPerms.getApi();
-			me.lucko.luckperms.api.User user = api.getUser(p.getUniqueId());
-			user.unsetPermission(api.getNodeFactory().makePrefixNode(100, Utils.luckPermsPrefixes.get(p.getUniqueId())).build());
-			user.unsetPermission(api.getNodeFactory().makeSuffixNode(100, Utils.luckPermsSuffixes.get(p.getUniqueId())).build());
-			api.getUserManager().saveUser(user);
-			
-			Utils.luckPermsPrefixes.remove(p.getUniqueId());
-			Utils.luckPermsSuffixes.remove(p.getUniqueId());
+			if(Utils.luckPermsPrefixes.containsKey(p.getUniqueId()) && Utils.luckPermsSuffixes.containsKey(p.getUniqueId())) {
+				LuckPermsApi api = LuckPerms.getApi();
+				me.lucko.luckperms.api.User user = api.getUser(p.getUniqueId());
+				user.unsetPermission((Node) Utils.luckPermsPrefixes.get(p.getUniqueId()));
+				user.unsetPermission((Node) Utils.luckPermsSuffixes.get(p.getUniqueId()));
+				api.getUserManager().saveUser(user);
+				
+				Utils.luckPermsPrefixes.remove(p.getUniqueId());
+				Utils.luckPermsSuffixes.remove(p.getUniqueId());
+			}
 		}
 	}
 	
@@ -487,8 +497,44 @@ public class NickManager {
 		
 		changeCloudNET(tagPrefix, tagSuffix);
 
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored"))
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))
+				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
+				
 			Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
+			
+			ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
+			UUID uuid = p.getUniqueId();
+			String finalTabPrefix = tabPrefix;
+			String finalTabSuffix = tabSuffix;
+			
+			new Timer().schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					if(Main.getInstance().isEnabled()) {
+						if(Utils.nickedPlayers.contains(uuid)) {
+							if((p != null) && p.isOnline()) {
+								sbtm.destroyTeam();
+								sbtm.createTeam();
+								
+								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
+									setPlayerListName(finalTabPrefix + p.getName() + finalTabSuffix);
+							} else {
+								sbtm.destroyTeam();
+								cancel();
+							}
+						} else {
+							sbtm.destroyTeam();
+							cancel();
+						}
+					} else {
+						sbtm.destroyTeam();
+						cancel();
+					}
+				}
+			}, 1000, 1000);
+		}
 		
 		setPlayerListName(tabPrefix + p.getName() + tabSuffix);
 		

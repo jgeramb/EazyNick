@@ -300,10 +300,12 @@ public class NMSNickManager extends ReflectUtils {
 			ArrayList<String> toRemove = new ArrayList<>();
 			
 			for (String cachedName : map.keySet()) {
-				Object entityPlayer = map.get(cachedName);
-				
-				if(entityPlayer.getClass().getMethod("getUniqueID").invoke(entityPlayer).equals(p.getUniqueId()))
-					toRemove.add(cachedName);
+				if(cachedName != null) {
+					Object entityPlayer = map.get(cachedName);
+					
+					if((entityPlayer == null) || entityPlayer.getClass().getMethod("getUniqueID").invoke(entityPlayer).equals(p.getUniqueId()))
+						toRemove.add(cachedName);
+				}
 			}
 			
 			for (String string : toRemove)
