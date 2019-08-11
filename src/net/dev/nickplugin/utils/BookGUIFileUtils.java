@@ -49,9 +49,9 @@ public class BookGUIFileUtils {
 		
 		cfg.addDefault("BookGUI.Page1.Title", "Info");
 		cfg.addDefault("BookGUI.Page1.Text", "&0Nicknames allow you to play with a different\nusername to not get recognized.\n\nAll rules still apply. You can still be reported and all name history is stored.\n\n");
-		cfg.addDefault("BookGUI.Page1.Title", "Ranks");
+		cfg.addDefault("BookGUI.Page2.Title", "Ranks");
 		cfg.addDefault("BookGUI.Page2.Text", "&0Let's get you set up with your nickname! First, you'll need to choose which &lRANK &0you would like to be shown as when nicked.\n\n");
-		cfg.addDefault("BookGUI.Page1.Title", "Skin");
+		cfg.addDefault("BookGUI.Page3.Title", "Skin");
 		cfg.addDefault("BookGUI.Page3.Text","&0Awesome! Now, wich &lSKIN &0would you like to have while nicked?\n\n");
 		cfg.addDefault("BookGUI.Page4.Title", "Name");
 		cfg.addDefault("BookGUI.Page4.Text", "&0Alright, now you'll need to choose the &0&lNAME &0to use!\n\n");

@@ -284,7 +284,6 @@ public class NMSNickManager extends ReflectUtils {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void updatePlayerCache(Player p) {
 		try {
 			Class<?> minecraftServer = getNMSClass("MinecraftServer");

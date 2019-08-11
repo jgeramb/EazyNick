@@ -10,7 +10,6 @@ import net.dev.nickplugin.utils.Utils;
 
 public class NickListCommand implements CommandExecutor {
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(sender instanceof Player) {

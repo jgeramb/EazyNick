@@ -41,32 +41,32 @@ public class BookGUICommand implements CommandExecutor {
 				} else if(args.length == 1) {
 					if(args[0].equalsIgnoreCase("accept")) {
 						TextComponent option1 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank1.Rank")));
-						option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank1.RankName")));
-						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Rank"))) }));
+						option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.getConfigString("BookGUI.Rank1.RankName")));
+						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank1.Rank"))) }));
 						TextComponent option2 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank2.Rank")));
-						option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank2.RankName")));
-						option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Rank"))) }));
+						option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.getConfigString("BookGUI.Rank2.RankName")));
+						option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank2.Rank"))) }));
 						TextComponent option3 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank3.Rank")));
-						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank3.RankName")));
-						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Rank"))) }));
+						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.getConfigString("BookGUI.Rank3.RankName")));
+						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank3.Rank"))) }));
 						TextComponent option4 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank4.Rank")));
-						option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank4.RankName")));
-						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Rank"))) }));
+						option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.getConfigString("BookGUI.Rank4.RankName")));
+						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank4.Rank"))) }));
 						TextComponent option5 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank5.Rank")));
-						option5.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank5.RankName")));
-						option5.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Rank"))) }));
+						option5.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.getConfigString("BookGUI.Rank5.RankName")));
+						option5.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank5.Rank"))) }));
 						TextComponent option6 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank6.Rank")));
-						option6.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank6.RankName")));
-						option6.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Rank"))) }));
+						option6.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.getConfigString("BookGUI.Rank6.RankName")));
+						option6.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank6.Rank"))) }));
 						
 						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page2.Title"), 
 								new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page2.Text")),
-								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission")))) ? option1 : new TextComponent(""), 
-								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission")))) ? option2 : new TextComponent(""), 
-								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission")))) ? option3 : new TextComponent(""), 
-								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission")))) ? option4 : new TextComponent(""), 
-								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission")))) ? option5 : new TextComponent(""),
-								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission")))) ? option6 : new TextComponent("")));
+								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") && (BookGUIFileUtils.getConfigString("BookGUI.Rank1.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.getConfigString("BookGUI.Rank1.Permission")))) ? option1 : new TextComponent(""), 
+								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") && (BookGUIFileUtils.getConfigString("BookGUI.Rank2.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.getConfigString("BookGUI.Rank2.Permission")))) ? option2 : new TextComponent(""), 
+								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") && (BookGUIFileUtils.getConfigString("BookGUI.Rank3.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.getConfigString("BookGUI.Rank3.Permission")))) ? option3 : new TextComponent(""), 
+								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") && (BookGUIFileUtils.getConfigString("BookGUI.Rank4.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.getConfigString("BookGUI.Rank4.Permission")))) ? option4 : new TextComponent(""), 
+								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") && (BookGUIFileUtils.getConfigString("BookGUI.Rank5.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.getConfigString("BookGUI.Rank5.Permission")))) ? option5 : new TextComponent(""),
+								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (BookGUIFileUtils.getConfigString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.getConfigString("BookGUI.Rank6.Permission")))) ? option6 : new TextComponent("")));
 					}
 				} else if(args.length == 2) {
 					TextComponent option1 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.NormalSkin.Text"));

@@ -12,7 +12,6 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class NMSBookBuilder {
 	
-	@SuppressWarnings("unchecked")
 	public static ItemStack create(String title, TextComponent... texts) {
 		ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 		BookMeta m = (BookMeta) is.getItemMeta();
