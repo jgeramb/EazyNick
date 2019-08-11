@@ -57,6 +57,7 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.Page4.Text", "&0Alright, now you'll need to choose the &0&lNAME &0to use!\n\n");
 		cfg.addDefault("BookGUI.Page5.Title", "RandomNick");
 		cfg.addDefault("BookGUI.Page5.Text", "&0We've generated a random username for you:\n&l%name%\n\n");
+		cfg.addDefault("BookGUI.Page5.Text2", "\n&0To go back to being your usual self, type:\n&l/nick reset");
 		cfg.addDefault("BookGUI.Page6.Title", "Done");
 		cfg.addDefault("BookGUI.Page6.Text.SingleServer", "&0You have finished setting up your nickname!\n\nYou are now nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
 		cfg.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!\n\nWhen you go into a game, you will be nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
@@ -79,12 +80,12 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.RandomName.Hover", "&fClick here to use a random name");
 		cfg.addDefault("BookGUI.ReuseName.Text", arrow + " &0Reuse '%name%'\n");
 		cfg.addDefault("BookGUI.ReuseName.Hover", "&fClick here to reuse '%name%'");
-		cfg.addDefault("BookGUI.OptionUseName.Text", "     §a§nUSE NAME\n");
-		cfg.addDefault("BookGUI.OptionUseName.Hover", "§fClick here to use this name.");
-		cfg.addDefault("BookGUI.OptionTryAgain.Text", "     §c§nTRY AGAIN\n\n");
-		cfg.addDefault("BookGUI.OptionTryAgain.Hover", "§fClick here to generate another name.");
-		cfg.addDefault("BookGUI.OptionEnterName.Text", "§0§nOr enter a name to\n§nuse.");
-		cfg.addDefault("BookGUI.OptionEnterName.Hover", "§fClick here to enter a name");
+		cfg.addDefault("BookGUI.OptionUseName.Text", "     &a&nUSE NAME\n");
+		cfg.addDefault("BookGUI.OptionUseName.Hover", "&fClick here to use this name.");
+		cfg.addDefault("BookGUI.OptionTryAgain.Text", "     &c&nTRY AGAIN\n\n");
+		cfg.addDefault("BookGUI.OptionTryAgain.Hover", "&fClick here to generate another name.");
+		cfg.addDefault("BookGUI.OptionEnterName.Text", "&0&nOr enter a name to\n&nuse.");
+		cfg.addDefault("BookGUI.OptionEnterName.Hover", "&fClick here to enter a name");
 		
 		cfg.addDefault("SignGUI.Line1", "");
 		cfg.addDefault("SignGUI.Line2", "^^^^^^^^^^^^^^^");

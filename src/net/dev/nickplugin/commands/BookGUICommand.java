@@ -103,9 +103,9 @@ public class BookGUICommand implements CommandExecutor {
 					}
 
 					if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname")))
-						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page4.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page4.Text")), option1, option2, option3, new TextComponent("\n§0To go back to being your usual self, type:\n§l/nick reset")));
+						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page4.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page4.Text")), option1, option2, option3, new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page5.Text2"))));
 					else
-						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page4.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page4.Text")), option2, option3, new TextComponent("\n§0To go back to being your usual self, type:\n§l/nick reset")));
+						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page4.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page4.Text")), option2, option3, new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page5.Text2"))));
 				} else {
 					if(args[3].equalsIgnoreCase("RANDOM")) {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
