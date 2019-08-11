@@ -16,6 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nametagedit.plugin.NametagEdit;
+import com.nametagedit.plugin.api.INametagApi;
+import com.nametagedit.plugin.api.data.Nametag;
 
 import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.sql.MySQLNickManager;
@@ -263,6 +265,20 @@ public class NickManager {
 			
 			Utils.ultraPermsPrefixes.remove(p.getUniqueId());
 			Utils.ultraPermsSuffixes.remove(p.getUniqueId());
+		}
+		
+		if(Utils.nameTagEditStatus()) {
+			INametagApi nametagEditAPI = NametagEdit.getApi();
+			String prefix = Utils.nametagEditPrefixes.get(p.getUniqueId());
+			String suffix = Utils.nametagEditSuffixes.get(p.getUniqueId());
+			
+			nametagEditAPI.setPrefix(p, prefix);
+			nametagEditAPI.setSuffix(p, suffix);
+			nametagEditAPI.setNametag(p, prefix, suffix);
+			nametagEditAPI.reloadNametag(p);
+			
+			Utils.nametagEditPrefixes.remove(p.getUniqueId());
+			Utils.nametagEditSuffixes.remove(p.getUniqueId());
 		}
 		
 		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
@@ -542,12 +558,25 @@ public class NickManager {
 			p.setDisplayName(chatPrefix + p.getName() + chatSuffix);
 		
 		if(Utils.nameTagEditStatus()) {
-			NametagEdit.getApi().setPrefix(p.getPlayer(), tabSuffix);
-			NametagEdit.getApi().setSuffix(p.getPlayer(), tabPrefix);
+			if(Utils.nametagEditPrefixes.containsKey(p.getUniqueId()) && Utils.nametagEditSuffixes.containsKey(p.getUniqueId())) {
+				Utils.nametagEditPrefixes.remove(p.getUniqueId());
+				Utils.nametagEditSuffixes.remove(p.getUniqueId());
+			}
+			
+			INametagApi nametagEditAPI = NametagEdit.getApi();
+			Nametag nametag = nametagEditAPI.getNametag(p);
+			
+			Utils.nametagEditPrefixes.put(p.getUniqueId(), nametag.getPrefix());
+			Utils.nametagEditSuffixes.put(p.getUniqueId(), nametag.getSuffix());
+			
+			nametagEditAPI.setPrefix(p, tagPrefix);
+			nametagEditAPI.setSuffix(p, tagSuffix);
+			nametagEditAPI.setNametag(p, tagPrefix, tagSuffix);
+			nametagEditAPI.reloadNametag(p);
 		}
 		
 		if(Utils.ultraPermissionsStatus()) {
-			if(Utils.ultraPermsPrefixes.containsKey(p.getUniqueId()) || Utils.ultraPermsSuffixes.containsKey(p.getUniqueId())) {
+			if(Utils.ultraPermsPrefixes.containsKey(p.getUniqueId()) && Utils.ultraPermsSuffixes.containsKey(p.getUniqueId())) {
 				Utils.ultraPermsPrefixes.remove(p.getUniqueId());
 				Utils.ultraPermsSuffixes.remove(p.getUniqueId());
 			}

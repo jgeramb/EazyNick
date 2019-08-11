@@ -48,6 +48,8 @@ public class Utils {
 	public static HashMap<UUID, Object> luckPermsSuffixes = new HashMap<>();
 	public static HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
 	public static HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
+	public static HashMap<UUID, String> nametagEditPrefixes = new HashMap<>();
+	public static HashMap<UUID, String> nametagEditSuffixes = new HashMap<>();
 	
 	public static HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
 	public static HashMap<UUID, String> nameCache = new HashMap<>();
