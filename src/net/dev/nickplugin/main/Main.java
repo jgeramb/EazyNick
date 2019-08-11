@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -73,9 +72,9 @@ public class Main extends JavaPlugin {
 					Utils.worldBlackList = new ArrayList<>(toAdd);
 				}
 
-				Utils.prefix = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Prefix"));
-				Utils.noPerm = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoPerm"));
-				Utils.notPlayer = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotPlayer"));
+				Utils.prefix = LanguageFileUtils.getConfigString("Messages.Prefix");
+				Utils.noPerm = LanguageFileUtils.getConfigString("Messages.NoPerm");
+				Utils.notPlayer = LanguageFileUtils.getConfigString("Messages.NotPlayer");
 
 				Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 				Utils.sendConsole("	§7Starting system...");

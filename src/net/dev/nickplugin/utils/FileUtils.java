@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -48,7 +49,7 @@ public class FileUtils {
 				+ "\nLanguages: de_DE, en_US"
 				+ "\n");
 
-		cfg.addDefault("Language", "de_DE");
+		cfg.addDefault("Language", "en_US");
 		cfg.addDefault("BungeeCord", false);
 		cfg.addDefault("LobbyMode", false);
 		cfg.addDefault("BungeeMySQL.hostname", "localhost");
@@ -153,6 +154,10 @@ public class FileUtils {
 		LanguageFileUtils.file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/lang/" + cfg.getString("Language") + ".yml");
 		LanguageFileUtils.cfg = YamlConfiguration.loadConfiguration(LanguageFileUtils.file);
 		LanguageFileUtils.setupFiles();
+	}
+	
+	public static String getConfigString(String path) {
+		return ChatColor.translateAlternateColorCodes('&', cfg.getString(path));
 	}
 	
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -51,13 +50,13 @@ public class PagesHandler<T> {
 	}
 
 	public void createPage(Player p, int page) {
-		Inventory inv = Bukkit.createInventory(null, 45, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.InventoryTitle")).replace("%currentPage%", "" + (page + 1)));
+		Inventory inv = Bukkit.createInventory(null, 45, LanguageFileUtils.getConfigString("NickNameGUI.InventoryTitle").replace("%currentPage%", "" + (page + 1)));
 		
 		for (T nickName : getPage(page))
-			inv.setItem(inv.firstEmpty(), Utils.createSkull(1, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.NickNameSkull.DisplayName")).replace("%nickName%", (String) nickName), (String) nickName));
+			inv.setItem(inv.firstEmpty(), Utils.createSkull(1, LanguageFileUtils.getConfigString("NickNameGUI.NickNameSkull.DisplayName").replace("%nickName%", (String) nickName), (String) nickName));
 
-		inv.setItem(38, Utils.createItem(Material.ARROW, 1, 0, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.BackItem.DisplayName"))));
-		inv.setItem(42, Utils.createItem(Material.ARROW, 1, 0, ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.NextItem.DisplayName"))));
+		inv.setItem(38, Utils.createItem(Material.ARROW, 1, 0, LanguageFileUtils.getConfigString("NickNameGUI.BackItem.DisplayName")));
+		inv.setItem(42, Utils.createItem(Material.ARROW, 1, 0, LanguageFileUtils.getConfigString("NickNameGUI.NextItem.DisplayName")));
 		
 		p.openInventory(inv);
 	}

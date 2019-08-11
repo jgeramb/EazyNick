@@ -1,6 +1,5 @@
 package net.dev.nickplugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +16,7 @@ public class CommandNotAvaiableCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.use"))
-				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.CommandNotAvaiableForThatVersion")));
+				p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.CommandNotAvaiableForThatVersion"));
 			else
 				p.sendMessage(Utils.noPerm);
 		} else

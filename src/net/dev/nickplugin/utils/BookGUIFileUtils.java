@@ -3,6 +3,7 @@ package net.dev.nickplugin.utils;
 import java.io.File;
 import java.io.IOException;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -43,6 +44,54 @@ public class BookGUIFileUtils {
 				+ "\nSpigot-Materials: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html"
 				+ "\nResource-Page: " + desc.getWebsite()
 				+ "\n");
+		
+		String arrow = "&0\u27A4";
+		
+		cfg.addDefault("BookGUI.Page1.Title", "Info");
+		cfg.addDefault("BookGUI.Page1.Text", "&0Nicknames allow you to play with a different\nusername to not get recognized.\n\nAll rules still apply. You can still be reported and all name history is stored.\n\n");
+		cfg.addDefault("BookGUI.Page1.Title", "Ranks");
+		cfg.addDefault("BookGUI.Page2.Text", "&0Let's get you set up with your nickname! First, you'll need to choose which &lRANK &0you would like to be shown as when nicked.\n\n");
+		cfg.addDefault("BookGUI.Page1.Title", "Skin");
+		cfg.addDefault("BookGUI.Page3.Text","&0Awesome! Now, wich &lSKIN &0would you like to have while nicked?\n\n");
+		cfg.addDefault("BookGUI.Page4.Title", "Name");
+		cfg.addDefault("BookGUI.Page4.Text", "&0Alright, now you'll need to choose the &0&lNAME &0to use!\n\n");
+		cfg.addDefault("BookGUI.Page5.Title", "RandomNick");
+		cfg.addDefault("BookGUI.Page5.Text", "&0We've generated a random username for you:\n&l%name%\n\n");
+		cfg.addDefault("BookGUI.Page6.Title", "Done");
+		cfg.addDefault("BookGUI.Page6.Text.SingleServer", "&0You have finished setting up your nickname!\n\nYou are now nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
+		cfg.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!\n\nWhen you go into a game, you will be nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
+		
+		cfg.addDefault("BookGUI.Accept.Text", "&0&n" + arrow + " I understand, set\n&nup my nickname");
+		cfg.addDefault("BookGUI.Accept.Hover", "&fClick here to proceed");
+		cfg.addDefault("BookGUI.Rank.Text", arrow + " %rank%\n");
+		cfg.addDefault("BookGUI.Rank.Hover", "&fClick here to be shown as %rank%");
+		cfg.addDefault("BookGUI.NormalSkin.Text", arrow + " &0My normal skin\n");
+		cfg.addDefault("BookGUI.NormalSkin.Hover", "&fClick here to use your normal skin");
+		cfg.addDefault("BookGUI.StevenAlexSkin.Text", arrow + " &0Steven/Alex skin\n");
+		cfg.addDefault("BookGUI.StevenAlexSkin.Hover", "&fClick here to use a Steven/Alex skin");
+		cfg.addDefault("BookGUI.RandomSkin.Text", arrow + " &0Random skin\n");
+		cfg.addDefault("BookGUI.RandomSkin.Hover", "&fClick here to use a random skin");
+		cfg.addDefault("BookGUI.ReuseSkin.Text", arrow + " &0Reuse %skin%\n");
+		cfg.addDefault("BookGUI.ReuseSkin.Hover", "&fClick here to reuse your previous skin");
+		cfg.addDefault("BookGUI.EnterName.Text", arrow + " &0Enter a name\n");
+		cfg.addDefault("BookGUI.EnterName.Hover", "&fClick here to enter a name");
+		cfg.addDefault("BookGUI.RandomName.Text", arrow + " &0Use random name\n");
+		cfg.addDefault("BookGUI.RandomName.Hover", "&fClick here to use a random name");
+		cfg.addDefault("BookGUI.ReuseName.Text", arrow + " &0Reuse '%name%'\n");
+		cfg.addDefault("BookGUI.ReuseName.Hover", "&fClick here to reuse '%name%'");
+		cfg.addDefault("BookGUI.OptionUseName.Text", "     §a§nUSE NAME\n");
+		cfg.addDefault("BookGUI.OptionUseName.Hover", "§fClick here to use this name.");
+		cfg.addDefault("BookGUI.OptionTryAgain.Text", "     §c§nTRY AGAIN\n\n");
+		cfg.addDefault("BookGUI.OptionTryAgain.Hover", "§fClick here to generate another name.");
+		cfg.addDefault("BookGUI.OptionEnterName.Text", "§0§nOr enter a name to\n§nuse.");
+		cfg.addDefault("BookGUI.OptionEnterName.Hover", "§fClick here to enter a name");
+		
+		cfg.addDefault("SignGUI.Line1", "");
+		cfg.addDefault("SignGUI.Line2", "^^^^^^^^^^^^^^^");
+		cfg.addDefault("SignGUI.Line3", "Enter your");
+		cfg.addDefault("SignGUI.Line4", "username here");
+		
+		cfg.addDefault("AnvilGUI.Title", "Enter name here");
 
 		cfg.addDefault("BookGUI.Rank1.Enabled", true);
 		cfg.addDefault("BookGUI.Rank1.Rank", "&8DEFAULT");
@@ -120,6 +169,10 @@ public class BookGUIFileUtils {
 		cfg.options().copyDefaults(true);
 		cfg.options().copyHeader(true);
 		saveFile();
+	}
+	
+	public static String getConfigString(String path) {
+		return ChatColor.translateAlternateColorCodes('&', cfg.getString(path));
 	}
 	
 }

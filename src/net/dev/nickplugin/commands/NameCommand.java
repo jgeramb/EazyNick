@@ -1,6 +1,5 @@
 package net.dev.nickplugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,9 +20,9 @@ public class NameCommand implements CommandExecutor {
 				NickManager api = new NickManager(p);
 				
 				if(api.isNicked()) {
-					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Name").replace("%name%", api.getNickName())));
+					p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.Name").replace("%name%", api.getNickName()));
 				} else
-					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
+					p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NotNicked"));
 			} else
 				p.sendMessage(Utils.noPerm);
 		} else

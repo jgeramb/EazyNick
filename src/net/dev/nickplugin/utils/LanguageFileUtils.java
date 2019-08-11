@@ -3,6 +3,7 @@ package net.dev.nickplugin.utils;
 import java.io.File;
 import java.io.IOException;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -164,6 +165,10 @@ public class LanguageFileUtils {
 		
 		cfg.options().copyDefaults(true);
 		saveFile();
+	}
+	
+	public static String getConfigString(String path) {
+		return ChatColor.translateAlternateColorCodes('&', cfg.getString(path));
 	}
 	
 }

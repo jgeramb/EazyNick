@@ -2,7 +2,6 @@ package net.dev.nickplugin.commands;
 
 import java.util.Random;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,7 +25,7 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 					boolean hasItem = false;
 					
 					if(FileUtils.cfg.getBoolean("NeedItemToToggleNick")) {
-						 if(!((p.getItemInHand() != null) && (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null) && (p.getItemInHand().getItemMeta().getDisplayName() .equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled"))) || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled"))))))
+						 if(!((p.getItemInHand() != null) && (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null) && (p.getItemInHand().getItemMeta().getDisplayName() .equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"))))
 							 return true;
 						 else
 							 hasItem = true;
@@ -36,18 +35,18 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 						MySQLNickManager.removePlayer(p.getUniqueId());
 						
 						if(hasItem)
-							p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+							p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 	
-						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.BungeeAutoNickDisabled")));
+						p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.BungeeAutoNickDisabled"));
 					} else {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 	
 						MySQLNickManager.addPlayer(p.getUniqueId(), name, name);
 						
 						if(hasItem)
-							p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
+							p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
 	
-						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.BungeeAutoNickEnabled")));
+						p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.BungeeAutoNickEnabled"));
 					}
 				}
 			} else

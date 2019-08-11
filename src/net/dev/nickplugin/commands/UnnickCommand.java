@@ -1,7 +1,6 @@
 package net.dev.nickplugin.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,9 +22,9 @@ public class UnnickCommand implements CommandExecutor {
 					if(Utils.nickedPlayers.contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					else
-						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotNicked")));
+						p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NotNicked"));
 				} else
-					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
+					p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickDelay"));
 			} else
 				p.sendMessage(Utils.noPerm);
 		} else

@@ -154,7 +154,7 @@ public class NickManager {
 					if(Main.getInstance().isEnabled()) {
 						if((p != null) && p.isOnline()) {
 							if(Utils.nickedPlayers.contains(uuid))
-								ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix)), 20);
+								ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), LanguageFileUtils.getConfigString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix), 20);
 							else {
 								ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
 								cancel();
@@ -172,8 +172,8 @@ public class NickManager {
 				ItemStack item = p.getInventory().getItem(slot);
 				
 				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled"))))
-						p.getInventory().setItem(slot, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
+					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled")))
+						p.getInventory().setItem(slot, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), LanguageFileUtils.getConfigString("NickItem.DisplayName.Enabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
 				}
 			}
 		}
@@ -270,8 +270,8 @@ public class NickManager {
 				ItemStack item = p.getInventory().getItem(slot);
 				
 				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled"))))
-						p.getInventory().setItem(slot, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Enabled")))
+						p.getInventory().setItem(slot, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 				}
 			}
 		}

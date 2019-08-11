@@ -1,6 +1,5 @@
 package net.dev.nickplugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,7 +26,7 @@ public class ResetNameCommand implements CommandExecutor {
 				MySQLPlayerDataManager.removeData(p.getUniqueId());
 				MySQLNickManager.removePlayer(p.getUniqueId());
 				
-				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ResetName")));
+				p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.ResetName"));
 			} else
 				p.sendMessage(Utils.noPerm);
 		} else

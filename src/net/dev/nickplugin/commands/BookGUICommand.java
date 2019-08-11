@@ -3,7 +3,6 @@ package net.dev.nickplugin.commands;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,37 +32,35 @@ public class BookGUICommand implements CommandExecutor {
 				if(new NickManager(p).isNicked())
 					p.chat("/unnick");
 				
-				String arrow = "§0\u27A4";
-				
 				if(args.length == 0) {
-					TextComponent option = new TextComponent("§0§n\u27A4 I understand, set\n§nup my nickname");
+					TextComponent option = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Accept.Text"));
 					option.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui accept"));
-					option.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to proceed") }));
+					option.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Accept.Hover")) }));
 					
-					NMSBookUtils.open(p, NMSBookBuilder.create("Info", new TextComponent("§0Nicknames allow you to play with a different\nusername to not get recognized.\n\nAll rules still apply. You can still be reported and all name history is stored.\n\n"), option));
+					NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page1.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page1.Text")), option));
 				} else if(args.length == 1) {
 					if(args[0].equalsIgnoreCase("accept")) {
-						TextComponent option1 = new TextComponent(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Rank")) + "\n");
+						TextComponent option1 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank1.Rank")));
 						option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank1.RankName")));
-						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to be shown as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Rank"))) }));
-						TextComponent option2 = new TextComponent(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Rank")) + "\n");
+						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Rank"))) }));
+						TextComponent option2 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank2.Rank")));
 						option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank2.RankName")));
-						option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to be shown as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Rank"))) }));
-						TextComponent option3 = new TextComponent(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Rank")) + "\n");
+						option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Rank"))) }));
+						TextComponent option3 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank3.Rank")));
 						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank3.RankName")));
-						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to be shown as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Rank"))) }));
-						TextComponent option4 = new TextComponent(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Rank")) + "\n");
+						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Rank"))) }));
+						TextComponent option4 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank4.Rank")));
 						option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank4.RankName")));
-						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to be shown as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Rank"))) }));
-						TextComponent option5 = new TextComponent(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Rank")) + "\n");
+						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Rank"))) }));
+						TextComponent option5 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank5.Rank")));
 						option5.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank5.RankName")));
-						option5.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to be shown as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Rank"))) }));
-						TextComponent option6 = new TextComponent(arrow + " " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Rank")) + "\n");
+						option5.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Rank"))) }));
+						TextComponent option6 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank6.Rank")));
 						option6.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + BookGUIFileUtils.cfg.getString("BookGUI.Rank6.RankName")));
-						option6.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to be shown as " + ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Rank"))) }));
+						option6.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Rank"))) }));
 						
-						NMSBookUtils.open(p, NMSBookBuilder.create("Ranks", 
-								new TextComponent("§0Let's get you set up with your nickname! First, you'll need to choose which §lRANK §0you would like to be shown as when nicked.\n\n"),
+						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page2.Title"), 
+								new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page2.Text")),
 								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission")))) ? option1 : new TextComponent(""), 
 								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission")))) ? option2 : new TextComponent(""), 
 								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission")))) ? option3 : new TextComponent(""), 
@@ -72,43 +69,43 @@ public class BookGUICommand implements CommandExecutor {
 								(BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission")))) ? option6 : new TextComponent("")));
 					}
 				} else if(args.length == 2) {
-					TextComponent option1 = new TextComponent(arrow + " §0My normal skin\n");
+					TextComponent option1 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.NormalSkin.Text"));
 					option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " DEFAULT"));
-					option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to use your normal skin") }));
-					TextComponent option2 = new TextComponent(arrow + " §0Steven/Alex skin\n");
+					option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.NormalSkin.Hover")) }));
+					TextComponent option2 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.StevenAlexSkin.Text"));
 					option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " NORMAL"));
-					option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to use a Steven/Alex skin") }));
-					TextComponent option3 = new TextComponent(arrow + " §0Random skin\n");
+					option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.StevenAlexSkin.Hover")) }));
+					TextComponent option3 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.RandomSkin.Text"));
 					option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " +args[1] + " RANDOM"));
-					option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to use a random skin") }));
+					option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.RandomSkin.Hover")) }));
 					
-					TextComponent option4 = new TextComponent(Utils.lastSkinNames.containsKey(p.getUniqueId()) ? (arrow + " §0Reuse " + Utils.lastSkinNames.get(p.getUniqueId()) + "\n") : "");
+					TextComponent option4 = new TextComponent(Utils.lastSkinNames.containsKey(p.getUniqueId()) ? (BookGUIFileUtils.getConfigString("BookGUI.ReuseSkin.Text").replace("%skin%", Utils.lastSkinNames.get(p.getUniqueId()))) : "");
 					
 					if(Utils.lastSkinNames.containsKey(p.getUniqueId())) {
 						option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + Utils.lastSkinNames.get(p.getUniqueId())));
-						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to reuse your previous skin") }));
+						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.ReuseSkin.Hover")) }));
 					}
 						
-					NMSBookUtils.open(p, NMSBookBuilder.create("Skin",  new TextComponent("§0Awesome! Now, wich §lSKIN §0would you like to have while nicked?\n\n"), option1, option2, option3, option4));
+					NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page3.Title"),  new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page3.Text")), option1, option2, option3, option4));
 				} else if(args.length == 3) {
-					TextComponent option1 = new TextComponent(arrow + " §0Enter a name\n");
+					TextComponent option1 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.EnterName.Text"));
 					option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2] + " ENTERNAME"));
-					option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to enter a name") }));
-					TextComponent option2 = new TextComponent(arrow + " §0Use random name\n");
+					option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.EnterName.Hover")) }));
+					TextComponent option2 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.RandomName.Text"));
 					option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2] + " RANDOM"));
-					option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to use a random name") }));
+					option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.RandomName.Hover")) }));
 					
-					TextComponent option3 = new TextComponent(Utils.lastSkinNames.containsKey(p.getUniqueId()) ? (arrow + " §0Reuse '" + Utils.lastNickNames.get(p.getUniqueId()) + "'\n") : "");
+					TextComponent option3 = new TextComponent(Utils.lastSkinNames.containsKey(p.getUniqueId()) ? (BookGUIFileUtils.getConfigString("BookGUI.ReuseName.Text").replace("%name%", Utils.lastNickNames.get(p.getUniqueId()))) : "");
 					
 					if(Utils.lastNickNames.containsKey(p.getUniqueId())) {
 						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/booknick " + args[1] + " " + args[2] + " " + Utils.lastNickNames.get(p.getUniqueId())));
-						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to reuse '" + Utils.lastNickNames.get(p.getUniqueId()) + "'") }));
+						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.ReuseName.Hover").replace("%name%", Utils.lastNickNames.get(p.getUniqueId()))) }));
 					}
 
 					if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname")))
-						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need to choose the §0§lNAME §0to use!\n\n"), option1, option2, option3, new TextComponent("\n§0To go back to being your usual self, type:\n§l/nick reset")));
+						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page4.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page4.Text")), option1, option2, option3, new TextComponent("\n§0To go back to being your usual self, type:\n§l/nick reset")));
 					else
-						NMSBookUtils.open(p, NMSBookBuilder.create("Name", new TextComponent("§0Alright, now you'll need to choose the §0§lNAME §0to use!\n\n"), option2, option3, new TextComponent("\n§0To go back to being your usual self, type:\n§l/nick reset")));
+						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page4.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page4.Text")), option2, option3, new TextComponent("\n§0To go back to being your usual self, type:\n§l/nick reset")));
 				} else {
 					if(args[3].equalsIgnoreCase("RANDOM")) {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
@@ -127,24 +124,24 @@ public class BookGUICommand implements CommandExecutor {
 									nickNameIsInUse = true;
 						}
 					
-						TextComponent option1 = new TextComponent("     §a§nUSE NAME\n");
+						TextComponent option1 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.OptionUseName.Text"));
 						option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/booknick " + args[1] + " " + args[2]  + " " + name));
-						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to use this name.") }));
-						TextComponent option2 = new TextComponent("     §c§nTRY AGAIN\n\n");
+						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.OptionUseName.Hover")) }));
+						TextComponent option2 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.OptionTryAgain.Text"));
 						option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2]  + " RANDOM"));
-						option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to generate another name.") }));
-						TextComponent option3 = new TextComponent("§0§nOr enter a name to\n§nuse.");
+						option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.OptionTryAgain.Hover")) }));
+						TextComponent option3 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.OptionEnterName.Text"));
 						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2]  + " ENTERNAME"));
-						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent("§fClick here to enter a name") }));
+						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.OptionEnterName.Hover")) }));
 						
 						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname")))
-							NMSBookUtils.open(p, NMSBookBuilder.create("RandomNick", new TextComponent("§0We've generated a random username for you:\n§l" + name + "\n\n"), option1, option2, option3));
+							NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page5.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page5.Text").replace("%name%", name)), option1, option2, option3));
 						else
-							NMSBookUtils.open(p, NMSBookBuilder.create("RandomNick", new TextComponent("§0We've generated a random username for you:\n§l" + name + "\n\n"), option1, option2));
+							NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page5.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page5.Text").replace("%name%", name)), option1, option2));
 					} else if(args[3].equalsIgnoreCase("ENTERNAME")) {
 						if(FileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname"))) {
 							if(FileUtils.cfg.getBoolean("UseSignGUIForCustomName")) {
-								SignGUI.open(p, "", "^^^^^^^^^^^^^^^", "Enter your", "username here", new SignGUI.EditCompleteListener() {
+								SignGUI.open(p, BookGUIFileUtils.getConfigString("SignGUI.Line1"), BookGUIFileUtils.getConfigString("SignGUI.Line2"), BookGUIFileUtils.getConfigString("SignGUI.Line3"), BookGUIFileUtils.getConfigString("SignGUI.Line4"), new SignGUI.EditCompleteListener() {
 									
 									@Override
 									public void onEditComplete(SignGUI.EditCompleteEvent e) {
@@ -168,7 +165,7 @@ public class BookGUICommand implements CommandExecutor {
 									}
 								});
 								
-								gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, Utils.createItem(Material.PAPER, 1, 0, "Enter name here"));
+								gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, Utils.createItem(Material.PAPER, 1, 0, BookGUIFileUtils.getConfigString("AnvilGUI.Title")));
 		
 								try {
 									gui.open();

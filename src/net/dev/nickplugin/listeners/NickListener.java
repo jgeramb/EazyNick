@@ -3,7 +3,6 @@ package net.dev.nickplugin.listeners;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -70,7 +69,7 @@ public class NickListener implements Listener {
 				MySQLPlayerDataManager.insertData(p.getUniqueId(), oldPermissionsExRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
 			}
 			
-			p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", e.getNickName())));
+			p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", e.getNickName()));
 		}
 	}
 	
@@ -81,7 +80,7 @@ public class NickListener implements Listener {
 			
 			new NickManager(p).unnickPlayer();
 			
-			p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Unnick")));
+			p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.Unnick"));
 		}
 	}
 	
@@ -207,18 +206,18 @@ public class NickListener implements Listener {
 					if (FileUtils.cfg.getBoolean("NickItem.getOnJoin")) {
 						if (p.hasPermission("nick.item")) {
 							if (!(MySQLNickManager.isPlayerNicked(p.getUniqueId())))
-								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 							else
-								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
+								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
 						}
 					}
 				} else {
 					if (FileUtils.cfg.getBoolean("NickItem.getOnJoin")) {
 						if (p.hasPermission("nick.item")) {
 							if (FileUtils.cfg.getBoolean("NickOnWorldChange"))
-								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 							else
-								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+								p.getInventory().setItem(FileUtils.cfg.getInt("NickItem.Slot") - 1, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 						}
 					}
 				}
@@ -286,43 +285,42 @@ public class NickListener implements Listener {
 		if ((e.getItem() != null) && (e.getItem().getType() != Material.AIR && (e.getItem().getItemMeta() != null) && (e.getItem().getItemMeta().getDisplayName() != null))) {
 			if (FileUtils.cfg.getBoolean("NickItem.getOnJoin")) {
 				if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-					if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")))) {
+					if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled"))) {
 						e.setCancelled(true);
 						p.chat("/nick");
 
-						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
-					} else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled")))) {
+						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), LanguageFileUtils.getConfigString("NickItem.DisplayName.Enabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
+					} else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Enabled"))) {
 						e.setCancelled(true);
 						p.chat("/unnick");
 
-						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 					} else {
 						if (FileUtils.cfg.getBoolean("NickOnWorldChange")) {
-							if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Disabled")))) {
+							if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled"))) {
 								e.setCancelled(true);
 
 								Utils.nickOnWorldChangePlayers.add(p.getUniqueId());
-								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Enabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Enabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
+								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Enabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
 
-								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&',
-										LanguageFileUtils.cfg.getString("Messages.WorldChangeAutoNickEnabled")));
-							} else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Enabled")))) {
+								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.WorldChangeAutoNickEnabled"));
+							} else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Enabled"))) {
 								e.setCancelled(true);
 
 								Utils.nickOnWorldChangePlayers.remove(p.getUniqueId());
-								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Disabled")), ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.ItemLore.Disabled").replace("&n", "\n")), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 
-								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.WorldChangeAutoNickDisabled")));
+								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.WorldChangeAutoNickDisabled"));
 							}
 						}
 
 						if (FileUtils.cfg.getBoolean("BungeeCord")) {
 							if (!(Utils.nickedPlayers.contains(p.getUniqueId()))) {
-								if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")))) {
+								if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) {
 									e.setCancelled(true);
 
 									p.chat("/togglenick");
-								} else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled")))) {
+								} else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"))) {
 									e.setCancelled(true);
 
 									p.chat("/togglenick");
@@ -338,7 +336,7 @@ public class NickListener implements Listener {
 	@EventHandler
 	public void onItemDrop(PlayerDropItemEvent e) {
 		if ((e.getItemDrop() != null) && (e.getItemDrop().getItemStack().getType() != Material.AIR) && (e.getItemDrop().getItemStack().getItemMeta() != null) && (e.getItemDrop().getItemStack().getItemMeta().getDisplayName() != null)) {
-			if (e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled"))) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled"))) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Enabled"))) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Disabled"))) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled"))) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")))) {
+			if (e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Enabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Enabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) {
 				if (FileUtils.cfg.getBoolean("NickItem.InventorySettings.PlayersCanDropItem") == false)
 					e.setCancelled(true);
 			}
@@ -351,44 +349,44 @@ public class NickListener implements Listener {
 			Player p = (Player) e.getWhoClicked();
 
 			if ((e.getCurrentItem() != null) && (e.getCurrentItem().getType() != Material.AIR) && (e.getCurrentItem().getItemMeta() != null) && (e.getCurrentItem().getItemMeta().getDisplayName() != null)) {
-				if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Enabled"))) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.DisplayName.Disabled"))) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Enabled"))) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.WorldChange.DisplayName.Disabled"))) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Enabled"))) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickItem.BungeeCord.DisplayName.Disabled")))) {
+				if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Enabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Enabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) {
 					if (FileUtils.cfg.getBoolean("NickItem.InventorySettings.PlayersCanMoveItem") == false)
 						e.setCancelled(true);
 				}
 
-				if (e.getView().getTitle().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickGUI.InventoryTitle")))) {
+				if (e.getView().getTitle().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickGUI.InventoryTitle"))) {
 					e.setCancelled(true);
 
-					if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickGUI.NickItem.DisplayName")))) {
+					if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickGUI.NickItem.DisplayName"))) {
 						p.closeInventory();
 						p.chat("/nick");
-					} else if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickGUI.UnnickItem.DisplayName")))) {
+					} else if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickGUI.UnnickItem.DisplayName"))) {
 						p.closeInventory();
 						p.chat("/unnick");
 					}
 				} else if (Utils.nickNameListPage.containsKey(p.getUniqueId())) {
 					String shownPage = "" + (Utils.nickNameListPage.get(p.getUniqueId()) + 1);
-					String inventoryName = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.InventoryTitle")).replace("%currentPage%", shownPage);
+					String inventoryName = LanguageFileUtils.getConfigString("NickNameGUI.InventoryTitle").replace("%currentPage%", shownPage);
 
 					if (e.getView().getTitle().equalsIgnoreCase(inventoryName)) {
 						Integer page = Utils.nickNameListPage.get(p.getUniqueId());
 						e.setCancelled(true);
 
-						if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.BackItem.DisplayName")))) {
+						if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickNameGUI.BackItem.DisplayName"))) {
 							if (!(page == 0)) {
 								Utils.nickNamesHandler.createPage(p, page - 1);
 								Utils.nickNameListPage.put(p.getUniqueId(), page - 1);
 							} else
-								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
-						} else if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("NickNameGUI.NextItem.DisplayName")))) {
+								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NoMorePages"));
+						} else if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickNameGUI.NextItem.DisplayName"))) {
 							if (page < (Utils.nickNamesHandler.getPages().size() - 1)) {
 								if (page != 99) {
 									Utils.nickNamesHandler.createPage(p, page + 1);
 									Utils.nickNameListPage.put(p.getUniqueId(), page + 1);
 								} else
-									p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePagesCanBeLoaded")));
+									p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NoMorePagesCanBeLoaded"));
 							} else
-								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoMorePages")));
+								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NoMorePages"));
 						} else {
 							if (e.getCurrentItem().getType().equals(Material.getMaterial((Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
 								String nickName = "";
@@ -446,7 +444,7 @@ public class NickListener implements Listener {
 				if (api.isNicked()) {
 					e.setCancelled(true);
 					
-					String format = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("Settings.ChatFormat"));
+					String format = FileUtils.getConfigString("Settings.ChatFormat");
 					format = format.replace("%displayName%", p.getDisplayName());
 					format = format.replace("%nickName%", api.getNickName());
 					format = format.replace("%playerName%", p.getName());
@@ -457,7 +455,7 @@ public class NickListener implements Listener {
 					if(Utils.placeholderAPIStatus())
 						format = PlaceholderAPI.setPlaceholders(p, format);
 					
-					e.setFormat(format);
+					e.setFormat(format.replaceAll("%", "%%"));
 					
 					Bukkit.getConsoleSender().sendMessage(format);
 	

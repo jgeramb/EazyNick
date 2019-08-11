@@ -76,17 +76,17 @@ public class NickCommand implements CommandExecutor {
 								}
 	
 								boolean serverFull = Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
-								String prefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Prefix")));
-								String suffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
+								String prefix = serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
+								String suffix = serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
 								
 								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, name,
-										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix")),
-										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix")),
-										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")),
-										ChatColor.translateAlternateColorCodes('&', serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")),
+										serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"),
+										serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"),
+										serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"),
+										serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"),
 										prefix,
 										suffix,
-										false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
+										false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.getConfigString("Settings.NickFormat.PermissionsEx.GroupName")));
 							}
 						} else {
 							if(p.hasPermission("nick.customnickname")) {
@@ -146,31 +146,31 @@ public class NickCommand implements CommandExecutor {
 														tagPrefix = chatPrefix;
 														tagSuffix = chatSuffix;
 													} else {
-														chatPrefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Prefix")));
-														chatSuffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.Chat.Suffix")));
-														tabPrefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Prefix")));
-														tabSuffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.PlayerList.Suffix")));
-														tagPrefix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Prefix")));
-														tagSuffix = ChatColor.translateAlternateColorCodes('&', (serverFull ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.cfg.getString("Settings.NickFormat.NameTag.Suffix")));
+														chatPrefix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"));
+														chatSuffix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"));
+														tabPrefix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : FileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"));
+														tabSuffix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"));
+														tagPrefix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix"));
+														tagSuffix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix"));
 													}
 													
-													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.cfg.getString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.cfg.getString("Settings.NickFormat.PermissionsEx.GroupName")));
+													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.getConfigString("Settings.NickFormat.PermissionsEx.GroupName")));
 												} else
-													p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.CanNotNickAsSelf")));
+													p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
 											} else
-												p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsKnown")));
+												p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
 										} else
-											p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
+											p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
 									} else
-										p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
+										p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NameNotAllowed"));
 								} else
-									p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
+									p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickTooLong"));
 							} else
 								p.sendMessage(Utils.noPerm);
 						}
 					}
 				} else
-					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
+					p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickDelay"));
 			} else
 				p.sendMessage(Utils.noPerm);
 		} else

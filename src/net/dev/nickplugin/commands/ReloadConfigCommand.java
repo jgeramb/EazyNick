@@ -1,6 +1,5 @@
 package net.dev.nickplugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -47,11 +46,11 @@ public class ReloadConfigCommand implements CommandExecutor {
 					Utils.worldBlackList.add(blackListWorld.toUpperCase());
 				}
 				
-				Utils.prefix = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.Prefix")) + " ";
-				Utils.noPerm = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NoPerm"));
-				Utils.notPlayer = ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NotPlayer"));
+				Utils.prefix = LanguageFileUtils.getConfigString("Messages.Prefix") + " ";
+				Utils.noPerm = LanguageFileUtils.getConfigString("Messages.NoPerm");
+				Utils.notPlayer = LanguageFileUtils.getConfigString("Messages.NotPlayer");
 				
-				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ReloadConfig")));
+				p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.ReloadConfig"));
 			} else
 				p.sendMessage(Utils.noPerm);
 		} else

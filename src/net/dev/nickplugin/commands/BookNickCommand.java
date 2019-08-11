@@ -3,7 +3,6 @@ package net.dev.nickplugin.commands;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,13 +11,16 @@ import org.bukkit.entity.Player;
 
 import net.dev.nickplugin.api.NickManager;
 import net.dev.nickplugin.api.PlayerNickEvent;
-import net.dev.nickplugin.sql.*;
+import net.dev.nickplugin.sql.MySQLNickManager;
+import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.BookGUIFileUtils;
-import net.dev.nickplugin.utils.*;
+import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
-import net.dev.nickplugin.utils.bookUtils.*;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
+import net.dev.nickplugin.utils.bookUtils.NMSBookBuilder;
+import net.dev.nickplugin.utils.bookUtils.NMSBookUtils;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class BookNickCommand implements CommandExecutor {
 
@@ -66,52 +68,52 @@ public class BookNickCommand implements CommandExecutor {
 										String groupName = "";
 										
 										if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.RankName")) && BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank1.Permission")))) {
-											chatPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.ChatPrefix"));
-											chatSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.ChatSuffix"));
-											tabPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.TabPrefix"));
-											tabSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.TabSuffix"));
-											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.TagPrefix"));
-											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.TagSuffix"));
+											chatPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.ChatPrefix");
+											chatSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.ChatSuffix");
+											tabPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.TabPrefix");
+											tabSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.TabSuffix");
+											tagPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.TagPrefix");
+											tagSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.TagSuffix");
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.PermissionsEx.GroupName");
 										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank2.RankName")) && BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission")))) {
-											chatPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.ChatPrefix"));
-											chatSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.ChatSuffix"));
-											tabPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.TabPrefix"));
-											tabSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.TabSuffix"));
-											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.TagPrefix"));
-											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.TagSuffix"));
+											chatPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.ChatPrefix");
+											chatSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.ChatSuffix");
+											tabPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.TabPrefix");
+											tabSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.TabSuffix");
+											tagPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.TagPrefix");
+											tagSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.TagSuffix");
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.PermissionsEx.GroupName");
 										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank3.RankName")) && BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission")))) {
-											chatPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.ChatPrefix"));
-											chatSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.ChatSuffix"));
-											tabPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.TabPrefix"));
-											tabSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.TabSuffix"));
-											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.TagPrefix"));
-											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.TagSuffix"));
+											chatPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.ChatPrefix");
+											chatSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.ChatSuffix");
+											tabPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.TabPrefix");
+											tabSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.TabSuffix");
+											tagPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.TagPrefix");
+											tagSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.TagSuffix");
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.PermissionsEx.GroupName");
 										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank4.RankName")) && BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission")))) {
-											chatPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.ChatPrefix"));
-											chatSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.ChatSuffix"));
-											tabPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.TabPrefix"));
-											tabSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.TabSuffix"));
-											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.TagPrefix"));
-											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.TagSuffix"));
+											chatPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.ChatPrefix");
+											chatSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.ChatSuffix");
+											tabPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.TabPrefix");
+											tabSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.TabSuffix");
+											tagPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.TagPrefix");
+											tagSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.TagSuffix");
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.PermissionsEx.GroupName");
 										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank5.RankName")) && BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission")))) {
-											chatPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.ChatPrefix"));
-											chatSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.ChatSuffix"));
-											tabPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.TabPrefix"));
-											tabSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.TabSuffix"));
-											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.TagPrefix"));
-											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.TagSuffix"));
+											chatPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.ChatPrefix");
+											chatSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.ChatSuffix");
+											tabPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.TabPrefix");
+											tabSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.TabSuffix");
+											tagPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.TagPrefix");
+											tagSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.TagSuffix");
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.PermissionsEx.GroupName");
 										} else if(args[0].equalsIgnoreCase(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.RankName")) && BookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(BookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission")))) {
-											chatPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.ChatPrefix"));
-											chatSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.ChatSuffix"));
-											tabPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.TabPrefix"));
-											tabSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.TabSuffix"));
-											tagPrefix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.TagPrefix"));
-											tagSuffix = ChatColor.translateAlternateColorCodes('&', BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.TagSuffix"));
+											chatPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.ChatPrefix");
+											chatSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.ChatSuffix");
+											tabPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.TabPrefix");
+											tabSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.TabSuffix");
+											tagPrefix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.TagPrefix");
+											tagSuffix = BookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.TagSuffix");
 											groupName = BookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.PermissionsEx.GroupName");
 										} else
 											return true;
@@ -138,20 +140,20 @@ public class BookNickCommand implements CommandExecutor {
 											MySQLNickManager.addPlayer(p.getUniqueId(), name, skinName);
 											MySQLPlayerDataManager.insertData(p.getUniqueId(), groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 											
-											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent("§0You have finished setting up your nickname!\n\nWhen you go into agame, you will be nicked as " + tagPrefix + p.getName() + tagSuffix + "§0. You will not be nicked in lobbies.\n\nTo go back to being your usual self, type:\n§l/nick reset")));
+											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + p.getName() + tagSuffix))));
 										} else {
 											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, groupName));
 										
-											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent("§0You have finished setting up your nickname!\n\nYou are now nicked as " + tagPrefix + p.getName() + tagSuffix + "§0.\n\nTo go back to being your usual self, type:\n§l/nick reset")));
+											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + p.getName() + tagSuffix))));
 										}
 									} else
-										p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerWithThisNameIsKnown")));
+										p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
 								} else
-									p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickNameAlreadyInUse")));
+									p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
 							} else
-								p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NameNotAllowed")));
+								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NameNotAllowed"));
 						} else
-							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickTooLong")));
+							p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickTooLong"));
 					}
 				}
 			} else

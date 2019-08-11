@@ -1,7 +1,6 @@
 package net.dev.nickplugin.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,16 +28,16 @@ public class NickedPlayersCommand implements CommandExecutor {
 				}
 				
 				if(playerIsNicked) {
-					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickedPlayers.CurrentNickedPlayers")));
+					p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickedPlayers.CurrentNickedPlayers"));
 					
 					for (Player all : Bukkit.getOnlinePlayers()) {
 						NickManager api = new NickManager(all);
 						
 						if(api.isNicked())
-							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickedPlayers.PlayerINFO")).replace("%realName%", api.getRealName()).replace("%nickName%", api.getNickName()));
+							p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickedPlayers.PlayerINFO").replace("%realName%", api.getRealName()).replace("%nickName%", api.getNickName()));
 					}
 				} else
-					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickedPlayers.NoPlayerIsNicked")));
+					p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickedPlayers.NoPlayerIsNicked"));
 			} else
 				p.sendMessage(Utils.noPerm);
 		} else

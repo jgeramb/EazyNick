@@ -1,6 +1,5 @@
 package net.dev.nickplugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,7 +22,7 @@ public class ResetSkinCommand implements CommandExecutor {
 				api.changeSkin(api.getRealName());
 				api.updatePlayer();
 				
-				p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.ResetSkin")));
+				p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.ResetSkin"));
 			} else
 				p.sendMessage(Utils.noPerm);
 		} else

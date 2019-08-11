@@ -1,7 +1,6 @@
 package net.dev.nickplugin.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,11 +23,11 @@ public class RealNameCommand implements CommandExecutor {
 					
 					if(t != null) {
 						if(Utils.nickedPlayers.contains(t.getUniqueId()))
-							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.RealName").replace("%realName%", new NickManager(t).getRealName())));
+							p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.RealName").replace("%realName%", new NickManager(t).getRealName()));
 						else
-							p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotNicked")));
+							p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.PlayerNotNicked"));
 					} else
-						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.PlayerNotFound")));
+						p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.PlayerNotFound"));
 				}
 			} else
 				p.sendMessage(Utils.noPerm);

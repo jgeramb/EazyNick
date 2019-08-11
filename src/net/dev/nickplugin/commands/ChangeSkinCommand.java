@@ -2,7 +2,6 @@ package net.dev.nickplugin.commands;
 
 import java.util.Random;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,16 +28,16 @@ public class ChangeSkinCommand implements CommandExecutor {
 						api.changeSkin(name);
 						api.updatePlayer();
 						
-						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.SkinChanged").replace("%skinName%", name)));
+						p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.SkinChanged").replace("%skinName%", name));
 					} else {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 						
 						api.changeSkin(name);		
 						
-						p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.SkinChanged").replace("%skinName%", name)));
+						p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.SkinChanged").replace("%skinName%", name));
 					}
 				} else
-					p.sendMessage(Utils.prefix + ChatColor.translateAlternateColorCodes('&', LanguageFileUtils.cfg.getString("Messages.NickDelay")));
+					p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickDelay"));
 			} else
 				p.sendMessage(Utils.noPerm);
 		} else

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import net.dev.nickplugin.api.NickManager;
@@ -99,8 +98,8 @@ public class ScoreboardTeamManager {
 				
 				if(t.hasPermission("nick.bypass") && FileUtils.cfg.getBoolean("BypassFormat.Show")) {
 					contents = Arrays.asList(new NickManager(p).getRealName());
-					prefixForPlayer = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("BypassFormat.NameTagPrefix"));
-					suffixForPlayer = ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("BypassFormat.NameTagSuffix"));
+					prefixForPlayer = FileUtils.getConfigString("BypassFormat.NameTagPrefix");
+					suffixForPlayer = FileUtils.getConfigString("BypassFormat.NameTagSuffix");
 				}
 				
 				if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -171,7 +170,6 @@ public class NMSNickManager extends ReflectUtils {
 		} 
 	}
 	
-	@SuppressWarnings({ })
 	public static void updatePlayer(Player p, boolean forceUpdate) {
 		NickManager api = new NickManager(p);
 		boolean onNick = !(api.isNicked());
@@ -205,12 +203,12 @@ public class NMSNickManager extends ReflectUtils {
 			if(onNick) {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnNnick")) {
 					for(Player all : Bukkit.getOnlinePlayers())
-						all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getRealName())));
+						all.sendMessage(FileUtils.getConfigString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getRealName()));
 				}
 			} else {
 				if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick")) {
 					for(Player all : Bukkit.getOnlinePlayers())
-						all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName())));
+						all.sendMessage(FileUtils.getConfigString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName()));
 				}
 			}
 			
@@ -260,12 +258,12 @@ public class NMSNickManager extends ReflectUtils {
 					if(onNick) {
 						if(FileUtils.cfg.getBoolean("NickMessage.OnNnick")) {
 							for(Player all : Bukkit.getOnlinePlayers())
-								all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName())));
+								all.sendMessage(FileUtils.getConfigString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
 						}
 					} else {
 						if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick")) {
 							for(Player all : Bukkit.getOnlinePlayers())
-								all.sendMessage(ChatColor.translateAlternateColorCodes('&', FileUtils.cfg.getString("NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName())));
+								all.sendMessage(FileUtils.getConfigString("NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
 						}
 					}
 				}
