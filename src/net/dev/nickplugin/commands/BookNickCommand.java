@@ -142,7 +142,7 @@ public class BookNickCommand implements CommandExecutor {
 											
 											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + p.getName() + tagSuffix))));
 										} else {
-											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, groupName));
+											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
 										
 											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + p.getName() + tagSuffix))));
 										}

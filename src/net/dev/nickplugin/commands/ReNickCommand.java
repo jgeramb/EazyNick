@@ -73,7 +73,9 @@ public class ReNickCommand implements CommandExecutor {
 											MySQLPlayerDataManager.getTabSuffix(p.getUniqueId()),
 											MySQLPlayerDataManager.getTagPrefix(p.getUniqueId()),
 											MySQLPlayerDataManager.getTagSuffix(p.getUniqueId()),
-											true, "NONE"));
+											true,
+											false,
+											"NONE"));
 								} else {
 									boolean serverFull = Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
 									String prefix = serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
@@ -86,7 +88,9 @@ public class ReNickCommand implements CommandExecutor {
 											serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"),
 											prefix,
 											suffix,
-											true, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.getConfigString("Settings.NickFormat.PermissionsEx.GroupName")));
+											true,
+											false,
+											(Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.getConfigString("Settings.NickFormat.PermissionsEx.GroupName")));
 								}
 							} else
 								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
