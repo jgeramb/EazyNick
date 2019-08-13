@@ -608,13 +608,8 @@ public class NickManager {
 				Utils.oldPermissionsExPrefixes.put(p.getUniqueId(), user.getPrefix());
 				Utils.oldPermissionsExSuffixes.put(p.getUniqueId(), user.getSuffix());
 				
-				if(Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) {
-					user.setPrefix(tabPrefix, p.getWorld().getName());
-					user.setSuffix(tabSuffix, p.getWorld().getName());
-				} else {
-					user.setPrefix(tabPrefix, p.getWorld().getName());
-					user.setSuffix(tabSuffix, p.getWorld().getName());
-				}
+				user.setPrefix(tabPrefix, p.getWorld().getName());
+				user.setSuffix(tabSuffix, p.getWorld().getName());
 			}
 		}
 		

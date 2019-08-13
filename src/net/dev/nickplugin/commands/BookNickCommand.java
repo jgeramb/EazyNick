@@ -140,11 +140,11 @@ public class BookNickCommand implements CommandExecutor {
 											MySQLNickManager.addPlayer(p.getUniqueId(), name, skinName);
 											MySQLPlayerDataManager.insertData(p.getUniqueId(), groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 											
-											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + p.getName() + tagSuffix))));
+											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
 										} else {
 											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
 										
-											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + p.getName() + tagSuffix))));
+											NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
 										}
 									} else
 										p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
