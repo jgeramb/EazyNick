@@ -17,7 +17,8 @@ public class NMSBookUtils extends ReflectUtils {
 		
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
-			Object craftItemStack = getCraftClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(getCraftClass("inventory.CraftItemStack"), book);
+			Class<?> craftItemStackClass = getCraftClass("inventory.CraftItemStack");
+			Object craftItemStack = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class).invoke(craftItemStackClass, book);
 			
 			p.setItemInHand(book);
 			
@@ -28,7 +29,7 @@ public class NMSBookUtils extends ReflectUtils {
 				if(Bukkit.getVersion().contains("1.14.4")) {
 					Class<?> itemWrittenBook = getNMSClass("ItemWrittenBook");
 					
-					if ((boolean) itemWrittenBook.getMethod("a").invoke(itemWrittenBook, craftItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {
+					if ((boolean) itemWrittenBook.getMethod("a", craftItemStackClass, getNMSClass("CommandListenerWrapper"), entityPlayer.getClass()).invoke(itemWrittenBook, craftItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {
 						Object activeContainer = entityPlayer.getClass().getField("activeContainer").get(entityPlayer);
 						
 		                activeContainer.getClass().getMethod("c").invoke(activeContainer);

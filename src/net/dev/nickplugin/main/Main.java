@@ -1,9 +1,11 @@
 package net.dev.nickplugin.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -186,6 +188,21 @@ public class Main extends JavaPlugin {
 				}
 			}
 		}, 20);
+		
+		try {
+			File file = new File("spigot.yml");
+			
+			if(!(file.exists()))
+				file.createNewFile();
+			
+			YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			cfg.set("settings.bungeecord", true);
+			cfg.save(file);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		
+		Bukkit.spigot().getConfig().set("settings.bungeecord", true);
 	}
 
 	@Override
