@@ -156,6 +156,21 @@ public class Main extends JavaPlugin {
 
 						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NICKNAME varchar(64), SKINNAME varchar(64))");
 						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), OldPermissionsExRank varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
+					
+						try {
+							File file = new File("spigot.yml");
+							
+							if(!(file.exists()))
+								file.createNewFile();
+							
+							YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+							cfg.set("settings.bungeecord", true);
+							cfg.save(file);
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					
+						Bukkit.spigot().getConfig().set("settings.bungeecord", true);
 					}
 					
 					Utils.sendConsole("	§7");
@@ -188,21 +203,6 @@ public class Main extends JavaPlugin {
 				}
 			}
 		}, 20);
-		
-		try {
-			File file = new File("spigot.yml");
-			
-			if(!(file.exists()))
-				file.createNewFile();
-			
-			YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-			cfg.set("settings.bungeecord", true);
-			cfg.save(file);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-		
-		Bukkit.spigot().getConfig().set("settings.bungeecord", true);
 	}
 
 	@Override
