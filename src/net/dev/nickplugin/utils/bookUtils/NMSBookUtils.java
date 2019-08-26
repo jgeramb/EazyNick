@@ -29,7 +29,7 @@ public class NMSBookUtils extends ReflectUtils {
 				if(Bukkit.getVersion().contains("1.14.4")) {
 					Class<?> itemWrittenBook = getNMSClass("ItemWrittenBook");
 					
-					if ((boolean) itemWrittenBook.getMethod("a", getNMSClass("ItemStack"), getNMSClass("CommandListenerWrapper"), entityPlayer.getClass()).invoke(itemWrittenBook, nmsItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {
+					if ((boolean) itemWrittenBook.getMethod("a", getNMSClass("ItemStack"), getNMSClass("CommandListenerWrapper"), getNMSClass("EntityHuman")).invoke(itemWrittenBook, nmsItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {
 						Object activeContainer = entityPlayer.getClass().getField("activeContainer").get(entityPlayer);
 						
 		                activeContainer.getClass().getMethod("c").invoke(activeContainer);
