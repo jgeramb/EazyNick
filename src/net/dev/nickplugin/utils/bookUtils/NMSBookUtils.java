@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.utils.ReflectUtils;
 
 import io.netty.buffer.ByteBuf;
@@ -22,7 +22,7 @@ public class NMSBookUtils extends ReflectUtils {
 			
 			p.setItemInHand(book);
 			
-			if(!(Main.version.startsWith("1_8"))) {
+			if(!(NickPlugin.version.startsWith("1_8"))) {
 				Class<?> enumHand = getNMSClass("EnumHand");
 				Object mainHand = getField(enumHand, "MAIN_HAND").get(enumHand);
 				

@@ -18,7 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.utils.ReflectUtils;
 
 public class AnvilGUI {
@@ -104,7 +104,7 @@ public class AnvilGUI {
 			
 		};
 
-		Bukkit.getPluginManager().registerEvents(listener, Main.getInstance());
+		Bukkit.getPluginManager().registerEvents(listener, NickPlugin.getInstance());
 	}
 
 	public Player getPlayer() {

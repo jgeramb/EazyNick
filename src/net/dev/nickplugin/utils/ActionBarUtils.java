@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -12,7 +12,7 @@ public class ActionBarUtils {
 	
 	public static void sendActionBar(Player p, String text, int time) {
 		try {
-			if (Main.version.startsWith("1_7_") || Main.version.startsWith("1_8_") || Bukkit.getVersion().contains("1.14.3")) {
+			if (NickPlugin.version.startsWith("1_7_") || NickPlugin.version.startsWith("1_8_") || Bukkit.getVersion().contains("1.14.3")) {
 				Class<?> mainChatPacket = ReflectUtils.getNMSClass("PacketPlayOutChat");
 				Class<?> chatSerializer = ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 
@@ -32,7 +32,7 @@ public class ActionBarUtils {
 						else
 							sendPacket(p, chatPacket);
 					}
-				}.runTaskTimer(Main.getInstance(), 1, 1);
+				}.runTaskTimer(NickPlugin.getInstance(), 1, 1);
 			} else
 				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
 		} catch (Exception e) {

@@ -19,7 +19,7 @@ import com.nametagedit.plugin.NametagEdit;
 import com.nametagedit.plugin.api.INametagApi;
 import com.nametagedit.plugin.api.data.Nametag;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.sql.MySQLNickManager;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.ActionBarUtils;
@@ -67,7 +67,7 @@ public class NickManager {
 	
 	public void setPlayerListName(String name) {
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-			if(Main.version.equals("1_7_R4"))
+			if(NickPlugin.version.equals("1_7_R4"))
 				NMSNickManager.updatePlayerListName_1_7_R4(p, name);
 			else
 				NMSNickManager.updatePlayerListName(p, name);
@@ -75,21 +75,21 @@ public class NickManager {
 	}
 	
 	public void changeSkin(String skinName) {
-		if(Main.version.equals("1_7_R4"))
+		if(NickPlugin.version.equals("1_7_R4"))
 			NMSNickManager.updateSkin_1_7_R4(p, skinName);
-		else if(Main.version.equals("1_8_R1"))
+		else if(NickPlugin.version.equals("1_8_R1"))
 			NMSNickManager.updateSkin_1_8_R1(p, skinName);
 		else
 			NMSNickManager.updateSkin(p, skinName);
 	}
 	
 	public void updatePlayer() {
-		updatePlayer(false);
+		updatePlayer(false, false);
 	}
 	
-	private void updatePlayer(boolean forceUpdate) {
+	private void updatePlayer(boolean forceUpdate, boolean isQuitUnnick) {
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			NMSNickManager.updatePlayer(p, true);
+			NMSNickManager.updatePlayer(p, true, isQuitUnnick);
 	}
 	
 	public void setName(String nickName) {
@@ -134,7 +134,7 @@ public class NickManager {
 		Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
 		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
 		
-		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
+		if (!(NickPlugin.version.equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
 		
 		MySQLNickManager.addPlayer(p.getUniqueId(), nickName, skinName);
@@ -153,7 +153,7 @@ public class NickManager {
 				
 				@Override
 				public void run() {
-					if(Main.getInstance().isEnabled()) {
+					if(NickPlugin.getInstance().isEnabled()) {
 						if((p != null) && p.isOnline()) {
 							if(Utils.nickedPlayers.contains(uuid))
 								ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), LanguageFileUtils.getConfigString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix), 20);
@@ -187,20 +187,20 @@ public class NickManager {
 			MySQLPlayerDataManager.removeData(p.getUniqueId());
 		}
 		
-		unnickPlayerWithoutRemovingMySQL();
+		unnickPlayerWithoutRemovingMySQL(false);
 	}
 	
-	public void unnickPlayerWithoutRemovingMySQL() {
+	public void unnickPlayerWithoutRemovingMySQL(boolean isQuitUnnick) {
 		String nickName = getRealName();
 		
-		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
+		if (!(NickPlugin.version.equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
 		
 		setName(nickName);
 		changeSkin(nickName);
-		updatePlayer(true);
+		updatePlayer(true, isQuitUnnick);
 		
-		Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 			
 			@Override
 			public void run() {
@@ -299,9 +299,9 @@ public class NickManager {
 		if(!(Bukkit.getOnlineMode()) && Utils.nameCache.containsKey(p.getUniqueId()))
 			realName = Utils.nameCache.get(p.getUniqueId());
 		else {
-			if(Main.version.equalsIgnoreCase("1_7_R4"))
+			if(NickPlugin.version.equalsIgnoreCase("1_7_R4"))
 				realName = UUIDFetcher_1_7.getName(p.getUniqueId());
-			else if(Main.version.equalsIgnoreCase("1_8_R1"))
+			else if(NickPlugin.version.equalsIgnoreCase("1_8_R1"))
 				realName = UUIDFetcher_1_8_R1.getName(p.getUniqueId());
 			else
 				realName = UUIDFetcher.getName(p.getUniqueId());
@@ -320,7 +320,7 @@ public class NickManager {
 		
 		chatPrefixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatPrefix));
 		
-		if(Main.version.equals("1_7_R4")) {
+		if(NickPlugin.version.equals("1_7_R4")) {
 			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
 			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
 			
@@ -347,7 +347,7 @@ public class NickManager {
 		
 		chatSuffixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatSuffix));
 		
-		if(Main.version.equals("1_7_R4")) {
+		if(NickPlugin.version.equals("1_7_R4")) {
 			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
 			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
 			
@@ -374,7 +374,7 @@ public class NickManager {
 		
 		tabPrefixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabPrefix));
 		
-		if(Main.version.equals("1_7_R4")) {
+		if(NickPlugin.version.equals("1_7_R4")) {
 			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
 			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
 			
@@ -401,7 +401,7 @@ public class NickManager {
 		
 		tabSuffixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabSuffix));
 		
-		if(Main.version.equals("1_7_R4")) {
+		if(NickPlugin.version.equals("1_7_R4")) {
 			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
 			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
 			
@@ -528,7 +528,7 @@ public class NickManager {
 				
 				@Override
 				public void run() {
-					if(Main.getInstance().isEnabled()) {
+					if(NickPlugin.getInstance().isEnabled()) {
 						if(Utils.nickedPlayers.contains(uuid)) {
 							if((p != null) && p.isOnline()) {
 								sbtm.destroyTeam();

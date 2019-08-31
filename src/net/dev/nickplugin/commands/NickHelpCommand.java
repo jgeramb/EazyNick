@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.utils.Utils;
 
 public class NickHelpCommand implements CommandExecutor {
@@ -15,7 +15,7 @@ public class NickHelpCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
-			PluginDescriptionFile desc = Main.getInstance().getDescription();
+			PluginDescriptionFile desc = NickPlugin.getInstance().getDescription();
 			
 			if(p.hasPermission("nick.showhelp")) {
 				p.sendMessage(Utils.prefix + "§7===== §8[ §5" + desc.getName() + " §8] §7=====");

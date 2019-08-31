@@ -11,12 +11,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 
 public class FileUtils {
 
-	public static File folder = new File("plugins/" + Main.getInstance().getDescription().getName() + "/");
-	public static File file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/setup.yml");
+	public static File folder = new File("plugins/" + NickPlugin.getInstance().getDescription().getName() + "/");
+	public static File file = new File("plugins/" + NickPlugin.getInstance().getDescription().getName() + "/setup.yml");
 	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 	
 	public static void saveFile() {
@@ -39,7 +39,7 @@ public class FileUtils {
 			}
 		}
 
-		PluginDescriptionFile desc = Main.getInstance().getDescription();
+		PluginDescriptionFile desc = NickPlugin.getInstance().getDescription();
 		
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"
@@ -148,7 +148,7 @@ public class FileUtils {
 		cfg.options().copyHeader(true);
 		saveFile();
 		
-		LanguageFileUtils.file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/lang/" + cfg.getString("Language") + ".yml");
+		LanguageFileUtils.file = new File("plugins/" + NickPlugin.getInstance().getDescription().getName() + "/lang/" + cfg.getString("Language") + ".yml");
 		LanguageFileUtils.cfg = YamlConfiguration.loadConfiguration(LanguageFileUtils.file);
 		LanguageFileUtils.setupFiles();
 	}

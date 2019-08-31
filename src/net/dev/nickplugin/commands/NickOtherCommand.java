@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.Utils;
 
@@ -32,7 +32,7 @@ public class NickOtherCommand implements CommandExecutor {
 									p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.Other.SelectedNick").replace("%playerName%", t.getName()).replace("%nickName%", ChatColor.translateAlternateColorCodes('&', name)));
 									
 									if((!(t.hasPermission("nick.use"))) || !(t.hasPermission("nick.customnickname"))) {
-										PermissionAttachment pa = t.addAttachment(Main.getInstance());
+										PermissionAttachment pa = t.addAttachment(NickPlugin.getInstance());
 										pa.setPermission("nick.use", true);
 										pa.setPermission("nick.customnickname", true);
 										t.recalculatePermissions();
@@ -50,7 +50,7 @@ public class NickOtherCommand implements CommandExecutor {
 								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.Other.RandomNick").replace("%playerName%", t.getName()));
 								
 								if(!(t.hasPermission("nick.use"))) {
-									PermissionAttachment pa = t.addAttachment(Main.getInstance());
+									PermissionAttachment pa = t.addAttachment(NickPlugin.getInstance());
 									pa.setPermission("nick.use", true);
 									t.recalculatePermissions();
 									
@@ -65,7 +65,7 @@ public class NickOtherCommand implements CommandExecutor {
 							p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.Other.Unnick").replace("%playerName%", t.getName()));
 							
 							if(!(t.hasPermission("nick.use"))) {
-								PermissionAttachment pa = t.addAttachment(Main.getInstance());
+								PermissionAttachment pa = t.addAttachment(NickPlugin.getInstance());
 								pa.setPermission("nick.use", true);
 								t.recalculatePermissions();
 								

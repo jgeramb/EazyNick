@@ -7,8 +7,8 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.api.NickManager;
-import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.ReflectUtils;
 
@@ -33,8 +33,8 @@ public class ScoreboardTeamManager {
 		try {
 			packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
 			
-			if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-				if(Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) {
+			if(!(NickPlugin.version.equalsIgnoreCase("1_7_R4"))) {
+				if(NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14")) {
 					try {
 						ReflectUtils.setField(packet, "a", teamName);
 						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
@@ -102,8 +102,8 @@ public class ScoreboardTeamManager {
 					suffixForPlayer = FileUtils.getConfigString("BypassFormat.NameTagSuffix");
 				}
 				
-				if(!(Main.version.equalsIgnoreCase("1_7_R4"))) {
-					if(Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) {
+				if(!(NickPlugin.version.equalsIgnoreCase("1_7_R4"))) {
+					if(NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14")) {
 						try {
 							ReflectUtils.setField(packet, "a", teamName);
 							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));

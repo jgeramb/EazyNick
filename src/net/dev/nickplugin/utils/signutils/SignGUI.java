@@ -13,7 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.utils.ReflectUtils;
 
 import io.netty.channel.Channel;
@@ -24,7 +24,7 @@ public class SignGUI implements Listener {
 
 	public static void open(Player p, String line1, String line2, String line3, String line4, EditCompleteListener listener) {
 		Block b = p.getWorld().getBlockAt(p.getLocation()).getRelative(BlockFace.UP);
-		b.setType(Material.getMaterial(Main.version.startsWith("1_14") ? "OAK_SIGN" : (Main.version.startsWith("1_13") ? "SIGN" : "SIGN_POST")));
+		b.setType(Material.getMaterial(NickPlugin.version.startsWith("1_14") ? "OAK_SIGN" : (NickPlugin.version.startsWith("1_13") ? "SIGN" : "SIGN_POST")));
 		
 		Sign sign = (Sign) b.getState();
 		sign.setLine(0, line1);
@@ -33,12 +33,12 @@ public class SignGUI implements Listener {
 		sign.setLine(3, line4);
 		sign.update();
 		
-		Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 			
 			@Override
 			public void run() {
 				try {
-					boolean useCraftBlockEntityState = Main.version.startsWith("1_14") || Main.version.startsWith("1_13") || Main.version.startsWith("1_12");
+					boolean useCraftBlockEntityState = NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_12");
 					Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 					Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
 
@@ -50,7 +50,7 @@ public class SignGUI implements Listener {
 					editable.setAccessible(true);
 					editable.set(tileSign, true);
 
-					Field handler = tileSign.getClass().getDeclaredField(Main.version.startsWith("1_14") ? "j" : (Main.version.startsWith("1_13") ? "g" : "h"));
+					Field handler = tileSign.getClass().getDeclaredField(NickPlugin.version.startsWith("1_14") ? "j" : (NickPlugin.version.startsWith("1_13") ? "g" : "h"));
 					handler.setAccessible(true);
 					handler.set(tileSign, entityPlayer);
 
@@ -79,7 +79,7 @@ public class SignGUI implements Listener {
 							}
 						}
 						
-					}, Main.getInstance());
+					}, NickPlugin.getInstance());
 					
 					if (channel.pipeline().get("PacketInjector") == null) {
 						channel.pipeline().addBefore("packet_handler", "PacketInjector", new ChannelDuplexHandler() {
@@ -89,14 +89,14 @@ public class SignGUI implements Listener {
 								if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
 									Object[] rawLines = (Object[]) ReflectUtils.getField(packet.getClass(), "b").get(packet);
 									
-									Bukkit.getScheduler().runTask(Main.getInstance(), new Runnable() {
+									Bukkit.getScheduler().runTask(NickPlugin.getInstance(), new Runnable() {
 										
 										@Override
 										public void run() {
 											try {
 												String[] lines = new String[4];
 
-												if(Main.version.startsWith("1_8")) {
+												if(NickPlugin.version.startsWith("1_8")) {
 													int i = 0;
 													
 													for (Object obj : rawLines) {

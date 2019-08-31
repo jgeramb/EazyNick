@@ -16,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 
 public class Utils {
@@ -128,7 +128,7 @@ public class Utils {
 		if (enchantedItem) {
 			m.addEnchant(Enchantment.DURABILITY, 1, true);
 
-			if(!(Main.version.equalsIgnoreCase("1_7_R4")) && !(Bukkit.getVersion().contains("1.14.3")))
+			if(!(NickPlugin.version.equalsIgnoreCase("1_7_R4")) && !(Bukkit.getVersion().contains("1.14.3")))
 				m.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE });
 		}
 
@@ -148,7 +148,7 @@ public class Utils {
 	}
 
 	public static ItemStack createSkull(int amount, String displayName, String owner) {
-		ItemStack is = new ItemStack(Material.getMaterial((Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"), amount, (byte) 3);
+		ItemStack is = new ItemStack(Material.getMaterial((NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"), amount, (byte) 3);
 		SkullMeta m = (SkullMeta) is.getItemMeta();
 		m.setDisplayName(displayName);
 		m.setOwner(owner);
@@ -158,7 +158,7 @@ public class Utils {
 	}
 
 	public static int getOnlinePlayers() {
-		if(Main.version.equals("1_7_R4")) {
+		if(NickPlugin.version.equals("1_7_R4")) {
 			try {
 				return Bukkit.getOnlinePlayers().getClass().getField("length").getInt(Bukkit.getOnlinePlayers());
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {

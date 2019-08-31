@@ -20,10 +20,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.api.NickManager;
 import net.dev.nickplugin.api.PlayerNickEvent;
 import net.dev.nickplugin.api.PlayerUnnickEvent;
-import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.sql.MySQLNickManager;
 import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.FileUtils;
@@ -45,7 +45,7 @@ public class NickListener implements Listener {
 			api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getGroupName());
 			
 			Utils.canUseNick.put(p.getUniqueId(), false);
-			Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+			Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 				
 				@Override
 				public void run() {
@@ -92,7 +92,7 @@ public class NickListener implements Listener {
 		if (!(Utils.canUseNick.containsKey(p.getUniqueId())))
 			Utils.canUseNick.put(p.getUniqueId(), true);
 
-		if (!(Main.version.equalsIgnoreCase("1_7_R4")))
+		if (!(NickPlugin.version.equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(p.getName());
 
 		if (e.getJoinMessage() != null && e.getJoinMessage() != "") {
@@ -109,21 +109,21 @@ public class NickListener implements Listener {
 			}
 		}
 
-		Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 
 			@EventHandler
 			public void run() {
 				if(p.hasPermission("nick.bypass")) {
-					if((Main.mysql != null) && Main.mysql.isConnected()) {
+					if((NickPlugin.mysql != null) && NickPlugin.mysql.isConnected()) {
 						for (Player all : Bukkit.getOnlinePlayers()) {
 							NickManager apiAll = new NickManager(all);
 							
 							if (apiAll.isNicked()) {
 								String name = apiAll.getNickName();
 
-								apiAll.unnickPlayerWithoutRemovingMySQL();
+								apiAll.unnickPlayerWithoutRemovingMySQL(false);
 								
-								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+								Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 
 									@Override
 									public void run() {
@@ -148,7 +148,7 @@ public class NickListener implements Listener {
 					if (FileUtils.cfg.getBoolean("LobbyMode") == false) {
 						if (MySQLNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (!(api.isNicked())) {
-								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+								Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 
 									@Override
 									public void run() {
@@ -189,7 +189,7 @@ public class NickListener implements Listener {
 				
 				if (FileUtils.cfg.getBoolean("JoinNick")) {
 					if (!(api.isNicked())) {
-						Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+						Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 
 							@Override
 							public void run() {
@@ -198,11 +198,11 @@ public class NickListener implements Listener {
 						}, 10);
 					}
 				} else if (!(FileUtils.cfg.getBoolean("DiconnectUnnick"))) {
-					if((Main.mysql != null) && Main.mysql.isConnected()) {
+					if((NickPlugin.mysql != null) && NickPlugin.mysql.isConnected()) {
 						if (api.isNicked()) {
-							api.unnickPlayerWithoutRemovingMySQL();
+							api.unnickPlayerWithoutRemovingMySQL(false);
 							
-							Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+							Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 	
 								@Override
 								public void run() {
@@ -230,15 +230,14 @@ public class NickListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
-		
+		NickManager api = new NickManager(p);
+
 		if(Utils.nameCache.containsKey(p.getUniqueId()))
 			Utils.nameCache.remove(p.getUniqueId());
 		
-		if (FileUtils.cfg.getBoolean("DisconnectUnnick")) {
-			NickManager api = new NickManager(p);
-
-			if (api.isNicked())
-				api.unnickPlayerWithoutRemovingMySQL();
+		if (api.isNicked()) {
+			if (FileUtils.cfg.getBoolean("DisconnectUnnick"))
+				api.unnickPlayerWithoutRemovingMySQL(true);
 		}
 	}
 
@@ -352,7 +351,7 @@ public class NickListener implements Listener {
 							} else
 								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NoMorePages"));
 						} else {
-							if (e.getCurrentItem().getType().equals(Material.getMaterial((Main.version.startsWith("1_13") || Main.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
+							if (e.getCurrentItem().getType().equals(Material.getMaterial((NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
 								String nickName = "";
 								String skullOwner = ((SkullMeta) e.getCurrentItem().getItemMeta()).getOwner();
 
@@ -450,13 +449,13 @@ public class NickListener implements Listener {
 					if (!(api.isNicked()))
 						p.chat("/renick");
 					else {
-						Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+						Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 
 							@Override
 							public void run() {
 								api.unnickPlayer();
 								
-								Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
+								Bukkit.getScheduler().runTaskLater(NickPlugin.getInstance(), new Runnable() {
 
 									@Override
 									public void run() {
@@ -496,9 +495,9 @@ public class NickListener implements Listener {
 			if (p.hasPermission("bukkit.command.help")) {
 				e.setCancelled(true);
 
-				p.sendMessage("§e--------- §fHelp: " + Main.getInstance().getDescription().getName() + " §e----------------------");
-				p.sendMessage("§7Below is a list of all " + Main.getInstance().getDescription().getName() + " commands:");
-				p.sendMessage("§6/eazynick: §r" + Main.getInstance().getCommand("eazynick").getDescription());
+				p.sendMessage("§e--------- §fHelp: " + NickPlugin.getInstance().getDescription().getName() + " §e----------------------");
+				p.sendMessage("§7Below is a list of all " + NickPlugin.getInstance().getDescription().getName() + " commands:");
+				p.sendMessage("§6/eazynick: §r" + NickPlugin.getInstance().getCommand("eazynick").getDescription());
 			}
 		}
 	}

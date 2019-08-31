@@ -12,7 +12,7 @@ import java.nio.channels.ReadableByteChannel;
 
 import org.bukkit.entity.Player;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.Utils;
 
@@ -24,7 +24,7 @@ public class SpigotUpdater {
 		ReadableByteChannel channel = null;
 		double newVersion = 0.0;
 		
-		File file = Main.pluginFile;
+		File file = NickPlugin.pluginFile;
 
 		try {
 			URL versionURL = new URL("https://api.spigotmc.org/legacy/update.php?resource=51398");
@@ -35,7 +35,7 @@ public class SpigotUpdater {
 			e.printStackTrace();
 		}
 
-		if (newVersion > Double.valueOf(Main.getInstance().getDescription().getVersion()).doubleValue()) {
+		if (newVersion > Double.valueOf(NickPlugin.getInstance().getDescription().getVersion()).doubleValue()) {
 			System.out.println("[Updater] Found a new version (" + newVersion + ")");
 
 			if (FileUtils.cfg.getBoolean("AutoUpdater")) {
@@ -71,7 +71,7 @@ public class SpigotUpdater {
 		ReadableByteChannel channel = null;
 		double newVersion = 0.0;
 		
-		File file = Main.pluginFile;
+		File file = NickPlugin.pluginFile;
 
 		try {
 			URL versionURL = new URL("https://api.spigotmc.org/legacy/update.php?resource=51398");
@@ -82,7 +82,7 @@ public class SpigotUpdater {
 			e.printStackTrace();
 		}
 
-		if (newVersion > Double.valueOf(Main.getInstance().getDescription().getVersion()).doubleValue()) {
+		if (newVersion > Double.valueOf(NickPlugin.getInstance().getDescription().getVersion()).doubleValue()) {
 			p.sendMessage(Utils.prefix + "§3Updater §8» §rFound a new version (" + newVersion + ")");
 
 			if (FileUtils.cfg.getBoolean("AutoUpdater")) {

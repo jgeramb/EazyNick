@@ -11,9 +11,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
+import net.dev.nickplugin.NickPlugin;
 import net.dev.nickplugin.api.PlayerNickEvent;
 import net.dev.nickplugin.api.PlayerUnnickEvent;
-import net.dev.nickplugin.main.Main;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.StringUtils;
@@ -34,7 +34,7 @@ public class NickCommand implements CommandExecutor {
 						if(args.length == 0) {
 							if(FileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand")) {
 								if(!(p.hasPermission("nick.gui"))) {
-									PermissionAttachment pa = p.addAttachment(Main.getInstance());
+									PermissionAttachment pa = p.addAttachment(NickPlugin.getInstance());
 									pa.setPermission("nick.gui", true);
 									p.recalculatePermissions();
 									
@@ -46,7 +46,7 @@ public class NickCommand implements CommandExecutor {
 									p.chat("/bookgui");
 							} else if(FileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
 								if(!(p.hasPermission("nick.gui"))) {
-									PermissionAttachment pa = p.addAttachment(Main.getInstance());
+									PermissionAttachment pa = p.addAttachment(NickPlugin.getInstance());
 									pa.setPermission("nick.gui", true);
 									p.recalculatePermissions();
 									

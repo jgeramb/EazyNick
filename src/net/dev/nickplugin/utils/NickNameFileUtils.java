@@ -9,12 +9,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import net.dev.nickplugin.main.Main;
+import net.dev.nickplugin.NickPlugin;
 
 public class NickNameFileUtils {
 
-	public static File folder = new File("plugins/" + Main.getInstance().getDescription().getName() + "/");
-	public static File file = new File("plugins/" + Main.getInstance().getDescription().getName() + "/nickNames.yml");
+	public static File folder = new File("plugins/" + NickPlugin.getInstance().getDescription().getName() + "/");
+	public static File file = new File("plugins/" + NickPlugin.getInstance().getDescription().getName() + "/nickNames.yml");
 	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 	
 	public static void saveFile() {
@@ -37,7 +37,7 @@ public class NickNameFileUtils {
 			}
 		}
 
-		PluginDescriptionFile desc = Main.getInstance().getDescription();
+		PluginDescriptionFile desc = NickPlugin.getInstance().getDescription();
 		
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"
