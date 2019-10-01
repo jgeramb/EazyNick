@@ -18,8 +18,8 @@ import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
-import net.dev.nickplugin.utils.bookUtils.NMSBookBuilder;
-import net.dev.nickplugin.utils.bookUtils.NMSBookUtils;
+import net.dev.nickplugin.utils.bookutils.NMSBookBuilder;
+import net.dev.nickplugin.utils.bookutils.NMSBookUtils;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class BookNickCommand implements CommandExecutor {

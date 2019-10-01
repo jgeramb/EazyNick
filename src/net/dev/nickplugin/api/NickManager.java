@@ -27,10 +27,10 @@ import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
 import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
-import net.dev.nickplugin.utils.nickUtils.NMSNickManager;
-import net.dev.nickplugin.utils.nickUtils.UUIDFetcher;
-import net.dev.nickplugin.utils.nickUtils.UUIDFetcher_1_7;
-import net.dev.nickplugin.utils.nickUtils.UUIDFetcher_1_8_R1;
+import net.dev.nickplugin.utils.nickutils.NMSNickManager;
+import net.dev.nickplugin.utils.nickutils.UUIDFetcher;
+import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_7;
+import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_8_R1;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
 import net.milkbowl.vault.chat.Chat;
 
@@ -41,7 +41,7 @@ import me.lucko.luckperms.LuckPerms;
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.NodeFactory;
-import me.neznamy.tab.bukkit.api.TABAPI;
+import me.neznamy.tab.api.TABAPI;
 
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
@@ -228,10 +228,10 @@ public class NickManager {
 			tabSuffixes.remove(p.getUniqueId());
 		
 		if(Utils.tabStatus()) {
-			TABAPI.removeTemporaryTabPrefix(p);
-			TABAPI.removeTemporaryTabSuffix(p);
-			TABAPI.removeTemporaryTagPrefix(p);
-			TABAPI.removeTemporaryTagSuffix(p);
+			TABAPI.removeTemporaryTabPrefix(p.getUniqueId());
+			TABAPI.removeTemporaryTabSuffix(p.getUniqueId());
+			TABAPI.removeTemporaryTagPrefix(p.getUniqueId());
+			TABAPI.removeTemporaryTagSuffix(p.getUniqueId());
 		}
 		
 		resetCloudNET();
@@ -614,10 +614,10 @@ public class NickManager {
 		}
 		
 		if(Utils.tabStatus()) {
-			TABAPI.setTabPrefixTemporarily(p, tabPrefix);
-			TABAPI.setTabSuffixTemporarily(p, tabSuffix);
-			TABAPI.setTagPrefixTemporarily(p, tagPrefix);
-			TABAPI.setTagSuffixTemporarily(p, tagSuffix);
+			TABAPI.removeTemporaryTabPrefix(p.getUniqueId());
+			TABAPI.removeTemporaryTabSuffix(p.getUniqueId());
+			TABAPI.removeTemporaryTagPrefix(p.getUniqueId());
+			TABAPI.removeTemporaryTagSuffix(p.getUniqueId());
 		}
 	}
 	

@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils.nickUtils;
+package net.dev.nickplugin.utils.nickutils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -40,7 +40,7 @@ public class NMSNickManager extends ReflectUtils {
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 			
-			Class<?> enumPlayerInfoAction = (NickPlugin.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(NickPlugin.version.equals("1_11_R1") || NickPlugin.version.equals("1_12_R1") || NickPlugin.version.startsWith("1_13") || NickPlugin.version.equals("1_14_R1")) ? 1 : 2]);
+			Class<?> enumPlayerInfoAction = NickPlugin.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(NickPlugin.version.equals("1_11_R1") || NickPlugin.version.equals("1_12_R1") || NickPlugin.version.startsWith("1_13") || NickPlugin.version.equals("1_14_R1")) ? 1 : 2];
 			Object packet = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray);
 			
 			for(Player all : Bukkit.getOnlinePlayers()) {

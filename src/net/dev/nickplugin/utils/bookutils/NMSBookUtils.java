@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils.bookUtils;
+package net.dev.nickplugin.utils.bookutils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

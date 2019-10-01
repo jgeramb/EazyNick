@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils.nickUtils;
+package net.dev.nickplugin.utils.nickutils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,24 +12,24 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
+import org.bukkit.craftbukkit.libs.com.google.gson.GsonBuilder;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonDeserializationContext;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonDeserializer;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonElement;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonObject;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonParseException;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonParser;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonSerializationContext;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonSerializer;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import net.minecraft.util.com.google.gson.Gson;
-import net.minecraft.util.com.google.gson.GsonBuilder;
-import net.minecraft.util.com.google.gson.JsonDeserializationContext;
-import net.minecraft.util.com.google.gson.JsonDeserializer;
-import net.minecraft.util.com.google.gson.JsonElement;
-import net.minecraft.util.com.google.gson.JsonObject;
-import net.minecraft.util.com.google.gson.JsonParseException;
-import net.minecraft.util.com.google.gson.JsonParser;
-import net.minecraft.util.com.google.gson.JsonSerializationContext;
-import net.minecraft.util.com.google.gson.JsonSerializer;
-import net.minecraft.util.com.mojang.authlib.GameProfile;
-import net.minecraft.util.com.mojang.authlib.properties.Property;
-import net.minecraft.util.com.mojang.authlib.properties.PropertyMap;
-import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
+import com.mojang.util.UUIDTypeAdapter;
 
-public class GameProfileBuilder_1_7 {
+public class GameProfileBuilder_1_8_R1 {
 	
 	private static final String SERVICE_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
 	private static final String JSON_SKIN = "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"}}}";
@@ -108,7 +108,7 @@ public class GameProfileBuilder_1_7 {
 				for (Entry<String, Property> prop : ((PropertyMap) context.deserialize(object.get("properties"), PropertyMap.class)).entries())
 					profile.getProperties().put(prop.getKey(), prop.getValue());
 			}
-				
+			
 			return profile;
 		}
 		

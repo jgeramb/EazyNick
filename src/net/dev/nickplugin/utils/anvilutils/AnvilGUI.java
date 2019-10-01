@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils.anvilUtils;
+package net.dev.nickplugin.utils.anvilutils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

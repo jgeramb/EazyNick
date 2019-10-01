@@ -1,4 +1,4 @@
-package net.dev.nickplugin.utils.nickUtils;
+package net.dev.nickplugin.utils.nickutils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
