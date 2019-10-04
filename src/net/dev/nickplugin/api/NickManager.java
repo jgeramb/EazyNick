@@ -115,7 +115,7 @@ public class NickManager {
 				api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
 			else
 				api.forceLogin(p);
-		} else if(Utils.authMeReloadedStatus("5.5.1")) {
+		} else if(Utils.authMeReloadedStatus("5.5.1") || Utils.authMeReloadedStatus("5.6.0")) {
 			AuthMeApi api = AuthMeApi.getInstance();
 			String name = p.getName();
 			
