@@ -210,7 +210,7 @@ public class NickManager {
 				Utils.oldDisplayNames.remove(p.getUniqueId());
 				Utils.oldPlayerListNames.remove(p.getUniqueId());
 			}
-		}, 5 + 1 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+		}, 4);
 
 		Utils.nickedPlayers.remove(p.getUniqueId());
 		Utils.playerNicknames.remove(p.getUniqueId());
