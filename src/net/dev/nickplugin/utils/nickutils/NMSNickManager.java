@@ -40,7 +40,7 @@ public class NMSNickManager extends ReflectUtils {
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 			
-			Class<?> enumPlayerInfoAction = NickPlugin.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(NickPlugin.version.equals("1_11_R1") || NickPlugin.version.equals("1_12_R1") || NickPlugin.version.startsWith("1_13") || NickPlugin.version.equals("1_14_R1")) ? 1 : 2];
+			Class<?> enumPlayerInfoAction = NickPlugin.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(NickPlugin.version.equals("1_11_R1") || NickPlugin.version.equals("1_12_R1") || NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) ? 1 : 2];
 			Object packet = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray);
 			
 			for(Player all : Bukkit.getOnlinePlayers()) {
@@ -192,7 +192,7 @@ public class NMSNickManager extends ReflectUtils {
 				packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 				packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 			} else {
-				Class<?> enumPlayerInfoAction = (NickPlugin.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(NickPlugin.version.startsWith("1_1") && !(NickPlugin.version.equals("1_10_R1"))) ? 1 : 2]);;
+				Class<?> enumPlayerInfoAction = (NickPlugin.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(NickPlugin.version.startsWith("1_1") && !(NickPlugin.version.equals("1_10_R1"))) ? 1 : 2]);
 				
 				packetPlayOutPlayerInfoRemove = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 				packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
@@ -218,7 +218,7 @@ public class NMSNickManager extends ReflectUtils {
 			if(!(isQuitUnnick)) {
 				Object packetRespawnPlayer = null;
 	
-				if(NickPlugin.version.equals("1_14_R1")) {
+				if(NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) {
 					Object worldProvider = worldClient.getClass().getMethod("getWorldProvider").invoke(worldClient);
 					
 					packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldProvider.getClass().getMethod("getDimensionManager").invoke(worldProvider), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));

@@ -25,6 +25,7 @@ import net.dev.nickplugin.sql.MySQLPlayerDataManager;
 import net.dev.nickplugin.utils.ActionBarUtils;
 import net.dev.nickplugin.utils.FileUtils;
 import net.dev.nickplugin.utils.LanguageFileUtils;
+import net.dev.nickplugin.utils.ReflectUtils;
 import net.dev.nickplugin.utils.StringUtils;
 import net.dev.nickplugin.utils.Utils;
 import net.dev.nickplugin.utils.nickutils.NMSNickManager;
@@ -42,6 +43,9 @@ import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.NodeFactory;
 import me.neznamy.tab.api.TABAPI;
+import me.wazup.survivalgames.PlayerData;
+import me.wazup.survivalgames.SurvivalGames;
+import me.wazup.survivalgames.SurvivalGamesAPI;
 
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
@@ -93,7 +97,49 @@ public class NickManager {
 	}
 	
 	public void setName(String nickName) {
+		if(Utils.survivalGamesStatus()) {
+			if(nickName != p.getName()) {
+				try {
+					SurvivalGames survivalGames = (SurvivalGames) ReflectUtils.getField(SurvivalGamesAPI.class, "plugin").get(SurvivalGames.api);
+					HashMap<String, PlayerData> playerData = (HashMap<String, PlayerData>) ReflectUtils.getField(SurvivalGames.class, "playerData").get(survivalGames);
+					playerData.put(nickName, playerData.get(p.getName()));
+					playerData.remove(p.getName());
+					ReflectUtils.setField(survivalGames, "playerData", playerData);
+					
+					Object config = (Object) ReflectUtils.getField(SurvivalGames.class, "config").get(survivalGames);
+					
+					if((boolean) ReflectUtils.getField(config.getClass(), "BungeeMode").get(config)) {
+						ArrayList<String> grace = (ArrayList<String>) ReflectUtils.getField(SurvivalGames.class, "grace").get(survivalGames);
+						grace.add(nickName);
+						grace.remove(p.getName());
+						ReflectUtils.setField(survivalGames, "grace", grace);
+						
+						ArrayList<String> spectator = (ArrayList<String>) ReflectUtils.getField(SurvivalGames.class, "spectator").get(survivalGames);
+					    spectator.add(nickName);
+				    	spectator.remove(p.getName());
+					    ReflectUtils.setField(survivalGames, "spectator", spectator);
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
+		
 		NMSNickManager.updateName(p, nickName);
+		
+		if(Utils.survivalGamesStatus()) {
+			if(nickName != p.getName()) {
+				try {
+					SurvivalGames survivalGames = (SurvivalGames) ReflectUtils.getField(SurvivalGamesAPI.class, "plugin").get(SurvivalGames.api);
+					HashMap<String, PlayerData> playerData = (HashMap<String, PlayerData>) ReflectUtils.getField(SurvivalGames.class, "playerData").get(survivalGames);
+					PlayerData data = playerData.get(nickName);
+					playerData.remove(nickName);
+					PlayerData.class.getMethod("loadStats", Player.class).invoke(playerData, p);
+					playerData.put(nickName, data);
+					ReflectUtils.setField(survivalGames, "playerData", playerData);
+				} catch (Exception e) {
+				}
+			}
+		}
 		
 		performAuthMeLogin();
 		

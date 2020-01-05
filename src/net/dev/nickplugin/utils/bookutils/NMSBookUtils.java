@@ -26,7 +26,7 @@ public class NMSBookUtils extends ReflectUtils {
 				Class<?> enumHand = getNMSClass("EnumHand");
 				Object mainHand = getField(enumHand, "MAIN_HAND").get(enumHand);
 				
-				if(Bukkit.getVersion().contains("1.14.4")) {
+				if(Bukkit.getVersion().contains("1.14.4") || NickPlugin.version.startsWith("1_15")) {
 					Class<?> itemWrittenBook = getNMSClass("ItemWrittenBook");
 					
 					if ((boolean) itemWrittenBook.getMethod("a", getNMSClass("ItemStack"), getNMSClass("CommandListenerWrapper"), getNMSClass("EntityHuman")).invoke(itemWrittenBook, nmsItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {
@@ -38,9 +38,8 @@ public class NMSBookUtils extends ReflectUtils {
 		            Object packet = getNMSClass("PacketPlayOutOpenBook").getConstructor(enumHand).newInstance(mainHand);
 					Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
 					playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
-				} else {
+				} else
 					entityPlayer.getClass().getMethod("a", getNMSClass("ItemStack"), enumHand).invoke(entityPlayer, nmsItemStack, mainHand);
-				}
 			} else {
 				Object packet = getNMSClass("PacketPlayOutCustomPayload").getConstructor(String.class, getNMSClass("PacketDataSerializer")).newInstance("MC|BOpen", getNMSClass("PacketDataSerializer").getConstructor(ByteBuf.class).newInstance(Unpooled.buffer()));
 				Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);

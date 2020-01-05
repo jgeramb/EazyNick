@@ -92,6 +92,17 @@ public class Utils {
 		return (Bukkit.getPluginManager().getPlugin("Vault") != null);
 	}
 	
+	public static boolean survivalGamesStatus() {
+		Plugin plugin = Bukkit.getPluginManager().getPlugin("SurvivalGames");
+		
+		if(plugin != null) {
+			if(plugin.getDescription().getMain().equalsIgnoreCase("me.wazup.survivalgames.SurvivalGames"))
+				return true;
+		}
+			
+		return false;
+	}
+	
 	public static boolean authMeReloadedStatus(String version) {
 		Plugin plugin = Bukkit.getPluginManager().getPlugin("AuthMe");
 		
@@ -128,7 +139,7 @@ public class Utils {
 		if (enchantedItem) {
 			m.addEnchant(Enchantment.DURABILITY, 1, true);
 
-			if(!(NickPlugin.version.equalsIgnoreCase("1_7_R4")) && !(Bukkit.getVersion().contains("1.14.3")))
+			if(!(NickPlugin.version.equalsIgnoreCase("1_7_R4")))
 				m.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE });
 		}
 
@@ -148,7 +159,7 @@ public class Utils {
 	}
 
 	public static ItemStack createSkull(int amount, String displayName, String owner) {
-		ItemStack is = new ItemStack(Material.getMaterial((NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"), amount, (byte) 3);
+		ItemStack is = new ItemStack(Material.getMaterial((NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) ? "PLAYER_HEAD" : "SKULL_ITEM"), amount, (byte) 3);
 		SkullMeta m = (SkullMeta) is.getItemMeta();
 		m.setDisplayName(displayName);
 		m.setOwner(owner);

@@ -34,7 +34,7 @@ public class ScoreboardTeamManager {
 			packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
 			
 			if(!(NickPlugin.version.equalsIgnoreCase("1_7_R4"))) {
-				if(NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14")) {
+				if(NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) {
 					try {
 						ReflectUtils.setField(packet, "a", teamName);
 						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
@@ -103,7 +103,7 @@ public class ScoreboardTeamManager {
 				}
 				
 				if(!(NickPlugin.version.equalsIgnoreCase("1_7_R4"))) {
-					if(NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14")) {
+					if(NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) {
 						try {
 							ReflectUtils.setField(packet, "a", teamName);
 							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));

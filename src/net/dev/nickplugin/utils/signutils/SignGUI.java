@@ -24,7 +24,7 @@ public class SignGUI implements Listener {
 
 	public static void open(Player p, String line1, String line2, String line3, String line4, EditCompleteListener listener) {
 		Block b = p.getWorld().getBlockAt(p.getLocation()).getRelative(BlockFace.UP);
-		b.setType(Material.getMaterial(NickPlugin.version.startsWith("1_14") ? "OAK_SIGN" : (NickPlugin.version.startsWith("1_13") ? "SIGN" : "SIGN_POST")));
+		b.setType(Material.getMaterial((NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) ? "OAK_SIGN" : (NickPlugin.version.startsWith("1_13") ? "SIGN" : "SIGN_POST")));
 		
 		Sign sign = (Sign) b.getState();
 		sign.setLine(0, line1);
@@ -50,7 +50,7 @@ public class SignGUI implements Listener {
 					editable.setAccessible(true);
 					editable.set(tileSign, true);
 
-					Field handler = tileSign.getClass().getDeclaredField(NickPlugin.version.startsWith("1_14") ? "j" : (NickPlugin.version.startsWith("1_13") ? "g" : "h"));
+					Field handler = tileSign.getClass().getDeclaredField((NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) ? "j" : (NickPlugin.version.startsWith("1_13") ? "g" : "h"));
 					handler.setAccessible(true);
 					handler.set(tileSign, entityPlayer);
 

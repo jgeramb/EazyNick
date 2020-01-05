@@ -351,7 +351,7 @@ public class NickListener implements Listener {
 							} else
 								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NoMorePages"));
 						} else {
-							if (e.getCurrentItem().getType().equals(Material.getMaterial((NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14")) ? "LEGACY_SKULL_ITEM" : "SKULL_ITEM"))) {
+							if (e.getCurrentItem().getType().equals(Material.getMaterial((NickPlugin.version.startsWith("1_13") || NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) ? "PLAYER_HEAD" : "SKULL_ITEM"))) {
 								String nickName = "";
 								String skullOwner = ((SkullMeta) e.getCurrentItem().getItemMeta()).getOwner();
 
