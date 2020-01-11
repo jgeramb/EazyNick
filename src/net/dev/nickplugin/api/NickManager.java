@@ -88,12 +88,13 @@ public class NickManager {
 	}
 	
 	public void updatePlayer() {
-		updatePlayer(false, false);
+		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
+			NMSNickManager.updatePlayer(p, false, false);
 	}
 	
 	private void updatePlayer(boolean forceUpdate, boolean isQuitUnnick) {
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			NMSNickManager.updatePlayer(p, true, isQuitUnnick);
+			NMSNickManager.updatePlayer(p, forceUpdate, isQuitUnnick);
 	}
 	
 	public void setName(String nickName) {

@@ -32,7 +32,8 @@ public class ChangeSkinCommand implements CommandExecutor {
 					} else {
 						String name = Utils.nickNames.get((new Random().nextInt(Utils.nickNames.size())));
 						
-						api.changeSkin(name);		
+						api.changeSkin(name);
+						api.updatePlayer();
 						
 						p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.SkinChanged").replace("%skinName%", name));
 					}

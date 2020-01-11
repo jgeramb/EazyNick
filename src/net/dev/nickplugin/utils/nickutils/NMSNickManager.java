@@ -219,9 +219,11 @@ public class NMSNickManager extends ReflectUtils {
 				Object packetRespawnPlayer = null;
 	
 				if(NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) {
-					Object worldProvider = worldClient.getClass().getMethod("getWorldProvider").invoke(worldClient);
+					Class<?> dimensionManager = getNMSClass("DimensionManager");
+					Class<?> worldType = getNMSClass("WorldType");
+					Class<?> enumGameMode = getNMSClass("EnumGamemode");
 					
-					packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldProvider.getClass().getMethod("getDimensionManager").invoke(worldProvider), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
+					packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, p.getWorld().getEnvironment().getId()), worldType.getMethod("getType", String.class).invoke(worldType, p.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, p.getGameMode().getValue()));
 				} else if(NickPlugin.version.equals("1_13_R2")) {
 					Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
 					
@@ -241,8 +243,13 @@ public class NMSNickManager extends ReflectUtils {
 					
 					@Override
 					public void run() {
-						sendPacket(p, packetPlayOutPlayerInfoAdd, forceUpdate);
+						sendPacket(p, packetPlayOutPlayerInfoAdd, true);
 						sendPacketExceptSelf(p, packetNamedEntitySpawn, forceUpdate);
+						
+						Bukkit.getOnlinePlayers().forEach(all -> {
+							all.hidePlayer(p);
+							all.showPlayer(p);
+						});
 						
 						try {
 							Object packetEntityLook = ((NickPlugin.version.equals("1_7_R4") || NickPlugin.version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
