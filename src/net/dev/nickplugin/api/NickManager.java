@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,15 +34,15 @@ import net.dev.nickplugin.utils.nickutils.UUIDFetcher;
 import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_7;
 import net.dev.nickplugin.utils.nickutils.UUIDFetcher_1_8_R1;
 import net.dev.nickplugin.utils.scoreboard.ScoreboardTeamManager;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.node.Node;
+import net.luckperms.api.node.NodeBuilderRegistry;
 import net.milkbowl.vault.chat.Chat;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.storage.objects.User;
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.lucko.luckperms.LuckPerms;
-import me.lucko.luckperms.api.LuckPermsApi;
-import me.lucko.luckperms.api.Node;
-import me.lucko.luckperms.api.NodeFactory;
 import me.neznamy.tab.api.TABAPI;
 import me.wazup.survivalgames.PlayerData;
 import me.wazup.survivalgames.SurvivalGames;
@@ -495,15 +496,15 @@ public class NickManager {
 
 	public void updateLuckPerms(String prefix, String suffix) {
 		if(Utils.luckPermsStatus()) {
-			LuckPermsApi api = LuckPerms.getApi();
-			me.lucko.luckperms.api.User user = api.getUser(p.getUniqueId());
-			NodeFactory nodeFactory = api.getNodeFactory();
-			Node prefixNode = nodeFactory.makePrefixNode(100, prefix).build();
-			Node suffixNode = nodeFactory.makeSuffixNode(100, suffix).build();
+			LuckPerms api = LuckPermsProvider.get();
+			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
+			NodeBuilderRegistry nodeFactory = api.getNodeBuilderRegistry();
+			Node prefixNode = nodeFactory.forPrefix().priority(100).prefix(prefix).expiry(Long.MAX_VALUE, TimeUnit.HOURS).build();
+			Node suffixNode = nodeFactory.forSuffix().priority(100).suffix(suffix).expiry(Long.MAX_VALUE, TimeUnit.HOURS).build();
 			
 			if((prefixNode != null) && (suffixNode != null)) {
-				user.setPermission(prefixNode);
-				user.setPermission(suffixNode);
+				user.transientData().add(prefixNode);
+				user.transientData().add(suffixNode);
 				api.getUserManager().saveUser(user);
 				
 				Utils.luckPermsPrefixes.put(p.getUniqueId(), prefixNode);
@@ -515,10 +516,10 @@ public class NickManager {
 	public void resetLuckPerms() {
 		if(Utils.luckPermsStatus()) {
 			if(Utils.luckPermsPrefixes.containsKey(p.getUniqueId()) && Utils.luckPermsSuffixes.containsKey(p.getUniqueId())) {
-				LuckPermsApi api = LuckPerms.getApi();
-				me.lucko.luckperms.api.User user = api.getUser(p.getUniqueId());
-				user.unsetPermission((Node) Utils.luckPermsPrefixes.get(p.getUniqueId()));
-				user.unsetPermission((Node) Utils.luckPermsSuffixes.get(p.getUniqueId()));
+				LuckPerms api = LuckPermsProvider.get();
+				net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
+				user.transientData().remove((Node) Utils.luckPermsPrefixes.get(p.getUniqueId()));
+				user.transientData().remove((Node) Utils.luckPermsSuffixes.get(p.getUniqueId()));
 				api.getUserManager().saveUser(user);
 				
 				Utils.luckPermsPrefixes.remove(p.getUniqueId());

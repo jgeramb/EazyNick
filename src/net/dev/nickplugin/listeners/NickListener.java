@@ -34,7 +34,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 
 public class NickListener implements Listener {
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onNick(PlayerNickEvent e) {
 		if(!(e.isCancelled())) {
 			Player p = e.getPlayer();
