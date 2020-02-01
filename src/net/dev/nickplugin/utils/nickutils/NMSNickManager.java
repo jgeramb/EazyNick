@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import com.google.common.hash.Hashing;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -218,7 +219,13 @@ public class NMSNickManager extends ReflectUtils {
 			if(!(isQuitUnnick)) {
 				Object packetRespawnPlayer = null;
 	
-				if(NickPlugin.version.startsWith("1_14") || NickPlugin.version.startsWith("1_15")) {
+				if(NickPlugin.version.startsWith("1_15")) {
+					Class<?> dimensionManager = getNMSClass("DimensionManager");
+					Class<?> worldType = getNMSClass("WorldType");
+					Class<?> enumGameMode = getNMSClass("EnumGamemode");
+					
+					packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, long.class, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, p.getWorld().getEnvironment().getId()), Hashing.sha256().hashLong(p.getWorld().getSeed()).asLong(), worldType.getMethod("getType", String.class).invoke(worldType, p.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, p.getGameMode().getValue()));
+				} else if(NickPlugin.version.startsWith("1_14")) {
 					Class<?> dimensionManager = getNMSClass("DimensionManager");
 					Class<?> worldType = getNMSClass("WorldType");
 					Class<?> enumGameMode = getNMSClass("EnumGamemode");

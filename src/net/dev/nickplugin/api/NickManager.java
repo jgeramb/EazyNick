@@ -41,7 +41,6 @@ import net.luckperms.api.node.NodeBuilderRegistry;
 import net.milkbowl.vault.chat.Chat;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
-import me.TechsCode.UltraPermissions.storage.objects.User;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.neznamy.tab.api.TABAPI;
 import me.wazup.survivalgames.PlayerData;
@@ -305,7 +304,7 @@ public class NickManager {
 		}
 		
 		if(Utils.ultraPermissionsStatus()) {
-			User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+			me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
 			
 			user.setPrefix(Utils.ultraPermsPrefixes.get(p.getUniqueId()));
 			user.setSuffix(Utils.ultraPermsSuffixes.get(p.getUniqueId()));
@@ -493,26 +492,24 @@ public class NickManager {
 	public String getOldPlayerListName() {
 		return Utils.oldPlayerListNames.containsKey(p.getUniqueId()) ? Utils.oldPlayerListNames.get(p.getUniqueId()) : p.getName();
 	}
-
+	
 	public void updateLuckPerms(String prefix, String suffix) {
 		if(Utils.luckPermsStatus()) {
 			LuckPerms api = LuckPermsProvider.get();
 			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
 			NodeBuilderRegistry nodeFactory = api.getNodeBuilderRegistry();
-			Node prefixNode = nodeFactory.forPrefix().priority(100).prefix(prefix).expiry(Long.MAX_VALUE, TimeUnit.HOURS).build();
-			Node suffixNode = nodeFactory.forSuffix().priority(100).suffix(suffix).expiry(Long.MAX_VALUE, TimeUnit.HOURS).build();
+			Object prefixNode = nodeFactory.forPrefix().priority(99).prefix(prefix).expiry(24 * 30, TimeUnit.HOURS).build();
+			Object suffixNode = nodeFactory.forSuffix().priority(99).suffix(suffix).expiry(24 * 30, TimeUnit.HOURS).build();
 			
-			if((prefixNode != null) && (suffixNode != null)) {
-				user.transientData().add(prefixNode);
-				user.transientData().add(suffixNode);
-				api.getUserManager().saveUser(user);
-				
-				Utils.luckPermsPrefixes.put(p.getUniqueId(), prefixNode);
-				Utils.luckPermsSuffixes.put(p.getUniqueId(), suffixNode);
-			}
+			user.transientData().add((Node) prefixNode);
+			user.transientData().add((Node) suffixNode);
+			api.getUserManager().saveUser(user);
+			
+			Utils.luckPermsPrefixes.put(p.getUniqueId(), prefixNode);
+			Utils.luckPermsSuffixes.put(p.getUniqueId(), suffixNode);
 		}
 	}
-	
+
 	public void resetLuckPerms() {
 		if(Utils.luckPermsStatus()) {
 			if(Utils.luckPermsPrefixes.containsKey(p.getUniqueId()) && Utils.luckPermsSuffixes.containsKey(p.getUniqueId())) {
@@ -629,7 +626,7 @@ public class NickManager {
 				Utils.ultraPermsSuffixes.remove(p.getUniqueId());
 			}
 			
-			User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+			me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
 			
 			Utils.ultraPermsPrefixes.put(p.getUniqueId(), user.getPrefix());
 			Utils.ultraPermsSuffixes.put(p.getUniqueId(), user.getSuffix());
