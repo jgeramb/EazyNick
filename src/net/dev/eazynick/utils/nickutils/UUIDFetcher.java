@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,22 +49,23 @@ public class UUIDFetcher {
 		   
 		   return data.id;
 	   } catch (Exception e) {
-			for(String nickName : Utils.nickNames) {
-				if(name.equalsIgnoreCase(nickName))
-					Utils.nickNames.remove(nickName);
-			}
-		   
 		   List<String> list = NickNameFileUtils.cfg.getStringList("NickNames");
+		   ArrayList<String> toRemove = new ArrayList<>();
+		   final String finalName = name;
 		   
-		   for(String nickName : list) {
-			   if(name.equalsIgnoreCase(nickName))
-				   list.remove(nickName);
-		   }
+		   list.stream().filter(s -> s.equalsIgnoreCase(finalName)).forEach(s -> toRemove.add(s));
+		   
+		   if(toRemove.size() >= 1) {
+			   toRemove.forEach(s -> {
+				   list.remove(s);
+				   Utils.nickNames.remove(s);
+			   });
 			   
-		   NickNameFileUtils.cfg.set("NickNames", list);
-		   NickNameFileUtils.saveFile();
-		   
-		   Utils.sendConsole("§cThe player §e" + name + " §cis §4§lnot existing§c!");
+			   NickNameFileUtils.cfg.set("NickNames", list);
+			   NickNameFileUtils.saveFile();
+			   
+			   Utils.sendConsole("§cThe player §e" + name + " §cis §4§lnot existing§c!");
+		   }
 	   }
 	   
 	   return null;

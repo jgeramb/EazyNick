@@ -119,12 +119,20 @@ public class NMSNickManager extends ReflectUtils {
 	}
 	
 	public static void updateUniqueId(Player p, UUID uniqueId) {
+		if(uniqueId == null)
+			uniqueId = p.getUniqueId();
+		
 		try {
 			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
-			Field nameField = Utils.uuidField;
-			nameField.setAccessible(true);
-			nameField.set(gameProfile, uniqueId);
-			nameField.setAccessible(false);
+			Field uuidField = Utils.uuidField;
+			uuidField.setAccessible(true);
+			uuidField.set(gameProfile, uniqueId);
+			uuidField.setAccessible(false);
+			
+			Field entityUniqueIDField = getNMSClass("Entity").getDeclaredField("uniqueID");
+			entityUniqueIDField.setAccessible(true);
+			entityUniqueIDField.set(p.getClass().getMethod("getHandle").invoke(p), uniqueId);
+			entityUniqueIDField.setAccessible(false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -187,6 +195,7 @@ public class NMSNickManager extends ReflectUtils {
 	public static void updatePlayer(Player p, boolean forceUpdate, boolean isQuitUnnick) {
 		NickManager api = new NickManager(p);
 		boolean onNick = !(api.isNicked());
+		UUID uuidBefore = p.getUniqueId();
 		
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
@@ -240,9 +249,6 @@ public class NMSNickManager extends ReflectUtils {
 					
 				sendPacketNMS(p, packetRespawnPlayer);
 				
-				updateUniqueId(p, UUIDFetcher.getUUID(api.getNickName()));
-				entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
-				
 				if(EazyNick.version.equals("1_7_R4")) {
 					Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
 					
@@ -274,6 +280,8 @@ public class NMSNickManager extends ReflectUtils {
 					
 					@Override
 					public void run() {
+						updateUniqueId(p, onNick ? UUIDFetcher.getUUID(api.getNickName()) : p.getUniqueId());
+						
 						sendPacket(p, packetPlayOutPlayerInfoAdd, true);
 						sendPacketExceptSelf(p, packetNamedEntitySpawn, forceUpdate);
 						
@@ -281,6 +289,8 @@ public class NMSNickManager extends ReflectUtils {
 							all.hidePlayer(p);
 							all.showPlayer(p);
 						});
+						
+						updateUniqueId(p, uuidBefore);
 						
 						try {
 							Object packetEntityLook = ((EazyNick.version.equals("1_7_R4") || EazyNick.version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
