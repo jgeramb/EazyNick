@@ -33,6 +33,7 @@ import net.dev.eazynick.utils.nickutils.NMSNickManager;
 import net.dev.eazynick.utils.nickutils.UUIDFetcher;
 import net.dev.eazynick.utils.nickutils.UUIDFetcher_1_7;
 import net.dev.eazynick.utils.nickutils.UUIDFetcher_1_8_R1;
+import net.dev.eazynick.utils.nickutils.NMSNickManager.UpdateType;
 import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -90,12 +91,12 @@ public class NickManager {
 	
 	public void updatePlayer() {
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			NMSNickManager.updatePlayer(p, false, false);
+			NMSNickManager.updatePlayer(p, UpdateType.UPDATE, false);
 	}
 	
-	private void updatePlayer(boolean forceUpdate, boolean isQuitUnnick) {
+	public void updatePlayer(UpdateType type, boolean forceUpdate) {
 		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			NMSNickManager.updatePlayer(p, forceUpdate, isQuitUnnick);
+			NMSNickManager.updatePlayer(p, type, forceUpdate);
 	}
 	
 	public void setName(String nickName) {
@@ -187,12 +188,12 @@ public class NickManager {
 		
 		MySQLNickManager.addPlayer(p.getUniqueId(), nickName, skinName);
 		
-		setName(new StringUtils(nickName).removeColorCodes().getString());
-		changeSkin(new StringUtils(skinName).removeColorCodes().getString());
-		updatePlayer();
-		
 		Utils.nickedPlayers.add(p.getUniqueId());
 		Utils.playerNicknames.put(p.getUniqueId(), nickName);
+		
+		setName(new StringUtils(nickName).removeColorCodes().getString());
+		changeSkin(new StringUtils(skinName).removeColorCodes().getString());
+		updatePlayer(UpdateType.NICK, false);
 		
 		if(FileUtils.cfg.getBoolean("NickActionBarMessage")) {
 			new Timer().schedule(new TimerTask() {
@@ -246,20 +247,8 @@ public class NickManager {
 		
 		setName(nickName);
 		changeSkin(nickName);
-		updatePlayer(true, isQuitUnnick);
+		updatePlayer(isQuitUnnick ? UpdateType.QUIT : UpdateType.UNNICK, true);
 		
-		Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
-			
-			@Override
-			public void run() {
-				p.setDisplayName(getOldDisplayName());
-				setPlayerListName(getOldPlayerListName());
-				
-				Utils.oldDisplayNames.remove(p.getUniqueId());
-				Utils.oldPlayerListNames.remove(p.getUniqueId());
-			}
-		}, 4);
-
 		Utils.nickedPlayers.remove(p.getUniqueId());
 		Utils.playerNicknames.remove(p.getUniqueId());
 		
@@ -329,6 +318,25 @@ public class NickManager {
 			Utils.nametagEditPrefixes.remove(p.getUniqueId());
 			Utils.nametagEditSuffixes.remove(p.getUniqueId());
 		}
+		
+		if(!(EazyNick.getInstance().isEnabled()))
+			return;
+		
+		UUID uuid = p.getUniqueId();
+		String oldDisplayName = getOldDisplayName();
+		String oldPlayerListName = getOldPlayerListName();
+		
+		Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+			
+			@Override
+			public void run() {
+				p.setDisplayName(oldDisplayName);
+				setPlayerListName(oldPlayerListName);
+				
+				Utils.oldDisplayNames.remove(uuid);
+				Utils.oldPlayerListNames.remove(uuid);
+			}
+		}, 4);
 		
 		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
@@ -567,7 +575,6 @@ public class NickManager {
 			Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
 			
 			ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
-			UUID uuid = p.getUniqueId();
 			String finalTabPrefix = tabPrefix;
 			String finalTabSuffix = tabSuffix;
 			
@@ -575,6 +582,8 @@ public class NickManager {
 				
 				@Override
 				public void run() {
+					UUID uuid = p.getUniqueId();
+					
 					if(EazyNick.getInstance().isEnabled()) {
 						if(Utils.nickedPlayers.contains(uuid)) {
 							if((p != null) && p.isOnline()) {
@@ -596,7 +605,7 @@ public class NickManager {
 						cancel();
 					}
 				}
-			}, 1000, 1000);
+			}, 0, 1000);
 		}
 		
 		setPlayerListName(tabPrefix + p.getName() + tabSuffix);

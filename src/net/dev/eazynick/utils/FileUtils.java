@@ -79,7 +79,7 @@ public class FileUtils {
 		cfg.addDefault("UseSignGUIForCustomName", true);
 		cfg.addDefault("AllowBookGUICustomName", true);
 
-		cfg.addDefault("NickActionBarMessage", true);
+		cfg.addDefault("NickActionBarMessage", false);
 		
 		cfg.addDefault("BypassFormat.Show", true);
 		cfg.addDefault("BypassFormat.NameTagPrefix", "&dBYPASS &7| &d");

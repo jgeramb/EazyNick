@@ -33,11 +33,14 @@ public class BookGUICommand implements CommandExecutor {
 					p.chat("/unnick");
 				
 				if(args.length == 0) {
-					TextComponent option = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Accept.Text"));
-					option.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui accept"));
-					option.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Accept.Hover")) }));
-					
-					NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page1.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page1.Text")), option));
+					if(BookGUIFileUtils.cfg.getBoolean("BookGUI.Page1.Enabled")) {
+						TextComponent option = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Accept.Text"));
+						option.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui accept"));
+						option.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Accept.Hover")) }));
+						
+						NMSBookUtils.open(p, NMSBookBuilder.create(BookGUIFileUtils.getConfigString("BookGUI.Page1.Title"), new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page1.Text")), option));
+					} else
+						p.chat("/bookgui accept");
 				} else if(args.length == 1) {
 					if(args[0].equalsIgnoreCase("accept")) {
 						TextComponent option1 = new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", BookGUIFileUtils.getConfigString("BookGUI.Rank1.Rank")));

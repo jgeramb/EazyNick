@@ -49,6 +49,7 @@ public class BookGUIFileUtils {
 		
 		cfg.addDefault("BookGUI.Page1.Title", "Info");
 		cfg.addDefault("BookGUI.Page1.Text", "&0Nicknames allow you to play with a different\nusername to not get recognized.\n\nAll rules still apply. You can still be reported and all name history is stored.\n\n");
+		cfg.addDefault("BookGUI.Page1.Enabled", true);
 		cfg.addDefault("BookGUI.Page2.Title", "Ranks");
 		cfg.addDefault("BookGUI.Page2.Text", "&0Let's get you set up with your nickname! First, you'll need to choose which &lRANK &0you would like to be shown as when nicked.\n\n");
 		cfg.addDefault("BookGUI.Page3.Title", "Skin");
@@ -61,6 +62,7 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.Page6.Title", "Done");
 		cfg.addDefault("BookGUI.Page6.Text.SingleServer", "&0You have finished setting up your nickname!\n\nYou are now nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
 		cfg.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!\n\nWhen you go into a game, you will be nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
+		cfg.addDefault("BookGUI.Page6.Enabled", true);
 		
 		cfg.addDefault("BookGUI.Accept.Text", "&0&n" + arrow + " I understand, set\n&nup my nickname");
 		cfg.addDefault("BookGUI.Accept.Hover", "&fClick here to proceed");
