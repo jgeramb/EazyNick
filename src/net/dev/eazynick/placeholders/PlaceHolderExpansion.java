@@ -40,6 +40,9 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 			
 			if(identifier.equals("real_name"))
 				return api.getRealName();
+			
+			if(identifier.equals("rank"))
+				return api.getRank();
 		}
 		
 		return null;

@@ -66,6 +66,7 @@ public class NickManager {
 	private static HashMap<UUID, String> chatSuffixes = new HashMap<>();
 	private static HashMap<UUID, String> tabPrefixes = new HashMap<>();
 	private static HashMap<UUID, String> tabSuffixes = new HashMap<>();
+	private static HashMap<UUID, String> nickRanks = new HashMap<>();
 	
 	public NickManager(Player p) {
 		this.p = p;
@@ -263,6 +264,8 @@ public class NickManager {
 		
 		if(tabSuffixes.containsKey(p.getUniqueId()))
 			tabSuffixes.remove(p.getUniqueId());
+		
+		unsetRank();
 		
 		if(Utils.tabStatus() && !(TABAPI.hasHiddenNametag(p.getUniqueId()))) {
 			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TABPREFIX);
@@ -501,6 +504,19 @@ public class NickManager {
 	
 	public String getOldPlayerListName() {
 		return Utils.oldPlayerListNames.containsKey(p.getUniqueId()) ? Utils.oldPlayerListNames.get(p.getUniqueId()) : p.getName();
+	}
+	
+	public String getRank() {
+		return nickRanks.containsKey(p.getUniqueId()) ? nickRanks.get(p.getUniqueId()) : "NONE";
+	}
+	
+	public void setRank(String rank) {
+		nickRanks.put(p.getUniqueId(), rank);
+	}
+	
+	public void unsetRank() {
+		if(nickRanks.containsKey(p.getUniqueId()))
+			nickRanks.remove(p.getUniqueId());
 	}
 	
 	public void updateLuckPerms(String prefix, String suffix) {

@@ -9,6 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.sql.MySQLNickManager;
@@ -66,6 +67,8 @@ public class ReNickCommand implements CommandExecutor {
 						if(!(isCancelled)) {
 							if(!(name.equalsIgnoreCase(p.getName()))) {
 								if(MySQLPlayerDataManager.isRegistered(p.getUniqueId())) {
+									new NickManager(p).setRank("Default");
+									
 									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, MySQLNickManager.getSkinName(p.getUniqueId()),
 											MySQLPlayerDataManager.getChatPrefix(p.getUniqueId()),
 											MySQLPlayerDataManager.getChatSuffix(p.getUniqueId()),
@@ -80,6 +83,8 @@ public class ReNickCommand implements CommandExecutor {
 									boolean serverFull = Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
 									String prefix = serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
 									String suffix = serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
+								
+									new NickManager(p).setRank("ServerFull");
 									
 									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, MySQLNickManager.getSkinName(p.getUniqueId()),
 											serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"),

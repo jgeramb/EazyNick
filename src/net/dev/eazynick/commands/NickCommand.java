@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.utils.FileUtils;
@@ -147,6 +148,8 @@ public class NickCommand implements CommandExecutor {
 														tabSuffix = chatSuffix;
 														tagPrefix = chatPrefix;
 														tagSuffix = chatSuffix;
+														
+														new NickManager(p).setRank("Default");
 													} else {
 														chatPrefix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : FileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"));
 														chatSuffix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : FileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"));
@@ -154,6 +157,8 @@ public class NickCommand implements CommandExecutor {
 														tabSuffix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : FileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"));
 														tagPrefix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix"));
 														tagSuffix = (serverFull ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : FileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix"));
+													
+														new NickManager(p).setRank("ServerFull");
 													}
 													
 													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, (Utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? FileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : FileUtils.getConfigString("Settings.NickFormat.PermissionsEx.GroupName")));

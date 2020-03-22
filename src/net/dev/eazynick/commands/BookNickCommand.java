@@ -136,17 +136,19 @@ public class BookNickCommand implements CommandExecutor {
 										Utils.lastSkinNames.put(p.getUniqueId(), skinName);
 										Utils.lastNickNames.put(p.getUniqueId(), name);
 										
-										if(BookGUIFileUtils.cfg.getBoolean("BookGUI.Page6.Enabled")) {
-											if(FileUtils.cfg.getBoolean("BungeeCord") && FileUtils.cfg.getBoolean("LobbyMode")) {
-												MySQLNickManager.addPlayer(p.getUniqueId(), name, skinName);
-												MySQLPlayerDataManager.insertData(p.getUniqueId(), groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
-												
-												NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
-											} else {
-												Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
+										new NickManager(p).setRank(args[0]);
+										
+										if(FileUtils.cfg.getBoolean("BungeeCord") && FileUtils.cfg.getBoolean("LobbyMode")) {
+											MySQLNickManager.addPlayer(p.getUniqueId(), name, skinName);
+											MySQLPlayerDataManager.insertData(p.getUniqueId(), groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 											
+											if(BookGUIFileUtils.cfg.getBoolean("BookGUI.Page6.Enabled"))
+												NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
+										} else {
+											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
+										
+											if(BookGUIFileUtils.cfg.getBoolean("BookGUI.Page6.Enabled"))
 												NMSBookUtils.open(p, NMSBookBuilder.create("Done", new TextComponent(BookGUIFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
-											}
 										}
 									} else
 										p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
