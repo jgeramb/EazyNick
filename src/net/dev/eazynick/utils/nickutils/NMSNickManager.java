@@ -22,6 +22,8 @@ import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.ReflectUtils;
 import net.dev.eazynick.utils.Utils;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+
 public class NMSNickManager extends ReflectUtils {
 
 	public static void updatePlayerListName(Player p, String name) {
@@ -340,11 +342,19 @@ public class NMSNickManager extends ReflectUtils {
 				updatePlayerCache(p);
 			
 			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
-				if(FileUtils.cfg.getBoolean("NickCommands.OnNick"))
-					FileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
+				if(FileUtils.cfg.getBoolean("NickCommands.OnNick")) {
+					if(Utils.placeholderAPIStatus())
+						FileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
+					else
+						FileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
+				}
 			} else {
-				if(FileUtils.cfg.getBoolean("NickCommands.OnUnnick"))
-					FileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
+				if(FileUtils.cfg.getBoolean("NickCommands.OnUnnick")) {
+					if(Utils.placeholderAPIStatus())
+						FileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
+					else
+						FileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
