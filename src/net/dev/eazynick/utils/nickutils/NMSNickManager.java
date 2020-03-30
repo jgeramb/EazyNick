@@ -200,6 +200,7 @@ public class NMSNickManager extends ReflectUtils {
 		NickManager api = new NickManager(p);
 		String nickName = api.getNickName();
 		UUID uuidBefore = p.getUniqueId();
+		boolean uuidSpoof = fileUtils.cfg.getBoolean("Settings.ChangeOptions.UUID");
 		UUID spoofedUUID = version.equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getUUID(nickName) : (version.equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(nickName) : eazyNick.getUUIDFetcher().getUUID(nickName));
 		
 		try {
@@ -212,7 +213,7 @@ public class NMSNickManager extends ReflectUtils {
 			
 			sendPacket(p, packetEntityDestroy, forceUpdate);
 			
-			if(!(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
+			if(uuidSpoof && !(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
 				updateUniqueId(p, spoofedUUID);
 			
 			if(version.equals("1_7_R4")) {
@@ -254,7 +255,7 @@ public class NMSNickManager extends ReflectUtils {
 
 						sendPacket(p, packetPlayOutPlayerInfoRemove, forceUpdate);
 						
-						if(!(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
+						if(uuidSpoof && !(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
 							updateUniqueId(p, uuidBefore);
 
 						if(skinName != null)
@@ -284,7 +285,7 @@ public class NMSNickManager extends ReflectUtils {
 						
 						sendPacketNMS(p, packetRespawnPlayer);
 						
-						if(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE))
+						if(uuidSpoof && (type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
 							updateUniqueId(p, spoofedUUID);
 						
 						packetNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer);
@@ -318,7 +319,8 @@ public class NMSNickManager extends ReflectUtils {
 								});
 							}
 							
-							updateUniqueId(p, uuidBefore);
+							if(uuidSpoof)
+								updateUniqueId(p, uuidBefore);
 							
 							try {
 								Object packetEntityLook = ((version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);

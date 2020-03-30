@@ -67,7 +67,7 @@ public class NickManager {
 	public void setPlayerListName(String name) {
 		NMSNickManager nmsNickManager = eazyNick.getNMSNickManager();
 		
-		if(eazyNick.getFileUtils().cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
+		if(eazyNick.getFileUtils().cfg.getBoolean("Settings.ChangeOptions.PlayerListName")) {
 			if(eazyNick.getVersion().equals("1_7_R4"))
 				nmsNickManager.updatePlayerListName_1_7_R4(p, name);
 			else
@@ -87,13 +87,11 @@ public class NickManager {
 	}
 	
 	public void updatePlayer() {
-		if(eazyNick.getFileUtils().cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			eazyNick.getNMSNickManager().updatePlayer(p, UpdateType.UPDATE, null, false);
+		updatePlayer(UpdateType.UPDATE, null, false);
 	}
 	
 	public void updatePlayer(UpdateType type, String skinName, boolean forceUpdate) {
-		if(eazyNick.getFileUtils().cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			eazyNick.getNMSNickManager().updatePlayer(p, type, skinName, forceUpdate);
+		eazyNick.getNMSNickManager().updatePlayer(p, type, skinName, forceUpdate);
 	}
 	
 	public void setName(String nickName) {
@@ -299,7 +297,7 @@ public class NickManager {
 			}
 		}
 		
-		if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+		if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.NameTag")) {
 			if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId())) {
 				utils.getScoreboardTeamManagers().get(p.getUniqueId()).destroyTeam();
 				utils.getScoreboardTeamManagers().remove(p.getUniqueId());
@@ -635,7 +633,7 @@ public class NickManager {
 		
 		changeCloudNET(tagPrefix, tagSuffix);
 
-		if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+		if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.NameTag")) {
 			if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
 				utils.getScoreboardTeamManagers().remove(p.getUniqueId());
 				
@@ -654,7 +652,7 @@ public class NickManager {
 					if(EazyNick.getInstance().isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline()) {
 						sbtm.createTeam();
 						
-						if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
+						if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.PlayerListName")) {
 							String tmpTabPrefix = finalTabPrefix;
 							String tmpTabSuffix = finalTabSuffix;
 							
@@ -671,10 +669,10 @@ public class NickManager {
 			}, 0, 175);
 		}
 		
-		if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
+		if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.PlayerListName"))
 			setPlayerListName(tabPrefix + p.getName() + tabSuffix);
 		
-		if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored"))
+		if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.DisplayName"))
 			p.setDisplayName(chatPrefix + p.getName() + chatSuffix);
 		
 		if(utils.nameTagEditStatus()) {

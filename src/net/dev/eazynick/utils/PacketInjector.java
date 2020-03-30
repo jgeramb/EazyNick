@@ -84,6 +84,7 @@ public class PacketInjector {
 		Utils utils = eazyNick.getUtils();
 		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
 		
+		String version = eazyNick.getVersion();
 		String lastChatMessage = utils.getLastChatMessage();
 		String prefix = utils.getPrefix();
 		
@@ -96,14 +97,14 @@ public class PacketInjector {
 			Class<?> iChatBaseComponentClass = reflectUtils.getNMSClass("IChatBaseComponent");
 			Class<?> chatSerializer;
 			
-			if(eazyNick.getVersion().equals("1_8_R1"))
+			if(version.equals("1_8_R1"))
 				chatSerializer = reflectUtils.getNMSClass("ChatSerializer");
 			else
 				chatSerializer = reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 			
 			String fullText = "";
 			
-			for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod("a").invoke(iChatBaseComponent))) {
+			for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod((version.startsWith("1_14") || version.startsWith("1_15")) ? "getSiblings" : "a").invoke(iChatBaseComponent))) {
 				if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
 					String[] json = ((String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent)).replace("\"", "").replace("{", "").replace("}", "").split(",");
 					String text = "";
@@ -171,7 +172,7 @@ public class PacketInjector {
 			}
 			
 			if(!(fullText.contains(lastChatMessage) || fullText.startsWith(prefix))) {
-				for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod("a").invoke(iChatBaseComponent))) {
+				for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod((version.startsWith("1_14") || version.startsWith("1_15")) ? "getSiblings" : "a").invoke(iChatBaseComponent))) {
 					if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
 						String json = (String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent);
 							

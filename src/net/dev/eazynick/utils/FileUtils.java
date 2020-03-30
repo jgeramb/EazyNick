@@ -109,10 +109,10 @@ public class FileUtils {
 
 		cfg.addDefault("Settings.NickDelay", (long) 0.5);
 		cfg.addDefault("Settings.ChatFormat", "%prefix%%playerName%%suffix%&7: &r%message%");
-		cfg.addDefault("Settings.NameChangeOptions.RefreshPlayer", true);
-		cfg.addDefault("Settings.NameChangeOptions.DisplayNameColored", true);
-		cfg.addDefault("Settings.NameChangeOptions.PlayerListNameColored", true);
-		cfg.addDefault("Settings.NameChangeOptions.NameTagColored", true);
+		cfg.addDefault("Settings.ChangeOptions.UUID", false);
+		cfg.addDefault("Settings.ChangeOptions.DisplayName", true);
+		cfg.addDefault("Settings.ChangeOptions.PlayerListName", true);
+		cfg.addDefault("Settings.ChangeOptions.NameTagColored", true);
 		cfg.addDefault("Settings.NickFormat.Chat.Prefix", "&8");
 		cfg.addDefault("Settings.NickFormat.Chat.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.PlayerList.Prefix", "&8");
