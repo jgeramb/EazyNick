@@ -2,12 +2,9 @@ package net.dev.eazynick.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -15,21 +12,18 @@ import net.dev.eazynick.EazyNick;
 
 public class FileUtils {
 
-	public static File folder = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/");
-	public static File file = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/setup.yml");
-	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+	private File directory, file;
+	public YamlConfiguration cfg;
 	
-	public static void saveFile() {
-		try {
-			cfg.save(file);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	public static void setupFiles() {
-		if (!(folder.exists()))
-			folder.mkdir();
+	public FileUtils() {
+		EazyNick eazyNick = EazyNick.getInstance();
+		PluginDescriptionFile desc = eazyNick.getDescription();
+		
+		directory = new File("plugins/" + desc.getName() + "/");
+		file = new File(directory, "setup.yml");
+		
+		if (!(directory.exists()))
+			directory.mkdir();
 
 		if (!(file.exists())) {
 			try {
@@ -38,9 +32,9 @@ public class FileUtils {
 				ex.printStackTrace();
 			}
 		}
-
-		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
 		
+		cfg = YamlConfiguration.loadConfiguration(file);
+
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"
 				+ "\nColorCodes can be found here: http://minecraft.tools/en/color-code.php"
@@ -133,28 +127,30 @@ public class FileUtils {
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Prefix", "&6");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName", "Premium");
-
-		List<String> worldBlackList = new ArrayList<>();
-		worldBlackList.add("world");
-
-		cfg.addDefault("AutoNickWorldBlackList", worldBlackList);
-
-		List<String> blackList = new ArrayList<>();
-		blackList.add("NAME_IN_CAPS_HERE");
-
-		cfg.addDefault("BlackList", blackList);
+		cfg.addDefault("AutoNickWorldBlackList", Arrays.asList("world"));
+		cfg.addDefault("BlackList", Arrays.asList("ExampleName"));
 		
 		cfg.options().copyDefaults(true);
 		cfg.options().copyHeader(true);
 		saveFile();
 		
-		LanguageFileUtils.file = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/lang/" + cfg.getString("Language") + ".yml");
-		LanguageFileUtils.cfg = YamlConfiguration.loadConfiguration(LanguageFileUtils.file);
-		LanguageFileUtils.setupFiles();
+		eazyNick.setLanguageFileUtils(new LanguageFileUtils(cfg.getString("Language")));
 	}
 	
-	public static String getConfigString(String path) {
+	public void saveFile() {
+		try {
+			cfg.save(file);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public String getConfigString(String path) {
 		return ChatColor.translateAlternateColorCodes('&', cfg.getString(path));
+	}
+	
+	public File getFile() {
+		return file;
 	}
 	
 }

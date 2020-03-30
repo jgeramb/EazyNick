@@ -21,78 +21,84 @@ import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
 
 public class Utils {
 
-	public static String prefix;
-	public static String noPerm;
-	public static String notPlayer;
+	private String prefix;
+	private String noPerm;
+	private String notPlayer;
+	private String lastChatMessage = "NONE";
 
-	public static Field nameField, uuidField;
-	public static PagesHandler<String> nickNamesHandler;
-
-	public static ArrayList<UUID> nickedPlayers = new ArrayList<>();
-	public static ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();
-	public static HashMap<UUID, String> playerNicknames = new HashMap<>();
-	public static List<String> nickNames = new ArrayList<>();
-	public static List<String> blackList = new ArrayList<>();
-	public static List<String> worldBlackList = new ArrayList<>();
-	public static HashMap<UUID, String> oldDisplayNames = new HashMap<>();
-	public static HashMap<UUID, String> oldPlayerListNames = new HashMap<>();
-	public static HashMap<UUID, Boolean> canUseNick = new HashMap<>();
-	public static HashMap<UUID, Integer> nickNameListPage = new HashMap<>();
-	public static HashMap<UUID, String> oldPermissionsExPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> oldPermissionsExSuffixes = new HashMap<>();
-	public static HashMap<UUID, String> oldCloudNETPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> oldCloudNETSuffixes = new HashMap<>();
-	public static HashMap<UUID, Integer> oldCloudNETTagIDS = new HashMap<>();
-	public static HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
-	public static HashMap<UUID, Object> luckPermsPrefixes = new HashMap<>();
-	public static HashMap<UUID, Object> luckPermsSuffixes = new HashMap<>();
-	public static HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
-	public static HashMap<UUID, String> nametagEditPrefixes = new HashMap<>();
-	public static HashMap<UUID, String> nametagEditSuffixes = new HashMap<>();
+	private Field nameField, uuidField;
 	
-	public static HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
-	public static HashMap<UUID, String> nameCache = new HashMap<>();
-	public static HashMap<UUID, String> lastSkinNames = new HashMap<>();
-	public static HashMap<UUID, String> lastNickNames = new HashMap<>();
+	private PagesHandler<String> nickNamesHandler;
 
-	public static boolean placeholderAPIStatus() {
+	private List<String> nickNames = new ArrayList<>();
+	private List<String> blackList = new ArrayList<>();
+	private List<String> worldBlackList = new ArrayList<>();
+	private ArrayList<UUID> nickedPlayers = new ArrayList<>();
+	private ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();
+	private HashMap<UUID, String> playerNicknames = new HashMap<>();
+	private HashMap<UUID, String> oldDisplayNames = new HashMap<>();
+	private HashMap<UUID, String> oldPlayerListNames = new HashMap<>();
+	private HashMap<UUID, Boolean> canUseNick = new HashMap<>();
+	private HashMap<UUID, Integer> nickNameListPage = new HashMap<>();
+	private HashMap<UUID, String> oldPermissionsExPrefixes = new HashMap<>();
+	private HashMap<UUID, String> oldPermissionsExSuffixes = new HashMap<>();
+	private HashMap<UUID, String> oldCloudNETPrefixes = new HashMap<>();
+	private HashMap<UUID, String> oldCloudNETSuffixes = new HashMap<>();
+	private HashMap<UUID, Integer> oldCloudNETTagIDS = new HashMap<>();
+	private HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
+	private HashMap<UUID, Object> luckPermsPrefixes = new HashMap<>();
+	private HashMap<UUID, Object> luckPermsSuffixes = new HashMap<>();
+	private HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
+	private HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
+	private HashMap<UUID, String> nametagEditPrefixes = new HashMap<>();
+	private HashMap<UUID, String> nametagEditSuffixes = new HashMap<>();
+	private HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
+	private HashMap<UUID, String> nameCache = new HashMap<>();
+	private HashMap<UUID, String> lastSkinNames = new HashMap<>();
+	private HashMap<UUID, String> lastNickNames = new HashMap<>();
+	private HashMap<UUID, String> chatPrefixes = new HashMap<>();
+	private HashMap<UUID, String> chatSuffixes = new HashMap<>();
+	private HashMap<UUID, String> tabPrefixes = new HashMap<>();
+	private HashMap<UUID, String> tabSuffixes = new HashMap<>();
+	private HashMap<UUID, String> nickRanks = new HashMap<>();
+
+	public boolean placeholderAPIStatus() {
 		return (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null);
 	}
 	
-	public static boolean cloudNetStatus() {
+	public boolean cloudNetStatus() {
 		return (Bukkit.getPluginManager().getPlugin("CloudNetAPI") != null);
 	}
 
-	public static boolean coloredTagsStatus() {
+	public boolean coloredTagsStatus() {
 		return (Bukkit.getPluginManager().getPlugin("ColoredTags") != null);
 	}
 
-	public static boolean nameTagEditStatus() {
+	public boolean nameTagEditStatus() {
 		return (Bukkit.getPluginManager().getPlugin("NametagEdit") != null);
 	}
 
-	public static boolean permissionsExStatus() {
+	public boolean permissionsExStatus() {
 		return (Bukkit.getPluginManager().getPlugin("PermissionsEx") != null);
 	}
 	
-	public static boolean luckPermsStatus() {
+	public boolean luckPermsStatus() {
 		return (Bukkit.getPluginManager().getPlugin("LuckPerms") != null);
 	}
 	
-	public static boolean datenschutzStatus() {
+	public boolean datenschutzStatus() {
 		return (Bukkit.getPluginManager().getPlugin("Datenschutz") != null);
 	}
 	
-	public static boolean ultraPermissionsStatus() {
+	public boolean ultraPermissionsStatus() {
 		return (Bukkit.getPluginManager().getPlugin("UltraPermissions") != null);
 	}
 	
-	public static boolean vaultStatus() {
+	public boolean vaultStatus() {
 		return (Bukkit.getPluginManager().getPlugin("Vault") != null);
 	}
 	
-	public static boolean survivalGamesStatus() {
+	public boolean survivalGamesStatus() {
 		Plugin plugin = Bukkit.getPluginManager().getPlugin("SurvivalGames");
 		
 		if(plugin != null) {
@@ -103,7 +109,7 @@ public class Utils {
 		return false;
 	}
 	
-	public static boolean authMeReloadedStatus(String version) {
+	public boolean authMeReloadedStatus(String version) {
 		Plugin plugin = Bukkit.getPluginManager().getPlugin("AuthMe");
 		
 		if(plugin != null) {
@@ -114,23 +120,23 @@ public class Utils {
 		return false;
 	}
 	
-	public static boolean tabStatus() {
+	public boolean tabStatus() {
 		return (Bukkit.getPluginManager().getPlugin("TAB") != null) && (Bukkit.getPluginManager().getPlugin("TAB").getDescription().getAuthors().contains("NEZNAMY"));
 	}
 	
-	public static boolean deluxeChatStatus() {
+	public boolean deluxeChatStatus() {
 		return (Bukkit.getPluginManager().getPlugin("DeluxeChat") != null);
 	}
 	
-	public static boolean chatControlProStatus() {
+	public boolean chatControlProStatus() {
 		return (Bukkit.getPluginManager().getPlugin("ChatControl") != null);
 	}
 	
-	public static void sendConsole(String msg) {
+	public void sendConsole(String msg) {
 		Bukkit.getConsoleSender().sendMessage(prefix + msg);
 	}
 
-	public static ItemStack createItem(Material mat, int amount, int metaData, String displayName, String lore, boolean enchantedItem) {
+	public ItemStack createItem(Material mat, int amount, int metaData, String displayName, String lore, boolean enchantedItem) {
 		ItemStack is = new ItemStack(mat, amount, (byte) metaData);
 		ItemMeta m = is.getItemMeta();
 		m.setDisplayName(displayName.trim());
@@ -139,7 +145,7 @@ public class Utils {
 		if (enchantedItem) {
 			m.addEnchant(Enchantment.DURABILITY, 1, true);
 
-			if(!(EazyNick.version.equalsIgnoreCase("1_7_R4")))
+			if(!(EazyNick.getInstance().getVersion().equalsIgnoreCase("1_7_R4")))
 				m.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE });
 		}
 
@@ -148,7 +154,7 @@ public class Utils {
 		return is;
 	}
 
-	public static ItemStack createItem(Material mat, int amount, int metaData, String displayName) {
+	public ItemStack createItem(Material mat, int amount, int metaData, String displayName) {
 		ItemStack is = new ItemStack(mat, amount, (byte) metaData);
 		ItemMeta m = is.getItemMeta();
 		m.setDisplayName(displayName.trim());
@@ -158,8 +164,10 @@ public class Utils {
 		return is;
 	}
 
-	public static ItemStack createSkull(int amount, String displayName, String owner) {
-		ItemStack is = new ItemStack(Material.getMaterial((EazyNick.version.startsWith("1_13") || EazyNick.version.startsWith("1_14") || EazyNick.version.startsWith("1_15")) ? "PLAYER_HEAD" : "SKULL_ITEM"), amount, (byte) 3);
+	public ItemStack createSkull(int amount, String displayName, String owner) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		
+		ItemStack is = new ItemStack(Material.getMaterial((eazyNick.getVersion().startsWith("1_13") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_15")) ? "PLAYER_HEAD" : "SKULL_ITEM"), amount, (byte) 3);
 		SkullMeta m = (SkullMeta) is.getItemMeta();
 		m.setDisplayName(displayName);
 		m.setOwner(owner);
@@ -168,8 +176,8 @@ public class Utils {
 		return is;
 	}
 
-	public static int getOnlinePlayers() {
-		if(EazyNick.version.equals("1_7_R4")) {
+	public int getOnlinePlayers() {
+		if(EazyNick.getInstance().getVersion().equals("1_7_R4")) {
 			try {
 				return Bukkit.getOnlinePlayers().getClass().getField("length").getInt(Bukkit.getOnlinePlayers());
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
@@ -180,5 +188,197 @@ public class Utils {
 		
 		return 0;
 	}
+	
+	public String getPrefix() {
+		return prefix;
+	}
+	
+	public String getNoPerm() {
+		return noPerm;
+	}
+	
+	public String getNotPlayer() {
+		return notPlayer;
+	}
+	
+	public Field getNameField() {
+		return nameField;
+	}
+	
+	public Field getUUIDField() {
+		return uuidField;
+	}
+	
+	public PagesHandler<String> getNickNamesHandler() {
+		return nickNamesHandler;
+	}
+	
+	public ArrayList<UUID> getNickedPlayers() {
+		return nickedPlayers;
+	}
+	
+	public ArrayList<UUID> getNickOnWorldChangePlayers() {
+		return nickOnWorldChangePlayers;
+	}
+	
+	public HashMap<UUID, String> getPlayerNicknames() {
+		return playerNicknames;
+	}
+	
+	public List<String> getNickNames() {
+		return nickNames;
+	}
+	
+	public List<String> getBlackList() {
+		return blackList;
+	}
+	
+	public List<String> getWorldBlackList() {
+		return worldBlackList;
+	}
+	
+	public HashMap<UUID, String> getOldDisplayNames() {
+		return oldDisplayNames;
+	}
+	
+	public HashMap<UUID, String> getOldPlayerListNames() {
+		return oldPlayerListNames;
+	}
+	
+	public HashMap<UUID, Boolean> getCanUseNick() {
+		return canUseNick;
+	}
+	
+	public HashMap<UUID, Integer> getNickNameListPage() {
+		return nickNameListPage;
+	}
+	
+	public HashMap<UUID, String> getOldPermissionsExPrefixes() {
+		return oldPermissionsExPrefixes;
+	}
+	
+	public HashMap<UUID, String> getOldPermissionsExSuffixes() {
+		return oldPermissionsExSuffixes;
+	}
+	
+	public HashMap<UUID, String> getOldCloudNETPrefixes() {
+		return oldCloudNETPrefixes;
+	}
+	
+	public HashMap<UUID, String> getOldCloudNETSuffixes() {
+		return oldCloudNETSuffixes;
+	}
+	
+	public HashMap<UUID, Integer> getOldCloudNETTagIDS() {
+		return oldCloudNETTagIDS;
+	}
+	
+	public HashMap<UUID, String[]> getOldPermissionsExGroups() {
+		return oldPermissionsExGroups;
+	}
+	
+	public HashMap<UUID, Object> getLuckPermsPrefixes() {
+		return luckPermsPrefixes;
+	}
+	
+	public HashMap<UUID, Object> getLuckPermsSuffixes() {
+		return luckPermsSuffixes;
+	}
+	
+	public HashMap<UUID, String> getUltraPermsPrefixes() {
+		return ultraPermsPrefixes;
+	}
+	
+	public HashMap<UUID, String> getUltraPermsSuffixes() {
+		return ultraPermsSuffixes;
+	}
+	
+	public HashMap<UUID, String> getNametagEditPrefixes() {
+		return nametagEditPrefixes;
+	}
+	
+	public HashMap<UUID, String> getNametagEditSuffixes() {
+		return nametagEditSuffixes;
+	}
+	
+	public HashMap<UUID, ScoreboardTeamManager> getScoreboardTeamManagers() {
+		return scoreboardTeamManagers;
+	}
+	
+	public HashMap<UUID, String> getNameCache() {
+		return nameCache;
+	}
+	
+	public HashMap<UUID, String> getLastSkinNames() {
+		return lastSkinNames;
+	}
+	
+	public HashMap<UUID, String> getLastNickNames() {
+		return lastNickNames;
+	}
+	
+	public HashMap<UUID, String> getChatPrefixes() {
+		return chatPrefixes;
+	}
+	
+	public HashMap<UUID, String> getChatSuffixes() {
+		return chatSuffixes;
+	}
+	
+	public HashMap<UUID, String> getTabPrefixes() {
+		return tabPrefixes;
+	}
+	
+	public HashMap<UUID, String> getTabSuffixes() {
+		return tabSuffixes;
+	}
+	
+	public HashMap<UUID, String> getNickRanks() {
+		return nickRanks;
+	}
+	
+	public String getLastChatMessage() {
+		return lastChatMessage;
+	}
+	
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+	
+	public void setNoPerm(String noPerm) {
+		this.noPerm = noPerm;
+	}
+	
+	public void setNotPlayer(String notPlayer) {
+		this.notPlayer = notPlayer;
+	}
+	
+	public void setNickNamesHandler(PagesHandler<String> nickNamesHandler) {
+		this.nickNamesHandler = nickNamesHandler;
+	}
+	
+	public void setNickNames(List<String> nickNames) {
+		this.nickNames = nickNames;
+	}
+	
+	public void setBlackList(List<String> blackList) {
+		this.blackList = blackList;
+	}
+	
+	public void setWorldBlackList(List<String> worldBlackList) {
+		this.worldBlackList = worldBlackList;
+	}
+	
+	public void setNameField(Field nameField) {
+		this.nameField = nameField;
+	}
+	
+	public void setUUIDField(Field uuidField) {
+		this.uuidField = uuidField;
+	}
 
+	public void setLastChatMessage(String lastChatMessage) {
+		this.lastChatMessage = lastChatMessage;
+	}
+	
 }

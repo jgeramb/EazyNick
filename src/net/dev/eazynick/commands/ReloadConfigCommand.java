@@ -1,11 +1,15 @@
 package net.dev.eazynick.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utils.BookGUIFileUtils;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
@@ -16,45 +20,61 @@ public class ReloadConfigCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		Utils utils = eazyNick.getUtils();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
+		NickNameFileUtils nickNameFileUtils = eazyNick.getNickNameFileUtils();
+		
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.reload")) {
-				FileUtils.cfg = YamlConfiguration.loadConfiguration(FileUtils.file);
-				FileUtils.saveFile();
+				fileUtils.cfg = YamlConfiguration.loadConfiguration(eazyNick.getFileUtils().getFile());
+				fileUtils.saveFile();
 				
-				NickNameFileUtils.cfg = YamlConfiguration.loadConfiguration(NickNameFileUtils.file);
-				NickNameFileUtils.saveFile();
+				nickNameFileUtils.cfg = YamlConfiguration.loadConfiguration(nickNameFileUtils.getFile());
+				nickNameFileUtils.saveFile();
 				
-				BookGUIFileUtils.cfg = YamlConfiguration.loadConfiguration(BookGUIFileUtils.file);
-				BookGUIFileUtils.saveFile();
+				bookGUIFileUtils.cfg = YamlConfiguration.loadConfiguration(bookGUIFileUtils.getFile());
+				bookGUIFileUtils.saveFile();
 				
-				LanguageFileUtils.cfg = YamlConfiguration.loadConfiguration(LanguageFileUtils.file);
-				LanguageFileUtils.saveFile();
+				languageFileUtils.cfg = YamlConfiguration.loadConfiguration(languageFileUtils.getFile());
+				languageFileUtils.saveFile();
 				
-				Utils.nickNames = NickNameFileUtils.cfg.getStringList("NickNames");
-				Utils.blackList = FileUtils.cfg.getStringList("BlackList");
-				Utils.worldBlackList = FileUtils.cfg.getStringList("AutoNickWorldBlackList");
+				utils.setNickNames(nickNameFileUtils.cfg.getStringList("NickNames"));
 				
-				for (String blackListName : Utils.blackList) {
-					Utils.blackList.remove(blackListName);
-					Utils.blackList.add(blackListName.toUpperCase());
+				List<String> blackList = fileUtils.cfg.getStringList("BlackList");
+				List<String> worldBlackList = fileUtils.cfg.getStringList("AutoNickWorldBlackList");
+				
+				if (blackList.size() >= 1) {
+					ArrayList<String> toAdd = new ArrayList<>();
+					
+					for (String blackListName : blackList)
+						toAdd.add(blackListName.toUpperCase());
+					
+					utils.setBlackList(new ArrayList<>(toAdd));
 				}
-				
-				for (String blackListWorld : Utils.worldBlackList) {
-					Utils.worldBlackList.remove(blackListWorld);
-					Utils.worldBlackList.add(blackListWorld.toUpperCase());
+
+				if (worldBlackList.size() >= 1) {
+					ArrayList<String> toAdd = new ArrayList<>();
+					
+					for (String blackListWorld : worldBlackList)
+						toAdd.add(blackListWorld.toUpperCase());
+					
+					utils.setWorldBlackList(new ArrayList<>(toAdd));
 				}
+
+				utils.setPrefix(languageFileUtils.getConfigString("Messages.Prefix"));
+				utils.setNoPerm(languageFileUtils.getConfigString("Messages.NoPerm"));
+				utils.setNotPlayer(languageFileUtils.getConfigString("Messages.NotPlayer"));
 				
-				Utils.prefix = LanguageFileUtils.getConfigString("Messages.Prefix") + " ";
-				Utils.noPerm = LanguageFileUtils.getConfigString("Messages.NoPerm");
-				Utils.notPlayer = LanguageFileUtils.getConfigString("Messages.NotPlayer");
-				
-				p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.ReloadConfig"));
+				p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.ReloadConfig"));
 			} else
-				p.sendMessage(Utils.noPerm);
+				p.sendMessage(utils.getNoPerm());
 		} else
-			Utils.sendConsole(Utils.notPlayer);
+			utils.sendConsole(utils.getNotPlayer());
 		
 		return true;
 	}

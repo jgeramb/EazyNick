@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -13,21 +12,17 @@ import net.dev.eazynick.EazyNick;
 
 public class NickNameFileUtils {
 
-	public static File folder = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/");
-	public static File file = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/nickNames.yml");
-	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+	private File directory, file;
+	public YamlConfiguration cfg;
 	
-	public static void saveFile() {
-		try {
-			cfg.save(file);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	public static void setupFiles() {
-		if (!(folder.exists()))
-			folder.mkdir();
+	public NickNameFileUtils() {
+		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
+		
+		directory = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/");
+		file = new File(directory, "nickNames.yml");		
+		
+		if (!(directory.exists()))
+			directory.mkdir();
 
 		if (!(file.exists())) {
 			try {
@@ -36,8 +31,8 @@ public class NickNameFileUtils {
 				ex.printStackTrace();
 			}
 		}
-
-		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
+		
+		cfg = YamlConfiguration.loadConfiguration(file);
 		
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"
@@ -2356,6 +2351,18 @@ public class NickNameFileUtils {
 		cfg.options().copyDefaults(true);
 		cfg.options().copyHeader(true);
 		saveFile();
+	}
+	
+	public void saveFile() {
+		try {
+			cfg.save(file);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public File getFile() {
+		return file;
 	}
 	
 }

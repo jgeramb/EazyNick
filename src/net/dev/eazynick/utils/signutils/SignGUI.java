@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,9 +21,12 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class SignGUI implements Listener {
 
-	public static void open(Player p, String line1, String line2, String line3, String line4, EditCompleteListener listener) {
-		Block b = p.getWorld().getBlockAt(p.getLocation()).getRelative(BlockFace.UP);
-		b.setType(Material.getMaterial((EazyNick.version.startsWith("1_14") || EazyNick.version.startsWith("1_15")) ? "OAK_SIGN" : (EazyNick.version.startsWith("1_13") ? "SIGN" : "SIGN_POST")));
+	public void open(Player p, String line1, String line2, String line3, String line4, EditCompleteListener listener) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
+		Block b = p.getWorld().getBlockAt(p.getLocation().clone().add(0, 4, 0));
+		b.setType(Material.getMaterial((eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_15")) ? "OAK_SIGN" : (eazyNick.getVersion().startsWith("1_13") ? "SIGN" : "SIGN_POST")));
 		
 		Sign sign = (Sign) b.getState();
 		sign.setLine(0, line1);
@@ -38,11 +40,11 @@ public class SignGUI implements Listener {
 			@Override
 			public void run() {
 				try {
-					boolean useCraftBlockEntityState = EazyNick.version.startsWith("1_14") || EazyNick.version.startsWith("1_13") || EazyNick.version.startsWith("1_12");
+					boolean useCraftBlockEntityState = eazyNick.getVersion().startsWith("1_15") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_13") || eazyNick.getVersion().startsWith("1_12");
 					Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 					Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
 
-					Field tileField = (useCraftBlockEntityState ? ReflectUtils.getCraftClass("block.CraftBlockEntityState") : sign.getClass()).getDeclaredField(useCraftBlockEntityState ? "tileEntity" : "sign");
+					Field tileField = (useCraftBlockEntityState ? reflectUtils.getCraftClass("block.CraftBlockEntityState") : sign.getClass()).getDeclaredField(useCraftBlockEntityState ? "tileEntity" : "sign");
 					tileField.setAccessible(true);
 					Object tileSign = tileField.get(sign);
 
@@ -50,13 +52,13 @@ public class SignGUI implements Listener {
 					editable.setAccessible(true);
 					editable.set(tileSign, true);
 
-					Field handler = tileSign.getClass().getDeclaredField((EazyNick.version.startsWith("1_14") || EazyNick.version.startsWith("1_15")) ? "j" : (EazyNick.version.startsWith("1_13") ? "g" : "h"));
+					Field handler = tileSign.getClass().getDeclaredField(eazyNick.getVersion().startsWith("1_15") ? "c" : (eazyNick.getVersion().startsWith("1_14") ? "j" : (eazyNick.getVersion().startsWith("1_13") ? "g" : "h")));
 					handler.setAccessible(true);
 					handler.set(tileSign, entityPlayer);
 
-					playerConnection.getClass().getDeclaredMethod("sendPacket", ReflectUtils.getNMSClass("Packet")).invoke(playerConnection, ReflectUtils.getNMSClass("PacketPlayOutOpenSignEditor").getConstructor(ReflectUtils.getNMSClass("BlockPosition")).newInstance(ReflectUtils.getNMSClass("BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
+					playerConnection.getClass().getDeclaredMethod("sendPacket", reflectUtils.getNMSClass("Packet")).invoke(playerConnection, reflectUtils.getNMSClass("PacketPlayOutOpenSignEditor").getConstructor(reflectUtils.getNMSClass("BlockPosition")).newInstance(reflectUtils.getNMSClass("BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
 		            
-					Bukkit.getOnlinePlayers().stream().filter(all -> (all != p)).forEach(all -> all.sendBlockChange(b.getLocation(), Material.AIR, (byte) 0));
+					Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), () -> b.setType(Material.AIR), 5);
 					
 					Object networkManager = playerConnection.getClass().getDeclaredField("networkManager").get(playerConnection);
 					Channel channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
@@ -87,7 +89,7 @@ public class SignGUI implements Listener {
 							@Override
 							public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
 								if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
-									Object[] rawLines = (Object[]) ReflectUtils.getField(packet.getClass(), "b").get(packet);
+									Object[] rawLines = (Object[]) reflectUtils.getField(packet.getClass(), "b").get(packet);
 									
 									Bukkit.getScheduler().runTask(EazyNick.getInstance(), new Runnable() {
 										
@@ -96,7 +98,7 @@ public class SignGUI implements Listener {
 											try {
 												String[] lines = new String[4];
 
-												if(EazyNick.version.startsWith("1_8")) {
+												if(eazyNick.getVersion().startsWith("1_8")) {
 													int i = 0;
 													
 													for (Object obj : rawLines) {
@@ -106,8 +108,6 @@ public class SignGUI implements Listener {
 													}
 												} else
 													lines = (String[]) rawLines;
-												
-												b.setType(Material.AIR);
 												
 												if (channel.pipeline().get("PacketInjector") != null)
 													channel.pipeline().remove("PacketInjector");
@@ -136,7 +136,7 @@ public class SignGUI implements Listener {
 		
 	}
 	
-	public static class EditCompleteEvent {
+	public class EditCompleteEvent {
 		
 		private String[] lines;
 		

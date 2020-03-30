@@ -26,36 +26,39 @@ import me.clip.placeholderapi.PlaceholderAPI;
 
 public class NMSNickManager extends ReflectUtils {
 
-	public static void updatePlayerListName(Player p, String name) {
+	private EazyNick eazyNick;
+	
+	public NMSNickManager() {
+		eazyNick = EazyNick.getInstance();
+	}
+	
+	public void updatePlayerListName(Player p, String name) {
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 			Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
 			String playerName = (String) entityPlayer.getClass().getMethod("getName").invoke(entityPlayer);
-			
+
 			if(name == null)
 				name = playerName;
 			
 			Field f = getNMSClass("EntityPlayer").getDeclaredField("listName");
 			f.setAccessible(true);
-			f.set(entityPlayer, name.equals(playerName) ? null : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, name))[0]);
+			f.set(entityPlayer, name.equals(playerName) ? null : ((eazyNick.getVersion().startsWith("1_15") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_13")) ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, name) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, name))[0]));
 			f.setAccessible(false);
 
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 			
-			Class<?> enumPlayerInfoAction = EazyNick.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(EazyNick.version.equals("1_11_R1") || EazyNick.version.equals("1_12_R1") || EazyNick.version.startsWith("1_13") || EazyNick.version.startsWith("1_14") || EazyNick.version.startsWith("1_15")) ? 1 : 2];
+			Class<?> enumPlayerInfoAction = eazyNick.getVersion().equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(eazyNick.getVersion().equals("1_11_R1") || eazyNick.getVersion().equals("1_12_R1") || eazyNick.getVersion().startsWith("1_13") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_15")) ? 1 : 2];
 			Object packet = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray);
 			
-			for(Player all : Bukkit.getOnlinePlayers()) {
-				if(all.canSee(p))
-					sendPacket(p, packet, !(Utils.nickedPlayers.contains(p.getUniqueId())));
-			}
+			sendPacket(p, packet, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void updatePlayerListName_1_7_R4(Player p, String name) {
+	public void updatePlayerListName_1_7_R4(Player p, String name) {
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 
@@ -88,7 +91,7 @@ public class NMSNickManager extends ReflectUtils {
 								sendPacketNMS(all, packet);
 						}
 					} else {
-						if(FileUtils.cfg.getBoolean("SeeNickSelf")) {
+						if(eazyNick.getFileUtils().cfg.getBoolean("SeeNickSelf")) {
 							Object playerConenction = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
 							Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
 							int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
@@ -107,10 +110,10 @@ public class NMSNickManager extends ReflectUtils {
 		}
 	}
 	
-	public static void updateName(Player p, String nickName) {
+	public void updateName(Player p, String nickName) {
 		try {
 			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
-			Field nameField = Utils.nameField;
+			Field nameField = eazyNick.getUtils().getNameField();
 			nameField.setAccessible(true);
 			nameField.set(gameProfile, nickName);
 			nameField.setAccessible(false);
@@ -119,13 +122,13 @@ public class NMSNickManager extends ReflectUtils {
 		}
 	}
 	
-	public static void updateUniqueId(Player p, UUID uniqueId) {
+	public void updateUniqueId(Player p, UUID uniqueId) {
 		if(uniqueId == null)
 			uniqueId = p.getUniqueId();
 		
 		try {
 			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
-			Field uuidField = Utils.uuidField;
+			Field uuidField = eazyNick.getUtils().getUUIDField();
 			uuidField.setAccessible(true);
 			uuidField.set(gameProfile, uniqueId);
 			uuidField.setAccessible(false);
@@ -134,13 +137,13 @@ public class NMSNickManager extends ReflectUtils {
 		}
 	}
 	
-	public static void updateSkin(Player p, String skinName) {
+	public void updateSkin(Player p, String skinName) {
 		try {
 			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
 			GameProfile gp = (GameProfile) gameProfile;
 			
 			try {
-				gp = GameProfileBuilder.fetch(UUIDFetcher.getUUID(skinName));
+				gp = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
 			} catch (Exception e) {
 			}
 
@@ -152,13 +155,13 @@ public class NMSNickManager extends ReflectUtils {
 		} 
 	}
 	
-	public static void updateSkin_1_8_R1(Player p, String skinName) {
+	public void updateSkin_1_8_R1(Player p, String skinName) {
 		try {
 			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
 			GameProfile gp = (GameProfile) gameProfile;
 			
 			try {
-				gp = GameProfileBuilder_1_8_R1.fetch(UUIDFetcher_1_8_R1.getUUID(skinName));
+				gp = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
 			} catch (Exception e) {
 			}
 
@@ -170,13 +173,13 @@ public class NMSNickManager extends ReflectUtils {
 		} 
 	}
 	
-	public static void updateSkin_1_7_R4(Player p, String skinName) {
+	public void updateSkin_1_7_R4(Player p, String skinName) {
 		try {
 			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
 			net.minecraft.util.com.mojang.authlib.GameProfile gp = (net.minecraft.util.com.mojang.authlib.GameProfile) gameProfile;
 			
 			try {
-				gp = GameProfileBuilder_1_7.fetch(UUIDFetcher_1_7.getUUID(skinName));
+				gp = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
 			} catch (Exception e) {
 			}
 
@@ -188,128 +191,137 @@ public class NMSNickManager extends ReflectUtils {
 		} 
 	}
 	
-	public static void updatePlayer(Player p, UpdateType type, boolean forceUpdate) {
+	public void updatePlayer(Player p, UpdateType type, String skinName, boolean forceUpdate) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		Utils utils = eazyNick.getUtils();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		
+		String version = eazyNick.getVersion();
 		NickManager api = new NickManager(p);
-		UUID uuidBefore = p.getUniqueId();
 		String nickName = api.getNickName();
+		UUID uuidBefore = p.getUniqueId();
+		UUID spoofedUUID = version.equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getUUID(nickName) : (version.equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(nickName) : eazyNick.getUUIDFetcher().getUUID(nickName));
 		
 		try {
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
-			Object worldClient = entityPlayer.getClass().getMethod("getWorld").invoke(entityPlayer);
-			Object worldData = worldClient.getClass().getMethod("getWorldData").invoke(worldClient);
-			Object interactManager = entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer);
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 			
 			Object packetEntityDestroy = getNMSClass("PacketPlayOutEntityDestroy").getConstructor(int[].class).newInstance(new int[] { p.getEntityId() });
 			Object packetPlayOutPlayerInfoRemove;
 			
-			if(EazyNick.version.equals("1_7_R4")) {
+			sendPacket(p, packetEntityDestroy, forceUpdate);
+			
+			if(!(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
+				updateUniqueId(p, spoofedUUID);
+			
+			if(version.equals("1_7_R4")) {
 				Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
 				
 				packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 			} else {
-				Class<?> enumPlayerInfoAction = (EazyNick.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(EazyNick.version.startsWith("1_1") && !(EazyNick.version.equals("1_10_R1"))) ? 1 : 2]);
+				Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
 				
 				packetPlayOutPlayerInfoRemove = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 			}
 			
-			sendPacket(p, packetEntityDestroy, forceUpdate);
 			sendPacket(p, packetPlayOutPlayerInfoRemove, forceUpdate);
-
-			if(type.equals(UpdateType.NICK)) {
-				if(FileUtils.cfg.getBoolean("NickMessage.OnNnick")) {
-					for(Player all : Bukkit.getOnlinePlayers())
-						all.sendMessage(FileUtils.getConfigString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getRealName()));
-				}
-			} else if(type.equals(UpdateType.UNNICK)) {
-				if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick")) {
-					for(Player all : Bukkit.getOnlinePlayers())
-						all.sendMessage(FileUtils.getConfigString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName()));
-				}
-			}
 			
 			if(!(type.equals(UpdateType.QUIT))) {
-				if(!(EazyNick.getInstance().isEnabled()))
+				if(!(eazyNick.isEnabled()) || !(p.isOnline()))
 					return;
 				
-				Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), () -> {
+				if(type.equals(UpdateType.NICK)) {
+					if(fileUtils.cfg.getBoolean("NickMessage.OnNnick")) {
+						for(Player all : Bukkit.getOnlinePlayers())
+							all.sendMessage(fileUtils.getConfigString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getRealName()));
+					}
+				} else if(type.equals(UpdateType.UNNICK)) {
+					if(fileUtils.cfg.getBoolean("NickMessage.OnUnnick")) {
+						for(Player all : Bukkit.getOnlinePlayers())
+							all.sendMessage(fileUtils.getConfigString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName()));
+					}
+				}
+				
+				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 					try {
-						Object packetRespawnPlayer;
 						Object packetNamedEntitySpawn;
 						Object packetPlayOutPlayerInfoAdd;
+						Object worldClient = entityPlayer.getClass().getMethod("getWorld").invoke(entityPlayer);
+						Object worldData = worldClient.getClass().getMethod("getWorldData").invoke(worldClient);
+						Object interactManager = entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer);
+						Object packetRespawnPlayer;
+
+						sendPacket(p, packetPlayOutPlayerInfoRemove, forceUpdate);
 						
-						boolean uuidSpoof = (System.getProperty("eazynick.uuidspoof") != null) ? System.getProperty("eazynick.uuidspoof").equals("true") : false;
+						if(!(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
+							updateUniqueId(p, uuidBefore);
+
+						if(skinName != null)
+							api.changeSkin(skinName);
 						
-						if(uuidSpoof) {
-							updateUniqueId(p, UUIDFetcher.getUUID(nickName));
-							
-							if(!(type.equals(UpdateType.NICK))) {
-								if(EazyNick.version.equals("1_7_R4")) {
-									Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
-									
-									sendPacket(p, playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer), true);
-								} else {
-									Class<?> enumPlayerInfoAction = (EazyNick.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(EazyNick.version.startsWith("1_1") && !(EazyNick.version.equals("1_10_R1"))) ? 1 : 2]);
-									
-									sendPacket(p, getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray), true);
-								}
-								
-								updateUniqueId(p, p.getUniqueId());
-							}
-						}
-						
-						if(EazyNick.version.startsWith("1_15")) {
+						if(version.startsWith("1_15")) {
 							Class<?> dimensionManager = getNMSClass("DimensionManager");
 							Class<?> worldType = getNMSClass("WorldType");
 							Class<?> enumGameMode = getNMSClass("EnumGamemode");
 							
 							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, long.class, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, p.getWorld().getEnvironment().getId()), Hashing.sha256().hashLong(p.getWorld().getSeed()).asLong(), worldType.getMethod("getType", String.class).invoke(worldType, p.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, p.getGameMode().getValue()));
-						} else if(EazyNick.version.startsWith("1_14")) {
+						} else if(version.startsWith("1_14")) {
 							Class<?> dimensionManager = getNMSClass("DimensionManager");
 							Class<?> worldType = getNMSClass("WorldType");
 							Class<?> enumGameMode = getNMSClass("EnumGamemode");
 							
 							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, p.getWorld().getEnvironment().getId()), worldType.getMethod("getType", String.class).invoke(worldType, p.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, p.getGameMode().getValue()));
-						} else if(EazyNick.version.equals("1_13_R2")) {
+						} else if(version.equals("1_13_R2")) {
 							Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
 							
 							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldClient.getClass().getDeclaredField("dimension").get(craftWorld), worldClient.getClass().getMethod("getDifficulty").invoke(worldClient), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
 						} else {
-							Class<?> enumGameMode = (EazyNick.version.equals("1_8_R2") || EazyNick.version.equals("1_8_R3") || EazyNick.version.equals("1_9_R1") || EazyNick.version.equals("1_9_R2")) ? getNMSClass("WorldSettings").getDeclaredClasses()[0] : getNMSClass("EnumGamemode");
+							Class<?> enumGameMode = (version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1") || version.equals("1_9_R2")) ? getNMSClass("WorldSettings").getDeclaredClasses()[0] : getNMSClass("EnumGamemode");
 							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(int.class, getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), enumGameMode).newInstance(p.getWorld().getEnvironment().getId(), (EazyNick.version.equals("1_7_R4") ? getNMSClass("World").getDeclaredField("difficulty").get(worldClient) : worldClient.getClass().getMethod("getDifficulty").invoke(worldClient)), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
-						}
-						
-						packetNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer);
-						
-						if(EazyNick.version.equals("1_7_R4")) {
-							Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
-							
-							packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
-						} else {
-							Class<?> enumPlayerInfoAction = (EazyNick.version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(EazyNick.version.startsWith("1_1") && !(EazyNick.version.equals("1_10_R1"))) ? 1 : 2]);
-							
-							packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(int.class, getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), enumGameMode).newInstance(p.getWorld().getEnvironment().getId(), (version.equals("1_7_R4") ? getNMSClass("World").getDeclaredField("difficulty").get(worldClient) : worldClient.getClass().getMethod("getDifficulty").invoke(worldClient)), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
 						}
 						
 						sendPacketNMS(p, packetRespawnPlayer);
 						
+						if(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE))
+							updateUniqueId(p, spoofedUUID);
+						
+						packetNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer);
+						
+						if(version.equals("1_7_R4")) {
+							Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+							
+							packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+						} else {
+							Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+							
+							packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+						}
+						
 						p.teleport(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch()));
 						p.updateInventory();
 						
-						if(!(EazyNick.getInstance().isEnabled()))
+						if(!(eazyNick.isEnabled()) || !(p.isOnline()))
 							return;
 						
-						Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), () -> {
-							sendPacket(p, packetPlayOutPlayerInfoAdd, true);
+						Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
+							sendPacket(p, packetPlayOutPlayerInfoAdd, forceUpdate);
 							sendPacketExceptSelf(p, packetNamedEntitySpawn, forceUpdate);
 							
-							if(uuidSpoof)
-								updateUniqueId(p, uuidBefore);
+							if(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)) {
+								Bukkit.getOnlinePlayers().stream().filter(all -> (!(all.hasPermission("nick.bypass")) && (all != p))).forEach(all -> {
+									all.hidePlayer(p);
+									all.showPlayer(p);
+									
+									sendPacketNMS(all, packetPlayOutPlayerInfoRemove);
+								});
+							}
+							
+							updateUniqueId(p, uuidBefore);
 							
 							try {
-								Object packetEntityLook = ((EazyNick.version.equals("1_7_R4") || EazyNick.version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
+								Object packetEntityLook = ((version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
 								Object packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
 								setField(packetHeadRotation, "a", p.getEntityId());
 								setField(packetHeadRotation, "b", (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)));
@@ -319,41 +331,41 @@ public class NMSNickManager extends ReflectUtils {
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
-							
+
 							if(type.equals(UpdateType.NICK)) {
-								if(FileUtils.cfg.getBoolean("NickMessage.OnNnick")) {
+								if(fileUtils.cfg.getBoolean("NickMessage.OnNnick")) {
 									for(Player all : Bukkit.getOnlinePlayers())
-										all.sendMessage(FileUtils.getConfigString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
+										all.sendMessage(fileUtils.getConfigString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
 								}
 							} else if(type.equals(UpdateType.UNNICK)) {
-								if(FileUtils.cfg.getBoolean("NickMessage.OnUnnick")) {
+								if(fileUtils.cfg.getBoolean("NickMessage.OnUnnick")) {
 									for(Player all : Bukkit.getOnlinePlayers())
-										all.sendMessage(FileUtils.getConfigString("NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
+										all.sendMessage(fileUtils.getConfigString("NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
 								}
 							}
-						}, 4 + (FileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
+						}, 4 + (fileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
 				}, 1);
 			}
 				
-			if(!(EazyNick.version.equals("1_7_R4") || EazyNick.version.equals("1_8_R1") || EazyNick.version.equals("1_8_R2")))
+			if(!(version.equals("1_7_R4") || version.equals("1_8_R1") || version.equals("1_8_R2")))
 				updatePlayerCache(p);
 			
-			if(Utils.oldDisplayNames.containsKey(p.getUniqueId())) {
-				if(FileUtils.cfg.getBoolean("NickCommands.OnNick")) {
-					if(Utils.placeholderAPIStatus())
-						FileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
+			if(type.equals(UpdateType.NICK)) {
+				if(fileUtils.cfg.getBoolean("NickCommands.OnNick")) {
+					if(utils.placeholderAPIStatus())
+						fileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
 					else
-						FileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
+						fileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
 				}
 			} else {
-				if(FileUtils.cfg.getBoolean("NickCommands.OnUnnick")) {
-					if(Utils.placeholderAPIStatus())
-						FileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
+				if(fileUtils.cfg.getBoolean("NickCommands.OnUnnick")) {
+					if(utils.placeholderAPIStatus())
+						fileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
 					else
-						FileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(FileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
+						fileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
 				}
 			}
 		} catch (Exception ex) {
@@ -361,7 +373,7 @@ public class NMSNickManager extends ReflectUtils {
 		}
 	}
 	
-	public static void updatePlayerCache(Player p) {
+	public void updatePlayerCache(Player p) {
 		try {
 			Class<?> minecraftServer = getNMSClass("MinecraftServer");
 			Object server = minecraftServer.getMethod("getServer").invoke(minecraftServer);
@@ -394,23 +406,21 @@ public class NMSNickManager extends ReflectUtils {
 		}
 	}
 	
-	public static void sendPacket(Player p, Object packet, boolean forceUpdate) {
+	public void sendPacket(Player p, Object packet, boolean forceUpdate) {
 		for (Player all : Bukkit.getOnlinePlayers()) {
 			if((all.canSee(p) && all.getWorld().getName().equals(p.getWorld().getName())) || forceUpdate) {
 				if(all.getEntityId() != p.getEntityId()) {
 					if(!(all.hasPermission("nick.bypass")) || forceUpdate)
 						sendPacketNMS(all, packet);
-				} else {
-					if(FileUtils.cfg.getBoolean("SeeNickSelf") || forceUpdate)
-						sendPacketNMS(all, packet);
-				}
+				} else if(eazyNick.getFileUtils().cfg.getBoolean("SeeNickSelf") || forceUpdate)
+					sendPacketNMS(all, packet);
 			}
 		}
 	}
 	
-	public static void sendPacketExceptSelf(Player p, Object packet, boolean forceUpdate) {
+	public void sendPacketExceptSelf(Player p, Object packet, boolean forceUpdate) {
 		for (Player all : Bukkit.getOnlinePlayers()) {
-			if((all.canSee(p) && all.getWorld().getName().equals(p.getWorld().getName())) || forceUpdate) {
+			if(all.getWorld().getName().equals(p.getWorld().getName()) || forceUpdate) {
 				if(all.getEntityId() != p.getEntityId()) {
 					if(!(all.hasPermission("nick.bypass")) || forceUpdate)
 						sendPacketNMS(all, packet);
@@ -419,7 +429,7 @@ public class NMSNickManager extends ReflectUtils {
 		}
 	}
 
-	public static void sendPacketNMS(Player p, Object packet) {
+	public void sendPacketNMS(Player p, Object packet) {
 		try {
 			Object handle = p.getClass().getMethod("getHandle").invoke(p);
 			Object playerConnection = handle.getClass().getDeclaredField("playerConnection").get(handle);

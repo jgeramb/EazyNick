@@ -21,8 +21,6 @@ import com.nametagedit.plugin.api.INametagApi;
 import com.nametagedit.plugin.api.data.Nametag;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.sql.MySQLNickManager;
-import net.dev.eazynick.sql.MySQLPlayerDataManager;
 import net.dev.eazynick.utils.ActionBarUtils;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
@@ -30,9 +28,6 @@ import net.dev.eazynick.utils.ReflectUtils;
 import net.dev.eazynick.utils.StringUtils;
 import net.dev.eazynick.utils.Utils;
 import net.dev.eazynick.utils.nickutils.NMSNickManager;
-import net.dev.eazynick.utils.nickutils.UUIDFetcher;
-import net.dev.eazynick.utils.nickutils.UUIDFetcher_1_7;
-import net.dev.eazynick.utils.nickutils.UUIDFetcher_1_8_R1;
 import net.dev.eazynick.utils.nickutils.NMSNickManager.UpdateType;
 import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
 import net.luckperms.api.LuckPerms;
@@ -61,85 +56,90 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class NickManager {
 
+	private EazyNick eazyNick;
 	private Player p;
-	private static HashMap<UUID, String> chatPrefixes = new HashMap<>();
-	private static HashMap<UUID, String> chatSuffixes = new HashMap<>();
-	private static HashMap<UUID, String> tabPrefixes = new HashMap<>();
-	private static HashMap<UUID, String> tabSuffixes = new HashMap<>();
-	private static HashMap<UUID, String> nickRanks = new HashMap<>();
 	
 	public NickManager(Player p) {
+		this.eazyNick = EazyNick.getInstance();
 		this.p = p;
 	}
 	
 	public void setPlayerListName(String name) {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
-			if(EazyNick.version.equals("1_7_R4"))
-				NMSNickManager.updatePlayerListName_1_7_R4(p, name);
+		NMSNickManager nmsNickManager = eazyNick.getNMSNickManager();
+		
+		if(eazyNick.getFileUtils().cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
+			if(eazyNick.getVersion().equals("1_7_R4"))
+				nmsNickManager.updatePlayerListName_1_7_R4(p, name);
 			else
-				NMSNickManager.updatePlayerListName(p, name);
+				nmsNickManager.updatePlayerListName(p, name);
 		}
 	}
 	
 	public void changeSkin(String skinName) {
-		if(EazyNick.version.equals("1_7_R4"))
-			NMSNickManager.updateSkin_1_7_R4(p, skinName);
-		else if(EazyNick.version.equals("1_8_R1"))
-			NMSNickManager.updateSkin_1_8_R1(p, skinName);
+		NMSNickManager nmsNickManager = eazyNick.getNMSNickManager();
+		
+		if(eazyNick.getVersion().equals("1_7_R4"))
+			nmsNickManager.updateSkin_1_7_R4(p, skinName);
+		else if(eazyNick.getVersion().equals("1_8_R1"))
+			nmsNickManager.updateSkin_1_8_R1(p, skinName);
 		else
-			NMSNickManager.updateSkin(p, skinName);
+			nmsNickManager.updateSkin(p, skinName);
 	}
 	
 	public void updatePlayer() {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			NMSNickManager.updatePlayer(p, UpdateType.UPDATE, false);
+		if(eazyNick.getFileUtils().cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
+			eazyNick.getNMSNickManager().updatePlayer(p, UpdateType.UPDATE, null, false);
 	}
 	
-	public void updatePlayer(UpdateType type, boolean forceUpdate) {
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
-			NMSNickManager.updatePlayer(p, type, forceUpdate);
+	public void updatePlayer(UpdateType type, String skinName, boolean forceUpdate) {
+		if(eazyNick.getFileUtils().cfg.getBoolean("Settings.NameChangeOptions.RefreshPlayer"))
+			eazyNick.getNMSNickManager().updatePlayer(p, type, skinName, forceUpdate);
 	}
 	
 	public void setName(String nickName) {
-		if(Utils.survivalGamesStatus()) {
+		Utils utils = eazyNick.getUtils();
+		NMSNickManager nmsNickManager = eazyNick.getNMSNickManager();
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
+		if(utils.survivalGamesStatus()) {
 			if(nickName != p.getName()) {
 				try {
-					SurvivalGames survivalGames = (SurvivalGames) ReflectUtils.getField(SurvivalGamesAPI.class, "plugin").get(SurvivalGames.api);
-					HashMap<String, PlayerData> playerData = (HashMap<String, PlayerData>) ReflectUtils.getField(SurvivalGames.class, "playerData").get(survivalGames);
+					SurvivalGames survivalGames = (SurvivalGames) reflectUtils.getField(SurvivalGamesAPI.class, "plugin").get(SurvivalGames.api);
+					HashMap<String, PlayerData> playerData = (HashMap<String, PlayerData>) reflectUtils.getField(SurvivalGames.class, "playerData").get(survivalGames);
 					playerData.put(nickName, playerData.get(p.getName()));
 					playerData.remove(p.getName());
-					ReflectUtils.setField(survivalGames, "playerData", playerData);
+					reflectUtils.setField(survivalGames, "playerData", playerData);
 					
-					Object config = (Object) ReflectUtils.getField(SurvivalGames.class, "config").get(survivalGames);
+					Object config = (Object) reflectUtils.getField(SurvivalGames.class, "config").get(survivalGames);
 					
-					if((boolean) ReflectUtils.getField(config.getClass(), "BungeeMode").get(config)) {
-						ArrayList<String> grace = (ArrayList<String>) ReflectUtils.getField(SurvivalGames.class, "grace").get(survivalGames);
+					if((boolean) reflectUtils.getField(config.getClass(), "BungeeMode").get(config)) {
+						ArrayList<String> grace = (ArrayList<String>) reflectUtils.getField(SurvivalGames.class, "grace").get(survivalGames);
 						grace.add(nickName);
 						grace.remove(p.getName());
-						ReflectUtils.setField(survivalGames, "grace", grace);
+						reflectUtils.setField(survivalGames, "grace", grace);
 						
-						ArrayList<String> spectator = (ArrayList<String>) ReflectUtils.getField(SurvivalGames.class, "spectator").get(survivalGames);
+						ArrayList<String> spectator = (ArrayList<String>) reflectUtils.getField(SurvivalGames.class, "spectator").get(survivalGames);
 					    spectator.add(nickName);
 				    	spectator.remove(p.getName());
-					    ReflectUtils.setField(survivalGames, "spectator", spectator);
+					    reflectUtils.setField(survivalGames, "spectator", spectator);
 					}
 				} catch (Exception e) {
 				}
 			}
 		}
 		
-		NMSNickManager.updateName(p, nickName);
+		nmsNickManager.updateName(p, nickName);
 		
-		if(Utils.survivalGamesStatus()) {
+		if(utils.survivalGamesStatus()) {
 			if(nickName != p.getName()) {
 				try {
-					SurvivalGames survivalGames = (SurvivalGames) ReflectUtils.getField(SurvivalGamesAPI.class, "plugin").get(SurvivalGames.api);
-					HashMap<String, PlayerData> playerData = (HashMap<String, PlayerData>) ReflectUtils.getField(SurvivalGames.class, "playerData").get(survivalGames);
+					SurvivalGames survivalGames = (SurvivalGames) reflectUtils.getField(SurvivalGamesAPI.class, "plugin").get(SurvivalGames.api);
+					HashMap<String, PlayerData> playerData = (HashMap<String, PlayerData>) reflectUtils.getField(SurvivalGames.class, "playerData").get(survivalGames);
 					PlayerData data = playerData.get(nickName);
 					playerData.remove(nickName);
 					PlayerData.class.getMethod("loadStats", Player.class).invoke(playerData, p);
 					playerData.put(nickName, data);
-					ReflectUtils.setField(survivalGames, "playerData", playerData);
+					reflectUtils.setField(survivalGames, "playerData", playerData);
 				} catch (Exception e) {
 				}
 			}
@@ -147,7 +147,7 @@ public class NickManager {
 		
 		performAuthMeLogin();
 		
-		if(Utils.datenschutzStatus()) {
+		if(utils.datenschutzStatus()) {
 			try {
 				me.tim.Main.Main.PlayerDatenschutz_Config.set(p.getName() + ".Entscheidung", true);
 				me.tim.Main.Main.PlayerDatenschutz_Config.save(me.tim.Main.Main.PlayerDatenschutz);
@@ -157,7 +157,9 @@ public class NickManager {
 	}
 	
 	private void performAuthMeLogin() {
-		if(Utils.authMeReloadedStatus("5.5.0")) {
+		Utils utils = eazyNick.getUtils();
+		
+		if(utils.authMeReloadedStatus("5.5.0")) {
 			NewAPI api = AuthMe.getApi();
 			String name = p.getName();
 			
@@ -165,7 +167,7 @@ public class NickManager {
 				api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
 			else
 				api.forceLogin(p);
-		} else if(Utils.authMeReloadedStatus("5.5.1") || Utils.authMeReloadedStatus("5.6.0")) {
+		} else if(utils.authMeReloadedStatus("5.5.1") || utils.authMeReloadedStatus("5.6.0")) {
 			AuthMeApi api = AuthMeApi.getInstance();
 			String name = p.getName();
 			
@@ -181,145 +183,152 @@ public class NickManager {
 	}
 	
 	public void nickPlayer(String nickName, String skinName) {
-		Utils.oldDisplayNames.put(p.getUniqueId(), p.getDisplayName());
-		Utils.oldPlayerListNames.put(p.getUniqueId(), p.getPlayerListName());
+		Utils utils = eazyNick.getUtils();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
 		
-		if (!(EazyNick.version.equalsIgnoreCase("1_7_R4")))
+		utils.getOldDisplayNames().put(p.getUniqueId(), (p.getDisplayName() != null) ? p.getDisplayName() : p.getName());
+		utils.getOldPlayerListNames().put(p.getUniqueId(), (p.getPlayerListName() != null) ? p.getPlayerListName() :  p.getName());
+		
+		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
 		
-		MySQLNickManager.addPlayer(p.getUniqueId(), nickName, skinName);
+		if(fileUtils.cfg.getBoolean("BungeeCord"))
+			eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), nickName, skinName);
 		
-		Utils.nickedPlayers.add(p.getUniqueId());
-		Utils.playerNicknames.put(p.getUniqueId(), nickName);
+		utils.getNickedPlayers().add(p.getUniqueId());
+		utils.getPlayerNicknames().put(p.getUniqueId(), nickName);
 		
 		setName(new StringUtils(nickName).removeColorCodes().getString());
-		changeSkin(new StringUtils(skinName).removeColorCodes().getString());
-		updatePlayer(UpdateType.NICK, false);
+		updatePlayer(UpdateType.NICK, new StringUtils(skinName).removeColorCodes().getString(), false);
 		
-		if(FileUtils.cfg.getBoolean("NickActionBarMessage")) {
+		if(fileUtils.cfg.getBoolean("NickActionBarMessage")) {
 			new Timer().schedule(new TimerTask() {
 				
 				UUID uuid = p.getUniqueId();
 				
 				@Override
 				public void run() {
-					if(EazyNick.getInstance().isEnabled()) {
-						if((p != null) && p.isOnline()) {
-							if(Utils.nickedPlayers.contains(uuid))
-								ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), LanguageFileUtils.getConfigString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", Utils.prefix), 20);
-							else {
-								ActionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
-								cancel();
-							}
-						} else
-							cancel();
-					} else
+					ActionBarUtils actionBarUtils = eazyNick.getActionBarUtils();
+					
+					if(EazyNick.getInstance().isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline())
+						actionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), eazyNick.getLanguageFileUtils().getConfigString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", utils.getPrefix()), 20);
+					else {
+						actionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
 						cancel();
+					}
 				}
 			}, 0, 1000);
 		}
 		
-		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
+		if(fileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
 				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled")))
-						p.getInventory().setItem(slot, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Enabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), FileUtils.cfg.getInt("NickItem.MetaData.Enabled"), LanguageFileUtils.getConfigString("NickItem.DisplayName.Enabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
+					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(eazyNick.getLanguageFileUtils().getConfigString("NickItem.DisplayName.Disabled")))
+						p.getInventory().setItem(slot, utils.createItem(Material.getMaterial(fileUtils.cfg.getString("NickItem.ItemType.Enabled")), fileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), fileUtils.cfg.getInt("NickItem.MetaData.Enabled"), languageFileUtils.getConfigString("NickItem.DisplayName.Enabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), fileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
 				}
 			}
 		}
 	}
 	
 	public void unnickPlayer() {
-		if(FileUtils.cfg.getBoolean("BungeeCord")) {
-			MySQLNickManager.removePlayer(p.getUniqueId());
-			MySQLPlayerDataManager.removeData(p.getUniqueId());
+		if(eazyNick.getFileUtils().cfg.getBoolean("BungeeCord")) {
+			eazyNick.getMySQLNickManager().removePlayer(p.getUniqueId());
+			eazyNick.getMySQLPlayerDataManager().removeData(p.getUniqueId());
 		}
 		
 		unnickPlayerWithoutRemovingMySQL(false);
 	}
 	
 	public void unnickPlayerWithoutRemovingMySQL(boolean isQuitUnnick) {
+		Utils utils = eazyNick.getUtils();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		
 		String nickName = getRealName();
 		
-		if (!(EazyNick.version.equalsIgnoreCase("1_7_R4")))
+		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
 		
 		setName(nickName);
 		changeSkin(nickName);
-		updatePlayer(isQuitUnnick ? UpdateType.QUIT : UpdateType.UNNICK, true);
+		updatePlayer(isQuitUnnick ? UpdateType.QUIT : UpdateType.UNNICK, nickName, true);
 		
-		Utils.nickedPlayers.remove(p.getUniqueId());
-		Utils.playerNicknames.remove(p.getUniqueId());
+		utils.getNickedPlayers().remove(p.getUniqueId());
+		utils.getPlayerNicknames().remove(p.getUniqueId());
 		
-		if(chatPrefixes.containsKey(p.getUniqueId()))
-			chatPrefixes.remove(p.getUniqueId());
+		if(utils.getChatPrefixes().containsKey(p.getUniqueId()))
+			utils.getChatPrefixes().remove(p.getUniqueId());
 			
-		if(chatSuffixes.containsKey(p.getUniqueId()))
-			chatSuffixes.remove(p.getUniqueId());
+		if(utils.getChatSuffixes().containsKey(p.getUniqueId()))
+			utils.getChatSuffixes().remove(p.getUniqueId());
 		
-		if(tabPrefixes.containsKey(p.getUniqueId()))
-			tabPrefixes.remove(p.getUniqueId());
+		if(utils.getTabPrefixes().containsKey(p.getUniqueId()))
+			utils.getTabPrefixes().remove(p.getUniqueId());
 		
-		if(tabSuffixes.containsKey(p.getUniqueId()))
-			tabSuffixes.remove(p.getUniqueId());
+		if(utils.getTabSuffixes().containsKey(p.getUniqueId()))
+			utils.getTabSuffixes().remove(p.getUniqueId());
 		
 		unsetRank();
 		
-		if(Utils.tabStatus() && !(TABAPI.hasHiddenNametag(p.getUniqueId()))) {
+		if(utils.tabStatus() && !(TABAPI.hasHiddenNametag(p.getUniqueId()))) {
+			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTABNAME, nickName);
+			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTAGNAME, nickName);
 			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TABPREFIX);
 			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TABSUFFIX);
 			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TAGPREFIX);
 			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TAGSUFFIX);
+			TABAPI.hideNametag(p.getUniqueId());
 			TABAPI.showNametag(p.getUniqueId());
 		}
 		
 		resetCloudNET();
 		resetLuckPerms();
 		
-		if(Utils.permissionsExStatus()) {
+		if(utils.permissionsExStatus()) {
 			PermissionUser user = PermissionsEx.getUser(p);
 		
-			if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
-				if(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId()))
-					user.setGroups(Utils.oldPermissionsExGroups.get(p.getUniqueId()));
+			if(fileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
+				if(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId()))
+					user.setGroups(utils.getOldPermissionsExGroups().get(p.getUniqueId()));
 			} else {
-				user.setPrefix(Utils.oldPermissionsExPrefixes.get(p.getUniqueId()), p.getWorld().getName());
-				user.setSuffix(Utils.oldPermissionsExSuffixes.get(p.getUniqueId()), p.getWorld().getName());
+				user.setPrefix(utils.getOldPermissionsExPrefixes().get(p.getUniqueId()), p.getWorld().getName());
+				user.setSuffix(utils.getOldPermissionsExSuffixes().get(p.getUniqueId()), p.getWorld().getName());
 			}
 		}
 		
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
-			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId())) {
-				Utils.scoreboardTeamManagers.get(p.getUniqueId()).destroyTeam();
-				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
+		if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+			if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId())) {
+				utils.getScoreboardTeamManagers().get(p.getUniqueId()).destroyTeam();
+				utils.getScoreboardTeamManagers().remove(p.getUniqueId());
 			}
 		}
 		
-		if(Utils.ultraPermissionsStatus()) {
+		if(utils.ultraPermissionsStatus()) {
 			me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
 			
-			user.setPrefix(Utils.ultraPermsPrefixes.get(p.getUniqueId()));
-			user.setSuffix(Utils.ultraPermsSuffixes.get(p.getUniqueId()));
+			user.setPrefix(utils.getUltraPermsPrefixes().get(p.getUniqueId()));
+			user.setSuffix(utils.getUltraPermsSuffixes().get(p.getUniqueId()));
 			user.save();
 			
-			Utils.ultraPermsPrefixes.remove(p.getUniqueId());
-			Utils.ultraPermsSuffixes.remove(p.getUniqueId());
+			utils.getUltraPermsPrefixes().remove(p.getUniqueId());
+			utils.getUltraPermsSuffixes().remove(p.getUniqueId());
 		}
 		
-		if(Utils.nameTagEditStatus()) {
+		if(utils.nameTagEditStatus()) {
 			INametagApi nametagEditAPI = NametagEdit.getApi();
-			String prefix = Utils.nametagEditPrefixes.get(p.getUniqueId());
-			String suffix = Utils.nametagEditSuffixes.get(p.getUniqueId());
+			String prefix = utils.getNametagEditPrefixes().get(p.getUniqueId());
+			String suffix = utils.getNametagEditSuffixes().get(p.getUniqueId());
 			
 			nametagEditAPI.setPrefix(p, prefix);
 			nametagEditAPI.setSuffix(p, suffix);
 			nametagEditAPI.setNametag(p, prefix, suffix);
 			nametagEditAPI.reloadNametag(p);
 			
-			Utils.nametagEditPrefixes.remove(p.getUniqueId());
-			Utils.nametagEditSuffixes.remove(p.getUniqueId());
+			utils.getNametagEditPrefixes().remove(p.getUniqueId());
+			utils.getNametagEditSuffixes().remove(p.getUniqueId());
 		}
 		
 		if(!(EazyNick.getInstance().isEnabled()))
@@ -334,55 +343,61 @@ public class NickManager {
 			@Override
 			public void run() {
 				p.setDisplayName(oldDisplayName);
-				setPlayerListName(oldPlayerListName);
+				p.setPlayerListName(oldPlayerListName);
 				
-				Utils.oldDisplayNames.remove(uuid);
-				Utils.oldPlayerListNames.remove(uuid);
+				utils.getOldDisplayNames().remove(uuid);
+				utils.getOldPlayerListNames().remove(uuid);
 			}
-		}, 4);
+		}, 5 + (fileUtils.cfg.getBoolean("RandomDisguiseDelay") ? 40 : 0));
 		
-		if(FileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
+		if(fileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
 				ItemStack item = p.getInventory().getItem(slot);
 				
 				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(LanguageFileUtils.getConfigString("NickItem.DisplayName.Enabled")))
-						p.getInventory().setItem(slot, Utils.createItem(Material.getMaterial(FileUtils.cfg.getString("NickItem.ItemType.Disabled")), FileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), FileUtils.cfg.getInt("NickItem.MetaData.Disabled"), LanguageFileUtils.getConfigString("NickItem.DisplayName.Disabled"), LanguageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), FileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(eazyNick.getLanguageFileUtils().getConfigString("NickItem.DisplayName.Enabled")))
+						p.getInventory().setItem(slot, utils.createItem(Material.getMaterial(fileUtils.cfg.getString("NickItem.ItemType.Disabled")), fileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), fileUtils.cfg.getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
 				}
 			}
 		}
 	}
 	
 	public String getRealName() {
+		Utils utils = eazyNick.getUtils();
+		
 		String realName = p.getName();
 		
-		if(!(Bukkit.getOnlineMode()) && Utils.nameCache.containsKey(p.getUniqueId()))
-			realName = Utils.nameCache.get(p.getUniqueId());
+		if(!(Bukkit.getOnlineMode()) && utils.getNameCache().containsKey(p.getUniqueId()))
+			realName = utils.getNameCache().get(p.getUniqueId());
 		else {
-			if(EazyNick.version.equalsIgnoreCase("1_7_R4"))
-				realName = UUIDFetcher_1_7.getName(p.getUniqueId());
-			else if(EazyNick.version.equalsIgnoreCase("1_8_R1"))
-				realName = UUIDFetcher_1_8_R1.getName(p.getUniqueId());
+			if(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))
+				realName = eazyNick.getUUIDFetcher_1_7().getName(p.getUniqueId());
+			else if(eazyNick.getVersion().equalsIgnoreCase("1_8_R1"))
+				realName = eazyNick.getUUIDFetcher_1_8_R1().getName(p.getUniqueId());
 			else
-				realName = UUIDFetcher.getName(p.getUniqueId());
+				realName = eazyNick.getUUIDFetcher().getName(p.getUniqueId());
 		}
 		
 		return realName;
 	}
 	
 	public String getChatPrefix() {
-		return chatPrefixes.containsKey(p.getUniqueId()) ? chatPrefixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
+		Utils utils = eazyNick.getUtils();
+		
+		return utils.getChatPrefixes().containsKey(p.getUniqueId()) ? utils.getChatPrefixes().get(p.getUniqueId()) : ((utils.vaultStatus() && eazyNick.getFileUtils().cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
 	}
 
 	public void setChatPrefix(String chatPrefix) {
-		if(chatPrefixes.containsKey(p.getUniqueId()))
-			chatPrefixes.remove(p.getUniqueId());
+		Utils utils = eazyNick.getUtils();
 		
-		chatPrefixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatPrefix));
+		if(utils.getChatPrefixes().containsKey(p.getUniqueId()))
+			utils.getChatPrefixes().remove(p.getUniqueId());
 		
-		if(EazyNick.version.equals("1_7_R4")) {
-			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
-			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
+		utils.getChatPrefixes().put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatPrefix));
+		
+		if(eazyNick.getVersion().equals("1_7_R4")) {
+			String nameFormatChat = utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId());
+			String nameFormatTab = utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId());
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
@@ -392,24 +407,28 @@ public class NickManager {
 				setPlayerListName(p.getName());
 			}
 		} else {
-			p.setDisplayName(chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId()));
-			setPlayerListName(tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId()));
+			p.setDisplayName(utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId()));
+			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
 		}
 	}
 
 	public String getChatSuffix() {
-		return chatSuffixes.containsKey(p.getUniqueId()) ? chatSuffixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
+		Utils utils = eazyNick.getUtils();
+		
+		return utils.getChatSuffixes().containsKey(p.getUniqueId()) ? utils.getChatSuffixes().get(p.getUniqueId()) : ((utils.vaultStatus() && eazyNick.getFileUtils().cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
 	}
 
 	public void setChatSuffix(String chatSuffix) {
-		if(chatSuffixes.containsKey(p.getUniqueId()))
-			chatSuffixes.remove(p.getUniqueId());
+		Utils utils = eazyNick.getUtils();
 		
-		chatSuffixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatSuffix));
+		if(utils.getChatSuffixes().containsKey(p.getUniqueId()))
+			utils.getChatSuffixes().remove(p.getUniqueId());
 		
-		if(EazyNick.version.equals("1_7_R4")) {
-			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
-			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
+		utils.getChatSuffixes().put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatSuffix));
+		
+		if(eazyNick.getVersion().equals("1_7_R4")) {
+			String nameFormatChat = utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId());
+			String nameFormatTab = utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId());
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
@@ -419,24 +438,28 @@ public class NickManager {
 				setPlayerListName(p.getName());
 			}
 		} else {
-			p.setDisplayName(chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId()));
-			setPlayerListName(tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId()));
+			p.setDisplayName(utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId()));
+			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
 		}
 	}
 
 	public String getTabPrefix() {
-		return tabPrefixes.containsKey(p.getUniqueId()) ? tabPrefixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
+		Utils utils = eazyNick.getUtils();
+		
+		return utils.getTabPrefixes().containsKey(p.getUniqueId()) ? utils.getTabPrefixes().get(p.getUniqueId()) : ((utils.vaultStatus() && eazyNick.getFileUtils().cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
 	}
 
 	public void setTabPrefix(String tabPrefix) {
-		if(tabPrefixes.containsKey(p.getUniqueId()))
-			tabPrefixes.remove(p.getUniqueId());
+		Utils utils = eazyNick.getUtils();
 		
-		tabPrefixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabPrefix));
+		if(utils.getTabPrefixes().containsKey(p.getUniqueId()))
+			utils.getTabPrefixes().remove(p.getUniqueId());
 		
-		if(EazyNick.version.equals("1_7_R4")) {
-			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
-			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
+		utils.getTabPrefixes().put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabPrefix));
+		
+		if(eazyNick.getVersion().equals("1_7_R4")) {
+			String nameFormatChat = utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId());
+			String nameFormatTab = utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId());
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
@@ -446,24 +469,28 @@ public class NickManager {
 				setPlayerListName(p.getName());
 			}
 		} else {
-			p.setDisplayName(chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId()));
-			setPlayerListName(tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId()));
+			p.setDisplayName(utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId()));
+			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
 		}
 	}
 
 	public String getTabSuffix() {
-		return tabSuffixes.containsKey(p.getUniqueId()) ? tabSuffixes.get(p.getUniqueId()) : ((Utils.vaultStatus() && FileUtils.cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
+		Utils utils = eazyNick.getUtils();
+		
+		return utils.getTabSuffixes().containsKey(p.getUniqueId()) ? utils.getTabSuffixes().get(p.getUniqueId()) : ((utils.vaultStatus() && eazyNick.getFileUtils().cfg.getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
 	}
 
 	public void setTabSuffix(String tabSuffix) {
-		if(tabSuffixes.containsKey(p.getUniqueId()))
-			tabSuffixes.remove(p.getUniqueId());
+		Utils utils = eazyNick.getUtils();
 		
-		tabSuffixes.put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabSuffix));
+		if(utils.getTabSuffixes().containsKey(p.getUniqueId()))
+			utils.getTabSuffixes().remove(p.getUniqueId());
 		
-		if(EazyNick.version.equals("1_7_R4")) {
-			String nameFormatChat = chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId());
-			String nameFormatTab = tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId());
+		utils.getTabSuffixes().put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabSuffix));
+		
+		if(eazyNick.getVersion().equals("1_7_R4")) {
+			String nameFormatChat = utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId());
+			String nameFormatTab = utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId());
 			
 			if(nameFormatTab.length() <= 16) {
 				p.setDisplayName(nameFormatChat);
@@ -473,25 +500,29 @@ public class NickManager {
 				setPlayerListName(p.getName());
 			}
 		} else {
-			p.setDisplayName(chatPrefixes.get(p.getUniqueId()) + getNickName() + chatSuffixes.get(p.getUniqueId()));
-			setPlayerListName(tabPrefixes.get(p.getUniqueId()) + getNickName() + tabSuffixes.get(p.getUniqueId()));
+			p.setDisplayName(utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId()));
+			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
 		}
 	}
 
 	public boolean isNicked() {
-		return Utils.nickedPlayers.contains(p.getUniqueId());
+		return eazyNick.getUtils().getNickedPlayers().contains(p.getUniqueId());
 	}
 	
 	public String getRandomStringFromList(ArrayList<String> list) {
 		return list.size() != 0 ? list.get((new Random()).nextInt(list.size())) : p.getName();
 	}
 	
-	public static String getRandomName() {
-		return Utils.nickNames.get((new Random()).nextInt(Utils.nickNames.size()));
+	public String getRandomName() {
+		Utils utils = eazyNick.getUtils();
+		
+		return utils.getNickNames().get((new Random()).nextInt(utils.getNickNames().size()));
 	}
 	
 	public String getNickName() {
-		return (Utils.playerNicknames.containsKey(p.getUniqueId()) ? Utils.playerNicknames.get(p.getUniqueId()) : p.getName());
+		Utils utils = eazyNick.getUtils();
+		
+		return (utils.getPlayerNicknames().containsKey(p.getUniqueId()) ? utils.getPlayerNicknames().get(p.getUniqueId()) : p.getName());
 	}
 	
 	public String getNickFormat() {
@@ -499,28 +530,40 @@ public class NickManager {
 	}
 	
 	public String getOldDisplayName() {
-		return Utils.oldDisplayNames.containsKey(p.getUniqueId()) ? Utils.oldDisplayNames.get(p.getUniqueId()) : p.getName();
+		Utils utils = eazyNick.getUtils();
+		
+		return utils.getOldDisplayNames().containsKey(p.getUniqueId()) ? utils.getOldDisplayNames().get(p.getUniqueId()) : p.getName();
 	}
 	
 	public String getOldPlayerListName() {
-		return Utils.oldPlayerListNames.containsKey(p.getUniqueId()) ? Utils.oldPlayerListNames.get(p.getUniqueId()) : p.getName();
+		Utils utils = eazyNick.getUtils();
+		
+		return utils.getOldPlayerListNames().containsKey(p.getUniqueId()) ? utils.getOldPlayerListNames().get(p.getUniqueId()) : p.getName();
 	}
 	
 	public String getRank() {
-		return nickRanks.containsKey(p.getUniqueId()) ? nickRanks.get(p.getUniqueId()) : "NONE";
+		Utils utils = eazyNick.getUtils();
+		
+		return utils.getNickRanks().containsKey(p.getUniqueId()) ? utils.getNickRanks().get(p.getUniqueId()) : "NONE";
 	}
 	
 	public void setRank(String rank) {
-		nickRanks.put(p.getUniqueId(), rank);
+		Utils utils = eazyNick.getUtils();
+		
+		utils.getNickRanks().put(p.getUniqueId(), rank);
 	}
 	
 	public void unsetRank() {
-		if(nickRanks.containsKey(p.getUniqueId()))
-			nickRanks.remove(p.getUniqueId());
+		Utils utils = eazyNick.getUtils();
+		
+		if(utils.getNickRanks().containsKey(p.getUniqueId()))
+			utils.getNickRanks().remove(p.getUniqueId());
 	}
 	
 	public void updateLuckPerms(String prefix, String suffix) {
-		if(Utils.luckPermsStatus()) {
+		Utils utils = eazyNick.getUtils();
+		
+		if(utils.luckPermsStatus()) {
 			LuckPerms api = LuckPermsProvider.get();
 			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
 			NodeBuilderRegistry nodeFactory = api.getNodeBuilderRegistry();
@@ -531,22 +574,24 @@ public class NickManager {
 			user.transientData().add((Node) suffixNode);
 			api.getUserManager().saveUser(user);
 			
-			Utils.luckPermsPrefixes.put(p.getUniqueId(), prefixNode);
-			Utils.luckPermsSuffixes.put(p.getUniqueId(), suffixNode);
+			utils.getLuckPermsPrefixes().put(p.getUniqueId(), prefixNode);
+			utils.getLuckPermsSuffixes().put(p.getUniqueId(), suffixNode);
 		}
 	}
 
 	public void resetLuckPerms() {
-		if(Utils.luckPermsStatus()) {
-			if(Utils.luckPermsPrefixes.containsKey(p.getUniqueId()) && Utils.luckPermsSuffixes.containsKey(p.getUniqueId())) {
+		Utils utils = eazyNick.getUtils();
+		
+		if(utils.luckPermsStatus()) {
+			if(utils.getLuckPermsPrefixes().containsKey(p.getUniqueId()) && utils.getLuckPermsSuffixes().containsKey(p.getUniqueId())) {
 				LuckPerms api = LuckPermsProvider.get();
 				net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
-				user.transientData().remove((Node) Utils.luckPermsPrefixes.get(p.getUniqueId()));
-				user.transientData().remove((Node) Utils.luckPermsSuffixes.get(p.getUniqueId()));
+				user.transientData().remove((Node) utils.getLuckPermsPrefixes().get(p.getUniqueId()));
+				user.transientData().remove((Node) utils.getLuckPermsSuffixes().get(p.getUniqueId()));
 				api.getUserManager().saveUser(user);
 				
-				Utils.luckPermsPrefixes.remove(p.getUniqueId());
-				Utils.luckPermsSuffixes.remove(p.getUniqueId());
+				utils.getLuckPermsPrefixes().remove(p.getUniqueId());
+				utils.getLuckPermsSuffixes().remove(p.getUniqueId());
 			}
 		}
 	}
@@ -556,7 +601,13 @@ public class NickManager {
 	}
 	
 	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String groupName) {
-		if(Utils.placeholderAPIStatus()) {
+		Utils utils = eazyNick.getUtils();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		
+		final String finalTabPrefix = tabPrefix;
+		final String finalTabSuffix = tabSuffix;
+		
+		if(utils.placeholderAPIStatus()) {
 			tagPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
 			tagSuffix = PlaceholderAPI.setPlaceholders(p, tagSuffix);
 			chatPrefix = PlaceholderAPI.setPlaceholders(p, chatPrefix);
@@ -565,155 +616,158 @@ public class NickManager {
 			tabSuffix = PlaceholderAPI.setPlaceholders(p, tabSuffix);
 		}
 
-		if(chatPrefixes.containsKey(p.getUniqueId()))
-			chatPrefixes.remove(p.getUniqueId());
+		if(utils.getChatPrefixes().containsKey(p.getUniqueId()))
+			utils.getChatPrefixes().remove(p.getUniqueId());
 			
-		if(chatSuffixes.containsKey(p.getUniqueId()))
-			chatSuffixes.remove(p.getUniqueId());
+		if(utils.getChatSuffixes().containsKey(p.getUniqueId()))
+			utils.getChatSuffixes().remove(p.getUniqueId());
 		
-		if(tabPrefixes.containsKey(p.getUniqueId()))
-			tabPrefixes.remove(p.getUniqueId());
+		if(utils.getTabPrefixes().containsKey(p.getUniqueId()))
+			utils.getTabPrefixes().remove(p.getUniqueId());
 		
-		if(tabSuffixes.containsKey(p.getUniqueId()))
-			tabSuffixes.remove(p.getUniqueId());
+		if(utils.getTabSuffixes().containsKey(p.getUniqueId()))
+			utils.getTabSuffixes().remove(p.getUniqueId());
 		
-		chatPrefixes.put(p.getUniqueId(), chatPrefix);
-		chatSuffixes.put(p.getUniqueId(), chatSuffix);
-		tabPrefixes.put(p.getUniqueId(), tabPrefix);
-		tabSuffixes.put(p.getUniqueId(), tabSuffix);
+		utils.getChatPrefixes().put(p.getUniqueId(), chatPrefix);
+		utils.getChatSuffixes().put(p.getUniqueId(), chatSuffix);
+		utils.getTabPrefixes().put(p.getUniqueId(), tabPrefix);
+		utils.getTabSuffixes().put(p.getUniqueId(), tabSuffix);
 		
 		changeCloudNET(tagPrefix, tagSuffix);
 
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
-			if(Utils.scoreboardTeamManagers.containsKey(p.getUniqueId()))
-				Utils.scoreboardTeamManagers.remove(p.getUniqueId());
+		if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.NameTagColored")) {
+			if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
+				utils.getScoreboardTeamManagers().remove(p.getUniqueId());
 				
-			Utils.scoreboardTeamManagers.put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
+			utils.getScoreboardTeamManagers().put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
 			
-			ScoreboardTeamManager sbtm = Utils.scoreboardTeamManagers.get(p.getUniqueId());
-			String finalTabPrefix = tabPrefix;
-			String finalTabSuffix = tabSuffix;
+			ScoreboardTeamManager sbtm = utils.getScoreboardTeamManagers().get(p.getUniqueId());
 			
 			new Timer().schedule(new TimerTask() {
 				
 				@Override
 				public void run() {
 					UUID uuid = p.getUniqueId();
+
+					sbtm.destroyTeam();
 					
-					if(EazyNick.getInstance().isEnabled()) {
-						if(Utils.nickedPlayers.contains(uuid)) {
-							if((p != null) && p.isOnline()) {
-								sbtm.destroyTeam();
-								sbtm.createTeam();
-								
-								if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
-									setPlayerListName(finalTabPrefix + p.getName() + finalTabSuffix);
-							} else {
-								sbtm.destroyTeam();
-								cancel();
+					if(EazyNick.getInstance().isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline()) {
+						sbtm.createTeam();
+						
+						if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored")) {
+							String tmpTabPrefix = finalTabPrefix;
+							String tmpTabSuffix = finalTabSuffix;
+							
+							if(utils.placeholderAPIStatus()) {
+								tmpTabPrefix = PlaceholderAPI.setPlaceholders(p, tmpTabPrefix);
+								tmpTabSuffix = PlaceholderAPI.setPlaceholders(p, tmpTabPrefix);
 							}
-						} else {
-							sbtm.destroyTeam();
-							cancel();
+							
+							setPlayerListName(tmpTabPrefix + p.getName() + tmpTabSuffix);
 						}
-					} else {
-						sbtm.destroyTeam();
+					} else
 						cancel();
-					}
 				}
-			}, 0, 1000);
+			}, 0, 175);
 		}
 		
-		setPlayerListName(tabPrefix + p.getName() + tabSuffix);
+		if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.PlayerListNameColored"))
+			setPlayerListName(tabPrefix + p.getName() + tabSuffix);
 		
-		if(FileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored"))
+		if(fileUtils.cfg.getBoolean("Settings.NameChangeOptions.DisplayNameColored"))
 			p.setDisplayName(chatPrefix + p.getName() + chatSuffix);
 		
-		if(Utils.nameTagEditStatus()) {
-			if(Utils.nametagEditPrefixes.containsKey(p.getUniqueId()) && Utils.nametagEditSuffixes.containsKey(p.getUniqueId())) {
-				Utils.nametagEditPrefixes.remove(p.getUniqueId());
-				Utils.nametagEditSuffixes.remove(p.getUniqueId());
+		if(utils.nameTagEditStatus()) {
+			if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) && utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
+				utils.getNametagEditPrefixes().remove(p.getUniqueId());
+				utils.getNametagEditSuffixes().remove(p.getUniqueId());
 			}
 			
 			INametagApi nametagEditAPI = NametagEdit.getApi();
 			Nametag nametag = nametagEditAPI.getNametag(p);
-			
-			Utils.nametagEditPrefixes.put(p.getUniqueId(), nametag.getPrefix());
-			Utils.nametagEditSuffixes.put(p.getUniqueId(), nametag.getSuffix());
-			
+
+			utils.getNametagEditPrefixes().put(p.getUniqueId(), nametag.getPrefix());
+			utils.getNametagEditSuffixes().put(p.getUniqueId(), nametag.getSuffix());
+
 			nametagEditAPI.setPrefix(p, tagPrefix);
 			nametagEditAPI.setSuffix(p, tagSuffix);
 			nametagEditAPI.setNametag(p, tagPrefix, tagSuffix);
 			nametagEditAPI.reloadNametag(p);
 		}
 		
-		if(Utils.ultraPermissionsStatus()) {
-			if(Utils.ultraPermsPrefixes.containsKey(p.getUniqueId()) && Utils.ultraPermsSuffixes.containsKey(p.getUniqueId())) {
-				Utils.ultraPermsPrefixes.remove(p.getUniqueId());
-				Utils.ultraPermsSuffixes.remove(p.getUniqueId());
+		if(utils.ultraPermissionsStatus()) {
+			if(utils.getUltraPermsPrefixes().containsKey(p.getUniqueId()) && utils.getUltraPermsSuffixes().containsKey(p.getUniqueId())) {
+				utils.getUltraPermsPrefixes().remove(p.getUniqueId());
+				utils.getUltraPermsSuffixes().remove(p.getUniqueId());
 			}
 			
 			me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
 			
-			Utils.ultraPermsPrefixes.put(p.getUniqueId(), user.getPrefix());
-			Utils.ultraPermsSuffixes.put(p.getUniqueId(), user.getSuffix());
+			utils.getUltraPermsPrefixes().put(p.getUniqueId(), user.getPrefix());
+			utils.getUltraPermsSuffixes().put(p.getUniqueId(), user.getSuffix());
 			
 			user.setPrefix(tabPrefix);
 			user.setSuffix(tabSuffix);
 			user.save();
 		}
 		
-		if(Utils.permissionsExStatus()) {
+		if(utils.permissionsExStatus()) {
 			PermissionUser user = PermissionsEx.getUser(p);
 		
-			if(FileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
+			if(fileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
 				String groupNames = "";
 
 				for (PermissionGroup group : user.getGroups())
 					groupNames += (" " + group.getName());
 				
-				if(!(Utils.oldPermissionsExGroups.containsKey(p.getUniqueId())))
-					Utils.oldPermissionsExGroups.put(p.getUniqueId(), groupNames.trim().split(" "));
+				if(!(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId())))
+					utils.getOldPermissionsExGroups().put(p.getUniqueId(), groupNames.trim().split(" "));
 				
 				user.setGroups(new String[] { groupName });
 			} else {
-				Utils.oldPermissionsExPrefixes.put(p.getUniqueId(), user.getPrefix());
-				Utils.oldPermissionsExSuffixes.put(p.getUniqueId(), user.getSuffix());
+				utils.getOldPermissionsExPrefixes().put(p.getUniqueId(), user.getPrefix());
+				utils.getOldPermissionsExSuffixes().put(p.getUniqueId(), user.getSuffix());
 				
 				user.setPrefix(tabPrefix, p.getWorld().getName());
 				user.setSuffix(tabSuffix, p.getWorld().getName());
 			}
 		}
 		
-		if(Utils.tabStatus() && !(TABAPI.hasHiddenNametag(p.getUniqueId()))) {
+		if(utils.tabStatus() && !(TABAPI.hasHiddenNametag(p.getUniqueId()))) {
+			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTABNAME, getNickName());
+			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTAGNAME, getNickName());
 			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TABPREFIX, tabPrefix);
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TABSUFFIX, tagSuffix);
+			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TABSUFFIX, tabSuffix);
 			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TAGPREFIX, tagPrefix);
 			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TAGSUFFIX, tagSuffix);
+			TABAPI.hideNametag(p.getUniqueId());
 			TABAPI.showNametag(p.getUniqueId());
 		}
 	}
 	
 	public void changeCloudNET(String prefix, String suffix) {
-		if(Utils.cloudNetStatus()) {
+		Utils utils = eazyNick.getUtils();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		
+		if(utils.cloudNetStatus()) {
 			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
 			
-			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+			if(fileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
 				PermissionEntity entity = cloudPlayer.getPermissionEntity();
 				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
 				
-				if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId()))
-					Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
+				if(utils.getOldCloudNETPrefixes().containsKey(p.getUniqueId()))
+					utils.getOldCloudNETPrefixes().remove(p.getUniqueId());
 				
-				if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId()))
-					Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
+				if(utils.getOldCloudNETSuffixes().containsKey(p.getUniqueId()))
+					utils.getOldCloudNETSuffixes().remove(p.getUniqueId());
 				
-				if(Utils.oldCloudNETTagIDS.containsKey(p.getUniqueId()))
-					Utils.oldCloudNETTagIDS.remove(p.getUniqueId());
+				if(utils.getOldCloudNETTagIDS().containsKey(p.getUniqueId()))
+					utils.getOldCloudNETTagIDS().remove(p.getUniqueId());
 				
-				Utils.oldCloudNETPrefixes.put(p.getUniqueId(), entity.getPrefix());
-				Utils.oldCloudNETSuffixes.put(p.getUniqueId(), entity.getSuffix());
-				Utils.oldCloudNETTagIDS.put(p.getUniqueId(), highestPermissionGroup.getTagId());
+				utils.getOldCloudNETPrefixes().put(p.getUniqueId(), entity.getPrefix());
+				utils.getOldCloudNETSuffixes().put(p.getUniqueId(), entity.getSuffix());
+				utils.getOldCloudNETTagIDS().put(p.getUniqueId(), highestPermissionGroup.getTagId());
 				
 				entity.setPrefix(prefix);
 				entity.setSuffix(suffix);
@@ -725,28 +779,31 @@ public class NickManager {
 	}
 	
 	public void resetCloudNET() {
-		if(Utils.cloudNetStatus()) {
+		Utils utils = eazyNick.getUtils();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		
+		if(utils.cloudNetStatus()) {
 			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
 			
-			if(FileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+			if(fileUtils.cfg.getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
 				PermissionEntity entity = cloudPlayer.getPermissionEntity();
 				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
 				
-				if(Utils.oldCloudNETPrefixes.containsKey(p.getUniqueId())) {
-					entity.setPrefix(Utils.oldCloudNETPrefixes.get(p.getUniqueId()));
-					highestPermissionGroup.setPrefix(Utils.oldCloudNETPrefixes.get(p.getUniqueId()));
-					Utils.oldCloudNETPrefixes.remove(p.getUniqueId());
+				if(utils.getOldCloudNETPrefixes().containsKey(p.getUniqueId())) {
+					entity.setPrefix(utils.getOldCloudNETPrefixes().get(p.getUniqueId()));
+					highestPermissionGroup.setPrefix(utils.getOldCloudNETPrefixes().get(p.getUniqueId()));
+					utils.getOldCloudNETPrefixes().remove(p.getUniqueId());
 				}
 				
-				if(Utils.oldCloudNETSuffixes.containsKey(p.getUniqueId())) {
-					entity.setSuffix(Utils.oldCloudNETSuffixes.get(p.getUniqueId()));
-					highestPermissionGroup.setSuffix(Utils.oldCloudNETSuffixes.get(p.getUniqueId()));
-					Utils.oldCloudNETSuffixes.remove(p.getUniqueId());
+				if(utils.getOldCloudNETSuffixes().containsKey(p.getUniqueId())) {
+					entity.setSuffix(utils.getOldCloudNETSuffixes().get(p.getUniqueId()));
+					highestPermissionGroup.setSuffix(utils.getOldCloudNETSuffixes().get(p.getUniqueId()));
+					utils.getOldCloudNETSuffixes().remove(p.getUniqueId());
 				}
 				
-				if(Utils.oldCloudNETTagIDS.containsKey(p.getUniqueId())) {
-					highestPermissionGroup.setTagId(Utils.oldCloudNETTagIDS.get(p.getUniqueId()));
-					Utils.oldCloudNETTagIDS.remove(p.getUniqueId());
+				if(utils.getOldCloudNETTagIDS().containsKey(p.getUniqueId())) {
+					highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDS().get(p.getUniqueId()));
+					utils.getOldCloudNETTagIDS().remove(p.getUniqueId());
 				}
 			}
 		}

@@ -23,23 +23,21 @@ import net.dev.eazynick.utils.ReflectUtils;
 
 public class AnvilGUI {
 	
+	private EazyNick eazyNick;
 	private Player p;
 	public AnvilClickEventHandler handler;
-	private static Class<?> blockPosition;
-	private static Class<?> containerAnvil;
-	private static Class<?> entityHuman;
 	private HashMap<AnvilSlot, ItemStack> items = new HashMap<AnvilSlot, ItemStack>();
+	private Class<?> blockPosition, containerAnvil, entityHuman;
 	private Inventory inv;
 	private Listener listener;
 
-	private void loadClasses() {
-		blockPosition = ReflectUtils.getNMSClass("BlockPosition");
-		containerAnvil = ReflectUtils.getNMSClass("ContainerAnvil");
-		entityHuman = ReflectUtils.getNMSClass("EntityHuman");
-	}
-
 	public AnvilGUI(final Player p, final AnvilClickEventHandler handler) {
-		loadClasses();
+		eazyNick = EazyNick.getInstance();
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
+		blockPosition = reflectUtils.getNMSClass("BlockPosition");
+		containerAnvil = reflectUtils.getNMSClass("ContainerAnvil");
+		entityHuman = reflectUtils.getNMSClass("EntityHuman");
 		
 		this.p = p;
 		this.handler = handler;
@@ -116,13 +114,15 @@ public class AnvilGUI {
 	}
 
 	public void open() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
 		p.setLevel(p.getLevel() + 1);
 
 		try {
 			Object player = p.getClass().getMethod("getHandle").invoke(p);
-			Object container = containerAnvil.getConstructor(ReflectUtils.getNMSClass("PlayerInventory"), ReflectUtils.getNMSClass("World"), blockPosition, entityHuman).newInstance(getPlayerField(p, "inventory"), getPlayerField(p, "world"), blockPosition.getConstructor(int.class, int.class, int.class).newInstance(0, 0, 0), player);
+			Object container = containerAnvil.getConstructor(reflectUtils.getNMSClass("PlayerInventory"), reflectUtils.getNMSClass("World"), blockPosition, entityHuman).newInstance(getPlayerField(p, "inventory"), getPlayerField(p, "world"), blockPosition.getConstructor(int.class, int.class, int.class).newInstance(0, 0, 0), player);
 			
-			ReflectUtils.getField(ReflectUtils.getNMSClass("Container"), "checkReachable").set(container, false);
+			reflectUtils.getField(reflectUtils.getNMSClass("Container"), "checkReachable").set(container, false);
 
 			Object bukkitView = invokeMethod("getBukkitView", container);
 			inv = (Inventory) invokeMethod("getTopInventory", bukkitView);
@@ -131,21 +131,21 @@ public class AnvilGUI {
 				inv.setItem(slot.getSlot(), items.get(slot));
 
 			int c = (int) invokeMethod("nextContainerCounter", player);
-			Constructor<?> chatMessageConstructor = ReflectUtils.getNMSClass("ChatMessage").getConstructor(String.class, Object[].class);
+			Constructor<?> chatMessageConstructor = reflectUtils.getNMSClass("ChatMessage").getConstructor(String.class, Object[].class);
 			Object playerConnection = getPlayerField(p, "playerConnection");
-			Object packet = ReflectUtils.getNMSClass("PacketPlayOutOpenWindow").getConstructor(int.class, String.class, ReflectUtils.getNMSClass("IChatBaseComponent"), int.class).newInstance(c, "minecraft:anvil", chatMessageConstructor.newInstance("Repairing", new Object[] {}), 0);
+			Object packet = reflectUtils.getNMSClass("PacketPlayOutOpenWindow").getConstructor(int.class, String.class, reflectUtils.getNMSClass("IChatBaseComponent"), int.class).newInstance(c, "minecraft:anvil", chatMessageConstructor.newInstance("Repairing", new Object[] {}), 0);
 
-			Method sendPacket = getMethod("sendPacket", playerConnection.getClass(), ReflectUtils.getNMSClass("Packet"));
+			Method sendPacket = getMethod("sendPacket", playerConnection.getClass(), reflectUtils.getNMSClass("Packet"));
 			sendPacket.invoke(playerConnection, packet);
 
-			Field activeContainerField = ReflectUtils.getField(entityHuman, "activeContainer");
+			Field activeContainerField = reflectUtils.getField(entityHuman, "activeContainer");
 			
 			if (activeContainerField != null) {
 				activeContainerField.set(player, container);
 
-				ReflectUtils.getField(ReflectUtils.getNMSClass("Container"), "windowId").set(activeContainerField.get(player), c);
+				reflectUtils.getField(reflectUtils.getNMSClass("Container"), "windowId").set(activeContainerField.get(player), c);
 
-				activeContainerField.get(player).getClass().getMethod("addSlotListener", ReflectUtils.getNMSClass("ICrafting")).invoke(activeContainerField.get(player), player);
+				activeContainerField.get(player).getClass().getMethod("addSlotListener", reflectUtils.getNMSClass("ICrafting")).invoke(activeContainerField.get(player), player);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

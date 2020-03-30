@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -12,21 +11,17 @@ import net.dev.eazynick.EazyNick;
 
 public class BookGUIFileUtils {
 
-	public static File folder = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/");
-	public static File file = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/bookgui.yml");
-	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+	private File directory, file;
+	public YamlConfiguration cfg;
 	
-	public static void saveFile() {
-		try {
-			cfg.save(file);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	public static void setupFiles() {
-		if (!(folder.exists()))
-			folder.mkdir();
+	public BookGUIFileUtils() {
+		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
+		
+		directory = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/");
+		file = new File(directory, "bookgui.yml");
+				
+		if (!(directory.exists()))
+			directory.mkdir();
 
 		if (!(file.exists())) {
 			try {
@@ -35,9 +30,9 @@ public class BookGUIFileUtils {
 				ex.printStackTrace();
 			}
 		}
-
-		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
 		
+		cfg = YamlConfiguration.loadConfiguration(file);
+
 		cfg.options().header("This plugin was coded by " + desc.getAuthors().toString().replace("[", "").replace("]", "") +  " - YouTube: https://www.youtube.com/c/JustixDevelopment"
 				+ "\n"
 				+ "\nColorCodes can be found here: http://minecraft.tools/en/color-code.php"
@@ -174,8 +169,20 @@ public class BookGUIFileUtils {
 		saveFile();
 	}
 	
-	public static String getConfigString(String path) {
+	public void saveFile() {
+		try {
+			cfg.save(file);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public String getConfigString(String path) {
 		return ChatColor.translateAlternateColorCodes('&', cfg.getString(path));
+	}
+	
+	public File getFile() {
+		return file;
 	}
 	
 }

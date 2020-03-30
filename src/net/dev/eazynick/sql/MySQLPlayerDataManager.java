@@ -4,16 +4,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.utils.FileUtils;
-
 public class MySQLPlayerDataManager {
 
-	public static String getOldPermissionsExRank(UUID uuid) {
-		if(EazyNick.mysql.isConnected()) {
+	private MySQL mysql;
+	
+	public MySQLPlayerDataManager(MySQL mysql) {
+		this.mysql = mysql;
+	}
+	
+	public String getOldPermissionsExRank(UUID uuid) {
+		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
-					ResultSet rs = EazyNick.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
 					if(rs.next())
 						return rs.getString("OldPermissionsExRank");
@@ -26,11 +29,11 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public static String getChatPrefix(UUID uuid) {
-		if(EazyNick.mysql.isConnected()) {
+	public String getChatPrefix(UUID uuid) {
+		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
-					ResultSet rs = EazyNick.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
 					if(rs.next())
 						return rs.getString("ChatPrefix");
@@ -43,11 +46,11 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public static String getChatSuffix(UUID uuid) {
-		if(EazyNick.mysql.isConnected()) {
+	public String getChatSuffix(UUID uuid) {
+		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
-					ResultSet rs = EazyNick.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
 					if(rs.next())
 						return rs.getString("ChatSuffix");
@@ -60,11 +63,11 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public static String getTabPrefix(UUID uuid) {
-		if(EazyNick.mysql.isConnected()) {
+	public String getTabPrefix(UUID uuid) {
+		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
-					ResultSet rs = EazyNick.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
 					if(rs.next())
 						return rs.getString("TabPrefix");
@@ -77,11 +80,11 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public static String getTabSuffix(UUID uuid) {
-		if(EazyNick.mysql.isConnected()) {
+	public String getTabSuffix(UUID uuid) {
+		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
-					ResultSet rs = EazyNick.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
 					if(rs.next())
 						return rs.getString("TabSuffix");
@@ -94,11 +97,11 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public static String getTagPrefix(UUID uuid) {
-		if(EazyNick.mysql.isConnected()) {
+	public String getTagPrefix(UUID uuid) {
+		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
-					ResultSet rs = EazyNick.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
 					if(rs.next())
 						return rs.getString("TagPrefix");
@@ -111,11 +114,11 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public static String getTagSuffix(UUID uuid) {
-		if(EazyNick.mysql.isConnected()) {
+	public String getTagSuffix(UUID uuid) {
+		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
-					ResultSet rs = EazyNick.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
 					if(rs.next())
 						return rs.getString("TagSuffix");
@@ -128,39 +131,33 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public static void insertData(UUID uuid, String oldPermissionsExRank, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
-		if(FileUtils.cfg.getBoolean("BungeeCord")) {
-			if(EazyNick.mysql.isConnected()) {
-				if(isRegistered(uuid))
-					removeData(uuid);
-				
-				EazyNick.mysql.update("INSERT INTO NickedPlayerDatas (UUID, OldPermissionsExRank, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + oldPermissionsExRank + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
-			}
+	public void insertData(UUID uuid, String oldPermissionsExRank, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
+		if(mysql.isConnected()) {
+			if(isRegistered(uuid))
+				removeData(uuid);
+			
+			mysql.update("INSERT INTO NickedPlayerDatas (UUID, OldPermissionsExRank, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + oldPermissionsExRank + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
 		}
 	}
 	
-	public static void removeData(UUID uuid) {
-		if(FileUtils.cfg.getBoolean("BungeeCord")) {
-			if(EazyNick.mysql.isConnected()) {
-				if(isRegistered(uuid))
-					EazyNick.mysql.update("DELETE FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-			}
+	public void removeData(UUID uuid) {
+		if(mysql.isConnected()) {
+			if(isRegistered(uuid))
+				mysql.update("DELETE FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 		}
 	}
 
-	public static boolean isRegistered(UUID uuid) {
-		if(FileUtils.cfg.getBoolean("BungeeCord")) {
-			if(EazyNick.mysql.isConnected()) {
-				try {
-					ResultSet rs = EazyNick.mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-					
-					if(rs.next()) {
-						if(rs.getString("OldPermissionsExRank") != null)
-							return true;
-					}
-				} catch (SQLException ex) {
-					ex.printStackTrace();
+	public boolean isRegistered(UUID uuid) {
+		if(mysql.isConnected()) {
+			try {
+				ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+				
+				if(rs.next()) {
+					if(rs.getString("OldPermissionsExRank") != null)
+						return true;
 				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 		}
 		

@@ -31,21 +31,21 @@ import com.mojang.util.UUIDTypeAdapter;
 
 public class GameProfileBuilder {
 	
-	private static final String SERVICE_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
-	private static final String JSON_SKIN = "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"}}}";
-	private static final String JSON_CAPE = "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"},\"CAPE\":{\"url\":\"%s\"}}}";
+	private final String SERVICE_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
+	private final String JSON_SKIN = "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"}}}";
+	private final String JSON_CAPE = "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"},\"CAPE\":{\"url\":\"%s\"}}}";
    
-	private static Gson gson = new GsonBuilder().disableHtmlEscaping().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).registerTypeAdapter(GameProfile.class, new GameProfileSerializer()).registerTypeAdapter(PropertyMap.class, new PropertyMap.Serializer()).create();
+	private Gson gson = new GsonBuilder().disableHtmlEscaping().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).registerTypeAdapter(GameProfile.class, new GameProfileSerializer()).registerTypeAdapter(PropertyMap.class, new PropertyMap.Serializer()).create();
    
-	private static HashMap<UUID, CachedProfile> cache = new HashMap<UUID, CachedProfile>();
+	private HashMap<UUID, CachedProfile> cache = new HashMap<UUID, CachedProfile>();
    
-	private static long cacheTime = -1;
+	private long cacheTime = -1;
 	
-	public static GameProfile fetch(UUID uuid) throws IOException {
+	public GameProfile fetch(UUID uuid) throws IOException {
 		return fetch(uuid, false);
 	}
    
-	public static GameProfile fetch(UUID uuid, boolean forceNew) throws IOException {
+	public GameProfile fetch(UUID uuid, boolean forceNew) throws IOException {
 		if(!forceNew && cache.containsKey(uuid) && cache.get(uuid).isValid())
 			return cache.get(uuid).profile;
 		else {
@@ -69,11 +69,11 @@ public class GameProfileBuilder {
 		}
 	}
    
-	public static GameProfile getProfile(UUID uuid, String name, String skin) {
+	public GameProfile getProfile(UUID uuid, String name, String skin) {
 		return getProfile(uuid, name, skin, null);
 	}
    
-	public static GameProfile getProfile(UUID uuid, String name, String skinUrl, String capeUrl) {
+	public GameProfile getProfile(UUID uuid, String name, String skinUrl, String capeUrl) {
 		GameProfile profile = new GameProfile(uuid, name);
 		boolean cape = capeUrl != null && !capeUrl.isEmpty();
 		
@@ -91,11 +91,11 @@ public class GameProfileBuilder {
 		return profile;
 	}
    
-	public static void setCacheTime(long time) {
+	public void setCacheTime(long time) {
 		cacheTime = time;
 	}
    
-	private static class GameProfileSerializer implements JsonSerializer<GameProfile>, JsonDeserializer<GameProfile> {
+	private class GameProfileSerializer implements JsonSerializer<GameProfile>, JsonDeserializer<GameProfile> {
       
 		@Override
 		public GameProfile deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
@@ -129,7 +129,7 @@ public class GameProfileBuilder {
 		}
 	}
    
-	private static class CachedProfile { 
+	private class CachedProfile { 
 		
 		private long timestamp = System.currentTimeMillis();
 		private GameProfile profile;

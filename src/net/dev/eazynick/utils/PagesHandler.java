@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import net.dev.eazynick.EazyNick;
+
 public class PagesHandler<T> {
 
 	private int pageSize;
@@ -50,13 +52,17 @@ public class PagesHandler<T> {
 	}
 
 	public void createPage(Player p, int page) {
-		Inventory inv = Bukkit.createInventory(null, 45, LanguageFileUtils.getConfigString("NickNameGUI.InventoryTitle").replace("%currentPage%", "" + (page + 1)));
+		EazyNick eazyNick = EazyNick.getInstance();
+		Utils utils = eazyNick.getUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		
+		Inventory inv = Bukkit.createInventory(null, 45, languageFileUtils.getConfigString("NickNameGUI.InventoryTitle").replace("%currentPage%", "" + (page + 1)));
 		
 		for (T nickName : getPage(page))
-			inv.setItem(inv.firstEmpty(), Utils.createSkull(1, LanguageFileUtils.getConfigString("NickNameGUI.NickNameSkull.DisplayName").replace("%nickName%", (String) nickName), (String) nickName));
+			inv.setItem(inv.firstEmpty(), utils.createSkull(1, languageFileUtils.getConfigString("NickNameGUI.NickNameSkull.DisplayName").replace("%nickName%", (String) nickName), (String) nickName));
 
-		inv.setItem(38, Utils.createItem(Material.ARROW, 1, 0, LanguageFileUtils.getConfigString("NickNameGUI.BackItem.DisplayName")));
-		inv.setItem(42, Utils.createItem(Material.ARROW, 1, 0, LanguageFileUtils.getConfigString("NickNameGUI.NextItem.DisplayName")));
+		inv.setItem(38, utils.createItem(Material.ARROW, 1, 0, languageFileUtils.getConfigString("NickNameGUI.BackItem.DisplayName")));
+		inv.setItem(42, utils.createItem(Material.ARROW, 1, 0, languageFileUtils.getConfigString("NickNameGUI.NextItem.DisplayName")));
 		
 		p.openInventory(inv);
 	}

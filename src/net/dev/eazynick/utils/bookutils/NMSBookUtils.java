@@ -12,7 +12,9 @@ import io.netty.buffer.Unpooled;
 
 public class NMSBookUtils extends ReflectUtils {
 
-	public static void open(Player p, ItemStack book) {
+	public void open(Player p, ItemStack book) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		
 		ItemStack hand = p.getItemInHand();
 		
 		try {
@@ -22,11 +24,11 @@ public class NMSBookUtils extends ReflectUtils {
 			
 			p.setItemInHand(book);
 			
-			if(!(EazyNick.version.startsWith("1_8"))) {
+			if(!(eazyNick.getVersion().startsWith("1_8"))) {
 				Class<?> enumHand = getNMSClass("EnumHand");
 				Object mainHand = getField(enumHand, "MAIN_HAND").get(enumHand);
 				
-				if(Bukkit.getVersion().contains("1.14.4") || EazyNick.version.startsWith("1_15")) {
+				if(Bukkit.getVersion().contains("1.14.4") || eazyNick.getVersion().startsWith("1_15")) {
 					Class<?> itemWrittenBook = getNMSClass("ItemWrittenBook");
 					
 					if ((boolean) itemWrittenBook.getMethod("a", getNMSClass("ItemStack"), getNMSClass("CommandListenerWrapper"), getNMSClass("EntityHuman")).invoke(itemWrittenBook, nmsItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {

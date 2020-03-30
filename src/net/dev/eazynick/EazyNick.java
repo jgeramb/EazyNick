@@ -3,59 +3,62 @@ package net.dev.eazynick;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mojang.authlib.GameProfile;
 
-import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.commands.BookGUICommand;
-import net.dev.eazynick.commands.BookNickCommand;
-import net.dev.eazynick.commands.ChangeSkinCommand;
-import net.dev.eazynick.commands.CommandNotAvaiableCommand;
-import net.dev.eazynick.commands.FixSkinCommand;
-import net.dev.eazynick.commands.NameCommand;
-import net.dev.eazynick.commands.NickCommand;
-import net.dev.eazynick.commands.NickGuiCommand;
-import net.dev.eazynick.commands.NickHelpCommand;
-import net.dev.eazynick.commands.NickListCommand;
-import net.dev.eazynick.commands.NickOtherCommand;
-import net.dev.eazynick.commands.NickUpdateCheckCommand;
-import net.dev.eazynick.commands.NickedPlayersCommand;
-import net.dev.eazynick.commands.ReNickCommand;
-import net.dev.eazynick.commands.RealNameCommand;
-import net.dev.eazynick.commands.ReloadConfigCommand;
-import net.dev.eazynick.commands.ResetNameCommand;
-import net.dev.eazynick.commands.ResetSkinCommand;
-import net.dev.eazynick.commands.ToggleBungeeNickCommand;
-import net.dev.eazynick.commands.UnnickCommand;
-import net.dev.eazynick.listeners.DeluxeChatHookListener;
-import net.dev.eazynick.listeners.NickListener;
-import net.dev.eazynick.placeholders.PlaceHolderExpansion;
-import net.dev.eazynick.sql.MySQL;
-import net.dev.eazynick.updater.SpigotUpdater;
-import net.dev.eazynick.utils.BookGUIFileUtils;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.NickNameFileUtils;
-import net.dev.eazynick.utils.ReflectUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.api.*;
+import net.dev.eazynick.commands.*;
+import net.dev.eazynick.listeners.*;
+import net.dev.eazynick.placeholders.*;
+import net.dev.eazynick.sql.*;
+import net.dev.eazynick.updater.*;
+import net.dev.eazynick.utils.*;
+import net.dev.eazynick.utils.bookutils.*;
+import net.dev.eazynick.utils.nickutils.*;
+import net.dev.eazynick.utils.signutils.*;
 
 public class EazyNick extends JavaPlugin {
 
-	public static File pluginFile;
-	public static MySQL mysql;
-	public static String version = "XX_XX_RXX";
-	private static boolean isCancelled;
 	private static EazyNick instance;
 	
 	public static EazyNick getInstance() {
 		return instance;
 	}
+	
+	private File pluginFile;
+	private String version = "XX_XX_RXX";
+	private boolean isCancelled;
 
+	private MySQL mysql;
+	private MySQLNickManager mysqlNickManager;
+	private MySQLPlayerDataManager mysqlPlayerDataManager;
+	
+	private SpigotUpdater spigotUpdater;
+	private Utils utils;
+	private ActionBarUtils actionBarUtils;
+	private FileUtils fileUtils;
+	private NickNameFileUtils nickNameFileUtils;
+	private BookGUIFileUtils bookGUIFileUtils;
+	private LanguageFileUtils languageFileUtils;
+	private ReflectUtils reflectUtils;
+	private NMSBookBuilder nmsBookBuilder;
+	private NMSBookUtils nmsBookUtils;
+	private GameProfileBuilder_1_7 gameProfileBuilder_1_7;
+	private GameProfileBuilder_1_8_R1 gameProfileBuilder_1_8_R1;
+	private GameProfileBuilder gameProfileBuilder;
+	private NMSNickManager nmsNickManager;
+	private UUIDFetcher_1_7 uuidFetcher_1_7;
+	private UUIDFetcher_1_8_R1 uuidFetcher_1_8_R1;
+	private UUIDFetcher uuidFetcher;
+	private SignGUI signGUI;
+	
 	@Override
 	public void onEnable() {
 		instance = this;
@@ -66,80 +69,98 @@ public class EazyNick extends JavaPlugin {
 			public void run() {
 				long startMillis = System.currentTimeMillis();
 
+				PluginManager pm = Bukkit.getPluginManager();
+				
 				pluginFile = getFile();
 
-				FileUtils.setupFiles();
-				FileUtils.saveFile();
-
-				NickNameFileUtils.setupFiles();
-				NickNameFileUtils.saveFile();
+				utils = new Utils();
+				actionBarUtils = new ActionBarUtils();
+				fileUtils = new FileUtils();
+				nickNameFileUtils = new NickNameFileUtils();
+				bookGUIFileUtils = new BookGUIFileUtils();
+				spigotUpdater = new SpigotUpdater();
+				reflectUtils = new ReflectUtils();
+				signGUI = new SignGUI();
+				nmsBookBuilder = new NMSBookBuilder();
+				nmsBookUtils = new NMSBookUtils();
+				nmsNickManager = new NMSNickManager();
 				
-				BookGUIFileUtils.setupFiles();
-				BookGUIFileUtils.saveFile();
-				
-				Utils.nickNames = NickNameFileUtils.cfg.getStringList("NickNames");
-				Utils.blackList = FileUtils.cfg.getStringList("BlackList");
-				Utils.worldBlackList = FileUtils.cfg.getStringList("AutoNickWorldBlackList");
+				utils.setNickNames(nickNameFileUtils.cfg.getStringList("NickNames"));
 
-				if (Utils.blackList.size() >= 1) {
+				List<String> blackList = fileUtils.cfg.getStringList("BlackList");
+				List<String> worldBlackList = fileUtils.cfg.getStringList("AutoNickWorldBlackList");
+				
+				if (blackList.size() >= 1) {
 					ArrayList<String> toAdd = new ArrayList<>();
 					
-					for (String blackListName : Utils.blackList)
+					for (String blackListName : blackList)
 						toAdd.add(blackListName.toUpperCase());
 					
-					Utils.blackList = new ArrayList<>(toAdd);
+					utils.setBlackList(new ArrayList<>(toAdd));
 				}
 
-				if (Utils.worldBlackList.size() >= 1) {
+				if (worldBlackList.size() >= 1) {
 					ArrayList<String> toAdd = new ArrayList<>();
 					
-					for (String blackListWorld : Utils.worldBlackList)
+					for (String blackListWorld : worldBlackList)
 						toAdd.add(blackListWorld.toUpperCase());
 					
-					Utils.worldBlackList = new ArrayList<>(toAdd);
+					utils.setWorldBlackList(new ArrayList<>(toAdd));
 				}
 
-				Utils.prefix = LanguageFileUtils.getConfigString("Messages.Prefix");
-				Utils.noPerm = LanguageFileUtils.getConfigString("Messages.NoPerm");
-				Utils.notPlayer = LanguageFileUtils.getConfigString("Messages.NotPlayer");
+				utils.setPrefix(languageFileUtils.getConfigString("Messages.Prefix"));
+				utils.setNoPerm(languageFileUtils.getConfigString("Messages.NoPerm"));
+				utils.setNotPlayer(languageFileUtils.getConfigString("Messages.NotPlayer"));
 
-				Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
-				Utils.sendConsole("	§7Starting system...");
-				Utils.sendConsole("	§7");
-				Utils.sendConsole("	§7Scanning active §3Minecraft-Version §7...");
+				utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
+				utils.sendConsole("	§7Starting system...");
+				utils.sendConsole("	§7");
+				utils.sendConsole("	§7Scanning active §3Minecraft-Version §7...");
 
-				if (!(ReflectUtils.getVersion().equalsIgnoreCase("v1_7_R4")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R2")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_8_R3")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_9_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_9_R2")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_10_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_11_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_12_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_13_R2")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_14_R1")
-						|| ReflectUtils.getVersion().equalsIgnoreCase("v1_15_R1"))) {
-					Utils.sendConsole("	§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
-					Utils.sendConsole("	§7");
-					Utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
-					Utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
-					Utils.sendConsole("	§7Plugin-State§8: §cCANCELLED");
+				String reflectVersion = reflectUtils.getVersion();
+				
+				if (!(reflectVersion.equals("v1_7_R4") || reflectVersion.equals("v1_8_R1")
+						|| reflectVersion.equals("v1_8_R2") || reflectVersion.equals("v1_8_R3")
+						|| reflectVersion.equals("v1_9_R1") || reflectVersion.equals("v1_9_R2")
+						|| reflectVersion.equals("v1_10_R1") || reflectVersion.equals("v1_11_R1")
+						|| reflectVersion.equals("v1_12_R1") || reflectVersion.equals("v1_13_R1")
+						|| reflectVersion.equals("v1_13_R2") || reflectVersion.equals("v1_14_R1")
+						|| reflectVersion.equals("v1_15_R1"))) {
+					utils.sendConsole("	§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
+					utils.sendConsole("	§7");
+					utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+					utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
+					utils.sendConsole("	§7Plugin-State§8: §cCANCELLED");
 
 					isCancelled = true;
 				} else {
-					if (FileUtils.cfg.getBoolean("APIMode") == false) {
-						if (ReflectUtils.getVersion().equalsIgnoreCase("v1_7_R4")) {
-							Utils.nameField = ReflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "name");
-							Utils.uuidField = ReflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "id");
+					if (reflectVersion.equals("v1_7_R4")) {
+						utils.setNameField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "name"));
+						utils.setUUIDField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "id"));
+						
+						gameProfileBuilder_1_7 = new GameProfileBuilder_1_7();
+						uuidFetcher_1_7 = new UUIDFetcher_1_7();
+					} else {
+						utils.setNameField(reflectUtils.getField(GameProfile.class, "name"));
+						utils.setUUIDField(reflectUtils.getField(GameProfile.class, "id"));
+						
+						if(reflectVersion.equals("v1_8_R1")) {
+							gameProfileBuilder_1_8_R1 = new GameProfileBuilder_1_8_R1();
+							uuidFetcher_1_8_R1 = new UUIDFetcher_1_8_R1();
 						} else {
-							Utils.nameField = ReflectUtils.getField(GameProfile.class, "name");
-							Utils.uuidField = ReflectUtils.getField(GameProfile.class, "id");
+							gameProfileBuilder = new GameProfileBuilder();
+							uuidFetcher = new UUIDFetcher();
 						}
-						
-						version = ReflectUtils.getVersion().substring(1);
-						
+					}
+
+					version = reflectVersion.substring(1);
+					
+					if(version.equals("1_7_R4"))
+						new PacketInjector_1_7().init();
+					else
+						new PacketInjector().init();
+					
+					if (fileUtils.cfg.getBoolean("APIMode") == false) {
 						getCommand("eazynick").setExecutor(new NickHelpCommand());
 						getCommand("nickother").setExecutor(new NickOtherCommand());
 						getCommand("changeskin").setExecutor(new ChangeSkinCommand());
@@ -166,26 +187,41 @@ public class EazyNick extends JavaPlugin {
 							getCommand("booknick").setExecutor(new CommandNotAvaiableCommand());
 						}
 						
-						Bukkit.getPluginManager().registerEvents(new NickListener(), instance);
+						pm.registerEvents(new PlayerNickListener(), instance);
+						pm.registerEvents(new PlayerUnnickListener(), instance);
+						
+						pm.registerEvents(new AsyncPlayerChatListener(), instance);
+						pm.registerEvents(new PlayerCommandPreprocessListener(), instance);
+						pm.registerEvents(new PlayerDropItemListener(), instance);
+						pm.registerEvents(new InventoryClickListener(), instance);
+						pm.registerEvents(new PlayerInteractListener(), instance);
+						pm.registerEvents(new PlayerChangedWorldListener(), instance);
+						pm.registerEvents(new PlayerDeathListener(), instance);
+						pm.registerEvents(new PlayerJoinListener(), instance);
+						pm.registerEvents(new PlayerKickListener(), instance);
+						pm.registerEvents(new PlayerQuitListener(), instance);
 
 						for (Player all : Bukkit.getOnlinePlayers()) {
 							if ((all != null) && (all.getUniqueId() != null)) {
-								if (!(Utils.canUseNick.containsKey(all.getUniqueId())))
-									Utils.canUseNick.put(all.getUniqueId(), true);
+								if (!(utils.getCanUseNick().containsKey(all.getUniqueId())))
+									utils.getCanUseNick().put(all.getUniqueId(), true);
 							}
 						}
 					}
 					
-					Utils.sendConsole("	§7Loading §e" + version + " §7...");
-					Utils.sendConsole("	§7Version §e" + version + " §7was loaded §asuccessfully§7!");
+					utils.sendConsole("	§7Loading §e" + version + " §7...");
+					utils.sendConsole("	§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
-					if (FileUtils.cfg.getBoolean("BungeeCord")) {
-						mysql = new MySQL(FileUtils.cfg.getString("BungeeMySQL.hostname"), FileUtils.cfg.getString("BungeeMySQL.port"), FileUtils.cfg.getString("BungeeMySQL.database"), FileUtils.cfg.getString("BungeeMySQL.username"), FileUtils.cfg.getString("BungeeMySQL.password"));
+					if (fileUtils.cfg.getBoolean("BungeeCord")) {
+						mysql = new MySQL(fileUtils.cfg.getString("BungeeMySQL.hostname"), fileUtils.cfg.getString("BungeeMySQL.port"), fileUtils.cfg.getString("BungeeMySQL.database"), fileUtils.cfg.getString("BungeeMySQL.username"), fileUtils.cfg.getString("BungeeMySQL.password"));
 						mysql.connect();
 
 						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NICKNAME varchar(64), SKINNAME varchar(64))");
 						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), OldPermissionsExRank varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
 					
+						mysqlNickManager = new MySQLNickManager(mysql);
+						mysqlPlayerDataManager = new MySQLPlayerDataManager(mysql);
+						
 						try {
 							File file = new File("spigot.yml");
 							
@@ -202,33 +238,33 @@ public class EazyNick extends JavaPlugin {
 						Bukkit.spigot().getConfig().set("settings.bungeecord", true);
 					}
 					
-					Utils.sendConsole("	§7");
-					Utils.sendConsole("	§7API-Mode§8: §3" + FileUtils.cfg.getBoolean("APIMode"));
-					Utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
-					Utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
-					Utils.sendConsole("	§7Plugin-State§8: §aENABLED");
-					Utils.sendConsole("	§7");
-					Utils.sendConsole("	§7System started in §e" + (System.currentTimeMillis() - startMillis) + "ms");
+					utils.sendConsole("	§7");
+					utils.sendConsole("	§7API-Mode§8: §3" + fileUtils.cfg.getBoolean("APIMode"));
+					utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+					utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
+					utils.sendConsole("	§7Plugin-State§8: §aENABLED");
+					utils.sendConsole("	§7");
+					utils.sendConsole("	§7System started in §e" + (System.currentTimeMillis() - startMillis) + "ms");
 				}
 
-				Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
+				utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 
-				if (FileUtils.cfg.getBoolean("AutoUpdater"))
-					SpigotUpdater.checkForUpdates();
+				if (fileUtils.cfg.getBoolean("AutoUpdater"))
+					spigotUpdater.checkForUpdates();
 
 				if (isCancelled)
-					Bukkit.getPluginManager().disablePlugin(instance);
+					pm.disablePlugin(instance);
 				
-				if(Utils.placeholderAPIStatus()) {
+				if(utils.placeholderAPIStatus()) {
 					new PlaceHolderExpansion(instance).register();
 					
-					Utils.sendConsole("§7Placeholders loaded successfully!");
+					utils.sendConsole("§7Placeholders loaded successfully!");
 				}
 				
-				if(Utils.deluxeChatStatus()) {
-					Bukkit.getPluginManager().registerEvents(new DeluxeChatHookListener(), instance);
+				if(utils.deluxeChatStatus()) {
+					pm.registerEvents(new DeluxeChatHookListener(), instance);
 					
-					Utils.sendConsole("§7DeluxeChat hooked successfully!");
+					utils.sendConsole("§7DeluxeChat hooked successfully!");
 				}
 			}
 		}, 20);
@@ -236,18 +272,18 @@ public class EazyNick extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
-		Utils.sendConsole("	§7Disabling System...");
+		utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
+		utils.sendConsole("	§7Disabling System...");
 
-		if (FileUtils.cfg.getBoolean("BungeeCord"))
+		if (fileUtils.cfg.getBoolean("BungeeCord"))
 			mysql.disconnect();
 
-		Utils.sendConsole("	§7System disabled §asuccessfully§7!");
-		Utils.sendConsole("	§7");
-		Utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
-		Utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
-		Utils.sendConsole("	§7Plugin-State§8: §cDISABLED");
-		Utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
+		utils.sendConsole("	§7System disabled §asuccessfully§7!");
+		utils.sendConsole("	§7");
+		utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+		utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
+		utils.sendConsole("	§7Plugin-State§8: §cDISABLED");
+		utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 		
 		for (Player all : Bukkit.getOnlinePlayers()) {
 			NickManager apiAll = new NickManager(all);
@@ -255,6 +291,102 @@ public class EazyNick extends JavaPlugin {
 			if(apiAll.isNicked())
 				apiAll.unnickPlayerWithoutRemovingMySQL(false);
 		}
+	}
+	
+	public File getPluginFile() {
+		return pluginFile;
+	}
+	
+	public MySQL getMySQL() {
+		return mysql;
+	}
+	
+	public MySQLNickManager getMySQLNickManager() {
+		return mysqlNickManager;
+	}
+	
+	public MySQLPlayerDataManager getMySQLPlayerDataManager() {
+		return mysqlPlayerDataManager;
+	}
+	
+	public String getVersion() {
+		return version;
+	}
+	
+	public SpigotUpdater getSpigotUpdater() {
+		return spigotUpdater;
+	}
+	
+	public Utils getUtils() {
+		return utils;
+	}
+	
+	public ActionBarUtils getActionBarUtils() {
+		return actionBarUtils;
+	}
+	
+	public FileUtils getFileUtils() {
+		return fileUtils;
+	}
+	
+	public NickNameFileUtils getNickNameFileUtils() {
+		return nickNameFileUtils;
+	}
+	
+	public BookGUIFileUtils getBookGUIFileUtils() {
+		return bookGUIFileUtils;
+	}
+	
+	public LanguageFileUtils getLanguageFileUtils() {
+		return languageFileUtils;
+	}
+	
+	public ReflectUtils getReflectUtils() {
+		return reflectUtils;
+	}
+	
+	public NMSBookBuilder getNMSBookBuilder() {
+		return nmsBookBuilder;
+	}
+	
+	public NMSBookUtils getNMSBookUtils() {
+		return nmsBookUtils;
+	}
+	
+	public GameProfileBuilder_1_7 getGameProfileBuilder_1_7() {
+		return gameProfileBuilder_1_7;
+	}
+	
+	public GameProfileBuilder_1_8_R1 getGameProfileBuilder_1_8_R1() {
+		return gameProfileBuilder_1_8_R1;
+	}
+	
+	public GameProfileBuilder getGameProfileBuilder() {
+		return gameProfileBuilder;
+	}
+	
+	public NMSNickManager getNMSNickManager() {
+		return nmsNickManager;
+	}
+	
+	public UUIDFetcher_1_7 getUUIDFetcher_1_7() {
+		return uuidFetcher_1_7;
+	}
+	
+	public UUIDFetcher_1_8_R1 getUUIDFetcher_1_8_R1() {
+		return uuidFetcher_1_8_R1;
+	}
+	
+	public UUIDFetcher getUUIDFetcher() {
+		return uuidFetcher;
+	}
+	
+	public SignGUI getSignGUI() {
+		return signGUI;
+	}
+	
+	public void setLanguageFileUtils(LanguageFileUtils languageFileUtils) {
+		this.languageFileUtils = languageFileUtils;
 	}
 
 }

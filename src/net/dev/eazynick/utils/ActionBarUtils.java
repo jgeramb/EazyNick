@@ -9,14 +9,17 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ActionBarUtils {
 	
-	public static void sendActionBar(Player p, String text, int time) {
+	public void sendActionBar(Player p, String text, int time) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
 		try {
-			if (EazyNick.version.startsWith("1_7_") || EazyNick.version.startsWith("1_8_")) {
-				Class<?> mainChatPacket = ReflectUtils.getNMSClass("PacketPlayOutChat");
-				Class<?> chatSerializer = ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
+			if (eazyNick.getVersion().startsWith("1_7_") || eazyNick.getVersion().startsWith("1_8_")) {
+				Class<?> mainChatPacket = reflectUtils.getNMSClass("PacketPlayOutChat");
+				Class<?> chatSerializer = reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 
 				Object chatText = chatSerializer.getMethod("a", new Class[] { String.class }).invoke(chatSerializer, new Object[] { "{\"text\":\"" + text + "\"}" });
-				Object chatPacket = mainChatPacket.getConstructor(new Class[] { ReflectUtils.getNMSClass("IChatBaseComponent"), byte.class }).newInstance(new Object[] { chatText, (byte) 2 });
+				Object chatPacket = mainChatPacket.getConstructor(new Class[] { reflectUtils.getNMSClass("IChatBaseComponent"), byte.class }).newInstance(new Object[] { chatText, (byte) 2 });
 
 				new BukkitRunnable() {
 
@@ -39,18 +42,18 @@ public class ActionBarUtils {
 		}
 	}
 	
-	public static void sendActionBar(Player p, String text) {
+	public void sendActionBar(Player p, String text) {
 		sendActionBar(p, text, 100);
 	}
 	
-	private static void sendPacket(Player p, Object packet) {
+	private void sendPacket(Player p, Object packet) {
 		if(packet == null)
 			return;
 		
 		try {
 			Object handle = p.getClass().getMethod("getHandle").invoke(p);
 			Object playerConnection = handle.getClass().getDeclaredField("playerConnection").get(handle);
-			playerConnection.getClass().getMethod("sendPacket", ReflectUtils.getNMSClass("Packet")).invoke(playerConnection, packet);
+			playerConnection.getClass().getMethod("sendPacket", EazyNick.getInstance().getReflectUtils().getNMSClass("Packet")).invoke(playerConnection, packet);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

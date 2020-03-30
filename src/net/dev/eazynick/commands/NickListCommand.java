@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utils.PagesHandler;
 import net.dev.eazynick.utils.Utils;
 
@@ -12,24 +13,26 @@ public class NickListCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		Utils utils = EazyNick.getInstance().getUtils();
+		
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.gui")) {
-				if(Utils.nickedPlayers.contains(p.getUniqueId()))
+				if(utils.getNickedPlayers().contains(p.getUniqueId()))
 					p.chat("/unnick");
 				
-				Utils.nickNamesHandler = new PagesHandler(36);
+				utils.setNickNamesHandler(new PagesHandler(36));
 
-				for (String name : Utils.nickNames)
-					Utils.nickNamesHandler.addObject(name);
+				for (String name : utils.getNickNames())
+					utils.getNickNamesHandler().addObject(name);
 				
-				Utils.nickNamesHandler.createPage(p, 0);
-				Utils.nickNameListPage.put(p.getUniqueId(), 0);
+				utils.getNickNamesHandler().createPage(p, 0);
+				utils.getNickNameListPage().put(p.getUniqueId(), 0);
 			} else
-				p.sendMessage(Utils.noPerm);
+				p.sendMessage(utils.getNoPerm());
 		} else
-			Utils.sendConsole(Utils.notPlayer);
+			utils.sendConsole(utils.getNotPlayer());
 		
 		return true;
 	}

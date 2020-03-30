@@ -14,6 +14,8 @@ import net.dev.eazynick.utils.ReflectUtils;
 
 public class ScoreboardTeamManager {
 
+	private EazyNick eazyNick;
+	
 	private String teamName;
 	
 	public Player p;
@@ -23,6 +25,7 @@ public class ScoreboardTeamManager {
 	private Object packet;
 	
 	public ScoreboardTeamManager(Player p, String prefix, String suffix) {
+		this.eazyNick = EazyNick.getInstance();
 		this.p = p;
 		this.prefix = prefix;
 		this.suffix = suffix;
@@ -30,40 +33,42 @@ public class ScoreboardTeamManager {
 	}
 	
 	public void destroyTeam() {
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
 		try {
-			packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
+			packet = reflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
 			
-			if(!(EazyNick.version.equalsIgnoreCase("1_7_R4"))) {
-				if(EazyNick.version.startsWith("1_13") || EazyNick.version.startsWith("1_14") || EazyNick.version.startsWith("1_15")) {
+			if(!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))) {
+				if(eazyNick.getVersion().startsWith("1_13") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_15")) {
 					try {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "i", 1);
+						reflectUtils.setField(packet, "a", teamName);
+						reflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
+						reflectUtils.setField(packet, "e", "ALWAYS");
+						reflectUtils.setField(packet, "i", 1);
 					} catch (Exception ex) {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "j", 1);
+						reflectUtils.setField(packet, "a", teamName);
+						reflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
+						reflectUtils.setField(packet, "e", "ALWAYS");
+						reflectUtils.setField(packet, "j", 1);
 					}
 				} else {
 					try {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", teamName);
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "h", 1);
+						reflectUtils.setField(packet, "a", teamName);
+						reflectUtils.setField(packet, "b", teamName);
+						reflectUtils.setField(packet, "e", "ALWAYS");
+						reflectUtils.setField(packet, "h", 1);
 					} catch (Exception ex) {
-						ReflectUtils.setField(packet, "a", teamName);
-						ReflectUtils.setField(packet, "b", teamName);
-						ReflectUtils.setField(packet, "e", "ALWAYS");
-						ReflectUtils.setField(packet, "i", 1);
+						reflectUtils.setField(packet, "a", teamName);
+						reflectUtils.setField(packet, "b", teamName);
+						reflectUtils.setField(packet, "e", "ALWAYS");
+						reflectUtils.setField(packet, "i", 1);
 					}
 				}
 			} else {
 				try {
-					ReflectUtils.setField(packet, "a", teamName);
-					ReflectUtils.setField(packet, "b", teamName);
-					ReflectUtils.setField(packet, "f", 1);
+					reflectUtils.setField(packet, "a", teamName);
+					reflectUtils.setField(packet, "b", teamName);
+					reflectUtils.setField(packet, "f", 1);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -78,8 +83,10 @@ public class ScoreboardTeamManager {
 
 
 	private Object getAsIChatBaseComponent(String txt) {
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
 		try {
-			return ReflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(ReflectUtils.getNMSClass("IChatBaseComponent"), "{\"text\":\"" + txt + "\"}");
+			return reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(reflectUtils.getNMSClass("IChatBaseComponent"), "{\"text\":\"" + txt + "\"}");
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
@@ -88,65 +95,68 @@ public class ScoreboardTeamManager {
 	}
 
 	public void createTeam() {
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
 		try {
 			for(Player t : Bukkit.getOnlinePlayers()) {
-				packet = ReflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
+				packet = reflectUtils.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor(new Class[0]).newInstance(new Object[0]);
 				
 				String prefixForPlayer = prefix;
 				String suffixForPlayer = suffix;
 				List<String> contents = Arrays.asList(p.getName());
 				
-				if(t.hasPermission("nick.bypass") && FileUtils.cfg.getBoolean("BypassFormat.Show")) {
+				if(t.hasPermission("nick.bypass") && fileUtils.cfg.getBoolean("BypassFormat.Show")) {
 					contents = Arrays.asList(new NickManager(p).getRealName());
-					prefixForPlayer = FileUtils.getConfigString("BypassFormat.NameTagPrefix");
-					suffixForPlayer = FileUtils.getConfigString("BypassFormat.NameTagSuffix");
+					prefixForPlayer = fileUtils.getConfigString("BypassFormat.NameTagPrefix");
+					suffixForPlayer = fileUtils.getConfigString("BypassFormat.NameTagSuffix");
 				}
 				
-				if(!(EazyNick.version.equalsIgnoreCase("1_7_R4"))) {
-					if(EazyNick.version.startsWith("1_13") || EazyNick.version.startsWith("1_14") || EazyNick.version.startsWith("1_15")) {
+				if(!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))) {
+					if(eazyNick.getVersion().startsWith("1_13") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_15")) {
 						try {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
-							ReflectUtils.setField(packet, "c", getAsIChatBaseComponent(prefixForPlayer));
-							ReflectUtils.setField(packet, "d", getAsIChatBaseComponent(suffixForPlayer));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "g", contents);
-							ReflectUtils.setField(packet, "i", 0);
+							reflectUtils.setField(packet, "a", teamName);
+							reflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
+							reflectUtils.setField(packet, "c", getAsIChatBaseComponent(prefixForPlayer));
+							reflectUtils.setField(packet, "d", getAsIChatBaseComponent(suffixForPlayer));
+							reflectUtils.setField(packet, "e", "ALWAYS");
+							reflectUtils.setField(packet, "g", contents);
+							reflectUtils.setField(packet, "i", 0);
 						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
-							ReflectUtils.setField(packet, "c", getAsIChatBaseComponent(prefixForPlayer));
-							ReflectUtils.setField(packet, "d", getAsIChatBaseComponent(suffixForPlayer));
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "h", contents);
-							ReflectUtils.setField(packet, "j", 0);
+							reflectUtils.setField(packet, "a", teamName);
+							reflectUtils.setField(packet, "b", getAsIChatBaseComponent(teamName));
+							reflectUtils.setField(packet, "c", getAsIChatBaseComponent(prefixForPlayer));
+							reflectUtils.setField(packet, "d", getAsIChatBaseComponent(suffixForPlayer));
+							reflectUtils.setField(packet, "e", "ALWAYS");
+							reflectUtils.setField(packet, "h", contents);
+							reflectUtils.setField(packet, "j", 0);
 						}
 					} else {
 						try {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", teamName);
-							ReflectUtils.setField(packet, "c", prefixForPlayer);
-							ReflectUtils.setField(packet, "d", suffixForPlayer);
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "g", contents);
-							ReflectUtils.setField(packet, "h", 0);
+							reflectUtils.setField(packet, "a", teamName);
+							reflectUtils.setField(packet, "b", teamName);
+							reflectUtils.setField(packet, "c", prefixForPlayer);
+							reflectUtils.setField(packet, "d", suffixForPlayer);
+							reflectUtils.setField(packet, "e", "ALWAYS");
+							reflectUtils.setField(packet, "g", contents);
+							reflectUtils.setField(packet, "h", 0);
 						} catch (Exception ex) {
-							ReflectUtils.setField(packet, "a", teamName);
-							ReflectUtils.setField(packet, "b", teamName);
-							ReflectUtils.setField(packet, "c", prefixForPlayer);
-							ReflectUtils.setField(packet, "d", suffixForPlayer);
-							ReflectUtils.setField(packet, "e", "ALWAYS");
-							ReflectUtils.setField(packet, "h", contents);
-							ReflectUtils.setField(packet, "i", 0);
+							reflectUtils.setField(packet, "a", teamName);
+							reflectUtils.setField(packet, "b", teamName);
+							reflectUtils.setField(packet, "c", prefixForPlayer);
+							reflectUtils.setField(packet, "d", suffixForPlayer);
+							reflectUtils.setField(packet, "e", "ALWAYS");
+							reflectUtils.setField(packet, "h", contents);
+							reflectUtils.setField(packet, "i", 0);
 						}
 					}
 				} else {
-					ReflectUtils.setField(packet, "a", teamName);
-					ReflectUtils.setField(packet, "b", teamName);
-					ReflectUtils.setField(packet, "c", prefixForPlayer);
-					ReflectUtils.setField(packet, "d", suffixForPlayer);
-					ReflectUtils.setField(packet, "e", contents);
-					ReflectUtils.setField(packet, "f", 0);
+					reflectUtils.setField(packet, "a", teamName);
+					reflectUtils.setField(packet, "b", teamName);
+					reflectUtils.setField(packet, "c", prefixForPlayer);
+					reflectUtils.setField(packet, "d", suffixForPlayer);
+					reflectUtils.setField(packet, "e", contents);
+					reflectUtils.setField(packet, "f", 0);
 				}
 			
 				sendPacket(t, packet);
@@ -160,7 +170,7 @@ public class ScoreboardTeamManager {
 		try {
 			Object playerHandle = p.getClass().getMethod("getHandle", new Class[0]).invoke(p, new Object[0]);
 			Object playerConnection = playerHandle.getClass().getField("playerConnection").get(playerHandle);
-			playerConnection.getClass().getMethod("sendPacket", new Class[] { ReflectUtils.getNMSClass("Packet") }).invoke(playerConnection, new Object[] { packet });
+			playerConnection.getClass().getMethod("sendPacket", new Class[] { EazyNick.getInstance().getReflectUtils().getNMSClass("Packet") }).invoke(playerConnection, new Object[] { packet });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

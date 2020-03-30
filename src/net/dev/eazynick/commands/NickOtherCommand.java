@@ -16,6 +16,10 @@ public class NickOtherCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		Utils utils = eazyNick.getUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
@@ -24,12 +28,12 @@ public class NickOtherCommand implements CommandExecutor {
 					Player t = Bukkit.getPlayer(args[0]);
 					
 					if(t != null) {
-						if(!(Utils.nickedPlayers.contains(t.getUniqueId()))) {
+						if(!(utils.getNickedPlayers().contains(t.getUniqueId()))) {
 							if(args.length >= 2) {
 								if(args[1].length() <= 16) {
 									String name = args[1].trim();
 									
-									p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.Other.SelectedNick").replace("%playerName%", t.getName()).replace("%nickName%", ChatColor.translateAlternateColorCodes('&', name)));
+									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.SelectedNick").replace("%playerName%", t.getName()).replace("%nickName%", ChatColor.translateAlternateColorCodes('&', name)));
 									
 									if((!(t.hasPermission("nick.use"))) || !(t.hasPermission("nick.customnickname"))) {
 										PermissionAttachment pa = t.addAttachment(EazyNick.getInstance());
@@ -44,10 +48,10 @@ public class NickOtherCommand implements CommandExecutor {
 									} else
 										t.chat("/nick " + name);
 								} else {
-									p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.NickTooLong"));
+									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickTooLong"));
 								}
 							} else {
-								p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.Other.RandomNick").replace("%playerName%", t.getName()));
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.RandomNick").replace("%playerName%", t.getName()));
 								
 								if(!(t.hasPermission("nick.use"))) {
 									PermissionAttachment pa = t.addAttachment(EazyNick.getInstance());
@@ -62,7 +66,7 @@ public class NickOtherCommand implements CommandExecutor {
 									t.chat("/nick");
 							}
 						} else {
-							p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.Other.Unnick").replace("%playerName%", t.getName()));
+							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.Unnick").replace("%playerName%", t.getName()));
 							
 							if(!(t.hasPermission("nick.use"))) {
 								PermissionAttachment pa = t.addAttachment(EazyNick.getInstance());
@@ -77,12 +81,12 @@ public class NickOtherCommand implements CommandExecutor {
 								t.chat("/unnick");
 						}
 					} else
-						p.sendMessage(Utils.prefix + LanguageFileUtils.getConfigString("Messages.PlayerNotFound"));
+						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerNotFound"));
 				}
 			} else
-				p.sendMessage(Utils.noPerm);
+				p.sendMessage(utils.getNoPerm());
 		} else
-			Utils.sendConsole(Utils.notPlayer);
+			utils.sendConsole(utils.getNotPlayer());
 		
 		return true;
 	}
