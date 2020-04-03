@@ -34,7 +34,7 @@ public class ReNickCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			boolean isNickOnWorldChange = utils.getNickOnWorldChangePlayers().contains(p.getUniqueId());
 			
-			if(mysqlNickManager.isPlayerNicked(p.getUniqueId()) || isNickOnWorldChange) {
+			if(isNickOnWorldChange || ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(p.getUniqueId()))) {
 				if(utils.getNickedPlayers().contains(p.getUniqueId()))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 				else {

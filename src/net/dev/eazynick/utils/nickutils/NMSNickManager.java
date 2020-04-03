@@ -253,7 +253,8 @@ public class NMSNickManager extends ReflectUtils {
 						Object interactManager = entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer);
 						Object packetRespawnPlayer;
 
-						sendPacket(p, packetPlayOutPlayerInfoRemove, forceUpdate);
+						if(uuidSpoof)
+							sendPacket(p, packetPlayOutPlayerInfoRemove, forceUpdate);
 						
 						if(uuidSpoof && !(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
 							updateUniqueId(p, uuidBefore);
@@ -310,7 +311,7 @@ public class NMSNickManager extends ReflectUtils {
 							sendPacket(p, packetPlayOutPlayerInfoAdd, forceUpdate);
 							sendPacketExceptSelf(p, packetNamedEntitySpawn, forceUpdate);
 							
-							if(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)) {
+							if(uuidSpoof && (type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE))) {
 								Bukkit.getOnlinePlayers().stream().filter(all -> (!(all.hasPermission("nick.bypass")) && (all != p))).forEach(all -> {
 									all.hidePlayer(p);
 									all.showPlayer(p);

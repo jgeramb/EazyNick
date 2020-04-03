@@ -355,7 +355,6 @@ public class NickManager {
 			
 			nametagEditAPI.setPrefix(p, prefix);
 			nametagEditAPI.setSuffix(p, suffix);
-			nametagEditAPI.setNametag(p, prefix, suffix);
 			nametagEditAPI.reloadNametag(p);
 			
 			utils.getNametagEditPrefixes().remove(p.getUniqueId());
@@ -722,8 +721,6 @@ public class NickManager {
 
 			nametagEditAPI.setPrefix(p, tagPrefix);
 			nametagEditAPI.setSuffix(p, tagSuffix);
-			nametagEditAPI.setNametag(p, tagPrefix, tagSuffix);
-			nametagEditAPI.reloadNametag(p);
 		}
 		
 		if(utils.ultraPermissionsStatus()) {
