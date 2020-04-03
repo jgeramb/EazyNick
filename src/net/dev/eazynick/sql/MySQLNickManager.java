@@ -17,9 +17,16 @@ public class MySQLNickManager {
 			if(mysql.isConnected()) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");
+
+					if(rs.next()) {
+						String s = rs.getString("NickName");
+						
+						rs.close();
+						
+						return s;
+					}
 					
-					if(rs.next())
-						return rs.getString("NICKNAME");
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -35,8 +42,15 @@ public class MySQLNickManager {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next())
-						return rs.getString("SKINNAME");
+					if(rs.next()) {
+						String s = rs.getString("SkinName");
+						
+						rs.close();
+						
+						return s;
+					}
+					
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -49,7 +63,7 @@ public class MySQLNickManager {
 	public void addPlayer(UUID uuid, String nickName, String skinName) {
 		if(mysql.isConnected()) {
 			if(!(isPlayerNicked(uuid)))
-				mysql.update("INSERT INTO NickedPlayers (UUID, NICKNAME, SKINNAME) VALUES ('" + uuid.toString() + "', '" + nickName + "', '" + skinName + "')");
+				mysql.update("INSERT INTO NickedPlayers (UUID, NickName, SkinName) VALUES ('" + uuid.toString() + "', '" + nickName + "', '" + skinName + "')");
 		}
 	}
 	
@@ -65,7 +79,13 @@ public class MySQLNickManager {
 			try {
 				ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");
 				
-				return rs.next();
+				if(rs.next()) {
+					rs.close();
+					
+					return true;
+				}
+				
+				rs.close();
 			} catch (SQLException ex) {
 				ex.printStackTrace();
 			}

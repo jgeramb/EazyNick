@@ -81,7 +81,7 @@ public class BookNickCommand implements CommandExecutor {
 											tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.TabSuffix");
 											tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.TagPrefix");
 											tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank1.TagSuffix");
-											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.PermissionsEx.GroupName");
+											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank1.GroupName");
 										} else if(args[0].equalsIgnoreCase(bookGUIFileUtils.cfg.getString("BookGUI.Rank2.RankName")) && bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") && (bookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.cfg.getString("BookGUI.Rank2.Permission")))) {
 											chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.ChatPrefix");
 											chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.ChatSuffix");
@@ -89,7 +89,7 @@ public class BookNickCommand implements CommandExecutor {
 											tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.TabSuffix");
 											tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.TagPrefix");
 											tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank2.TagSuffix");
-											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.PermissionsEx.GroupName");
+											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank2.GroupName");
 										} else if(args[0].equalsIgnoreCase(bookGUIFileUtils.cfg.getString("BookGUI.Rank3.RankName")) && bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") && (bookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.cfg.getString("BookGUI.Rank3.Permission")))) {
 											chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.ChatPrefix");
 											chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.ChatSuffix");
@@ -97,7 +97,7 @@ public class BookNickCommand implements CommandExecutor {
 											tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.TabSuffix");
 											tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.TagPrefix");
 											tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank3.TagSuffix");
-											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.PermissionsEx.GroupName");
+											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank3.GroupName");
 										} else if(args[0].equalsIgnoreCase(bookGUIFileUtils.cfg.getString("BookGUI.Rank4.RankName")) && bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") && (bookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.cfg.getString("BookGUI.Rank4.Permission")))) {
 											chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.ChatPrefix");
 											chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.ChatSuffix");
@@ -105,7 +105,7 @@ public class BookNickCommand implements CommandExecutor {
 											tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.TabSuffix");
 											tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.TagPrefix");
 											tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank4.TagSuffix");
-											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.PermissionsEx.GroupName");
+											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank4.GroupName");
 										} else if(args[0].equalsIgnoreCase(bookGUIFileUtils.cfg.getString("BookGUI.Rank5.RankName")) && bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") && (bookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.cfg.getString("BookGUI.Rank5.Permission")))) {
 											chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.ChatPrefix");
 											chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.ChatSuffix");
@@ -113,7 +113,7 @@ public class BookNickCommand implements CommandExecutor {
 											tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.TabSuffix");
 											tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.TagPrefix");
 											tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank5.TagSuffix");
-											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.PermissionsEx.GroupName");
+											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank5.GroupName");
 										} else if(args[0].equalsIgnoreCase(bookGUIFileUtils.cfg.getString("BookGUI.Rank6.RankName")) && bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (bookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.cfg.getString("BookGUI.Rank6.Permission")))) {
 											chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.ChatPrefix");
 											chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.ChatSuffix");
@@ -121,7 +121,7 @@ public class BookNickCommand implements CommandExecutor {
 											tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.TabSuffix");
 											tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.TagPrefix");
 											tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank6.TagSuffix");
-											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.PermissionsEx.GroupName");
+											groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank6.GroupName");
 										} else
 											return true;
 										

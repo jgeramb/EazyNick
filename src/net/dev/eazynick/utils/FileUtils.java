@@ -64,9 +64,13 @@ public class FileUtils {
 		cfg.addDefault("ReplaceNickedChatFormat", true);
 		cfg.addDefault("AllowPlayersToNickAsOnlinePlayers", false);
 		cfg.addDefault("AllowPlayersToNickAsKnownPlayers", false);
+		cfg.addDefault("SwitchUltraPermissionsGroupByNicking", false);
+		cfg.addDefault("SwitchLuckPermsGroupByNicking", false);
 		cfg.addDefault("SwitchPermissionsExGroupByNicking", false);
 		cfg.addDefault("ServerIsUsingCloudNETPrefixesAndSuffixes", false);
 		cfg.addDefault("ServerIsUsingVaultPrefixesAndSuffixes", false);
+		cfg.addDefault("ChangeNameAndPrefixandSuffixInDeluxeChatFormat", false);
+		cfg.addDefault("ChangeLuckPermsPrefixAndSufix", false);
 		cfg.addDefault("RandomDisguiseDelay", false);
 		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
@@ -119,14 +123,14 @@ public class FileUtils {
 		cfg.addDefault("Settings.NickFormat.PlayerList.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.NameTag.Prefix", "&8");
 		cfg.addDefault("Settings.NickFormat.NameTag.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.PermissionsEx.GroupName", "Spieler");
+		cfg.addDefault("Settings.NickFormat.GroupName", "Spieler");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Prefix", "&6");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Prefix", "&6");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Prefix", "&6");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName", "Premium");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.GroupName", "Premium");
 		cfg.addDefault("AutoNickWorldBlackList", Arrays.asList("world"));
 		cfg.addDefault("BlackList", Arrays.asList("ExampleName"));
 		

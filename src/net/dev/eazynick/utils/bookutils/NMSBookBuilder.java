@@ -13,9 +13,15 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class NMSBookBuilder {
 	
+	private EazyNick eazyNick;
+	private ReflectUtils reflectUtils;
+	
+	public NMSBookBuilder() {
+		this.eazyNick = EazyNick.getInstance();
+		this.reflectUtils = eazyNick.getReflectUtils();
+	}
+	
 	public ItemStack create(String title, TextComponent... texts) {
-		ReflectUtils reflectUtils = EazyNick.getInstance().getReflectUtils();
-		
 		ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 		BookMeta m = (BookMeta) is.getItemMeta();
 		m.setTitle(title);
@@ -29,7 +35,7 @@ public class NMSBookBuilder {
 			for (TextComponent tc : texts)
 				text.addExtra(tc);
 			
-			list.add(toIChatBaseComponent(text));
+			list.add(getAsIChatBaseComponent(text));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -39,11 +45,11 @@ public class NMSBookBuilder {
 		return is;
 	}
 	
-	public Object toIChatBaseComponent(TextComponent tc) {
+	public Object getAsIChatBaseComponent(TextComponent textComponent) {
 		try {
-			Class<?> chatSerializer = EazyNick.getInstance().getReflectUtils().getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
+			Class<?> chatSerializer = eazyNick.getVersion().equals("1_8_R1") ? reflectUtils.getNMSClass("ChatSerializer") : reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 			
-			return chatSerializer.getMethod("a", String.class).invoke(chatSerializer, ComponentSerializer.toString(tc));
+			return chatSerializer.getMethod("a", String.class).invoke(chatSerializer, ComponentSerializer.toString(textComponent));
 		} catch (Exception e) {
 			return null;
 		}

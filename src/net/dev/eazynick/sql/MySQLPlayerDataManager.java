@@ -12,14 +12,21 @@ public class MySQLPlayerDataManager {
 		this.mysql = mysql;
 	}
 	
-	public String getOldPermissionsExRank(UUID uuid) {
+	public String getOldRank(UUID uuid) {
 		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next())
-						return rs.getString("OldPermissionsExRank");
+					if(rs.next()) {
+						String s = rs.getString("OldRank");
+						
+						rs.close();
+						
+						return s;
+					}
+					
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -35,8 +42,15 @@ public class MySQLPlayerDataManager {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next())
-						return rs.getString("ChatPrefix");
+					if(rs.next()) {
+						String s = rs.getString("ChatPrefix");
+						
+						rs.close();
+						
+						return s;
+					}
+					
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -52,8 +66,15 @@ public class MySQLPlayerDataManager {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next())
-						return rs.getString("ChatSuffix");
+					if(rs.next()) {
+						String s = rs.getString("ChatSuffix");
+						
+						rs.close();
+						
+						return s;
+					}
+					
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -69,8 +90,15 @@ public class MySQLPlayerDataManager {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next())
-						return rs.getString("TabPrefix");
+					if(rs.next()) {
+						String s = rs.getString("TabPrefix");
+						
+						rs.close();
+						
+						return s;
+					}
+					
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -86,8 +114,15 @@ public class MySQLPlayerDataManager {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next())
-						return rs.getString("TabSuffix");
+					if(rs.next()) {
+						String s = rs.getString("TabSuffix");
+						
+						rs.close();
+						
+						return s;
+					}
+					
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -103,8 +138,15 @@ public class MySQLPlayerDataManager {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next())
-						return rs.getString("TagPrefix");
+					if(rs.next()) {
+						String s = rs.getString("TagPrefix");
+						
+						rs.close();
+						
+						return s;
+					}
+					
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -120,8 +162,15 @@ public class MySQLPlayerDataManager {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
-					if(rs.next())
-						return rs.getString("TagSuffix");
+					if(rs.next()) {
+						String s = rs.getString("TagSuffix");
+						
+						rs.close();
+						
+						return s;
+					}
+					
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -131,12 +180,12 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public void insertData(UUID uuid, String oldPermissionsExRank, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
+	public void insertData(UUID uuid, String oldRank, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
 		if(mysql.isConnected()) {
 			if(isRegistered(uuid))
 				removeData(uuid);
 			
-			mysql.update("INSERT INTO NickedPlayerDatas (UUID, OldPermissionsExRank, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + oldPermissionsExRank + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
+			mysql.update("INSERT INTO NickedPlayerDatas (UUID, OldRank, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + oldRank + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
 		}
 	}
 	
@@ -153,9 +202,12 @@ public class MySQLPlayerDataManager {
 				ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 				
 				if(rs.next()) {
-					if(rs.getString("OldPermissionsExRank") != null)
-						return true;
+					rs.close();
+					
+					return true;
 				}
+				
+				rs.close();
 			} catch (SQLException ex) {
 				ex.printStackTrace();
 			}

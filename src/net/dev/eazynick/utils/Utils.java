@@ -40,16 +40,18 @@ public class Utils {
 	private HashMap<UUID, String> oldPlayerListNames = new HashMap<>();
 	private HashMap<UUID, Boolean> canUseNick = new HashMap<>();
 	private HashMap<UUID, Integer> nickNameListPage = new HashMap<>();
+	private HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
 	private HashMap<UUID, String> oldPermissionsExPrefixes = new HashMap<>();
 	private HashMap<UUID, String> oldPermissionsExSuffixes = new HashMap<>();
 	private HashMap<UUID, String> oldCloudNETPrefixes = new HashMap<>();
 	private HashMap<UUID, String> oldCloudNETSuffixes = new HashMap<>();
 	private HashMap<UUID, Integer> oldCloudNETTagIDS = new HashMap<>();
-	private HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
+	private HashMap<UUID, String> oldLuckPermsGroups = new HashMap<>();
 	private HashMap<UUID, Object> luckPermsPrefixes = new HashMap<>();
 	private HashMap<UUID, Object> luckPermsSuffixes = new HashMap<>();
-	private HashMap<UUID, String> ultraPermsPrefixes = new HashMap<>();
-	private HashMap<UUID, String> ultraPermsSuffixes = new HashMap<>();
+	private HashMap<UUID, HashMap<String, Long>> oldUltraPermissionsGroups = new HashMap<>();
+	private HashMap<UUID, String> ultraPermissionsPrefixes = new HashMap<>();
+	private HashMap<UUID, String> ultraPermissionsSuffixes = new HashMap<>();
 	private HashMap<UUID, String> nametagEditPrefixes = new HashMap<>();
 	private HashMap<UUID, String> nametagEditSuffixes = new HashMap<>();
 	private HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
@@ -253,6 +255,10 @@ public class Utils {
 		return nickNameListPage;
 	}
 	
+	public HashMap<UUID, String[]> getOldPermissionsExGroups() {
+		return oldPermissionsExGroups;
+	}
+	
 	public HashMap<UUID, String> getOldPermissionsExPrefixes() {
 		return oldPermissionsExPrefixes;
 	}
@@ -273,8 +279,8 @@ public class Utils {
 		return oldCloudNETTagIDS;
 	}
 	
-	public HashMap<UUID, String[]> getOldPermissionsExGroups() {
-		return oldPermissionsExGroups;
+	public HashMap<UUID, String> getOldLuckPermsGroups() {
+		return oldLuckPermsGroups;
 	}
 	
 	public HashMap<UUID, Object> getLuckPermsPrefixes() {
@@ -285,12 +291,16 @@ public class Utils {
 		return luckPermsSuffixes;
 	}
 	
-	public HashMap<UUID, String> getUltraPermsPrefixes() {
-		return ultraPermsPrefixes;
+	public HashMap<UUID, HashMap<String, Long>> getOldUltraPermissionsGroups() {
+		return oldUltraPermissionsGroups;
 	}
 	
-	public HashMap<UUID, String> getUltraPermsSuffixes() {
-		return ultraPermsSuffixes;
+	public HashMap<UUID, String> getUltraPermissionsPrefixes() {
+		return ultraPermissionsPrefixes;
+	}
+	
+	public HashMap<UUID, String> getUltraPermissionsSuffixes() {
+		return ultraPermissionsSuffixes;
 	}
 	
 	public HashMap<UUID, String> getNametagEditPrefixes() {

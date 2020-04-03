@@ -104,7 +104,7 @@ public class ReNickCommand implements CommandExecutor {
 											suffix,
 											true,
 											false,
-											(utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PermissionsEx.GroupName") : fileUtils.getConfigString("Settings.NickFormat.PermissionsEx.GroupName")));
+											(utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
 								}
 							} else
 								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));

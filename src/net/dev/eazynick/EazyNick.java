@@ -216,8 +216,8 @@ public class EazyNick extends JavaPlugin {
 						mysql = new MySQL(fileUtils.cfg.getString("BungeeMySQL.hostname"), fileUtils.cfg.getString("BungeeMySQL.port"), fileUtils.cfg.getString("BungeeMySQL.database"), fileUtils.cfg.getString("BungeeMySQL.username"), fileUtils.cfg.getString("BungeeMySQL.password"));
 						mysql.connect();
 
-						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NICKNAME varchar(64), SKINNAME varchar(64))");
-						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), OldPermissionsExRank varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
+						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NickName varchar(64), SkinName varchar(64))");
+						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), OldRank varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
 					
 						mysqlNickManager = new MySQLNickManager(mysql);
 						mysqlPlayerDataManager = new MySQLPlayerDataManager(mysql);

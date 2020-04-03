@@ -40,16 +40,30 @@ public class PlayerNickListener implements Listener {
 			}, fileUtils.cfg.getLong("Settings.NickDelay") * 20);
 			
 			if(fileUtils.cfg.getBoolean("BungeeCord")) {
-				String oldPermissionsExRank = "";
+				String oldRank = "";
+				
+				if(utils.ultraPermissionsStatus()) {
+					if(e.isJoinNick())
+						oldRank = e.getGroupName();
+					else if(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId()))
+						oldRank = utils.getOldUltraPermissionsGroups().get(p.getUniqueId()).toString();
+				}
+				
+				if(utils.luckPermsStatus()) {
+					if(e.isJoinNick())
+						oldRank = e.getGroupName();
+					else if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId()))
+						oldRank = utils.getOldLuckPermsGroups().get(p.getUniqueId());
+				}
 				
 				if(utils.permissionsExStatus()) {
 					if(e.isJoinNick())
-						oldPermissionsExRank = e.getGroupName();
+						oldRank = e.getGroupName();
 					else if(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId()))
-						oldPermissionsExRank = utils.getOldPermissionsExGroups().get(p.getUniqueId()).toString();
+						oldRank = utils.getOldPermissionsExGroups().get(p.getUniqueId()).toString();
 				}
 				
-				eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), oldPermissionsExRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
+				eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), oldRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
 			}
 			
 			if(!(e.isRenick()))

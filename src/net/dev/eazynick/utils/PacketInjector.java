@@ -95,16 +95,11 @@ public class PacketInjector {
 			Object iChatBaseComponent = field.get(packet);
 			Object editedComponent = null;
 			Class<?> iChatBaseComponentClass = reflectUtils.getNMSClass("IChatBaseComponent");
-			Class<?> chatSerializer;
-			
-			if(version.equals("1_8_R1"))
-				chatSerializer = reflectUtils.getNMSClass("ChatSerializer");
-			else
-				chatSerializer = reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
+			Class<?> chatSerializer = version.equals("1_8_R1") ? reflectUtils.getNMSClass("ChatSerializer") : reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 			
 			String fullText = "";
 			
-			for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod((version.startsWith("1_14") || version.startsWith("1_15")) ? "getSiblings" : "a").invoke(iChatBaseComponent))) {
+			for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15")) ? "getSiblings" : "a").invoke(iChatBaseComponent))) {
 				if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
 					String[] json = ((String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent)).replace("\"", "").replace("{", "").replace("}", "").split(",");
 					String text = "";
@@ -172,7 +167,7 @@ public class PacketInjector {
 			}
 			
 			if(!(fullText.contains(lastChatMessage) || fullText.startsWith(prefix))) {
-				for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod((version.startsWith("1_14") || version.startsWith("1_15")) ? "getSiblings" : "a").invoke(iChatBaseComponent))) {
+				for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15")) ? "getSiblings" : "a").invoke(iChatBaseComponent))) {
 					if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
 						String json = (String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent);
 							

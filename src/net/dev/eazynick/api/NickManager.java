@@ -37,6 +37,8 @@ import net.luckperms.api.node.NodeBuilderRegistry;
 import net.milkbowl.vault.chat.Chat;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
+import me.TechsCode.UltraPermissions.UltraPermissionsAPI;
+import me.TechsCode.UltraPermissions.storage.objects.Group;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.neznamy.tab.api.EnumProperty;
 import me.neznamy.tab.api.TABAPI;
@@ -285,12 +287,43 @@ public class NickManager {
 		resetCloudNET();
 		resetLuckPerms();
 		
+		if(utils.ultraPermissionsStatus()) {
+			UltraPermissionsAPI api = UltraPermissions.getAPI();
+			me.TechsCode.UltraPermissions.storage.objects.User user = api.getUsers().uuid(p.getUniqueId());
+		
+			if(fileUtils.cfg.getBoolean("SwitchUltraPermissionsGroupByNicking")) {
+				if(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId())) {
+					HashMap<String, Long> data = utils.getOldUltraPermissionsGroups().get(p.getUniqueId());
+					
+					data.keySet().forEach(group -> user.addGroup(api.getGroups().name(group), data.get(group)));
+					
+					utils.getOldUltraPermissionsGroups().remove(p.getUniqueId());
+				}
+			}
+		}
+		
+		if(utils.luckPermsStatus()) {
+			LuckPerms api = LuckPermsProvider.get();
+			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
+		
+			if(fileUtils.cfg.getBoolean("SwitchLuckPermsGroupByNicking")) {
+				if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())) {
+					user.setPrimaryGroup(utils.getOldLuckPermsGroups().get(p.getUniqueId()));
+					
+					utils.getOldLuckPermsGroups().remove(p.getUniqueId());
+				}
+			}
+		}
+		
 		if(utils.permissionsExStatus()) {
 			PermissionUser user = PermissionsEx.getUser(p);
 		
 			if(fileUtils.cfg.getBoolean("SwitchPermissionsExGroupByNicking")) {
-				if(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId()))
+				if(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId())) {
 					user.setGroups(utils.getOldPermissionsExGroups().get(p.getUniqueId()));
+					
+					utils.getOldPermissionsExGroups().remove(p.getUniqueId());
+				}
 			} else {
 				user.setPrefix(utils.getOldPermissionsExPrefixes().get(p.getUniqueId()), p.getWorld().getName());
 				user.setSuffix(utils.getOldPermissionsExSuffixes().get(p.getUniqueId()), p.getWorld().getName());
@@ -307,12 +340,12 @@ public class NickManager {
 		if(utils.ultraPermissionsStatus()) {
 			me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
 			
-			user.setPrefix(utils.getUltraPermsPrefixes().get(p.getUniqueId()));
-			user.setSuffix(utils.getUltraPermsSuffixes().get(p.getUniqueId()));
+			user.setPrefix(utils.getUltraPermissionsPrefixes().get(p.getUniqueId()));
+			user.setSuffix(utils.getUltraPermissionsSuffixes().get(p.getUniqueId()));
 			user.save();
 			
-			utils.getUltraPermsPrefixes().remove(p.getUniqueId());
-			utils.getUltraPermsSuffixes().remove(p.getUniqueId());
+			utils.getUltraPermissionsPrefixes().remove(p.getUniqueId());
+			utils.getUltraPermissionsSuffixes().remove(p.getUniqueId());
 		}
 		
 		if(utils.nameTagEditStatus()) {
@@ -561,7 +594,7 @@ public class NickManager {
 	public void updateLuckPerms(String prefix, String suffix) {
 		Utils utils = eazyNick.getUtils();
 		
-		if(utils.luckPermsStatus()) {
+		if(utils.luckPermsStatus() && eazyNick.getFileUtils().cfg.getBoolean("ChangeLuckPermsPrefixAndSufix")) {
 			LuckPerms api = LuckPermsProvider.get();
 			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
 			NodeBuilderRegistry nodeFactory = api.getNodeBuilderRegistry();
@@ -580,7 +613,7 @@ public class NickManager {
 	public void resetLuckPerms() {
 		Utils utils = eazyNick.getUtils();
 		
-		if(utils.luckPermsStatus()) {
+		if(utils.luckPermsStatus() && eazyNick.getFileUtils().cfg.getBoolean("ChangeLuckPermsPrefixAndSufix")) {
 			if(utils.getLuckPermsPrefixes().containsKey(p.getUniqueId()) && utils.getLuckPermsSuffixes().containsKey(p.getUniqueId())) {
 				LuckPerms api = LuckPermsProvider.get();
 				net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
@@ -694,19 +727,45 @@ public class NickManager {
 		}
 		
 		if(utils.ultraPermissionsStatus()) {
-			if(utils.getUltraPermsPrefixes().containsKey(p.getUniqueId()) && utils.getUltraPermsSuffixes().containsKey(p.getUniqueId())) {
-				utils.getUltraPermsPrefixes().remove(p.getUniqueId());
-				utils.getUltraPermsSuffixes().remove(p.getUniqueId());
+			if(utils.getUltraPermissionsPrefixes().containsKey(p.getUniqueId()) && utils.getUltraPermissionsSuffixes().containsKey(p.getUniqueId())) {
+				utils.getUltraPermissionsPrefixes().remove(p.getUniqueId());
+				utils.getUltraPermissionsSuffixes().remove(p.getUniqueId());
 			}
 			
-			me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+			UltraPermissionsAPI api = UltraPermissions.getAPI();
+			me.TechsCode.UltraPermissions.storage.objects.User user = api.getUsers().uuid(p.getUniqueId());
 			
-			utils.getUltraPermsPrefixes().put(p.getUniqueId(), user.getPrefix());
-			utils.getUltraPermsSuffixes().put(p.getUniqueId(), user.getSuffix());
+			utils.getUltraPermissionsPrefixes().put(p.getUniqueId(), user.getPrefix());
+			utils.getUltraPermissionsSuffixes().put(p.getUniqueId(), user.getSuffix());
 			
 			user.setPrefix(tabPrefix);
 			user.setSuffix(tabSuffix);
 			user.save();
+			
+			if(fileUtils.cfg.getBoolean("SwitchUltraPermissionsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
+				if(!(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId())))
+					utils.getOldUltraPermissionsGroups().put(p.getUniqueId(), new HashMap<>());
+				
+				for (Group group : user.getGroupsMap().keySet()) {
+					utils.getOldUltraPermissionsGroups().get(p.getUniqueId()).put(group.getName(), user.getGroupsMap().get(group));
+					
+					user.removeGroup(group);
+				}
+				
+				user.addGroup(api.getGroups().name(groupName));
+			}
+		}
+		
+		if(utils.luckPermsStatus()) {
+			LuckPerms api = LuckPermsProvider.get();
+			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
+		
+			if(fileUtils.cfg.getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
+				if(!(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())))
+					utils.getOldLuckPermsGroups().put(p.getUniqueId(), user.getPrimaryGroup());
+				
+				user.setPrimaryGroup(groupName);
+			}
 		}
 		
 		if(utils.permissionsExStatus()) {
