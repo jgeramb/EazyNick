@@ -1,6 +1,7 @@
 package net.dev.eazynick.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -101,8 +102,10 @@ public class PacketInjector_1_7 {
 				chatSerializer = reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 			
 			String fullText = "";
+			Method method = iChatBaseComponentClass.getDeclaredMethod("a");
+			method.setAccessible(true);
 			
-			for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod("a").invoke(iChatBaseComponent))) {
+			for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {
 				if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
 					String[] json = ((String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent)).replace("\"", "").replace("{", "").replace("}", "").split(",");
 					String text = "";
@@ -112,7 +115,6 @@ public class PacketInjector_1_7 {
 					boolean italic = false;
 					boolean strikethrough = false;
 					boolean underlined = false;
-					boolean reset = false;
 					
 					for (String s : json) {
 						if(s.startsWith("text:"))
@@ -127,8 +129,6 @@ public class PacketInjector_1_7 {
 							strikethrough = true;
 						else if(s.equals("underlined:true"))
 							underlined = true;
-						else if(s.equals("reset:true"))
-							reset = true;
 						else if(s.equals("color:black"))
 							color = "§0";
 						else if(s.equals("color:dark_blue"))
@@ -165,15 +165,18 @@ public class PacketInjector_1_7 {
 							color = "§f";
 					}
 					
-					fullText += color + (obfuscated ? "§k" : "") + (bold ? "§l" : "") + (italic ? "§o" : "") + (strikethrough ? "§m" : "") + (underlined ? "§n" : "") + (reset ? "§r" : "") + text;
+					fullText += (color.isEmpty() ? "§r" : color) + (obfuscated ? "§k" : "") + (bold ? "§l" : "") + (italic ? "§o" : "") + (strikethrough ? "§m" : "") + (underlined ? "§n" : "") + (color.isEmpty() ? "§r" : "") + text;
 				}
 			}
 			
 			if(!(fullText.contains(lastChatMessage) || fullText.startsWith(prefix))) {
-				for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod("a").invoke(iChatBaseComponent))) {
+				for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {
 					if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
 						String json = (String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent);
 							
+						if(json.startsWith("\""))
+							json = "{\"color\":\"white\",\"obfuscated\":false,\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underlined\":false,\"text\":" + json + "}";
+						
 						for (Player all : Bukkit.getOnlinePlayers()) {
 							NickManager api = new NickManager(all);
 							

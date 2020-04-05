@@ -7,8 +7,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.nametagedit.plugin.NametagEdit;
-
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.utils.FileUtils;
@@ -31,7 +29,7 @@ public class ScoreboardTeamManager {
 		this.p = p;
 		this.prefix = prefix;
 		this.suffix = suffix;
-		this.teamName = (eazyNick.getUtils().nameTagEditStatus() ? (NametagEdit.getApi().getFakeTeam(p).getName().split("_")[0] + "_TTTTT") : "99") + "-P";
+		this.teamName = "999999999" + p.getName();
 		
 		if(teamName.length() > 16)
 			teamName = teamName.substring(0, 16);

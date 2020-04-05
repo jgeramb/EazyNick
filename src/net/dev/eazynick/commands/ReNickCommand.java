@@ -76,7 +76,7 @@ public class ReNickCommand implements CommandExecutor {
 						if(!(isCancelled)) {
 							if(!(name.equalsIgnoreCase(p.getName()))) {
 								if(mysqlPlayerDataManager.isRegistered(p.getUniqueId())) {
-									new NickManager(p).setRank("Default");
+									new NickManager(p).setGroupName("Default");
 									
 									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
 											mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()),
@@ -93,7 +93,7 @@ public class ReNickCommand implements CommandExecutor {
 									String prefix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
 									String suffix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
 								
-									new NickManager(p).setRank("ServerFull");
+									new NickManager(p).setGroupName("ServerFull");
 									
 									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
 											serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"),

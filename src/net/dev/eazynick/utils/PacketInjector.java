@@ -1,6 +1,7 @@
 package net.dev.eazynick.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -94,96 +95,101 @@ public class PacketInjector {
 
 			Object iChatBaseComponent = field.get(packet);
 			Object editedComponent = null;
-			Class<?> iChatBaseComponentClass = reflectUtils.getNMSClass("IChatBaseComponent");
-			Class<?> chatSerializer = version.equals("1_8_R1") ? reflectUtils.getNMSClass("ChatSerializer") : reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 			
-			String fullText = "";
-			
-			for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15")) ? "getSiblings" : "a").invoke(iChatBaseComponent))) {
-				if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
-					String[] json = ((String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent)).replace("\"", "").replace("{", "").replace("}", "").split(",");
-					String text = "";
-					String color = "";
-					boolean obfuscated = false;
-					boolean bold = false;
-					boolean italic = false;
-					boolean strikethrough = false;
-					boolean underlined = false;
-					boolean reset = false;
-					
-					for (String s : json) {
-						if(s.startsWith("text:"))
-							text = s.replaceFirst("text:", "");
-						else if(s.equals("obfuscated:true"))
-							obfuscated = true;
-						else if(s.equals("bold:true"))
-							bold = true;
-						else if(s.equals("italic:true"))
-							italic = true;
-						else if(s.equals("strikethrough:true"))
-							strikethrough = true;
-						else if(s.equals("underlined:true"))
-							underlined = true;
-						else if(s.equals("reset:true"))
-							reset = true;
-						else if(s.equals("color:black"))
-							color = "§0";
-						else if(s.equals("color:dark_blue"))
-							color = "§1";
-						else if(s.equals("color:dark_green"))
-							color = "§2";
-						else if(s.equals("color:dark_aqua"))
-							color = "§3";
-						else if(s.equals("color:dark_red"))
-							color = "§4";
-						else if(s.equals("color:dark_purple"))
-							color = "§5";
-						else if(s.equals("color:gold"))
-							color = "§6";
-						else if(s.equals("color:gray"))
-							color = "§7";
-						else if(s.equals("color:dark_gray"))
-							color = "§8";
-						else if(s.equals("color:blue"))
-							color = "§9";
-						else if(s.equals("color:green"))
-							color = "§a";
-						else if(s.equals("color:aqua"))
-							color = "§b";
-						else if(s.equals("color:red"))
-							color = "§c";
-						else if(s.equals("color:light_purple"))
-							color = "§d";
-						else if(s.equals("color:yellow"))
-							color = "§e";
-						else if(s.equals("color:white"))
-							color = "§f";
-						else if(s.equals("color:white"))
-							color = "§f";
-					}
-					
-					fullText += color + (obfuscated ? "§k" : "") + (bold ? "§l" : "") + (italic ? "§o" : "") + (strikethrough ? "§m" : "") + (underlined ? "§n" : "") + (reset ? "§r" : "") + text;
-				}
-			}
-			
-			if(!(fullText.contains(lastChatMessage) || fullText.startsWith(prefix))) {
-				for (Object partlyIChatBaseComponent : ((List<Object>) iChatBaseComponentClass.getMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15")) ? "getSiblings" : "a").invoke(iChatBaseComponent))) {
+			if(iChatBaseComponent != null) {
+				Class<?> iChatBaseComponentClass = reflectUtils.getNMSClass("IChatBaseComponent");
+				Class<?> chatSerializer = version.equals("1_8_R1") ? reflectUtils.getNMSClass("ChatSerializer") : reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
+				
+				String fullText = "";
+				Method method = iChatBaseComponentClass.getDeclaredMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15")) ? "getSiblings" : "a");
+				method.setAccessible(true);
+				
+				for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {
 					if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
-						String json = (String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent);
-							
-						for (Player all : Bukkit.getOnlinePlayers()) {
-							NickManager api = new NickManager(all);
-							
-							if(api.isNicked())
-								json = json.replaceAll(api.getRealName(), api.getNickName());
-						}
-	
-						Object newPartlyIChatBaseComponent = chatSerializer.getMethod("a", String.class).invoke(null, json);
+						String[] json = ((String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent)).replace("\"", "").replace("{", "").replace("}", "").split(",");
+						String text = "";
+						String color = "";
+						boolean obfuscated = false;
+						boolean bold = false;
+						boolean italic = false;
+						boolean strikethrough = false;
+						boolean underlined = false;
 						
-						if(editedComponent == null)
-							editedComponent = newPartlyIChatBaseComponent;
-						else
-							iChatBaseComponentClass.getMethod("addSibling", iChatBaseComponentClass).invoke(editedComponent, newPartlyIChatBaseComponent);
+						for (String s : json) {
+							if(s.startsWith("text:"))
+								text = s.replaceFirst("text:", "");
+							else if(s.equals("obfuscated:true"))
+								obfuscated = true;
+							else if(s.equals("bold:true"))
+								bold = true;
+							else if(s.equals("italic:true"))
+								italic = true;
+							else if(s.equals("strikethrough:true"))
+								strikethrough = true;
+							else if(s.equals("underlined:true"))
+								underlined = true;
+							else if(s.equals("color:black"))
+								color = "§0";
+							else if(s.equals("color:dark_blue"))
+								color = "§1";
+							else if(s.equals("color:dark_green"))
+								color = "§2";
+							else if(s.equals("color:dark_aqua"))
+								color = "§3";
+							else if(s.equals("color:dark_red"))
+								color = "§4";
+							else if(s.equals("color:dark_purple"))
+								color = "§5";
+							else if(s.equals("color:gold"))
+								color = "§6";
+							else if(s.equals("color:gray"))
+								color = "§7";
+							else if(s.equals("color:dark_gray"))
+								color = "§8";
+							else if(s.equals("color:blue"))
+								color = "§9";
+							else if(s.equals("color:green"))
+								color = "§a";
+							else if(s.equals("color:aqua"))
+								color = "§b";
+							else if(s.equals("color:red"))
+								color = "§c";
+							else if(s.equals("color:light_purple"))
+								color = "§d";
+							else if(s.equals("color:yellow"))
+								color = "§e";
+							else if(s.equals("color:white"))
+								color = "§f";
+							else if(s.equals("color:white"))
+								color = "§f";
+						}
+						
+						fullText += (color.isEmpty() ? "§r" : color) + (obfuscated ? "§k" : "") + (bold ? "§l" : "") + (italic ? "§o" : "") + (strikethrough ? "§m" : "") + (underlined ? "§n" : "") + text;
+					}
+				}
+				
+				if(!(fullText.contains(lastChatMessage) || fullText.startsWith(prefix))) {
+					for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {
+						if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
+							String json = (String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent);
+	
+							if(json.startsWith("\""))
+								json = "{\"color\":\"white\",\"obfuscated\":false,\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underlined\":false,\"text\":" + json + "}";
+							
+							for (Player all : Bukkit.getOnlinePlayers()) {
+								NickManager api = new NickManager(all);
+								
+								if(api.isNicked())
+									json = json.replaceAll(api.getRealName(), api.getNickName());
+							}
+		
+							Object newPartlyIChatBaseComponent = chatSerializer.getMethod("a", String.class).invoke(null, json);
+							
+							if(editedComponent == null)
+								editedComponent = newPartlyIChatBaseComponent;
+							else
+								iChatBaseComponentClass.getMethod("addSibling", iChatBaseComponentClass).invoke(editedComponent, newPartlyIChatBaseComponent);
+						}
 					}
 				}
 			}

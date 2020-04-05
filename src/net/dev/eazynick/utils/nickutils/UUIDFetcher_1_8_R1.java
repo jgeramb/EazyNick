@@ -75,7 +75,7 @@ public class UUIDFetcher_1_8_R1 {
 			}
 		}
 
-		return UUID.fromString("640a5372-780b-4c2a-b7e7-8359d2f9a6a8");
+		return null;
 	}
 
 	public String getName(UUID uuid) {

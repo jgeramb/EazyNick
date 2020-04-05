@@ -267,7 +267,7 @@ public class EazyNick extends JavaPlugin {
 					utils.sendConsole("§7DeluxeChat hooked successfully!");
 				}
 			}
-		}, 20);
+		}, 10);
 	}
 
 	@Override

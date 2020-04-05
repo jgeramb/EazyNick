@@ -33,12 +33,12 @@ public class AsyncPlayerChatListener implements Listener {
 				if (api.isNicked()) {
 					e.setCancelled(true);
 					
-					String format = fileUtils.getConfigString("Settings.ChatFormat").replace("%displayName%", p.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", p.getName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", e.getMessage()).replace("§r", "§f");
+					String format = fileUtils.getConfigString("Settings.ChatFormat").replace("%displayName%", p.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", p.getName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", e.getMessage().replaceAll("%", "%%"));
 					
 					if(utils.placeholderAPIStatus())
 						format = PlaceholderAPI.setPlaceholders(p, format);
 					
-					e.setFormat(format.replaceAll("%", "%%"));
+					e.setFormat(format);
 					
 					Bukkit.getConsoleSender().sendMessage(format);
 	

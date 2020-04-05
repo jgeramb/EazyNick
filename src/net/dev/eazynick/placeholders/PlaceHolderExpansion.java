@@ -42,7 +42,7 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 				return api.getRealName();
 			
 			if(identifier.equals("rank"))
-				return api.getRank();
+				return api.getGroupName();
 		}
 		
 		return null;

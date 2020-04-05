@@ -128,7 +128,7 @@ public class NickCommand implements CommandExecutor {
 											
 											if(!(isCancelled)) {
 												if(!(name.equalsIgnoreCase(p.getName()))) {
-													name = ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(eazyNick.getUUIDFetcher().getUUID(name))));
+													name = ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? ((eazyNick.getUUIDFetcher_1_7().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_7().getName(eazyNick.getUUIDFetcher_1_7().getUUID(name)) : name) : (eazyNick.getVersion().equals("1_8_R1") ? ((eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_8_R1().getName(eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : name) : ((eazyNick.getUUIDFetcher().getUUID(name) != null) ? eazyNick.getUUIDFetcher().getName(eazyNick.getUUIDFetcher().getUUID(name)) : name)));
 													
 													boolean serverFull = utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
 													String nameWhithoutColors = ChatColor.stripColor(name);
@@ -154,7 +154,7 @@ public class NickCommand implements CommandExecutor {
 														tagPrefix = chatPrefix;
 														tagSuffix = chatSuffix;
 														
-														new NickManager(p).setRank("Default");
+														new NickManager(p).setGroupName("Default");
 													} else {
 														chatPrefix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"));
 														chatSuffix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"));
@@ -163,7 +163,7 @@ public class NickCommand implements CommandExecutor {
 														tagPrefix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix"));
 														tagSuffix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix"));
 													
-														new NickManager(p).setRank("ServerFull");
+														new NickManager(p).setGroupName("ServerFull");
 													}
 													
 													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, (utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));

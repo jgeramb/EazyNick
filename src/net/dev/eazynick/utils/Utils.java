@@ -62,7 +62,7 @@ public class Utils {
 	private HashMap<UUID, String> chatSuffixes = new HashMap<>();
 	private HashMap<UUID, String> tabPrefixes = new HashMap<>();
 	private HashMap<UUID, String> tabSuffixes = new HashMap<>();
-	private HashMap<UUID, String> nickRanks = new HashMap<>();
+	private HashMap<UUID, String> groupNames = new HashMap<>();
 
 	public boolean placeholderAPIStatus() {
 		return (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null);
@@ -343,8 +343,8 @@ public class Utils {
 		return tabSuffixes;
 	}
 	
-	public HashMap<UUID, String> getNickRanks() {
-		return nickRanks;
+	public HashMap<UUID, String> getGroupNames() {
+		return groupNames;
 	}
 	
 	public String getLastChatMessage() {

@@ -271,7 +271,7 @@ public class NickManager {
 		if(utils.getTabSuffixes().containsKey(p.getUniqueId()))
 			utils.getTabSuffixes().remove(p.getUniqueId());
 		
-		unsetRank();
+		unsetGroupName();
 		
 		if(utils.tabStatus() && !(TABAPI.hasHiddenNametag(p.getUniqueId()))) {
 			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTABNAME, nickName);
@@ -571,23 +571,23 @@ public class NickManager {
 		return utils.getOldPlayerListNames().containsKey(p.getUniqueId()) ? utils.getOldPlayerListNames().get(p.getUniqueId()) : p.getName();
 	}
 	
-	public String getRank() {
+	public String getGroupName() {
 		Utils utils = eazyNick.getUtils();
 		
-		return utils.getNickRanks().containsKey(p.getUniqueId()) ? utils.getNickRanks().get(p.getUniqueId()) : "NONE";
+		return utils.getGroupNames().containsKey(p.getUniqueId()) ? utils.getGroupNames().get(p.getUniqueId()) : "NONE";
 	}
 	
-	public void setRank(String rank) {
+	public void setGroupName(String rank) {
 		Utils utils = eazyNick.getUtils();
 		
-		utils.getNickRanks().put(p.getUniqueId(), rank);
+		utils.getGroupNames().put(p.getUniqueId(), rank);
 	}
 	
-	public void unsetRank() {
+	public void unsetGroupName() {
 		Utils utils = eazyNick.getUtils();
 		
-		if(utils.getNickRanks().containsKey(p.getUniqueId()))
-			utils.getNickRanks().remove(p.getUniqueId());
+		if(utils.getGroupNames().containsKey(p.getUniqueId()))
+			utils.getGroupNames().remove(p.getUniqueId());
 	}
 	
 	public void updateLuckPerms(String prefix, String suffix) {

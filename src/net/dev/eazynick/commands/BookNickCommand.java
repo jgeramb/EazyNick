@@ -143,7 +143,7 @@ public class BookNickCommand implements CommandExecutor {
 										utils.getLastSkinNames().put(p.getUniqueId(), skinName);
 										utils.getLastNickNames().put(p.getUniqueId(), name);
 										
-										new NickManager(p).setRank(args[0]);
+										new NickManager(p).setGroupName(args[0]);
 										
 										if(fileUtils.cfg.getBoolean("BungeeCord") && fileUtils.cfg.getBoolean("LobbyMode")) {
 											eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), name, skinName);

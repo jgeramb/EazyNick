@@ -116,7 +116,7 @@ public class FileUtils {
 		cfg.addDefault("Settings.ChangeOptions.UUID", false);
 		cfg.addDefault("Settings.ChangeOptions.DisplayName", true);
 		cfg.addDefault("Settings.ChangeOptions.PlayerListName", true);
-		cfg.addDefault("Settings.ChangeOptions.NameTagColored", true);
+		cfg.addDefault("Settings.ChangeOptions.NameTag", true);
 		cfg.addDefault("Settings.NickFormat.Chat.Prefix", "&8");
 		cfg.addDefault("Settings.NickFormat.Chat.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.PlayerList.Prefix", "&8");

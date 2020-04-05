@@ -63,7 +63,8 @@ public class PlayerNickListener implements Listener {
 						oldRank = utils.getOldPermissionsExGroups().get(p.getUniqueId()).toString();
 				}
 				
-				eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), oldRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
+				if(!(oldRank.equals("NONE")))
+					eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), oldRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
 			}
 			
 			if(!(e.isRenick()))
