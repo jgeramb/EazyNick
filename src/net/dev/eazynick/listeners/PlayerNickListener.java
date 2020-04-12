@@ -41,27 +41,23 @@ public class PlayerNickListener implements Listener {
 			}, fileUtils.cfg.getLong("Settings.NickDelay") * 20);
 			
 			if(fileUtils.cfg.getBoolean("BungeeCord")) {
-				String oldRank = "";
+				String oldRank = e.getGroupName();
 				
-				if(utils.ultraPermissionsStatus()) {
-					if(e.isJoinNick())
-						oldRank = e.getGroupName();
-					else if(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId()))
-						oldRank = utils.getOldUltraPermissionsGroups().get(p.getUniqueId()).toString();
-				}
-				
-				if(utils.luckPermsStatus()) {
-					if(e.isJoinNick())
-						oldRank = e.getGroupName();
-					else if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId()))
-						oldRank = utils.getOldLuckPermsGroups().get(p.getUniqueId());
-				}
-				
-				if(utils.permissionsExStatus()) {
-					if(e.isJoinNick())
-						oldRank = e.getGroupName();
-					else if(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId()))
-						oldRank = utils.getOldPermissionsExGroups().get(p.getUniqueId()).toString();
+				if(!(e.isJoinNick())) {
+					if(utils.ultraPermissionsStatus()) {
+						if(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId()))
+							oldRank = utils.getOldUltraPermissionsGroups().get(p.getUniqueId()).toString();
+					}
+					
+					if(utils.luckPermsStatus()) {
+						if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId()))
+							oldRank = utils.getOldLuckPermsGroups().get(p.getUniqueId());
+					}
+					
+					if(utils.permissionsExStatus()) {
+						if(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId()))
+							oldRank = utils.getOldPermissionsExGroups().get(p.getUniqueId()).toString();
+					}
 				}
 				
 				if(!(oldRank.equals("NONE")))

@@ -152,11 +152,11 @@ public class BookNickCommand implements CommandExecutor {
 										utils.getLastSkinNames().put(p.getUniqueId(), skinName);
 										utils.getLastNickNames().put(p.getUniqueId(), name);
 										
-										new NickManager(p).setGroupName(args[0]);
+										new NickManager(p).setGroupName(groupName);
 										
 										if(fileUtils.cfg.getBoolean("BungeeCord") && fileUtils.cfg.getBoolean("LobbyMode")) {
 											eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), name, skinName);
-											eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
+											eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 											
 											if(bookGUIFileUtils.cfg.getBoolean("BookGUI.Page6.Enabled"))
 												nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
