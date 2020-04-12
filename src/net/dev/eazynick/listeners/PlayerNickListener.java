@@ -15,7 +15,7 @@ import net.dev.eazynick.utils.Utils;
 
 public class PlayerNickListener implements Listener {
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerNick(PlayerNickEvent e) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
@@ -31,7 +31,8 @@ public class PlayerNickListener implements Listener {
 			api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getGroupName());
 			
 			utils.getCanUseNick().put(p.getUniqueId(), false);
-			Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+			
+			Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 				
 				@Override
 				public void run() {

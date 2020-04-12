@@ -89,7 +89,7 @@ public class ReNickCommand implements CommandExecutor {
 											false,
 											"NONE"));
 								} else {
-									boolean serverFull = utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
+									boolean serverFull = utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
 									String prefix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
 									String suffix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
 								
@@ -104,7 +104,7 @@ public class ReNickCommand implements CommandExecutor {
 											suffix,
 											true,
 											false,
-											(utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+											(utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
 								}
 							} else
 								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));

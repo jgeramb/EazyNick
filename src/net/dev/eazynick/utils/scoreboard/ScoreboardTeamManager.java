@@ -179,7 +179,7 @@ public class ScoreboardTeamManager {
 		try {
 			Object playerHandle = p.getClass().getMethod("getHandle", new Class[0]).invoke(p, new Object[0]);
 			Object playerConnection = playerHandle.getClass().getField("playerConnection").get(playerHandle);
-			playerConnection.getClass().getMethod("sendPacket", new Class[] { EazyNick.getInstance().getReflectUtils().getNMSClass("Packet") }).invoke(playerConnection, new Object[] { packet });
+			playerConnection.getClass().getMethod("sendPacket", new Class[] { eazyNick.getReflectUtils().getNMSClass("Packet") }).invoke(playerConnection, new Object[] { packet });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

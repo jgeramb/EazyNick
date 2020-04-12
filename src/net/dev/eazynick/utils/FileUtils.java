@@ -62,6 +62,7 @@ public class FileUtils {
 		cfg.addDefault("DisconnectUnnick", true);
 		cfg.addDefault("SeeNickSelf", true);
 		cfg.addDefault("ReplaceNickedChatFormat", true);
+		cfg.addDefault("OverwriteJoinQuitMessages", false);
 		cfg.addDefault("AllowPlayersToNickAsOnlinePlayers", false);
 		cfg.addDefault("AllowPlayersToNickAsKnownPlayers", false);
 		cfg.addDefault("SwitchUltraPermissionsGroupByNicking", false);
@@ -83,12 +84,15 @@ public class FileUtils {
 		cfg.addDefault("BypassFormat.NameTagPrefix", "&dBYPASS &7| &d");
 		cfg.addDefault("BypassFormat.NameTagSuffix", "&r");
 		
+		cfg.addDefault("OverwrittenMessages.Join", "&8[&a+&8] &7%name%");
+		cfg.addDefault("OverwrittenMessages.Quit", "&8[&c-&8] &7%name%");
+		
 		cfg.addDefault("NickMessage.OnNnick", false);
 		cfg.addDefault("NickMessage.OnUnnick", false);
-		cfg.addDefault("NickMessage.Nick.Quit", "&8[&c-&8] &7%name%");
 		cfg.addDefault("NickMessage.Nick.Join", "&8[&a+&8] &7%name%");
-		cfg.addDefault("NickMessage.Unnick.Quit", "&8[&c-&8] &7%displayName%");
+		cfg.addDefault("NickMessage.Nick.Quit", "&8[&c-&8] &7%name%");
 		cfg.addDefault("NickMessage.Unnick.Join", "&8[&a+&8] &7%displayName%");
+		cfg.addDefault("NickMessage.Unnick.Quit", "&8[&c-&8] &7%displayName%");
 		
 		cfg.addDefault("NickCommands.SendAsConsole", false);
 		cfg.addDefault("NickCommands.OnNick", false);
@@ -112,25 +116,25 @@ public class FileUtils {
 		cfg.addDefault("NickItem.Enchanted.Disabled", false);
 
 		cfg.addDefault("Settings.NickDelay", (long) 0.5);
-		cfg.addDefault("Settings.ChatFormat", "%prefix%%playerName%%suffix%&7: &r%message%");
+		cfg.addDefault("Settings.ChatFormat", "%prefix%%playerName%%suffix%: %message%");
 		cfg.addDefault("Settings.ChangeOptions.UUID", false);
 		cfg.addDefault("Settings.ChangeOptions.DisplayName", true);
 		cfg.addDefault("Settings.ChangeOptions.PlayerListName", true);
 		cfg.addDefault("Settings.ChangeOptions.NameTag", true);
-		cfg.addDefault("Settings.NickFormat.Chat.Prefix", "&8");
-		cfg.addDefault("Settings.NickFormat.Chat.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.PlayerList.Prefix", "&8");
-		cfg.addDefault("Settings.NickFormat.PlayerList.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.NameTag.Prefix", "&8");
-		cfg.addDefault("Settings.NickFormat.NameTag.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.GroupName", "Spieler");
-		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Prefix", "&6");
+		cfg.addDefault("Settings.NickFormat.Chat.Prefix", "&7");
+		cfg.addDefault("Settings.NickFormat.Chat.Suffix", "&7");
+		cfg.addDefault("Settings.NickFormat.PlayerList.Prefix", "&7");
+		cfg.addDefault("Settings.NickFormat.PlayerList.Suffix", "&7");
+		cfg.addDefault("Settings.NickFormat.NameTag.Prefix", "&7");
+		cfg.addDefault("Settings.NickFormat.NameTag.Suffix", "&7");
+		cfg.addDefault("Settings.NickFormat.GroupName", "Default");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Prefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Prefix", "&6");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Prefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Prefix", "&6");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Prefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Suffix", "&r");
-		cfg.addDefault("Settings.NickFormat.ServerFullRank.GroupName", "Premium");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.GroupName", "VIP");
 		cfg.addDefault("AutoNickWorldBlackList", Arrays.asList("world"));
 		cfg.addDefault("BlackList", Arrays.asList("ExampleName"));
 		

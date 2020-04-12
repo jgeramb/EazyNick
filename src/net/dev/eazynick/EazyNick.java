@@ -161,7 +161,7 @@ public class EazyNick extends JavaPlugin {
 						new PacketInjector().init();
 					
 					if (fileUtils.cfg.getBoolean("APIMode") == false) {
-						getCommand("eazynick").setExecutor(new NickHelpCommand());
+						getCommand("eazynick").setExecutor(new HelpCommand());
 						getCommand("nickother").setExecutor(new NickOtherCommand());
 						getCommand("changeskin").setExecutor(new ChangeSkinCommand());
 						getCommand("nicklist").setExecutor(new NickListCommand());

@@ -34,7 +34,7 @@ public class ActionBarUtils {
 						else
 							sendPacket(p, chatPacket);
 					}
-				}.runTaskTimer(EazyNick.getInstance(), 1, 1);
+				}.runTaskTimer(eazyNick, 1, 1);
 			} else
 				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
 		} catch (Exception e) {

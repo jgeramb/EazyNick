@@ -36,7 +36,7 @@ public class NickOtherCommand implements CommandExecutor {
 									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.SelectedNick").replace("%playerName%", t.getName()).replace("%nickName%", ChatColor.translateAlternateColorCodes('&', name)));
 									
 									if((!(t.hasPermission("nick.use"))) || !(t.hasPermission("nick.customnickname"))) {
-										PermissionAttachment pa = t.addAttachment(EazyNick.getInstance());
+										PermissionAttachment pa = t.addAttachment(eazyNick);
 										pa.setPermission("nick.use", true);
 										pa.setPermission("nick.customnickname", true);
 										t.recalculatePermissions();
@@ -54,7 +54,7 @@ public class NickOtherCommand implements CommandExecutor {
 								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.RandomNick").replace("%playerName%", t.getName()));
 								
 								if(!(t.hasPermission("nick.use"))) {
-									PermissionAttachment pa = t.addAttachment(EazyNick.getInstance());
+									PermissionAttachment pa = t.addAttachment(eazyNick);
 									pa.setPermission("nick.use", true);
 									t.recalculatePermissions();
 									
@@ -69,7 +69,7 @@ public class NickOtherCommand implements CommandExecutor {
 							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.Unnick").replace("%playerName%", t.getName()));
 							
 							if(!(t.hasPermission("nick.use"))) {
-								PermissionAttachment pa = t.addAttachment(EazyNick.getInstance());
+								PermissionAttachment pa = t.addAttachment(eazyNick);
 								pa.setPermission("nick.use", true);
 								t.recalculatePermissions();
 								

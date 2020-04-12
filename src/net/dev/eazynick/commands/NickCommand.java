@@ -40,7 +40,7 @@ public class NickCommand implements CommandExecutor {
 						if(args.length == 0) {
 							if(fileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand")) {
 								if(!(p.hasPermission("nick.gui"))) {
-									PermissionAttachment pa = p.addAttachment(EazyNick.getInstance());
+									PermissionAttachment pa = p.addAttachment(eazyNick);
 									pa.setPermission("nick.gui", true);
 									p.recalculatePermissions();
 									
@@ -52,7 +52,7 @@ public class NickCommand implements CommandExecutor {
 									p.chat("/bookgui");
 							} else if(fileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
 								if(!(p.hasPermission("nick.gui"))) {
-									PermissionAttachment pa = p.addAttachment(EazyNick.getInstance());
+									PermissionAttachment pa = p.addAttachment(eazyNick);
 									pa.setPermission("nick.gui", true);
 									p.recalculatePermissions();
 									
@@ -81,7 +81,7 @@ public class NickCommand implements CommandExecutor {
 									}
 								}
 	
-								boolean serverFull = utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
+								boolean serverFull = utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
 								String prefix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
 								String suffix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
 								
@@ -94,7 +94,7 @@ public class NickCommand implements CommandExecutor {
 										suffix,
 										false,
 										false,
-										(utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+										(utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
 							}
 						} else {
 							if(p.hasPermission("nick.customnickname")) {
@@ -130,7 +130,7 @@ public class NickCommand implements CommandExecutor {
 												if(!(name.equalsIgnoreCase(p.getName()))) {
 													name = ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? ((eazyNick.getUUIDFetcher_1_7().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_7().getName(eazyNick.getUUIDFetcher_1_7().getUUID(name)) : name) : (eazyNick.getVersion().equals("1_8_R1") ? ((eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_8_R1().getName(eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : name) : ((eazyNick.getUUIDFetcher().getUUID(name) != null) ? eazyNick.getUUIDFetcher().getName(eazyNick.getUUIDFetcher().getUUID(name)) : name)));
 													
-													boolean serverFull = utils.getOnlinePlayers() >= Bukkit.getMaxPlayers();
+													boolean serverFull = utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
 													String nameWhithoutColors = ChatColor.stripColor(name);
 													String[] prefixSuffix = name.split(nameWhithoutColors);
 													String chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix;
@@ -166,7 +166,7 @@ public class NickCommand implements CommandExecutor {
 														new NickManager(p).setGroupName("ServerFull");
 													}
 													
-													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, (utils.getOnlinePlayers() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, (utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
 												} else
 													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
 											} else

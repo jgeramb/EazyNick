@@ -9,7 +9,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utils.Utils;
 
-public class NickHelpCommand implements CommandExecutor {
+public class HelpCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -18,7 +18,7 @@ public class NickHelpCommand implements CommandExecutor {
 		
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
-			PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
+			PluginDescriptionFile desc = eazyNick.getDescription();
 			
 			if(p.hasPermission("nick.showhelp")) {
 				p.sendMessage(utils.getPrefix() + "§7===== §8[ §5" + desc.getName() + " §8] §7=====");
@@ -60,8 +60,10 @@ public class NickHelpCommand implements CommandExecutor {
 						p.sendMessage(utils.getPrefix() + "§7/reloadconfig §8» §eConfig reload");
 						p.sendMessage(utils.getPrefix() + "§7");
 						p.sendMessage(utils.getPrefix() + "§7/eazynick [1-3] §8» §ePlugin help");
-					} else
-						p.sendMessage(utils.getPrefix() + "§cPage not found!");
+					} else if(args[0].equalsIgnoreCase("reload") && p.hasPermission("nick.reload"))
+						p.chat("/reloadconfig");
+					else
+						p.sendMessage(utils.getPrefix() + "§cPage §e" + args[0] + " could not be found (Pages: 0-3)");
 				}
 			} else {
 				p.sendMessage(utils.getPrefix() + "§7===== §8[ §5" + desc.getName() + " §8] §7=====");

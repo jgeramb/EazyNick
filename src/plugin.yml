@@ -1,5 +1,5 @@
 name: EazyNick
-version: 2.2
+version: 2.3
 author: Justix
 main: net.dev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)
@@ -62,9 +62,6 @@ commands:
       reloadconfig:
         permission: nick.reload
         description: Reloads the configuration file
-        aliases:
-        - reloadcfg
-        - rlcfg
       fixskin:
         permission: nick.fixskin
         description: Fixes your skin, if it was not loaded correctly

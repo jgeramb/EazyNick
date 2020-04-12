@@ -28,13 +28,13 @@ public class PlayerChangedWorldListener implements Listener {
 					if (!(api.isNicked()))
 						p.chat("/renick");
 					else {
-						Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+						Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
 							@Override
 							public void run() {
 								api.unnickPlayer();
 								
-								Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+								Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
 									@Override
 									public void run() {

@@ -178,17 +178,8 @@ public class Utils {
 		return is;
 	}
 
-	public int getOnlinePlayers() {
-		if(EazyNick.getInstance().getVersion().equals("1_7_R4")) {
-			try {
-				return Bukkit.getOnlinePlayers().getClass().getField("length").getInt(Bukkit.getOnlinePlayers());
-			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-				e.printStackTrace();
-			}
-		} else
-			return Bukkit.getOnlinePlayers().size();
-		
-		return 0;
+	public int getOnlinePlayerCount() {
+		return Bukkit.getOnlinePlayers().size();
 	}
 	
 	public String getPrefix() {

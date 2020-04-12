@@ -46,7 +46,7 @@ public class PlayerJoinListener implements Listener {
 		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(p.getName());
 
-		if (e.getJoinMessage() != null && e.getJoinMessage() != "") {
+		if ((e.getJoinMessage() != null) && (e.getJoinMessage() != "")) {
 			if (fileUtils.cfg.getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(p.getUniqueId())) {
 				if (e.getJoinMessage().contains("formerly known as"))
 					e.setJoinMessage("§e" + p.getName() + " joined the game");
@@ -59,8 +59,19 @@ public class PlayerJoinListener implements Listener {
 				e.setJoinMessage(e.getJoinMessage().replace(p.getName(), utils.getPlayerNicknames().get(p.getUniqueId())));
 			}
 		}
+		
+		if(fileUtils.cfg.getBoolean("OverwriteJoinQuitMessages")) {
+			String message = fileUtils.getConfigString("OverwrittenMessages.Join");
+			
+			if(mysqlNickManager.isPlayerNicked(p.getUniqueId()))
+				message = message.replace("%name%", mysqlNickManager.getNickName(p.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()) + mysqlNickManager.getNickName(p.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()));
+			else if(utils.getPlayerNicknames().containsKey(p.getUniqueId()))
+				message = message.replace("%name%", utils.getPlayerNicknames().get(p.getUniqueId()).replace("%displayName%", utils.getChatPrefixes().get(p.getUniqueId()) + utils.getPlayerNicknames().get(p.getUniqueId()) + utils.getChatSuffixes().get(p.getUniqueId())));
+				
+			e.setJoinMessage(message);
+		}
 
-		Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
 			@EventHandler
 			public void run() {
@@ -74,7 +85,7 @@ public class PlayerJoinListener implements Listener {
 
 								apiAll.unnickPlayerWithoutRemovingMySQL(false);
 								
-								Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+								Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
 									@Override
 									public void run() {
@@ -99,7 +110,7 @@ public class PlayerJoinListener implements Listener {
 					if (fileUtils.cfg.getBoolean("LobbyMode") == false) {
 						if (mysqlNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (!(api.isNicked())) {
-								Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+								Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
 									@Override
 									public void run() {
@@ -140,7 +151,7 @@ public class PlayerJoinListener implements Listener {
 				
 				if (fileUtils.cfg.getBoolean("JoinNick")) {
 					if (!(api.isNicked())) {
-						Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+						Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
 							@Override
 							public void run() {
@@ -153,7 +164,7 @@ public class PlayerJoinListener implements Listener {
 						if (api.isNicked()) {
 							api.unnickPlayerWithoutRemovingMySQL(false);
 							
-							Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+							Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 	
 								@Override
 								public void run() {

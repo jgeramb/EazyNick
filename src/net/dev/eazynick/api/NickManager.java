@@ -211,7 +211,7 @@ public class NickManager {
 				public void run() {
 					ActionBarUtils actionBarUtils = eazyNick.getActionBarUtils();
 					
-					if(EazyNick.getInstance().isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline())
+					if(eazyNick.isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline())
 						actionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), eazyNick.getLanguageFileUtils().getConfigString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", utils.getPrefix()), 20);
 					else {
 						actionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "", 5);
@@ -305,7 +305,7 @@ public class NickManager {
 		if(utils.luckPermsStatus()) {
 			LuckPerms api = LuckPermsProvider.get();
 			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
-		
+			
 			if(fileUtils.cfg.getBoolean("SwitchLuckPermsGroupByNicking")) {
 				if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())) {
 					user.setPrimaryGroup(utils.getOldLuckPermsGroups().get(p.getUniqueId()));
@@ -361,14 +361,14 @@ public class NickManager {
 			utils.getNametagEditSuffixes().remove(p.getUniqueId());
 		}
 		
-		if(!(EazyNick.getInstance().isEnabled()))
+		if(!(eazyNick.isEnabled()))
 			return;
 		
 		UUID uuid = p.getUniqueId();
 		String oldDisplayName = getOldDisplayName();
 		String oldPlayerListName = getOldPlayerListName();
 		
-		Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 			
 			@Override
 			public void run() {
@@ -681,7 +681,7 @@ public class NickManager {
 
 					sbtm.destroyTeam();
 					
-					if(EazyNick.getInstance().isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline()) {
+					if(eazyNick.isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline()) {
 						sbtm.createTeam();
 						
 						if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.PlayerListName")) {
@@ -690,7 +690,7 @@ public class NickManager {
 							
 							if(utils.placeholderAPIStatus()) {
 								tmpTabPrefix = PlaceholderAPI.setPlaceholders(p, tmpTabPrefix);
-								tmpTabSuffix = PlaceholderAPI.setPlaceholders(p, tmpTabPrefix);
+								tmpTabSuffix = PlaceholderAPI.setPlaceholders(p, tmpTabSuffix);
 							}
 							
 							setPlayerListName(tmpTabPrefix + p.getName() + tmpTabSuffix);

@@ -8,6 +8,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
+import net.dev.eazynick.sql.MySQLNickManager;
+import net.dev.eazynick.sql.MySQLPlayerDataManager;
+import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.Utils;
 
 public class PlayerQuitListener implements Listener {
@@ -16,6 +19,9 @@ public class PlayerQuitListener implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
 		Player p = e.getPlayer();
 		NickManager api = new NickManager(p);
@@ -24,8 +30,19 @@ public class PlayerQuitListener implements Listener {
 			utils.getNameCache().remove(p.getUniqueId());
 		
 		if (api.isNicked()) {
-			if (eazyNick.getFileUtils().cfg.getBoolean("DisconnectUnnick"))
+			if (fileUtils.cfg.getBoolean("DisconnectUnnick"))
 				api.unnickPlayerWithoutRemovingMySQL(true);
+		}
+		
+		if(fileUtils.cfg.getBoolean("OverwriteJoinQuitMessages")) {
+			String message = fileUtils.getConfigString("OverwrittenMessages.Quit");
+			
+			if(mysqlNickManager.isPlayerNicked(p.getUniqueId()))
+				message = message.replace("%name%", mysqlNickManager.getNickName(p.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()) + mysqlNickManager.getNickName(p.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()));
+			else if(utils.getPlayerNicknames().containsKey(p.getUniqueId()))
+				message = message.replace("%name%", utils.getPlayerNicknames().get(p.getUniqueId()).replace("%displayName%", utils.getChatPrefixes().get(p.getUniqueId()) + utils.getPlayerNicknames().get(p.getUniqueId()) + utils.getChatSuffixes().get(p.getUniqueId())));
+				
+			e.setQuitMessage(message);
 		}
 	}
 

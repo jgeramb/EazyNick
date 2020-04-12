@@ -102,7 +102,7 @@ public class AnvilGUI {
 			
 		};
 
-		Bukkit.getPluginManager().registerEvents(listener, EazyNick.getInstance());
+		Bukkit.getPluginManager().registerEvents(listener, eazyNick);
 	}
 
 	public Player getPlayer() {

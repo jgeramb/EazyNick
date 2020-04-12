@@ -35,7 +35,7 @@ public class SignGUI implements Listener {
 		sign.setLine(3, line4);
 		sign.update();
 		
-		Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 			
 			@Override
 			public void run() {
@@ -58,7 +58,7 @@ public class SignGUI implements Listener {
 
 					playerConnection.getClass().getDeclaredMethod("sendPacket", reflectUtils.getNMSClass("Packet")).invoke(playerConnection, reflectUtils.getNMSClass("PacketPlayOutOpenSignEditor").getConstructor(reflectUtils.getNMSClass("BlockPosition")).newInstance(reflectUtils.getNMSClass("BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
 		            
-					Bukkit.getScheduler().runTaskLater(EazyNick.getInstance(), () -> b.setType(Material.AIR), 5);
+					Bukkit.getScheduler().runTaskLater(eazyNick, () -> b.setType(Material.AIR), 5);
 					
 					Object networkManager = playerConnection.getClass().getDeclaredField("networkManager").get(playerConnection);
 					Channel channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
@@ -81,7 +81,7 @@ public class SignGUI implements Listener {
 							}
 						}
 						
-					}, EazyNick.getInstance());
+					}, eazyNick);
 					
 					if (channel.pipeline().get("PacketInjector") == null) {
 						channel.pipeline().addBefore("packet_handler", "PacketInjector", new ChannelDuplexHandler() {
@@ -91,7 +91,7 @@ public class SignGUI implements Listener {
 								if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
 									Object[] rawLines = (Object[]) reflectUtils.getField(packet.getClass(), "b").get(packet);
 									
-									Bukkit.getScheduler().runTask(EazyNick.getInstance(), new Runnable() {
+									Bukkit.getScheduler().runTask(eazyNick, new Runnable() {
 										
 										@Override
 										public void run() {

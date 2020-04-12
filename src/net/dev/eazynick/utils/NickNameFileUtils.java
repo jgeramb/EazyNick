@@ -18,7 +18,7 @@ public class NickNameFileUtils {
 	public NickNameFileUtils() {
 		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
 		
-		directory = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/");
+		directory = new File("plugins/" + desc.getName() + "/");
 		file = new File(directory, "nickNames.yml");		
 		
 		if (!(directory.exists()))

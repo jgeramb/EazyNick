@@ -83,9 +83,9 @@ public class BookGUICommand implements CommandExecutor {
 					TextComponent option1 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.NormalSkin.Text"));
 					option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " DEFAULT"));
 					option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.NormalSkin.Hover")) }));
-					TextComponent option2 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.StevenAlexSkin.Text"));
+					TextComponent option2 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.SteveAlexSkin.Text"));
 					option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " NORMAL"));
-					option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.StevenAlexSkin.Hover")) }));
+					option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.SteveAlexSkin.Hover")) }));
 					TextComponent option3 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.RandomSkin.Text"));
 					option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " +args[1] + " RANDOM"));
 					option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.RandomSkin.Hover")) }));

@@ -39,9 +39,9 @@ public class PlayerCommandPreprocessListener implements Listener {
 			if (p.hasPermission("bukkit.command.help")) {
 				e.setCancelled(true);
 
-				p.sendMessage("§e--------- §fHelp: " + EazyNick.getInstance().getDescription().getName() + " §e----------------------");
-				p.sendMessage("§7Below is a list of all " + EazyNick.getInstance().getDescription().getName() + " commands:");
-				p.sendMessage("§6/eazynick: §r" + EazyNick.getInstance().getCommand("eazynick").getDescription());
+				p.sendMessage("§e--------- §fHelp: " + eazyNick.getDescription().getName() + " §e----------------------");
+				p.sendMessage("§7Below is a list of all " + eazyNick.getDescription().getName() + " commands:");
+				p.sendMessage("§6/eazynick: §r" + eazyNick.getCommand("eazynick").getDescription());
 			}
 		}
 	}

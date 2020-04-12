@@ -17,7 +17,7 @@ public class BookGUIFileUtils {
 	public BookGUIFileUtils() {
 		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
 		
-		directory = new File("plugins/" + EazyNick.getInstance().getDescription().getName() + "/");
+		directory = new File("plugins/" + desc.getName() + "/");
 		file = new File(directory, "bookgui.yml");
 				
 		if (!(directory.exists()))
@@ -48,7 +48,7 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.Page2.Title", "Ranks");
 		cfg.addDefault("BookGUI.Page2.Text", "&0Let's get you set up with your nickname! First, you'll need to choose which &lRANK &0you would like to be shown as when nicked.\n\n");
 		cfg.addDefault("BookGUI.Page3.Title", "Skin");
-		cfg.addDefault("BookGUI.Page3.Text","&0Awesome! Now, wich &lSKIN &0would you like to have while nicked?\n\n");
+		cfg.addDefault("BookGUI.Page3.Text","&0Awesome! Now, which &lSKIN &0would you like to have while nicked?\n\n");
 		cfg.addDefault("BookGUI.Page4.Title", "Name");
 		cfg.addDefault("BookGUI.Page4.Text", "&0Alright, now you'll need to choose the &0&lNAME &0to use!\n\n");
 		cfg.addDefault("BookGUI.Page5.Title", "RandomNick");
@@ -59,14 +59,14 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!\n\nWhen you go into a game, you will be nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
 		cfg.addDefault("BookGUI.Page6.Enabled", true);
 		
-		cfg.addDefault("BookGUI.Accept.Text", "&0&n" + arrow + " I understand, set\n&nup my nickname");
+		cfg.addDefault("BookGUI.Accept.Text", arrow + " &nI understand, set\n&nup my nickname");
 		cfg.addDefault("BookGUI.Accept.Hover", "&fClick here to proceed");
 		cfg.addDefault("BookGUI.Rank.Text", arrow + " %rank%\n");
 		cfg.addDefault("BookGUI.Rank.Hover", "&fClick here to be shown as %rank%");
 		cfg.addDefault("BookGUI.NormalSkin.Text", arrow + " &0My normal skin\n");
 		cfg.addDefault("BookGUI.NormalSkin.Hover", "&fClick here to use your normal skin");
-		cfg.addDefault("BookGUI.StevenAlexSkin.Text", arrow + " &0Steven/Alex skin\n");
-		cfg.addDefault("BookGUI.StevenAlexSkin.Hover", "&fClick here to use a Steven/Alex skin");
+		cfg.addDefault("BookGUI.SteveAlexSkin.Text", arrow + " &0Steve/Alex skin\n");
+		cfg.addDefault("BookGUI.SteveAlexSkin.Hover", "&fClick here to use a Steve/Alex skin");
 		cfg.addDefault("BookGUI.RandomSkin.Text", arrow + " &0Random skin\n");
 		cfg.addDefault("BookGUI.RandomSkin.Hover", "&fClick here to use a random skin");
 		cfg.addDefault("BookGUI.ReuseSkin.Text", arrow + " &0Reuse %skin%\n");
@@ -98,35 +98,35 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.Rank2.Enabled", true);
 		cfg.addDefault("BookGUI.Rank2.Rank", "&aVIP");
 		cfg.addDefault("BookGUI.Rank2.RankName", "VIP");
-		cfg.addDefault("BookGUI.Rank2.Permission", "nick.rank.2");
+		cfg.addDefault("BookGUI.Rank2.Permission", "nick.rank.vip");
 		cfg.addDefault("BookGUI.Rank3.Enabled", true);
 		cfg.addDefault("BookGUI.Rank3.Rank", "&aVIP&6+");
 		cfg.addDefault("BookGUI.Rank3.RankName", "VIPPLUS");
-		cfg.addDefault("BookGUI.Rank3.Permission", "nick.rank.3");
+		cfg.addDefault("BookGUI.Rank3.Permission", "nick.rank.vipplus");
 		cfg.addDefault("BookGUI.Rank4.Enabled", true);
-		cfg.addDefault("BookGUI.Rank4.Rank", "&aVIP&6++");
-		cfg.addDefault("BookGUI.Rank4.RankName", "VIPPLUSPLUS");
-		cfg.addDefault("BookGUI.Rank4.Permission", "nick.rank.4");
+		cfg.addDefault("BookGUI.Rank4.Rank", "&bMVP");
+		cfg.addDefault("BookGUI.Rank4.RankName", "MVP");
+		cfg.addDefault("BookGUI.Rank4.Permission", "nick.rank.mvp");
 		cfg.addDefault("BookGUI.Rank5.Enabled", true);
-		cfg.addDefault("BookGUI.Rank5.Rank", "&bMVP");
-		cfg.addDefault("BookGUI.Rank5.RankName", "MVP");
-		cfg.addDefault("BookGUI.Rank5.Permission", "nick.rank.5");
+		cfg.addDefault("BookGUI.Rank5.Rank", "&bMVP&c+");
+		cfg.addDefault("BookGUI.Rank5.RankName", "MVPPLUS");
+		cfg.addDefault("BookGUI.Rank5.Permission", "nick.rank.mvpplus");
 		cfg.addDefault("BookGUI.Rank6.Enabled", true);
-		cfg.addDefault("BookGUI.Rank6.Rank", "&bMVP&c+");
-		cfg.addDefault("BookGUI.Rank6.RankName", "MVPPLUS");
-		cfg.addDefault("BookGUI.Rank6.Permission", "nick.rank.6");
+		cfg.addDefault("BookGUI.Rank6.Rank", "&6MVP&c++");
+		cfg.addDefault("BookGUI.Rank6.RankName", "MVPPLUSPLUS");
+		cfg.addDefault("BookGUI.Rank6.Permission", "nick.rank.mvpplusplus");
 
 		cfg.addDefault("Settings.NickFormat.Rank1.ChatPrefix", "&7");
-		cfg.addDefault("Settings.NickFormat.Rank1.ChatSuffix", "&r");
+		cfg.addDefault("Settings.NickFormat.Rank1.ChatSuffix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.TabPrefix", "&7");
-		cfg.addDefault("Settings.NickFormat.Rank1.TabSuffix", "&r");
+		cfg.addDefault("Settings.NickFormat.Rank1.TabSuffix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.TagPrefix", "&7");
-		cfg.addDefault("Settings.NickFormat.Rank1.TagSuffix", "&r");
+		cfg.addDefault("Settings.NickFormat.Rank1.TagSuffix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.GroupName", "Default");
 		
 		cfg.addDefault("Settings.NickFormat.Rank2.ChatPrefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.Rank2.ChatSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank2.TabPrefix", "&aVIP &7| &a");
+		cfg.addDefault("Settings.NickFormat.Rank2.TabPrefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.Rank2.TabSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank2.TagPrefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.Rank2.TagSuffix", "&r");
@@ -134,35 +134,35 @@ public class BookGUIFileUtils {
 		
 		cfg.addDefault("Settings.NickFormat.Rank3.ChatPrefix", "&a[VIP&6+&a] ");
 		cfg.addDefault("Settings.NickFormat.Rank3.ChatSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank3.TabPrefix", "&aVIP&6+ &7| &a");
+		cfg.addDefault("Settings.NickFormat.Rank3.TabPrefix", "&a[VIP&6+&a] ");
 		cfg.addDefault("Settings.NickFormat.Rank3.TabSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank3.TagPrefix", "&a[VIP&6+&a] ");
 		cfg.addDefault("Settings.NickFormat.Rank3.TagSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank3.GroupName", "VIPPlus");
 		
-		cfg.addDefault("Settings.NickFormat.Rank4.ChatPrefix", "&a[VIP&6+&a] ");
+		cfg.addDefault("Settings.NickFormat.Rank4.ChatPrefix", "&b[MVP] ");
 		cfg.addDefault("Settings.NickFormat.Rank4.ChatSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank4.TabPrefix", "&aVIP&6+ &7| &a");
+		cfg.addDefault("Settings.NickFormat.Rank4.TabPrefix", "&b[MVP] ");
 		cfg.addDefault("Settings.NickFormat.Rank4.TabSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank4.TagPrefix", "&a[VIP&6+&a] ");
+		cfg.addDefault("Settings.NickFormat.Rank4.TagPrefix", "&b[MVP] ");
 		cfg.addDefault("Settings.NickFormat.Rank4.TagSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank4.GroupName", "VIPPlusPlus");
+		cfg.addDefault("Settings.NickFormat.Rank4.GroupName", "MVP");
 		
-		cfg.addDefault("Settings.NickFormat.Rank5.ChatPrefix", "&b[MVP] ");
+		cfg.addDefault("Settings.NickFormat.Rank5.ChatPrefix", "&b[MVP%randomColor%+&b] ");
 		cfg.addDefault("Settings.NickFormat.Rank5.ChatSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank5.TabPrefix", "&bMVP &7| &b");
+		cfg.addDefault("Settings.NickFormat.Rank5.TabPrefix", "&b[MVP%randomColor%+&b] ");
 		cfg.addDefault("Settings.NickFormat.Rank5.TabSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank5.TagPrefix", "&b[MVP] ");
+		cfg.addDefault("Settings.NickFormat.Rank5.TagPrefix", "&b[MVP%randomColor%+&b] ");
 		cfg.addDefault("Settings.NickFormat.Rank5.TagSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank5.GroupName", "MVP");
+		cfg.addDefault("Settings.NickFormat.Rank5.GroupName", "MVPPlus");
 		
-		cfg.addDefault("Settings.NickFormat.Rank6.ChatPrefix", "&b[MVP&c+&b] ");
+		cfg.addDefault("Settings.NickFormat.Rank6.ChatPrefix", "&6[MVP%randomColor%++&6] ");
 		cfg.addDefault("Settings.NickFormat.Rank6.ChatSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank6.TabPrefix", "&bMVP&c+ &7| &b");
+		cfg.addDefault("Settings.NickFormat.Rank6.TabPrefix", "&6[MVP%randomColor%++&6] ");
 		cfg.addDefault("Settings.NickFormat.Rank6.TabSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank6.TagPrefix", "&b[MVP&c+&b] ");
+		cfg.addDefault("Settings.NickFormat.Rank6.TagPrefix", "&6[MVP%randomColor%++&6] ");
 		cfg.addDefault("Settings.NickFormat.Rank6.TagSuffix", "&r");
-		cfg.addDefault("Settings.NickFormat.Rank6.GroupName", "MVPPlus");
+		cfg.addDefault("Settings.NickFormat.Rank6.GroupName", "MVPPlusPlus");
 
 		cfg.options().copyDefaults(true);
 		cfg.options().copyHeader(true);

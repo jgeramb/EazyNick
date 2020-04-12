@@ -192,7 +192,6 @@ public class NMSNickManager extends ReflectUtils {
 	}
 	
 	public void updatePlayer(Player p, UpdateType type, String skinName, boolean forceUpdate) {
-		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		

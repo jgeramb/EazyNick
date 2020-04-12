@@ -125,12 +125,21 @@ public class BookNickCommand implements CommandExecutor {
 										} else
 											return true;
 										
+										String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
+										
+										chatPrefix = chatPrefix.replaceAll("%randomColor%", randomColor);
+										chatSuffix = chatSuffix.replaceAll("%randomColor%", randomColor);
+										tabPrefix = tabPrefix.replaceAll("%randomColor%", randomColor);
+										tabSuffix = tabSuffix.replaceAll("%randomColor%", randomColor);
+										tagPrefix = tagPrefix.replaceAll("%randomColor%", randomColor);
+										tagSuffix = tagSuffix.replaceAll("%randomColor%", randomColor);
+										
 										if(args[1].equalsIgnoreCase("DEFAULT"))
 											skinName = api.getRealName();
 										else if(args[1].equalsIgnoreCase("NORMAL"))
-											skinName = (new Random().nextBoolean()) ? "Steve" : "Alex";
+											skinName = new Random().nextBoolean() ? "Steve" : "Alex";
 										else if(args[1].equalsIgnoreCase("RANDOM"))
-											skinName = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+											skinName = utils.getNickNames().get(new Random().nextInt(utils.getNickNames().size()));
 										else
 											skinName = args[1];
 										

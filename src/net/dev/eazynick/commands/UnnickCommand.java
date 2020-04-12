@@ -23,13 +23,10 @@ public class UnnickCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.use")) {
-				if((utils.getCanUseNick().get(p.getUniqueId()))) {
-					if(utils.getNickedPlayers().contains(p.getUniqueId()))
-						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
-					else
-						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NotNicked"));
-				} else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickDelay"));
+				if(utils.getNickedPlayers().contains(p.getUniqueId()))
+					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
+				else
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NotNicked"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else
