@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 public class MySQL {
@@ -27,8 +26,7 @@ public class MySQL {
 	public void connect() {
 		if(!isConnected()) {
 			try {
-				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false", username, password);
-				con.setNetworkTimeout(Executors.newFixedThreadPool(1), 5 * 1000);
+				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false&characterEncoding=utf8&useUnicode=true&interactiveClient=true", username, password);
 				
 				System.out.println(PREFIX + "Connected to database successfully!");
 			} catch (SQLException e) {
