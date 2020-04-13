@@ -69,7 +69,7 @@ public class UUIDFetcher_1_7 {
 				nickNameFileUtils.cfg.set("NickNames", list);
 				nickNameFileUtils.saveFile();
 
-				utils.sendConsole("§cThe player §e" + name + " §cis §4§lnot existing§c!");
+				utils.sendConsole("§cThe player §e" + name + " §cdoes not exist");
 			}
 		}
 

@@ -55,7 +55,7 @@ public class FileUtils {
 		cfg.addDefault("AutoUpdater", true);
 		cfg.addDefault("APIMode", false);
 
-		cfg.addDefault("NeedItemToToggleNick", false);
+		cfg.addDefault("NeedItemToToggleNick", true);
 		cfg.addDefault("GetNewNickOnEveryServerSwitch", false);
 		cfg.addDefault("NickOnWorldChange", false);
 		cfg.addDefault("JoinNick", false);
