@@ -47,7 +47,7 @@ public class PlayerJoinListener implements Listener {
 			p.setCustomName(p.getName());
 
 		if ((e.getJoinMessage() != null) && (e.getJoinMessage() != "")) {
-			if (fileUtils.cfg.getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(p.getUniqueId())) {
+			if (fileUtils.cfg.getBoolean("BungeeCord") && !(fileUtils.cfg.getBoolean("LobbyMode")) && mysqlNickManager.isPlayerNicked(p.getUniqueId())) {
 				if (e.getJoinMessage().contains("formerly known as"))
 					e.setJoinMessage("§e" + p.getName() + " joined the game");
 
@@ -107,7 +107,7 @@ public class PlayerJoinListener implements Listener {
 				}
 				
 				if (fileUtils.cfg.getBoolean("BungeeCord")) {
-					if (fileUtils.cfg.getBoolean("LobbyMode") == false) {
+					if (!(fileUtils.cfg.getBoolean("LobbyMode"))) {
 						if (mysqlNickManager.isPlayerNicked(p.getUniqueId())) {
 							if (!(api.isNicked())) {
 								Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
