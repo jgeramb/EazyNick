@@ -63,9 +63,11 @@ public class BookNickCommand implements CommandExecutor {
 											playerWithNameIsKnown = true;
 									}
 									
-									for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
-										if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-											playerWithNameIsKnown = true;
+									if(Bukkit.getOfflinePlayers() != null) {
+										for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+											if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+												playerWithNameIsKnown = true;
+										}
 									}
 									
 									if(!(fileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)

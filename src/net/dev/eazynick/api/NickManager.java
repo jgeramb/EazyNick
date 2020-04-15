@@ -280,8 +280,6 @@ public class NickManager {
 			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TABSUFFIX);
 			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TAGPREFIX);
 			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TAGSUFFIX);
-			TABAPI.hideNametag(p.getUniqueId());
-			TABAPI.showNametag(p.getUniqueId());
 		}
 		
 		resetCloudNET();
@@ -794,8 +792,6 @@ public class NickManager {
 			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TABSUFFIX, tabSuffix);
 			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TAGPREFIX, tagPrefix);
 			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TAGSUFFIX, tagSuffix);
-			TABAPI.hideNametag(p.getUniqueId());
-			TABAPI.showNametag(p.getUniqueId());
 		}
 	}
 	
