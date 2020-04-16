@@ -322,7 +322,7 @@ public class NickManager {
 					
 					utils.getOldPermissionsExGroups().remove(p.getUniqueId());
 				}
-			} else {
+			} else if(utils.getOldPermissionsExPrefixes().containsKey(p.getUniqueId()) && utils.getOldPermissionsExSuffixes().containsKey(p.getUniqueId())) {
 				user.setPrefix(utils.getOldPermissionsExPrefixes().get(p.getUniqueId()), p.getWorld().getName());
 				user.setSuffix(utils.getOldPermissionsExSuffixes().get(p.getUniqueId()), p.getWorld().getName());
 			}
@@ -336,47 +336,53 @@ public class NickManager {
 		}
 		
 		if(utils.ultraPermissionsStatus()) {
-			me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
-			
-			user.setPrefix(utils.getUltraPermissionsPrefixes().get(p.getUniqueId()));
-			user.setSuffix(utils.getUltraPermissionsSuffixes().get(p.getUniqueId()));
-			user.save();
-			
-			utils.getUltraPermissionsPrefixes().remove(p.getUniqueId());
-			utils.getUltraPermissionsSuffixes().remove(p.getUniqueId());
+			if(utils.getUltraPermissionsPrefixes().containsKey(p.getUniqueId()) && utils.getUltraPermissionsSuffixes().containsKey(p.getUniqueId())) {
+				me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
+				
+				user.setPrefix(utils.getUltraPermissionsPrefixes().get(p.getUniqueId()));
+				user.setSuffix(utils.getUltraPermissionsSuffixes().get(p.getUniqueId()));
+				user.save();
+				
+				utils.getUltraPermissionsPrefixes().remove(p.getUniqueId());
+				utils.getUltraPermissionsSuffixes().remove(p.getUniqueId());
+			}
 		}
 		
 		if(utils.nameTagEditStatus()) {
-			INametagApi nametagEditAPI = NametagEdit.getApi();
-			String prefix = utils.getNametagEditPrefixes().get(p.getUniqueId());
-			String suffix = utils.getNametagEditSuffixes().get(p.getUniqueId());
-			
-			nametagEditAPI.setPrefix(p, prefix);
-			nametagEditAPI.setSuffix(p, suffix);
-			nametagEditAPI.reloadNametag(p);
-			
-			utils.getNametagEditPrefixes().remove(p.getUniqueId());
-			utils.getNametagEditSuffixes().remove(p.getUniqueId());
+			if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) && utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
+				INametagApi nametagEditAPI = NametagEdit.getApi();
+				String prefix = utils.getNametagEditPrefixes().get(p.getUniqueId());
+				String suffix = utils.getNametagEditSuffixes().get(p.getUniqueId());
+				
+				nametagEditAPI.setPrefix(p, prefix);
+				nametagEditAPI.setSuffix(p, suffix);
+				nametagEditAPI.reloadNametag(p);
+				
+				utils.getNametagEditPrefixes().remove(p.getUniqueId());
+				utils.getNametagEditSuffixes().remove(p.getUniqueId());
+			}
 		}
 		
 		if(!(eazyNick.isEnabled()))
 			return;
 		
-		UUID uuid = p.getUniqueId();
-		String oldDisplayName = getOldDisplayName();
-		String oldPlayerListName = getOldPlayerListName();
-		
-		Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
+		if(utils.getOldDisplayNames().containsKey(p.getUniqueId()) && utils.getOldPlayerListNames().containsKey(p.getUniqueId())) {
+			UUID uuid = p.getUniqueId();
+			String oldDisplayName = getOldDisplayName();
+			String oldPlayerListName = getOldPlayerListName();
 			
-			@Override
-			public void run() {
-				p.setDisplayName(oldDisplayName);
-				p.setPlayerListName(oldPlayerListName);
+			Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 				
-				utils.getOldDisplayNames().remove(uuid);
-				utils.getOldPlayerListNames().remove(uuid);
-			}
-		}, 5 + (fileUtils.cfg.getBoolean("RandomDisguiseDelay") ? 40 : 0));
+				@Override
+				public void run() {
+					p.setDisplayName(oldDisplayName);
+					p.setPlayerListName(oldPlayerListName);
+					
+					utils.getOldDisplayNames().remove(uuid);
+					utils.getOldPlayerListNames().remove(uuid);
+				}
+			}, 5 + (fileUtils.cfg.getBoolean("RandomDisguiseDelay") ? 40 : 0));
+		}
 		
 		if(fileUtils.cfg.getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {

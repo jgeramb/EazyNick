@@ -32,7 +32,9 @@ public class Utils {
 
 	private List<String> nickNames = new ArrayList<>();
 	private List<String> blackList = new ArrayList<>();
+	private List<String> worldsWithDisabledPrefixAndSuffix = new ArrayList<>();
 	private List<String> worldBlackList = new ArrayList<>();
+	private List<String> mineSkinIds = new ArrayList<>();
 	private ArrayList<UUID> nickedPlayers = new ArrayList<>();
 	private ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();
 	private HashMap<UUID, String> playerNicknames = new HashMap<>();
@@ -226,8 +228,16 @@ public class Utils {
 		return blackList;
 	}
 	
+	public List<String> getWorldsWithDisabledPrefixAndSuffix() {
+		return worldsWithDisabledPrefixAndSuffix;
+	}
+	
 	public List<String> getWorldBlackList() {
 		return worldBlackList;
+	}
+	
+	public List<String> getMineSkinIds() {
+		return mineSkinIds;
 	}
 	
 	public HashMap<UUID, String> getOldDisplayNames() {
@@ -366,8 +376,16 @@ public class Utils {
 		this.blackList = blackList;
 	}
 	
+	public void setWorldsWithDisabledPrefixAndSuffix(List<String> worldsWithDisabledPrefixAndSuffix) {
+		this.worldsWithDisabledPrefixAndSuffix = worldsWithDisabledPrefixAndSuffix;
+	}
+	
 	public void setWorldBlackList(List<String> worldBlackList) {
 		this.worldBlackList = worldBlackList;
+	}
+	
+	public void setMineSkinIds(List<String> mineSkinIds) {
+		this.mineSkinIds = mineSkinIds;
 	}
 	
 	public void setNameField(Field nameField) {

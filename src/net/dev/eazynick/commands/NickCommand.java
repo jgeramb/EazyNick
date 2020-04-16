@@ -110,7 +110,7 @@ public class NickCommand implements CommandExecutor {
 												nickNameIsInUse = true;
 										}
 
-										if(!(nickNameIsInUse)) {
+										if(!(nickNameIsInUse) || fileUtils.cfg.getBoolean("AllowPlayersToUseSameNickName")) {
 											boolean playerWithNameIsKnown = false;
 											
 											for (Player all : Bukkit.getOnlinePlayers()) {
@@ -166,7 +166,7 @@ public class NickCommand implements CommandExecutor {
 
 													new NickManager(p).setGroupName(serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName"));
 													
-													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, (utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, fileUtils.cfg.getBoolean("UseMineSkinAPI") ? "MINESKIN" : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, (utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
 												} else
 													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
 											} else

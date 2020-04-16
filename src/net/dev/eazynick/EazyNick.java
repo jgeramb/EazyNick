@@ -58,6 +58,7 @@ public class EazyNick extends JavaPlugin {
 	private UUIDFetcher_1_8_R1 uuidFetcher_1_8_R1;
 	private UUIDFetcher uuidFetcher;
 	private SignGUI signGUI;
+	private MineSkinAPI mineSkinAPI;
 	
 	@Override
 	public void onEnable() {
@@ -83,11 +84,14 @@ public class EazyNick extends JavaPlugin {
 				signGUI = new SignGUI();
 				nmsBookBuilder = new NMSBookBuilder();
 				nmsBookUtils = new NMSBookUtils();
+				mineSkinAPI = new MineSkinAPI();
 				nmsNickManager = new NMSNickManager();
 				
 				utils.setNickNames(nickNameFileUtils.cfg.getStringList("NickNames"));
+				utils.setMineSkinIds(fileUtils.cfg.getStringList("MineSkinIds"));
 
 				List<String> blackList = fileUtils.cfg.getStringList("BlackList");
+				List<String> worldsWithDisabledPrefixAndSuffix = fileUtils.cfg.getStringList("WorldsWithDisabledPrefixAndSuffix");
 				List<String> worldBlackList = fileUtils.cfg.getStringList("AutoNickWorldBlackList");
 				
 				if (blackList.size() >= 1) {
@@ -97,6 +101,15 @@ public class EazyNick extends JavaPlugin {
 						toAdd.add(blackListName.toUpperCase());
 					
 					utils.setBlackList(new ArrayList<>(toAdd));
+				}
+				
+				if (worldsWithDisabledPrefixAndSuffix.size() >= 1) {
+					ArrayList<String> toAdd = new ArrayList<>();
+					
+					for (String worldWithDisabledPrefixAndSuffix : worldsWithDisabledPrefixAndSuffix)
+						toAdd.add(worldWithDisabledPrefixAndSuffix.toUpperCase());
+					
+					utils.setWorldsWithDisabledPrefixAndSuffix(new ArrayList<>(toAdd));
 				}
 
 				if (worldBlackList.size() >= 1) {
@@ -249,8 +262,7 @@ public class EazyNick extends JavaPlugin {
 
 				utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 
-				if (fileUtils.cfg.getBoolean("AutoUpdater"))
-					spigotUpdater.checkForUpdates();
+				spigotUpdater.checkForUpdates();
 
 				if (isCancelled)
 					pm.disablePlugin(instance);
@@ -383,6 +395,10 @@ public class EazyNick extends JavaPlugin {
 	
 	public SignGUI getSignGUI() {
 		return signGUI;
+	}
+	
+	public MineSkinAPI getMineSkinAPI() {
+		return mineSkinAPI;
 	}
 	
 	public void setLanguageFileUtils(LanguageFileUtils languageFileUtils) {

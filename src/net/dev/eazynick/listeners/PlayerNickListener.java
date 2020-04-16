@@ -25,10 +25,15 @@ public class PlayerNickListener implements Listener {
 		if(!(e.isCancelled())) {
 			Player p = e.getPlayer();
 			NickManager api = new NickManager(p);
+			boolean changePrefixAndSuffix = fileUtils.cfg.getBoolean("WorldsWithDisabledPrefixAndSuffix") || !(utils.getWorldsWithDisabledPrefixAndSuffix().contains(p.getWorld().getName().toUpperCase()));
 			
-			api.updateLuckPerms(e.getTagPrefix(), e.getTagSuffix());
+			if(changePrefixAndSuffix)
+				api.updateLuckPerms(e.getTagPrefix(), e.getTagSuffix());
+			
 			api.nickPlayer(e.getNickName(), e.getSkinName());
-			api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getGroupName());
+			
+			if(changePrefixAndSuffix)
+				api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getGroupName());
 			
 			utils.getCanUseNick().put(p.getUniqueId(), false);
 			

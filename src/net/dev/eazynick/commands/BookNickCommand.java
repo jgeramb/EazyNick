@@ -55,7 +55,7 @@ public class BookNickCommand implements CommandExecutor {
 										nickNameIsInUse = true;
 								}
 
-								if(!(nickNameIsInUse)) {
+								if(!(nickNameIsInUse) || fileUtils.cfg.getBoolean("AllowPlayersToUseSameNickName")) {
 									boolean playerWithNameIsKnown = false;
 									
 									for (Player all : Bukkit.getOnlinePlayers()) {

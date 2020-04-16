@@ -63,6 +63,7 @@ public class FileUtils {
 		cfg.addDefault("SeeNickSelf", true);
 		cfg.addDefault("ReplaceNickedChatFormat", true);
 		cfg.addDefault("OverwriteJoinQuitMessages", false);
+		cfg.addDefault("AllowPlayersToUseSameNickName", false);
 		cfg.addDefault("AllowPlayersToNickAsOnlinePlayers", false);
 		cfg.addDefault("AllowPlayersToNickAsKnownPlayers", false);
 		cfg.addDefault("SwitchUltraPermissionsGroupByNicking", false);
@@ -77,6 +78,7 @@ public class FileUtils {
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
 		cfg.addDefault("UseSignGUIForCustomName", true);
 		cfg.addDefault("AllowBookGUICustomName", true);
+		cfg.addDefault("UseMineSkinAPI", false);
 
 		cfg.addDefault("NickActionBarMessage", false);
 		
@@ -135,8 +137,10 @@ public class FileUtils {
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Prefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.GroupName", "VIP");
-		cfg.addDefault("AutoNickWorldBlackList", Arrays.asList("world"));
+		cfg.addDefault("WorldsWithDisabledPrefixAndSuffix", Arrays.asList("example_world"));
+		cfg.addDefault("AutoNickWorldBlackList", Arrays.asList("example_world"));
 		cfg.addDefault("BlackList", Arrays.asList("ExampleName"));
+		cfg.addDefault("MineSkinIds", Arrays.asList("1416741364", "898982494", "186233253"));
 		
 		cfg.options().copyDefaults(true);
 		cfg.options().copyHeader(true);

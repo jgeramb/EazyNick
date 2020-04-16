@@ -19,6 +19,7 @@ import com.mojang.authlib.properties.Property;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.utils.FileUtils;
+import net.dev.eazynick.utils.MineSkinAPI;
 import net.dev.eazynick.utils.ReflectUtils;
 import net.dev.eazynick.utils.Utils;
 
@@ -27,9 +28,13 @@ import me.clip.placeholderapi.PlaceholderAPI;
 public class NMSNickManager extends ReflectUtils {
 
 	private EazyNick eazyNick;
+	private MineSkinAPI mineSkinAPI;
+	private Utils utils;
 	
 	public NMSNickManager() {
 		eazyNick = EazyNick.getInstance();
+		mineSkinAPI = eazyNick.getMineSkinAPI();
+		utils = eazyNick.getUtils();
 	}
 	
 	public void updatePlayerListName(Player p, String name) {
@@ -113,7 +118,7 @@ public class NMSNickManager extends ReflectUtils {
 	public void updateName(Player p, String nickName) {
 		try {
 			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
-			Field nameField = eazyNick.getUtils().getNameField();
+			Field nameField = utils.getNameField();
 			nameField.setAccessible(true);
 			nameField.set(gameProfile, nickName);
 			nameField.setAccessible(false);
@@ -128,7 +133,7 @@ public class NMSNickManager extends ReflectUtils {
 		
 		try {
 			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
-			Field uuidField = eazyNick.getUtils().getUUIDField();
+			Field uuidField = utils.getUUIDField();
 			uuidField.setAccessible(true);
 			uuidField.set(gameProfile, uniqueId);
 			uuidField.setAccessible(false);
@@ -139,17 +144,23 @@ public class NMSNickManager extends ReflectUtils {
 	
 	public void updateSkin(Player p, String skinName) {
 		try {
-			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
-			GameProfile gp = (GameProfile) gameProfile;
+			GameProfile gameProfile = (GameProfile) p.getClass().getMethod("getProfile").invoke(p);
 			
-			try {
-				gp = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
-			} catch (Exception e) {
-			}
+			gameProfile.getProperties().removeAll("textures");
 
-			Collection<Property> props = gp.getProperties().get("textures");
-			((GameProfile) gameProfile).getProperties().removeAll("textures");
-			((GameProfile) gameProfile).getProperties().putAll("textures", props);
+			if(skinName.equals("MineSkin"))
+				gameProfile.getProperties().putAll("textures", mineSkinAPI.getTextureProperties(utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size()))));
+			else {
+				GameProfile gp = (GameProfile) gameProfile;
+				
+				try {
+					gp = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
+				} catch (Exception e) {
+				}
+	
+				Collection<Property> props = gp.getProperties().get("textures");
+				gameProfile.getProperties().putAll("textures", props);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -157,17 +168,23 @@ public class NMSNickManager extends ReflectUtils {
 	
 	public void updateSkin_1_8_R1(Player p, String skinName) {
 		try {
-			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
-			GameProfile gp = (GameProfile) gameProfile;
-			
-			try {
-				gp = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
-			} catch (Exception e) {
-			}
+			GameProfile gameProfile = (GameProfile) p.getClass().getMethod("getProfile").invoke(p);
 
-			Collection<Property> props = gp.getProperties().get("textures");
-			((GameProfile) gameProfile).getProperties().removeAll("textures");
-			((GameProfile) gameProfile).getProperties().putAll("textures", props);
+			gameProfile.getProperties().removeAll("textures");
+			
+			if(skinName.equals("MineSkin"))
+				gameProfile.getProperties().putAll("textures", mineSkinAPI.getTextureProperties(utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size()))));
+			else {
+				GameProfile gp = gameProfile;
+				
+				try {
+					gp = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
+				} catch (Exception e) {
+				}
+	
+				Collection<Property> props = gp.getProperties().get("textures");
+				gameProfile.getProperties().putAll("textures", props);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -175,24 +192,29 @@ public class NMSNickManager extends ReflectUtils {
 	
 	public void updateSkin_1_7_R4(Player p, String skinName) {
 		try {
-			Object gameProfile = p.getClass().getMethod("getProfile").invoke(p);
-			net.minecraft.util.com.mojang.authlib.GameProfile gp = (net.minecraft.util.com.mojang.authlib.GameProfile) gameProfile;
+			net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = (net.minecraft.util.com.mojang.authlib.GameProfile) p.getClass().getMethod("getProfile").invoke(p);
 			
-			try {
-				gp = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
-			} catch (Exception e) {
+			gameProfile.getProperties().removeAll("textures");
+			
+			if(skinName.equals("MineSkin"))
+				gameProfile.getProperties().putAll("textures", mineSkinAPI.getTextureProperties_1_7(utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size()))));
+			else {
+				net.minecraft.util.com.mojang.authlib.GameProfile gp = gameProfile;
+				
+				try {
+					gp = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
+				} catch (Exception e) {
+				}
+	
+				Collection<net.minecraft.util.com.mojang.authlib.properties.Property> props = gp.getProperties().get("textures");
+				gameProfile.getProperties().putAll("textures", props);
 			}
-
-			Collection<net.minecraft.util.com.mojang.authlib.properties.Property> props = gp.getProperties().get("textures");
-			((net.minecraft.util.com.mojang.authlib.GameProfile) gameProfile).getProperties().removeAll("textures");
-			((net.minecraft.util.com.mojang.authlib.GameProfile) gameProfile).getProperties().putAll("textures", props);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 	}
 	
 	public void updatePlayer(Player p, UpdateType type, String skinName, boolean forceUpdate) {
-		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		
 		String version = eazyNick.getVersion();
