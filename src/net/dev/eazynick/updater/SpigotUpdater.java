@@ -18,7 +18,7 @@ import net.dev.eazynick.utils.Utils;
 
 public class SpigotUpdater {
 
-	public void checkForUpdates() {
+	public boolean checkForUpdates() {
 		EazyNick eazyNick = EazyNick.getInstance();
 		
 		PluginDescriptionFile desc = eazyNick.getDescription();
@@ -63,10 +63,14 @@ public class SpigotUpdater {
 				}
 
 				System.out.println("[Updater] Successfully updated plugin to version " + newVersion + ". Please reload/restart your server now.");
+				
+				return true;
 			} else
 				System.out.println("[Updater] Download the update here: " + desc.getWebsite());
 		} else
 			System.out.println("[Updater] No new version available");
+		
+		return false;
 	}
 	
 	public void checkForUpdates(Player p) {

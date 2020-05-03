@@ -36,7 +36,6 @@ public class ReflectUtils {
 		
 		try {
 			f = clazz.getDeclaredField(fieldName);
-			
 			f.setAccessible(true);
 		} catch (Exception e) {
 			e.printStackTrace();

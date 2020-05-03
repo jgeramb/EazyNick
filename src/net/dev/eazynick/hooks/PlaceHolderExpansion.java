@@ -1,9 +1,11 @@
-package net.dev.eazynick.placeholders;
+package net.dev.eazynick.hooks;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
+import net.dev.eazynick.sql.MySQLNickManager;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
@@ -17,14 +19,16 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 	
 	@Override
 	public String onPlaceholderRequest(Player p, String identifier) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+		
 		if(p != null) {
 			NickManager api = new NickManager(p);
-			
 			if(identifier.equals("is_nicked") || identifier.equals("is_disguised"))
 				return String.valueOf(api.isNicked());
 			
 			if(identifier.equals("display_name"))
-				return p.getName();
+				return (!(api.isNicked() && mysqlNickManager.isPlayerNicked(p.getUniqueId())) ? (mysqlNickManager.getNickName(p.getUniqueId())) : p.getName());
 			
 			if(identifier.equals("chat_prefix"))
 				return api.getChatPrefix();

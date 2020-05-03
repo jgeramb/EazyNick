@@ -13,16 +13,65 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mojang.authlib.GameProfile;
 
-import net.dev.eazynick.api.*;
-import net.dev.eazynick.commands.*;
-import net.dev.eazynick.listeners.*;
-import net.dev.eazynick.placeholders.*;
-import net.dev.eazynick.sql.*;
-import net.dev.eazynick.updater.*;
-import net.dev.eazynick.utils.*;
-import net.dev.eazynick.utils.bookutils.*;
-import net.dev.eazynick.utils.nickutils.*;
-import net.dev.eazynick.utils.signutils.*;
+import net.dev.eazynick.api.NickManager;
+import net.dev.eazynick.commands.BookGUICommand;
+import net.dev.eazynick.commands.BookNickCommand;
+import net.dev.eazynick.commands.ChangeSkinCommand;
+import net.dev.eazynick.commands.CommandNotAvaiableCommand;
+import net.dev.eazynick.commands.FixSkinCommand;
+import net.dev.eazynick.commands.HelpCommand;
+import net.dev.eazynick.commands.NameCommand;
+import net.dev.eazynick.commands.NickCommand;
+import net.dev.eazynick.commands.NickGuiCommand;
+import net.dev.eazynick.commands.NickListCommand;
+import net.dev.eazynick.commands.NickOtherCommand;
+import net.dev.eazynick.commands.NickUpdateCheckCommand;
+import net.dev.eazynick.commands.NickedPlayersCommand;
+import net.dev.eazynick.commands.ReNickCommand;
+import net.dev.eazynick.commands.RealNameCommand;
+import net.dev.eazynick.commands.ReloadConfigCommand;
+import net.dev.eazynick.commands.ResetNameCommand;
+import net.dev.eazynick.commands.ResetSkinCommand;
+import net.dev.eazynick.commands.ToggleBungeeNickCommand;
+import net.dev.eazynick.commands.UnnickCommand;
+import net.dev.eazynick.hooks.DeluxeChatListener;
+import net.dev.eazynick.hooks.PlaceHolderExpansion;
+import net.dev.eazynick.listeners.AsyncPlayerChatListener;
+import net.dev.eazynick.listeners.InventoryClickListener;
+import net.dev.eazynick.listeners.PlayerChangedWorldListener;
+import net.dev.eazynick.listeners.PlayerCommandPreprocessListener;
+import net.dev.eazynick.listeners.PlayerDeathListener;
+import net.dev.eazynick.listeners.PlayerDropItemListener;
+import net.dev.eazynick.listeners.PlayerInteractListener;
+import net.dev.eazynick.listeners.PlayerJoinListener;
+import net.dev.eazynick.listeners.PlayerKickListener;
+import net.dev.eazynick.listeners.PlayerNickListener;
+import net.dev.eazynick.listeners.PlayerQuitListener;
+import net.dev.eazynick.listeners.PlayerUnnickListener;
+import net.dev.eazynick.sql.MySQL;
+import net.dev.eazynick.sql.MySQLNickManager;
+import net.dev.eazynick.sql.MySQLPlayerDataManager;
+import net.dev.eazynick.updater.SpigotUpdater;
+import net.dev.eazynick.utils.ActionBarUtils;
+import net.dev.eazynick.utils.BookGUIFileUtils;
+import net.dev.eazynick.utils.FileUtils;
+import net.dev.eazynick.utils.LanguageFileUtils;
+import net.dev.eazynick.utils.MineSkinAPI;
+import net.dev.eazynick.utils.NickNameFileUtils;
+import net.dev.eazynick.utils.PacketInjector;
+import net.dev.eazynick.utils.PacketInjector_1_7;
+import net.dev.eazynick.utils.ReflectUtils;
+import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.bookutils.NMSBookBuilder;
+import net.dev.eazynick.utils.bookutils.NMSBookUtils;
+import net.dev.eazynick.utils.nickutils.GameProfileBuilder;
+import net.dev.eazynick.utils.nickutils.GameProfileBuilder_1_7;
+import net.dev.eazynick.utils.nickutils.GameProfileBuilder_1_8_R1;
+import net.dev.eazynick.utils.nickutils.NMSNickManager;
+import net.dev.eazynick.utils.nickutils.UUIDFetcher;
+import net.dev.eazynick.utils.nickutils.UUIDFetcher_1_7;
+import net.dev.eazynick.utils.nickutils.UUIDFetcher_1_8_R1;
+import net.dev.eazynick.utils.signutils.SignGUI;
 
 public class EazyNick extends JavaPlugin {
 
@@ -262,10 +311,13 @@ public class EazyNick extends JavaPlugin {
 
 				utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 
-				spigotUpdater.checkForUpdates();
+				if (spigotUpdater.checkForUpdates())
+					isCancelled = true;
 
-				if (isCancelled)
+				if (isCancelled) {
 					pm.disablePlugin(instance);
+					return;
+				}
 				
 				if(utils.placeholderAPIStatus()) {
 					new PlaceHolderExpansion(instance).register();
@@ -274,7 +326,7 @@ public class EazyNick extends JavaPlugin {
 				}
 				
 				if(utils.deluxeChatStatus()) {
-					pm.registerEvents(new DeluxeChatHookListener(), instance);
+					pm.registerEvents(new DeluxeChatListener(), instance);
 					
 					utils.sendConsole("§7DeluxeChat hooked successfully!");
 				}

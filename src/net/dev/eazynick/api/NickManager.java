@@ -8,7 +8,6 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +20,7 @@ import com.nametagedit.plugin.api.INametagApi;
 import com.nametagedit.plugin.api.data.Nametag;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.utils.ActionBarUtils;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
@@ -30,10 +30,6 @@ import net.dev.eazynick.utils.Utils;
 import net.dev.eazynick.utils.nickutils.NMSNickManager;
 import net.dev.eazynick.utils.nickutils.NMSNickManager.UpdateType;
 import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.node.Node;
-import net.luckperms.api.node.NodeBuilderRegistry;
 import net.milkbowl.vault.chat.Chat;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
@@ -283,7 +279,9 @@ public class NickManager {
 		}
 		
 		resetCloudNET();
-		resetLuckPerms();
+		
+		if(utils.luckPermsStatus())
+			new LuckPermsHook(p).resetNodes();
 		
 		if(utils.ultraPermissionsStatus()) {
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
@@ -296,19 +294,6 @@ public class NickManager {
 					data.keySet().forEach(group -> user.addGroup(api.getGroups().name(group), data.get(group)));
 					
 					utils.getOldUltraPermissionsGroups().remove(p.getUniqueId());
-				}
-			}
-		}
-		
-		if(utils.luckPermsStatus()) {
-			LuckPerms api = LuckPermsProvider.get();
-			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
-			
-			if(fileUtils.cfg.getBoolean("SwitchLuckPermsGroupByNicking")) {
-				if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())) {
-					user.setPrimaryGroup(utils.getOldLuckPermsGroups().get(p.getUniqueId()));
-					
-					utils.getOldLuckPermsGroups().remove(p.getUniqueId());
 				}
 			}
 		}
@@ -594,42 +579,6 @@ public class NickManager {
 			utils.getGroupNames().remove(p.getUniqueId());
 	}
 	
-	public void updateLuckPerms(String prefix, String suffix) {
-		Utils utils = eazyNick.getUtils();
-		
-		if(utils.luckPermsStatus() && eazyNick.getFileUtils().cfg.getBoolean("ChangeLuckPermsPrefixAndSufix")) {
-			LuckPerms api = LuckPermsProvider.get();
-			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
-			NodeBuilderRegistry nodeFactory = api.getNodeBuilderRegistry();
-			Object prefixNode = nodeFactory.forPrefix().priority(99).prefix(prefix).expiry(24 * 30, TimeUnit.HOURS).build();
-			Object suffixNode = nodeFactory.forSuffix().priority(99).suffix(suffix).expiry(24 * 30, TimeUnit.HOURS).build();
-			
-			user.transientData().add((Node) prefixNode);
-			user.transientData().add((Node) suffixNode);
-			api.getUserManager().saveUser(user);
-			
-			utils.getLuckPermsPrefixes().put(p.getUniqueId(), prefixNode);
-			utils.getLuckPermsSuffixes().put(p.getUniqueId(), suffixNode);
-		}
-	}
-
-	public void resetLuckPerms() {
-		Utils utils = eazyNick.getUtils();
-		
-		if(utils.luckPermsStatus() && eazyNick.getFileUtils().cfg.getBoolean("ChangeLuckPermsPrefixAndSufix")) {
-			if(utils.getLuckPermsPrefixes().containsKey(p.getUniqueId()) && utils.getLuckPermsSuffixes().containsKey(p.getUniqueId())) {
-				LuckPerms api = LuckPermsProvider.get();
-				net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
-				user.transientData().remove((Node) utils.getLuckPermsPrefixes().get(p.getUniqueId()));
-				user.transientData().remove((Node) utils.getLuckPermsSuffixes().get(p.getUniqueId()));
-				api.getUserManager().saveUser(user);
-				
-				utils.getLuckPermsPrefixes().remove(p.getUniqueId());
-				utils.getLuckPermsSuffixes().remove(p.getUniqueId());
-			}
-		}
-	}
-	
 	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix) {
 		updatePrefixSuffix(tagPrefix, tagSuffix, chatPrefix, chatSuffix, tabPrefix, tabSuffix, "NONE");
 	}
@@ -754,18 +703,6 @@ public class NickManager {
 				}
 				
 				user.addGroup(api.getGroups().name(groupName));
-			}
-		}
-		
-		if(utils.luckPermsStatus()) {
-			LuckPerms api = LuckPermsProvider.get();
-			net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
-		
-			if(fileUtils.cfg.getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
-				if(!(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())))
-					utils.getOldLuckPermsGroups().put(p.getUniqueId(), user.getPrimaryGroup());
-				
-				user.setPrimaryGroup(groupName);
 			}
 		}
 		

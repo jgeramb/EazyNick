@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
+import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
 import net.dev.eazynick.utils.Utils;
@@ -27,8 +28,8 @@ public class PlayerNickListener implements Listener {
 			NickManager api = new NickManager(p);
 			boolean changePrefixAndSuffix = fileUtils.cfg.getBoolean("WorldsWithDisabledPrefixAndSuffix") || !(utils.getWorldsWithDisabledPrefixAndSuffix().contains(p.getWorld().getName().toUpperCase()));
 			
-			if(changePrefixAndSuffix)
-				api.updateLuckPerms(e.getTagPrefix(), e.getTagSuffix());
+			if(changePrefixAndSuffix && utils.luckPermsStatus())
+				new LuckPermsHook(p).updateNodes(e.getTagPrefix(), e.getTagSuffix(), e.getGroupName());
 			
 			api.nickPlayer(e.getNickName(), e.getSkinName());
 			
