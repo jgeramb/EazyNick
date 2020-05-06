@@ -1,5 +1,6 @@
 package net.dev.eazynick.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
 import net.dev.eazynick.utils.Utils;
@@ -36,10 +38,10 @@ public class InventoryClickListener implements Listener {
 
 					if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickGUI.NickItem.DisplayName"))) {
 						p.closeInventory();
-						p.chat("/nick");
+						utils.performNick(p, "RANDOM");
 					} else if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickGUI.UnnickItem.DisplayName"))) {
 						p.closeInventory();
-						p.chat("/unnick");
+						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					}
 				} else if (utils.getNickNameListPage().containsKey(p.getUniqueId())) {
 					String shownPage = "" + (utils.getNickNameListPage().get(p.getUniqueId()) + 1);
@@ -74,7 +76,7 @@ public class InventoryClickListener implements Listener {
 										nickName = name;
 
 								p.closeInventory();
-								p.chat("/nick " + nickName);
+								utils.performNick(p, nickName);
 							}
 						}
 					}

@@ -151,12 +151,16 @@ public class NMSNickManager extends ReflectUtils {
 			if(skinName.equals("MineSkin"))
 				gameProfile.getProperties().putAll("textures", mineSkinAPI.getTextureProperties(utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size()))));
 			else {
-				GameProfile gp = (GameProfile) gameProfile;
+				GameProfile gp = null;
 				
 				try {
 					gp = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
 				} catch (Exception e) {
+					p.sendMessage(utils.getPrefix() + "§cThe mojang session servers are currently not responding. Try again later!");
 				}
+				
+				if(gp == null)
+					gp = utils.getDefaultGameProfile();
 	
 				Collection<Property> props = gp.getProperties().get("textures");
 				gameProfile.getProperties().putAll("textures", props);
@@ -175,12 +179,16 @@ public class NMSNickManager extends ReflectUtils {
 			if(skinName.equals("MineSkin"))
 				gameProfile.getProperties().putAll("textures", mineSkinAPI.getTextureProperties(utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size()))));
 			else {
-				GameProfile gp = gameProfile;
+				GameProfile gp = null;
 				
 				try {
 					gp = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
 				} catch (Exception e) {
+					p.sendMessage(utils.getPrefix() + "§cThe mojang session servers are currently not responding. Try again later!");
 				}
+				
+				if(gp == null)
+					gp = utils.getDefaultGameProfile();
 	
 				Collection<Property> props = gp.getProperties().get("textures");
 				gameProfile.getProperties().putAll("textures", props);
@@ -199,12 +207,16 @@ public class NMSNickManager extends ReflectUtils {
 			if(skinName.equals("MineSkin"))
 				gameProfile.getProperties().putAll("textures", mineSkinAPI.getTextureProperties_1_7(utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size()))));
 			else {
-				net.minecraft.util.com.mojang.authlib.GameProfile gp = gameProfile;
+				net.minecraft.util.com.mojang.authlib.GameProfile gp = null;
 				
 				try {
 					gp = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
 				} catch (Exception e) {
+					p.sendMessage(utils.getPrefix() + "§cThe mojang session servers are currently not responding. Try again later!");
 				}
+				
+				if(gp == null)
+					gp = utils.getDefaultGameProfile_1_7();
 	
 				Collection<net.minecraft.util.com.mojang.authlib.properties.Property> props = gp.getProperties().get("textures");
 				gameProfile.getProperties().putAll("textures", props);

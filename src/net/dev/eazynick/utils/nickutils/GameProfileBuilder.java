@@ -51,9 +51,13 @@ public class GameProfileBuilder {
 		else {
 			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(SERVICE_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
 			connection.setReadTimeout(5000);
-			
+
 			if(connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				String json = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
+				String json = "", line = "";
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+				
+				while ((line = bufferedReader.readLine()) != null)
+					json += line;
             
 				GameProfile result = gson.fromJson(json, GameProfile.class);
 				cache.put(uuid, new CachedProfile(result));

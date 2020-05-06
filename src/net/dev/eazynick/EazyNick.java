@@ -2,8 +2,6 @@ package net.dev.eazynick;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -136,44 +134,6 @@ public class EazyNick extends JavaPlugin {
 				mineSkinAPI = new MineSkinAPI();
 				nmsNickManager = new NMSNickManager();
 				
-				utils.setNickNames(nickNameFileUtils.cfg.getStringList("NickNames"));
-				utils.setMineSkinIds(fileUtils.cfg.getStringList("MineSkinIds"));
-
-				List<String> blackList = fileUtils.cfg.getStringList("BlackList");
-				List<String> worldsWithDisabledPrefixAndSuffix = fileUtils.cfg.getStringList("WorldsWithDisabledPrefixAndSuffix");
-				List<String> worldBlackList = fileUtils.cfg.getStringList("AutoNickWorldBlackList");
-				
-				if (blackList.size() >= 1) {
-					ArrayList<String> toAdd = new ArrayList<>();
-					
-					for (String blackListName : blackList)
-						toAdd.add(blackListName.toUpperCase());
-					
-					utils.setBlackList(new ArrayList<>(toAdd));
-				}
-				
-				if (worldsWithDisabledPrefixAndSuffix.size() >= 1) {
-					ArrayList<String> toAdd = new ArrayList<>();
-					
-					for (String worldWithDisabledPrefixAndSuffix : worldsWithDisabledPrefixAndSuffix)
-						toAdd.add(worldWithDisabledPrefixAndSuffix.toUpperCase());
-					
-					utils.setWorldsWithDisabledPrefixAndSuffix(new ArrayList<>(toAdd));
-				}
-
-				if (worldBlackList.size() >= 1) {
-					ArrayList<String> toAdd = new ArrayList<>();
-					
-					for (String blackListWorld : worldBlackList)
-						toAdd.add(blackListWorld.toUpperCase());
-					
-					utils.setWorldBlackList(new ArrayList<>(toAdd));
-				}
-
-				utils.setPrefix(languageFileUtils.getConfigString("Messages.Prefix"));
-				utils.setNoPerm(languageFileUtils.getConfigString("Messages.NoPerm"));
-				utils.setNotPlayer(languageFileUtils.getConfigString("Messages.NotPlayer"));
-
 				utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 				utils.sendConsole("	§7Starting system...");
 				utils.sendConsole("	§7");
@@ -196,6 +156,8 @@ public class EazyNick extends JavaPlugin {
 
 					isCancelled = true;
 				} else {
+					utils.reloadConfigs();
+					
 					if (reflectVersion.equals("v1_7_R4")) {
 						utils.setNameField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "name"));
 						utils.setUUIDField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "id"));

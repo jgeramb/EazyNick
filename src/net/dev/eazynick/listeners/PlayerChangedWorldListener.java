@@ -26,7 +26,7 @@ public class PlayerChangedWorldListener implements Listener {
 			if (fileUtils.cfg.getBoolean("NickOnWorldChange")) {
 				if (utils.getNickOnWorldChangePlayers().contains(p.getUniqueId())) {
 					if (!(api.isNicked()))
-						p.chat("/renick");
+						utils.performReNick(p);
 					else {
 						Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
@@ -38,7 +38,7 @@ public class PlayerChangedWorldListener implements Listener {
 
 									@Override
 									public void run() {
-										p.chat("/renick");
+										utils.performReNick(p);
 									}
 								}, 10 + (fileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 							}

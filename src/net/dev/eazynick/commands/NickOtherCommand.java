@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.utils.LanguageFileUtils;
 import net.dev.eazynick.utils.Utils;
 
@@ -41,12 +42,12 @@ public class NickOtherCommand implements CommandExecutor {
 										pa.setPermission("nick.customnickname", true);
 										t.recalculatePermissions();
 										
-										t.chat("/nick " + name);
+										utils.performNick(t, name);
 										
 										t.removeAttachment(pa);
 										t.recalculatePermissions();
 									} else
-										t.chat("/nick " + name);
+										utils.performNick(t, name);
 								} else {
 									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickTooLong"));
 								}
@@ -58,27 +59,27 @@ public class NickOtherCommand implements CommandExecutor {
 									pa.setPermission("nick.use", true);
 									t.recalculatePermissions();
 									
-									t.chat("/nick");
+									utils.performNick(t, "RANDOM");
 									
 									t.removeAttachment(pa);
 									t.recalculatePermissions();
 								} else
-									t.chat("/nick");
+									utils.performNick(t, "RANDOM");
 							}
 						} else {
 							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.Unnick").replace("%playerName%", t.getName()));
+							
+							if(utils.getNickedPlayers().contains(p.getUniqueId()))
+								Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(t));
 							
 							if(!(t.hasPermission("nick.use"))) {
 								PermissionAttachment pa = t.addAttachment(eazyNick);
 								pa.setPermission("nick.use", true);
 								t.recalculatePermissions();
 								
-								t.chat("/unnick");
-								
 								t.removeAttachment(pa);
 								t.recalculatePermissions();
-							} else
-								t.chat("/unnick");
+							}
 						}
 					} else
 						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerNotFound"));

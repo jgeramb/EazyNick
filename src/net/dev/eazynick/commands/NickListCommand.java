@@ -1,12 +1,13 @@
 package net.dev.eazynick.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.utils.PagesHandler;
+import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.utils.Utils;
 
 public class NickListCommand implements CommandExecutor {
@@ -20,15 +21,9 @@ public class NickListCommand implements CommandExecutor {
 			
 			if(p.hasPermission("nick.gui")) {
 				if(utils.getNickedPlayers().contains(p.getUniqueId()))
-					p.chat("/unnick");
+					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 				
-				utils.setNickNamesHandler(new PagesHandler(36));
-
-				for (String name : utils.getNickNames())
-					utils.getNickNamesHandler().addObject(name);
-				
-				utils.getNickNamesHandler().createPage(p, 0);
-				utils.getNickNameListPage().put(p.getUniqueId(), 0);
+				utils.openNickList(p);
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

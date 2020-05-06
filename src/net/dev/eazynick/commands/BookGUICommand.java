@@ -1,8 +1,10 @@
 package net.dev.eazynick.commands;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,10 +13,12 @@ import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
+import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.utils.BookGUIFileUtils;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.Utils;
 import net.dev.eazynick.utils.anvilutils.AnvilGUI;
+import net.dev.eazynick.utils.bookutils.BookPage;
 import net.dev.eazynick.utils.bookutils.NMSBookBuilder;
 import net.dev.eazynick.utils.bookutils.NMSBookUtils;
 import net.dev.eazynick.utils.signutils.SignGUI;
@@ -38,7 +42,7 @@ public class BookGUICommand implements CommandExecutor {
 			
 			if(p.hasPermission("nick.gui")) {
 				if(new NickManager(p).isNicked())
-					p.chat("/unnick");
+					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 				
 				if(args.length == 0) {
 					if(bookGUIFileUtils.cfg.getBoolean("BookGUI.Page1.Enabled")) {
@@ -47,37 +51,34 @@ public class BookGUICommand implements CommandExecutor {
 						option.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Accept.Hover")) }));
 						
 						nmsBookUtils.open(p, nmsBookBuilder.create(bookGUIFileUtils.getConfigString("BookGUI.Page1.Title"), new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page1.Text")), option));
+						return true;
 					} else
-						p.chat("/bookgui accept");
-				} else if(args.length == 1) {
+						args = new String[] { "accept" };
+				}
+				
+				if(args.length == 1) {
 					if(args[0].equalsIgnoreCase("accept")) {
-						TextComponent option1 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank1.Rank")));
-						option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + bookGUIFileUtils.getConfigString("BookGUI.Rank1.RankName")));
-						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank1.Rank"))) }));
-						TextComponent option2 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank2.Rank")));
-						option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + bookGUIFileUtils.getConfigString("BookGUI.Rank2.RankName")));
-						option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank2.Rank"))) }));
-						TextComponent option3 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank3.Rank")));
-						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + bookGUIFileUtils.getConfigString("BookGUI.Rank3.RankName")));
-						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank3.Rank"))) }));
-						TextComponent option4 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank4.Rank")));
-						option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + bookGUIFileUtils.getConfigString("BookGUI.Rank4.RankName")));
-						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank4.Rank"))) }));
-						TextComponent option5 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank5.Rank")));
-						option5.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + bookGUIFileUtils.getConfigString("BookGUI.Rank5.RankName")));
-						option5.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank5.Rank"))) }));
-						TextComponent option6 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank6.Rank")));
-						option6.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + bookGUIFileUtils.getConfigString("BookGUI.Rank6.RankName")));
-						option6.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank6.Rank"))) }));
+						ArrayList<TextComponent> textComponentsOfFirstPage = new ArrayList<>();
+						ArrayList<TextComponent> textComponentsOfSecondPage = new ArrayList<>();
 						
-						nmsBookUtils.open(p, nmsBookBuilder.create(bookGUIFileUtils.getConfigString("BookGUI.Page2.Title"), 
-								new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page2.Text")),
-								(bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank1.Enabled") && (bookGUIFileUtils.getConfigString("BookGUI.Rank1.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.getConfigString("BookGUI.Rank1.Permission")))) ? option1 : new TextComponent(""), 
-								(bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank2.Enabled") && (bookGUIFileUtils.getConfigString("BookGUI.Rank2.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.getConfigString("BookGUI.Rank2.Permission")))) ? option2 : new TextComponent(""), 
-								(bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank3.Enabled") && (bookGUIFileUtils.getConfigString("BookGUI.Rank3.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.getConfigString("BookGUI.Rank3.Permission")))) ? option3 : new TextComponent(""), 
-								(bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank4.Enabled") && (bookGUIFileUtils.getConfigString("BookGUI.Rank4.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.getConfigString("BookGUI.Rank4.Permission")))) ? option4 : new TextComponent(""), 
-								(bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank5.Enabled") && (bookGUIFileUtils.getConfigString("BookGUI.Rank5.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.getConfigString("BookGUI.Rank5.Permission")))) ? option5 : new TextComponent(""),
-								(bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank6.Enabled") && (bookGUIFileUtils.getConfigString("BookGUI.Rank6.Permission").equalsIgnoreCase("NONE") ? true : p.hasPermission(bookGUIFileUtils.getConfigString("BookGUI.Rank6.Permission")))) ? option6 : new TextComponent("")));
+						textComponentsOfFirstPage.add(new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page2.Text")));
+						
+						for (int i = 1; i <= 18; i++) {
+							String permission = bookGUIFileUtils.getConfigString("BookGUI.Rank" + i + ".Permission");
+							
+							if(bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission))) {
+								TextComponent textComponent = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Text").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank" + i + ".Rank")));
+								textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + bookGUIFileUtils.getConfigString("BookGUI.Rank" + i + ".RankName")));
+								textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Rank.Hover").replace("%rank%", bookGUIFileUtils.getConfigString("BookGUI.Rank" + i + ".Rank"))) }));
+								
+								if(textComponentsOfFirstPage.size() < 7)
+									textComponentsOfFirstPage.add(textComponent);
+								else
+									textComponentsOfSecondPage.add(textComponent);
+							}
+						}
+						
+						nmsBookUtils.open(p, nmsBookBuilder.create(bookGUIFileUtils.getConfigString("BookGUI.Page2.Title"), new BookPage(textComponentsOfFirstPage), new BookPage(textComponentsOfSecondPage)));
 					}
 				} else if(args.length == 2) {
 					TextComponent option1 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.NormalSkin.Text"));
@@ -151,12 +152,14 @@ public class BookGUICommand implements CommandExecutor {
 							nmsBookUtils.open(p, nmsBookBuilder.create(bookGUIFileUtils.getConfigString("BookGUI.Page5.Title"), new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page5.Text").replace("%name%", name)), option1, option2));
 					} else if(args[3].equalsIgnoreCase("ENTERNAME")) {
 						if(fileUtils.cfg.getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname"))) {
+							String rankName = args[1], skinType = args[2];
+							
 							if(fileUtils.cfg.getBoolean("UseSignGUIForCustomName")) {
 								eazyNick.getSignGUI().open(p, bookGUIFileUtils.getConfigString("SignGUI.Line1"), bookGUIFileUtils.getConfigString("SignGUI.Line2"), bookGUIFileUtils.getConfigString("SignGUI.Line3"), bookGUIFileUtils.getConfigString("SignGUI.Line4"), new SignGUI.EditCompleteListener() {
 									
 									@Override
 									public void onEditComplete(SignGUI.EditCompleteEvent e) {
-										p.chat("/booknick " + args[1] + " " + args[2] + " " + e.getLines()[0]);
+										utils.performRankedNick(p, rankName, skinType, e.getLines()[0]);
 									}
 								});
 							} else {
@@ -168,7 +171,7 @@ public class BookGUICommand implements CommandExecutor {
 											e.setWillClose(true);
 											e.setWillDestroy(true);
 											
-											p.chat("/booknick " + args[1] + " " + args[2] + " " + e.getName());
+											utils.performRankedNick(p, rankName, skinType, e.getName());
 										} else {
 											e.setWillClose(false);
 											e.setWillDestroy(false);

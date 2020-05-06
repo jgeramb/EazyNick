@@ -5,19 +5,35 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.Plugin;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.api.NickManager;
+import net.dev.eazynick.api.PlayerNickEvent;
+import net.dev.eazynick.sql.MySQLNickManager;
+import net.dev.eazynick.sql.MySQLPlayerDataManager;
+import net.dev.eazynick.utils.bookutils.NMSBookBuilder;
+import net.dev.eazynick.utils.bookutils.NMSBookUtils;
 import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class Utils {
 
@@ -182,6 +198,417 @@ public class Utils {
 
 	public int getOnlinePlayerCount() {
 		return Bukkit.getOnlinePlayers().size();
+	}
+	
+	public void reloadConfigs() {
+		EazyNick eazyNick = EazyNick.getInstance();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
+		NickNameFileUtils nickNameFileUtils = eazyNick.getNickNameFileUtils();
+		
+		fileUtils.cfg = YamlConfiguration.loadConfiguration(eazyNick.getFileUtils().getFile());
+		fileUtils.saveFile();
+		
+		nickNameFileUtils.cfg = YamlConfiguration.loadConfiguration(nickNameFileUtils.getFile());
+		nickNameFileUtils.saveFile();
+		
+		bookGUIFileUtils.cfg = YamlConfiguration.loadConfiguration(bookGUIFileUtils.getFile());
+		bookGUIFileUtils.saveFile();
+		
+		languageFileUtils.cfg = YamlConfiguration.loadConfiguration(languageFileUtils.getFile());
+		languageFileUtils.saveFile();
+		
+		this.nickNames = nickNameFileUtils.cfg.getStringList("NickNames");
+		
+		List<String> blackList = fileUtils.cfg.getStringList("BlackList");
+		List<String> worldsWithDisabledPrefixAndSuffix = fileUtils.cfg.getStringList("WorldsWithDisabledPrefixAndSuffix");
+		List<String> worldBlackList = fileUtils.cfg.getStringList("AutoNickWorldBlackList");
+		
+		if (blackList.size() >= 1) {
+			ArrayList<String> toAdd = new ArrayList<>();
+			
+			for (String blackListName : blackList)
+				toAdd.add(blackListName.toUpperCase());
+			
+			this.blackList = toAdd;
+		}
+
+		if (worldsWithDisabledPrefixAndSuffix.size() >= 1) {
+			ArrayList<String> toAdd = new ArrayList<>();
+			
+			for (String worldWithDisabledPrefixAndSuffix : worldsWithDisabledPrefixAndSuffix)
+				toAdd.add(worldWithDisabledPrefixAndSuffix.toUpperCase());
+			
+			this.worldsWithDisabledPrefixAndSuffix = toAdd;
+		}
+		
+		if (worldBlackList.size() >= 1) {
+			ArrayList<String> toAdd = new ArrayList<>();
+			
+			for (String blackListWorld : worldBlackList)
+				toAdd.add(blackListWorld.toUpperCase());
+			
+			this.worldBlackList = toAdd;
+		}
+		
+		this.mineSkinIds = fileUtils.cfg.getStringList("MineSkinIds");
+
+		this.prefix = languageFileUtils.getConfigString("Messages.Prefix");
+		this.noPerm = languageFileUtils.getConfigString("Messages.NoPerm");
+		this.notPlayer = languageFileUtils.getConfigString("Messages.NotPlayer");
+	}
+
+	public void performRankedNick(Player p, String rankName, String skinType, String name) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
+		NMSBookUtils nmsBookUtils = eazyNick.getNMSBookUtils();
+		NMSBookBuilder nmsBookBuilder = eazyNick.getNMSBookBuilder();
+		
+		String chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "";
+		String skinName = "";
+		boolean isCancelled = false;
+		
+		if(new StringUtils(name).removeColorCodes().getString().length() <= 16) {
+			if(!(blackList.contains(name.toUpperCase()))) {
+				boolean nickNameIsInUse = false;
+				
+				for (String nickName : playerNicknames.values()) {
+					if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+						nickNameIsInUse = true;
+				}
+
+				if(!(nickNameIsInUse) || fileUtils.cfg.getBoolean("AllowPlayersToUseSameNickName")) {
+					boolean playerWithNameIsKnown = false;
+					
+					for (Player all : Bukkit.getOnlinePlayers()) {
+						if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+							playerWithNameIsKnown = true;
+					}
+					
+					if(Bukkit.getOfflinePlayers() != null) {
+						for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+							if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+								playerWithNameIsKnown = true;
+						}
+					}
+					
+					if(!(fileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+						isCancelled = true;
+					
+					if(!(isCancelled)) {
+						String groupName = "";
+						
+						for (int i = 1; i <= 18; i++) {
+							String permission = bookGUIFileUtils.getConfigString("BookGUI.Rank" + i + ".Permission");
+							
+							if(rankName.equalsIgnoreCase(bookGUIFileUtils.cfg.getString("BookGUI.Rank" + i + ".RankName")) && bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission))) {
+								chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
+								chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
+								tabPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
+								tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
+								tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
+								tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+								groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank" + i + ".GroupName");
+							}
+						}
+						
+						if(groupName.isEmpty())
+							return;
+						
+						String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
+						
+						chatPrefix = chatPrefix.replaceAll("%randomColor%", randomColor);
+						chatSuffix = chatSuffix.replaceAll("%randomColor%", randomColor);
+						tabPrefix = tabPrefix.replaceAll("%randomColor%", randomColor);
+						tabSuffix = tabSuffix.replaceAll("%randomColor%", randomColor);
+						tagPrefix = tagPrefix.replaceAll("%randomColor%", randomColor);
+						tagSuffix = tagSuffix.replaceAll("%randomColor%", randomColor);
+						
+						if(skinType.equalsIgnoreCase("DEFAULT"))
+							skinName = p.getName();
+						else if(skinType.equalsIgnoreCase("NORMAL"))
+							skinName = new Random().nextBoolean() ? "Steve" : "Alex";
+						else if(skinType.equalsIgnoreCase("RANDOM"))
+							skinName = nickNames.get(new Random().nextInt(getNickNames().size()));
+						else
+							skinName = skinType;
+						
+						if(lastSkinNames.containsKey(p.getUniqueId()))
+							lastSkinNames.remove(p.getUniqueId());
+						
+						if(lastNickNames.containsKey(p.getUniqueId()))
+							lastNickNames.remove(p.getUniqueId());
+						
+						lastSkinNames.put(p.getUniqueId(), skinName);
+						lastNickNames.put(p.getUniqueId(), name);
+						
+						new NickManager(p).setGroupName(groupName);
+						
+						if(fileUtils.cfg.getBoolean("BungeeCord") && fileUtils.cfg.getBoolean("LobbyMode")) {
+							eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), name, skinName);
+							eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
+							
+							if(bookGUIFileUtils.cfg.getBoolean("BookGUI.Page6.Enabled"))
+								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
+						} else {
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
+						
+							if(bookGUIFileUtils.cfg.getBoolean("BookGUI.Page6.Enabled"))
+								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
+						}
+					} else
+						p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
+				} else
+					p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
+			} else
+				p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NameNotAllowed"));
+		} else
+			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickTooLong"));
+	}
+
+	public void openNickList(Player p) {
+		nickNamesHandler = new PagesHandler(36);
+
+		for (String name : nickNames)
+			nickNamesHandler.addObject(name);
+		
+		nickNamesHandler.createPage(p, 0);
+		nickNameListPage.put(p.getUniqueId(), 0);
+	}
+
+	public void performNick(Player p, String customNickName) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		
+		if(fileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand")) {
+			if(!(p.hasPermission("nick.gui"))) {
+				PermissionAttachment pa = p.addAttachment(eazyNick);
+				pa.setPermission("nick.gui", true);
+				p.recalculatePermissions();
+				
+				p.chat("/bookgui");
+				
+				p.removeAttachment(pa);
+				p.recalculatePermissions();
+			} else
+				openNickList(p);
+		} else if(fileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
+			if(!(p.hasPermission("nick.gui"))) {
+				PermissionAttachment pa = p.addAttachment(eazyNick);
+				pa.setPermission("nick.gui", true);
+				p.recalculatePermissions();
+				
+				openNickList(p);
+				
+				p.removeAttachment(pa);
+				p.recalculatePermissions();
+			} else
+				openNickList(p);
+		} else {
+			String name = customNickName.equals("RANDOM") ? nickNames.get((new Random().nextInt(nickNames.size()))) : customNickName;
+			boolean nickNameIsInUse = false;
+			
+			for (String nickName : playerNicknames.values()) {
+				if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+					nickNameIsInUse = true;
+			}
+			
+			while (nickNameIsInUse) {
+				nickNameIsInUse = false;
+				name = nickNames.get((new Random().nextInt(nickNames.size())));
+				
+				for (String nickName : playerNicknames.values()) {
+					if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+						nickNameIsInUse = true;
+				}
+			}
+
+			boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
+			String nameWhithoutColors = ChatColor.stripColor(name);
+			String[] prefixSuffix = name.split(nameWhithoutColors);
+			String chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix;
+			
+			if(prefixSuffix.length >= 1) {
+				chatPrefix = ChatColor.translateAlternateColorCodes('&', prefixSuffix[0]);
+				
+				if(chatPrefix.length() > 16)
+					chatPrefix = chatPrefix.substring(0, 16);
+				
+				if(prefixSuffix.length >= 2) {
+					chatSuffix = ChatColor.translateAlternateColorCodes('&', prefixSuffix[1]);
+					
+					if(chatSuffix.length() > 16)
+						chatSuffix = chatSuffix.substring(0, 16);
+				} else
+					chatSuffix = "§r";
+				
+				tabPrefix = chatPrefix;
+				tabSuffix = chatSuffix;
+				tagPrefix = chatPrefix;
+				tagSuffix = chatSuffix;
+			} else {
+				chatPrefix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"));
+				chatSuffix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"));
+				tabPrefix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"));
+				tabSuffix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"));
+				tagPrefix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix"));
+				tagSuffix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix"));
+			}
+
+			new NickManager(p).setGroupName(serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName"));
+			
+			Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, fileUtils.cfg.getBoolean("UseMineSkinAPI") ? "MineSkin" : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+		}
+	}
+	
+	public void performReNick(Player p) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
+		
+		String name = nickOnWorldChangePlayers.contains(p.getUniqueId()) ? nickNames.get((new Random().nextInt(nickNames.size()))) : mysqlNickManager.getNickName(p.getUniqueId());
+		boolean isCancelled = false;
+		boolean nickNameIsInUse = false;
+		
+		for (String nickName : playerNicknames.values()) {
+			if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+				nickNameIsInUse = true;
+		}
+		
+		while (nickNameIsInUse) {
+			nickNameIsInUse = false;
+			name = nickNames.get((new Random().nextInt(nickNames.size())));
+			
+			for (String nickName : playerNicknames.values()) {
+				if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+					nickNameIsInUse = true;
+			}
+		}
+		
+		if(!(nickNameIsInUse) || fileUtils.cfg.getBoolean("AllowPlayersToUseSameNickName")) {
+			boolean playerWithNameIsKnown = false;
+			
+			for (Player all : Bukkit.getOnlinePlayers()) {
+				if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+					playerWithNameIsKnown = true;
+			}
+			
+			if(Bukkit.getOfflinePlayers() != null) {
+				for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+					if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+						playerWithNameIsKnown = true;
+				}
+			}
+			
+			if(!(fileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+				isCancelled = true;
+			
+			if(!(isCancelled)) {
+				if(!(name.equalsIgnoreCase(p.getName()))) {
+					if(mysqlPlayerDataManager.isRegistered(p.getUniqueId())) {
+						new NickManager(p).setGroupName("Default");
+						
+						Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
+								mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()),
+								mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()),
+								mysqlPlayerDataManager.getTabPrefix(p.getUniqueId()),
+								mysqlPlayerDataManager.getTabSuffix(p.getUniqueId()),
+								mysqlPlayerDataManager.getTagPrefix(p.getUniqueId()),
+								mysqlPlayerDataManager.getTagSuffix(p.getUniqueId()),
+								true,
+								false,
+								"NONE"));
+					} else {
+						boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
+						String prefix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
+						String suffix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
+					
+						new NickManager(p).setGroupName("ServerFull");
+						
+						Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
+								serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"),
+								serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"),
+								serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"),
+								serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"),
+								prefix,
+								suffix,
+								true,
+								false,
+								(getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+					}
+				} else
+					p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
+			} else
+				p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
+		} else
+			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
+	}
+
+	public void toggleBungeeNick(Player p) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
+		
+		boolean hasItem = false;
+		
+		if(fileUtils.cfg.getBoolean("NeedItemToToggleNick")) {
+			 if(!((p.getItemInHand() != null) && (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null) && (p.getItemInHand().getItemMeta().getDisplayName() .equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"))))
+				 return;
+			 else
+				 hasItem = true;
+		}
+		
+		if(mysqlNickManager.isPlayerNicked(p.getUniqueId())) {
+			mysqlNickManager.removePlayer(p.getUniqueId());
+			mysqlPlayerDataManager.removeData(p.getUniqueId());
+			
+			if(hasItem)
+				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), createItem(Material.getMaterial(fileUtils.cfg.getString("NickItem.ItemType.Disabled")), fileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), fileUtils.cfg.getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+
+			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.BungeeAutoNickDisabled"));
+		} else {
+			String name = nickNames.get((new Random().nextInt(nickNames.size())));
+
+			mysqlNickManager.addPlayer(p.getUniqueId(), name, name);
+			
+			if(hasItem)
+				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), createItem(Material.getMaterial(fileUtils.cfg.getString("NickItem.ItemType.Enabled")), fileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), fileUtils.cfg.getInt("NickItem.MetaData.Enabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), fileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
+
+			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.BungeeAutoNickEnabled"));
+		}
+	}
+
+	public GameProfile getDefaultGameProfile() {
+		GameProfile gameProfile = new GameProfile(getDefaultUUID(), "MHF_Question");
+		gameProfile.getProperties().put("textures", new Property("textures", getDefaultSkinValue(), getDefaultSkinSignature()));
+		
+		return gameProfile;
+	}
+	
+	public net.minecraft.util.com.mojang.authlib.GameProfile getDefaultGameProfile_1_7() {
+		net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(getDefaultUUID(), "MHF_Question");
+		gameProfile.getProperties().put("textures", new net.minecraft.util.com.mojang.authlib.properties.Property("textures", getDefaultSkinValue(), getDefaultSkinSignature()));
+		
+		return gameProfile;
+	}
+	
+	public String getDefaultSkinValue() {
+		return "ewogICJ0aW1lc3RhbXAiIDogMTU4ODc3MTM4ODk5MCwKICAicHJvZmlsZUlkIiA6ICI2MDZlMmZmMGVkNzc0ODQyOWQ2Y2UxZDMzMjFjNzgzOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJNSEZfUXVlc3Rpb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDM0ZTA2M2NhZmI0NjdhNWM4ZGU0M2VjNzg2MTkzOTlmMzY5ZjRhNTI0MzRkYTgwMTdhOTgzY2RkOTI1MTZhMCIKICAgIH0KICB9Cn0=";
+	}
+	
+	public String getDefaultSkinSignature() {
+		return "vk8nqYneRFvGl7etPHuQ0brqjZONRVhR2azobdY2vBzk51m8vAT1OqvObHKXieuTr/EqiejViXEEbD6KJjQcG89F4Ab29IuGVIDFPaws2cyypv7XreI9mtCrqoA1ZjrxyT/ZZNAm4tNrPNznsMvmVge18rVia3nvd9i4IvmQvwNT+56iuuRisv0G5Ij9FinB3S23g1BStqrcIaiE/8gOSJwCgn4heqDHJNw9sKfyL4FOhKPijh7HkbENnQPm9R8S8C3DcHzjrhJe7oAxmPPnctGyFJwZ5TqPDNIV/4mNEv+oejlN5RDkBeW0XVZVh+dQ10zVv1tbMkXRTEqlbkRS23P7WVWBSPuhN/aIOfxoeNrIF45dJhEp2mJzlPdfIT9jcXHGzP5dXi+GyGhAwi/D95AuM/QFojHsOGx7oy/tEIOBpThVwzxdBFTg0xtwwBwd+8yVoa/yvJGjaJJ8Oy7xP2l1X9QIimAaq+nUMINZBh0/66+Dr38wnJvcFGKASrf64oLswAuOvRd4Pk+F6PZqt/ThF22E/EbI7BToMgzINoJv/NY7+LhmAEMi/0fX0lnni043pOgtwI8y/nVD8mxdP1B8qy4RamQfK9wnYpZVcHNNPNdCQIk3ayzd24JG6PoxkkbHrM+gOybx5UNBir/FaPHLClsnInlHHcdTdb71nD8=";
+	}
+	
+	public UUID getDefaultUUID() {
+		return UUID.fromString("606e2ff0-ed77-4842-9d6c-e1d3321c7838");
 	}
 	
 	public String getPrefix() {
@@ -352,40 +779,8 @@ public class Utils {
 		return lastChatMessage;
 	}
 	
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-	
-	public void setNoPerm(String noPerm) {
-		this.noPerm = noPerm;
-	}
-	
-	public void setNotPlayer(String notPlayer) {
-		this.notPlayer = notPlayer;
-	}
-	
 	public void setNickNamesHandler(PagesHandler<String> nickNamesHandler) {
 		this.nickNamesHandler = nickNamesHandler;
-	}
-	
-	public void setNickNames(List<String> nickNames) {
-		this.nickNames = nickNames;
-	}
-	
-	public void setBlackList(List<String> blackList) {
-		this.blackList = blackList;
-	}
-	
-	public void setWorldsWithDisabledPrefixAndSuffix(List<String> worldsWithDisabledPrefixAndSuffix) {
-		this.worldsWithDisabledPrefixAndSuffix = worldsWithDisabledPrefixAndSuffix;
-	}
-	
-	public void setWorldBlackList(List<String> worldBlackList) {
-		this.worldBlackList = worldBlackList;
-	}
-	
-	public void setMineSkinIds(List<String> mineSkinIds) {
-		this.mineSkinIds = mineSkinIds;
 	}
 	
 	public void setNameField(Field nameField) {
@@ -399,5 +794,5 @@ public class Utils {
 	public void setLastChatMessage(String lastChatMessage) {
 		this.lastChatMessage = lastChatMessage;
 	}
-	
+
 }

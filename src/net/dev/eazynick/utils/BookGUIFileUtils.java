@@ -115,6 +115,13 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.Rank6.Rank", "&6MVP&c++");
 		cfg.addDefault("BookGUI.Rank6.RankName", "MVPPLUSPLUS");
 		cfg.addDefault("BookGUI.Rank6.Permission", "nick.rank.mvpplusplus");
+		
+		for (int i = 7; i <= 18; i++) {
+			cfg.addDefault("BookGUI.Rank" + i + ".Enabled", false);
+			cfg.addDefault("BookGUI.Rank" + i + ".Rank", "&dRank" + i);
+			cfg.addDefault("BookGUI.Rank" + i + ".RankName", "RANK" + i);
+			cfg.addDefault("BookGUI.Rank" + i + ".Permission", "nick.rank." + i);
+		}
 
 		cfg.addDefault("Settings.NickFormat.Rank1.ChatPrefix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.ChatSuffix", "&7");
@@ -163,6 +170,18 @@ public class BookGUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank6.TagPrefix", "&6[MVP%randomColor%++&6] ");
 		cfg.addDefault("Settings.NickFormat.Rank6.TagSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank6.GroupName", "MVPPlusPlus");
+		
+		for (int i = 7; i <= 18; i++) {
+			String prefix = "&d[Rank" + i + "] ", suffix = "&r";
+			
+			cfg.addDefault("Settings.NickFormat.Rank" + i + ".ChatPrefix", prefix);
+			cfg.addDefault("Settings.NickFormat.Rank" + i + ".ChatSuffix", suffix);
+			cfg.addDefault("Settings.NickFormat.Rank" + i + ".TabPrefix", prefix);
+			cfg.addDefault("Settings.NickFormat.Rank" + i + ".TabSuffix", suffix);
+			cfg.addDefault("Settings.NickFormat.Rank" + i + ".TagPrefix", prefix);
+			cfg.addDefault("Settings.NickFormat.Rank" + i + ".TagSuffix", suffix);
+			cfg.addDefault("Settings.NickFormat.Rank" + i + ".GroupName", "Rank" + i);
+		}
 
 		cfg.options().copyDefaults(true);
 		cfg.options().copyHeader(true);

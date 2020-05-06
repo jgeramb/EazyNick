@@ -61,7 +61,7 @@ public class HelpCommand implements CommandExecutor {
 						p.sendMessage(utils.getPrefix() + "§7");
 						p.sendMessage(utils.getPrefix() + "§7/eazynick [1-3] §8» §ePlugin help");
 					} else if(args[0].equalsIgnoreCase("reload") && p.hasPermission("nick.reload"))
-						p.chat("/reloadconfig");
+						utils.reloadConfigs();
 					else
 						p.sendMessage(utils.getPrefix() + "§cPage §e" + args[0] + " could not be found (Pages: 0-3)");
 				}

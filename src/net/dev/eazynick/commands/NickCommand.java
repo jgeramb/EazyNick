@@ -1,7 +1,5 @@
 package net.dev.eazynick.commands;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -9,11 +7,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachment;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
@@ -37,68 +32,9 @@ public class NickCommand implements CommandExecutor {
 					if(utils.getNickedPlayers().contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					else {
-						if(args.length == 0) {
-							if(fileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand")) {
-								if(!(p.hasPermission("nick.gui"))) {
-									PermissionAttachment pa = p.addAttachment(eazyNick);
-									pa.setPermission("nick.gui", true);
-									p.recalculatePermissions();
-									
-									p.chat("/bookgui");
-									
-									p.removeAttachment(pa);
-									p.recalculatePermissions();
-								} else
-									p.chat("/bookgui");
-							} else if(fileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
-								if(!(p.hasPermission("nick.gui"))) {
-									PermissionAttachment pa = p.addAttachment(eazyNick);
-									pa.setPermission("nick.gui", true);
-									p.recalculatePermissions();
-									
-									p.chat("/nicklist");
-									
-									p.removeAttachment(pa);
-									p.recalculatePermissions();
-								} else
-									p.chat("/nicklist");
-							} else {
-								String name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
-								boolean nickNameIsInUse = false;
-								
-								for (String nickName : utils.getPlayerNicknames().values()) {
-									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-										nickNameIsInUse = true;
-								}
-								
-								while (nickNameIsInUse) {
-									nickNameIsInUse = false;
-									name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
-									
-									for (String nickName : utils.getPlayerNicknames().values()) {
-										if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-											nickNameIsInUse = true;
-									}
-								}
-	
-								boolean serverFull = utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
-								String prefix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
-								String suffix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
-								
-								new NickManager(p).setGroupName(serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName"));
-								
-								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, name,
-										serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"),
-										serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"),
-										serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"),
-										serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"),
-										prefix,
-										suffix,
-										false,
-										false,
-										serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
-							}
-						} else {
+						if(args.length == 0)
+							utils.performNick(p, "RANDOM");
+						else {
 							if(p.hasPermission("nick.customnickname")) {
 								String name = args[0].replace("\"", "");
 								boolean isCancelled = false;
@@ -131,45 +67,9 @@ public class NickCommand implements CommandExecutor {
 												isCancelled = true;
 											
 											if(!(isCancelled)) {
-												if(!(name.equalsIgnoreCase(p.getName()))) {
-													name = ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? ((eazyNick.getUUIDFetcher_1_7().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_7().getName(eazyNick.getUUIDFetcher_1_7().getUUID(name)) : name) : (eazyNick.getVersion().equals("1_8_R1") ? ((eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_8_R1().getName(eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : name) : ((eazyNick.getUUIDFetcher().getUUID(name) != null) ? eazyNick.getUUIDFetcher().getName(eazyNick.getUUIDFetcher().getUUID(name)) : name)));
-													
-													boolean serverFull = utils.getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
-													String nameWhithoutColors = ChatColor.stripColor(name);
-													String[] prefixSuffix = name.split(nameWhithoutColors);
-													String chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix;
-													
-													if(prefixSuffix.length >= 1) {
-														chatPrefix = ChatColor.translateAlternateColorCodes('&', prefixSuffix[0]);
-														
-														if(chatPrefix.length() > 16)
-															chatPrefix = chatPrefix.substring(0, 16);
-														
-														if(prefixSuffix.length >= 2) {
-															chatSuffix = ChatColor.translateAlternateColorCodes('&', prefixSuffix[1]);
-															
-															if(chatSuffix.length() > 16)
-																chatSuffix = chatSuffix.substring(0, 16);
-														} else
-															chatSuffix = "§r";
-														
-														tabPrefix = chatPrefix;
-														tabSuffix = chatSuffix;
-														tagPrefix = chatPrefix;
-														tagSuffix = chatSuffix;
-													} else {
-														chatPrefix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"));
-														chatSuffix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"));
-														tabPrefix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"));
-														tabSuffix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"));
-														tagPrefix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix"));
-														tagSuffix = (serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix"));
-													}
-
-													new NickManager(p).setGroupName(serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName"));
-													
-													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, fileUtils.cfg.getBoolean("UseMineSkinAPI") ? "MINESKIN" : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
-												} else
+												if(!(name.equalsIgnoreCase(p.getName())))
+													utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? ((eazyNick.getUUIDFetcher_1_7().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_7().getName(eazyNick.getUUIDFetcher_1_7().getUUID(name)) : name) : (eazyNick.getVersion().equals("1_8_R1") ? ((eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_8_R1().getName(eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : name) : ((eazyNick.getUUIDFetcher().getUUID(name) != null) ? eazyNick.getUUIDFetcher().getName(eazyNick.getUUIDFetcher().getUUID(name)) : name))));
+												else
 													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
 											} else
 												p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));

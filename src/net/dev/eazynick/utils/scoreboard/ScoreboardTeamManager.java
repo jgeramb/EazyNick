@@ -29,7 +29,7 @@ public class ScoreboardTeamManager {
 		this.p = p;
 		this.prefix = prefix;
 		this.suffix = suffix;
-		this.teamName = "999999999" + p.getName();
+		this.teamName = "9999" + p.getName();
 		
 		if(teamName.length() > 16)
 			teamName = teamName.substring(0, 16);
@@ -76,7 +76,6 @@ public class ScoreboardTeamManager {
 			} else {
 				try {
 					reflectUtils.setField(packet, "a", teamName);
-					reflectUtils.setField(packet, "b", teamName);
 					reflectUtils.setField(packet, "f", 1);
 				} catch (Exception ex) {
 					ex.printStackTrace();
@@ -88,19 +87,6 @@ public class ScoreboardTeamManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-
-	private Object getAsIChatBaseComponent(String txt) {
-		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
-		
-		try {
-			return reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(reflectUtils.getNMSClass("IChatBaseComponent"), "{\"text\":\"" + txt + "\"}");
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
 	}
 
 	public void createTeam() {
@@ -166,6 +152,7 @@ public class ScoreboardTeamManager {
 					reflectUtils.setField(packet, "d", suffixForPlayer);
 					reflectUtils.setField(packet, "e", contents);
 					reflectUtils.setField(packet, "f", 0);
+					reflectUtils.setField(packet, "g", 0);
 				}
 			
 				sendPacket(t, packet);
@@ -173,6 +160,18 @@ public class ScoreboardTeamManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private Object getAsIChatBaseComponent(String txt) {
+		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		
+		try {
+			return reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(reflectUtils.getNMSClass("IChatBaseComponent"), "{\"text\":\"" + txt + "\"}");
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	private void sendPacket(Player p, Object packet) {

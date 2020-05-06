@@ -702,7 +702,10 @@ public class NickManager {
 					user.removeGroup(group);
 				}
 				
-				user.addGroup(api.getGroups().name(groupName));
+				Group group = api.getGroups().name(groupName);
+				
+				if(group != null)
+					user.addGroup(group);
 			}
 		}
 		

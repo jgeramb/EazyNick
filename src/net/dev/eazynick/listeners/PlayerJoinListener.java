@@ -114,7 +114,7 @@ public class PlayerJoinListener implements Listener {
 
 									@Override
 									public void run() {
-										p.chat("/renick");
+										utils.performReNick(p);
 									}
 								}, 15);
 							}
@@ -155,7 +155,7 @@ public class PlayerJoinListener implements Listener {
 
 							@Override
 							public void run() {
-								p.chat("/nick");
+								utils.performNick(p, "RANDOM");
 							}
 						}, 10);
 					}

@@ -34,6 +34,9 @@ public class UUIDFetcher {
 	}
 
 	public UUID getUUIDAt(String name, long timestamp) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		Utils utils = eazyNick.getUtils();
+		
 		name = name.toLowerCase();
 
 		if (uuidCache.containsKey(name))
@@ -50,8 +53,6 @@ public class UUIDFetcher {
 
 			return data.id;
 		} catch (Exception e) {
-			EazyNick eazyNick = EazyNick.getInstance();
-			Utils utils = eazyNick.getUtils();
 			NickNameFileUtils nickNameFileUtils = eazyNick.getNickNameFileUtils();
 
 			List<String> list = nickNameFileUtils.cfg.getStringList("NickNames");
@@ -69,11 +70,11 @@ public class UUIDFetcher {
 				nickNameFileUtils.cfg.set("NickNames", list);
 				nickNameFileUtils.saveFile();
 
-				utils.sendConsole("§cThe player §e" + name + " §cdoes not exist");
+				utils.sendConsole("§cThere is no account with username §6" + name + " §cin the mojang database");
 			}
 		}
 
-		return null;
+		return utils.getDefaultUUID();
 	}
 
 	public String getName(UUID uuid) {
