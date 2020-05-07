@@ -21,6 +21,7 @@ import com.nametagedit.plugin.api.data.Nametag;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.hooks.LuckPermsHook;
+import net.dev.eazynick.hooks.TABHook;
 import net.dev.eazynick.utils.ActionBarUtils;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
@@ -36,8 +37,6 @@ import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.UltraPermissionsAPI;
 import me.TechsCode.UltraPermissions.storage.objects.Group;
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.neznamy.tab.api.EnumProperty;
-import me.neznamy.tab.api.TABAPI;
 import me.wazup.survivalgames.PlayerData;
 import me.wazup.survivalgames.SurvivalGames;
 import me.wazup.survivalgames.SurvivalGamesAPI;
@@ -155,22 +154,25 @@ public class NickManager {
 	private void performAuthMeLogin() {
 		Utils utils = eazyNick.getUtils();
 		
-		if(utils.authMeReloadedStatus("5.5.0")) {
-			NewAPI api = AuthMe.getApi();
-			String name = p.getName();
-			
-			if(!(api.isRegistered(name)))
-				api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
-			else
-				api.forceLogin(p);
-		} else if(utils.authMeReloadedStatus("5.5.1") || utils.authMeReloadedStatus("5.6.0")) {
-			AuthMeApi api = AuthMeApi.getInstance();
-			String name = p.getName();
-			
-			if(!(api.isRegistered(name)))
-				api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
-			else
-				api.forceLogin(p);
+		try {
+			if(utils.authMeReloadedStatus("5.5.0")) {
+				NewAPI api = AuthMe.getApi();
+				String name = p.getName();
+				
+				if(!(api.isRegistered(name)))
+					api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
+				else
+					api.forceLogin(p);
+			} else if(utils.authMeReloadedStatus("5.5.1") || utils.authMeReloadedStatus("5.6.0")) {
+				AuthMeApi api = AuthMeApi.getInstance();
+				String name = p.getName();
+				
+				if(!(api.isRegistered(name)))
+					api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
+				else
+					api.forceLogin(p);
+			}
+		} catch (Exception ex) {
 		}
 	}
 
@@ -268,20 +270,13 @@ public class NickManager {
 			utils.getTabSuffixes().remove(p.getUniqueId());
 		
 		unsetGroupName();
-		
-		if(utils.tabStatus() && !(TABAPI.hasHiddenNametag(p.getUniqueId()))) {
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTABNAME, nickName);
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTAGNAME, nickName);
-			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TABPREFIX);
-			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TABSUFFIX);
-			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TAGPREFIX);
-			TABAPI.removeTemporaryValue(p.getUniqueId(), EnumProperty.TAGSUFFIX);
-		}
-		
 		resetCloudNET();
 		
 		if(utils.luckPermsStatus())
 			new LuckPermsHook(p).resetNodes();
+		
+		if(utils.tabStatus())
+			new TABHook(p).reset();
 		
 		if(utils.ultraPermissionsStatus()) {
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
@@ -587,18 +582,6 @@ public class NickManager {
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		
-		final String finalTabPrefix = tabPrefix;
-		final String finalTabSuffix = tabSuffix;
-		
-		if(utils.placeholderAPIStatus()) {
-			tagPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
-			tagSuffix = PlaceholderAPI.setPlaceholders(p, tagSuffix);
-			chatPrefix = PlaceholderAPI.setPlaceholders(p, chatPrefix);
-			chatSuffix = PlaceholderAPI.setPlaceholders(p, chatSuffix);
-			tabPrefix = PlaceholderAPI.setPlaceholders(p, tabPrefix);
-			tabSuffix = PlaceholderAPI.setPlaceholders(p, tabSuffix);
-		}
-
 		if(utils.getChatPrefixes().containsKey(p.getUniqueId()))
 			utils.getChatPrefixes().remove(p.getUniqueId());
 			
@@ -638,8 +621,8 @@ public class NickManager {
 						sbtm.createTeam();
 						
 						if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.PlayerListName")) {
-							String tmpTabPrefix = finalTabPrefix;
-							String tmpTabSuffix = finalTabSuffix;
+							String tmpTabPrefix = tabPrefix;
+							String tmpTabSuffix = tabSuffix;
 							
 							if(utils.placeholderAPIStatus()) {
 								tmpTabPrefix = PlaceholderAPI.setPlaceholders(p, tmpTabPrefix);
@@ -729,15 +712,6 @@ public class NickManager {
 				user.setPrefix(tabPrefix, p.getWorld().getName());
 				user.setSuffix(tabSuffix, p.getWorld().getName());
 			}
-		}
-		
-		if(utils.tabStatus() && !(TABAPI.hasHiddenNametag(p.getUniqueId()))) {
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTABNAME, getNickName());
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.CUSTOMTAGNAME, getNickName());
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TABPREFIX, tabPrefix);
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TABSUFFIX, tabSuffix);
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TAGPREFIX, tagPrefix);
-			TABAPI.setValueTemporarily(p.getUniqueId(), EnumProperty.TAGSUFFIX, tagSuffix);
 		}
 	}
 	

@@ -10,9 +10,12 @@ import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.hooks.LuckPermsHook;
+import net.dev.eazynick.hooks.TABHook;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
 import net.dev.eazynick.utils.Utils;
+
+import me.clip.placeholderapi.PlaceholderAPI;
 
 public class PlayerNickListener implements Listener {
 
@@ -27,14 +30,7 @@ public class PlayerNickListener implements Listener {
 			Player p = e.getPlayer();
 			NickManager api = new NickManager(p);
 			boolean changePrefixAndSuffix = fileUtils.cfg.getBoolean("WorldsWithDisabledPrefixAndSuffix") || !(utils.getWorldsWithDisabledPrefixAndSuffix().contains(p.getWorld().getName().toUpperCase()));
-			
-			if(changePrefixAndSuffix && utils.luckPermsStatus())
-				new LuckPermsHook(p).updateNodes(e.getTagPrefix(), e.getTagSuffix(), e.getGroupName());
-			
-			api.nickPlayer(e.getNickName(), e.getSkinName());
-			
-			if(changePrefixAndSuffix)
-				api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getGroupName());
+			String nickName = e.getNickName(), tagPrefix = e.getTagPrefix(), tagSuffix = e.getTagSuffix(), chatPrefix = e.getChatPrefix(), chatSuffix = e.getChatSuffix(), tabPrefix = e.getTabPrefix(), tabSuffix = e.getTabSuffix();
 			
 			utils.getCanUseNick().put(p.getUniqueId(), false);
 			
@@ -67,11 +63,31 @@ public class PlayerNickListener implements Listener {
 				}
 				
 				if(!(oldRank.equals("NONE")))
-					eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), oldRank, e.getChatPrefix(), e.getChatSuffix(), e.getTabPrefix(), e.getTabSuffix(), e.getTagPrefix(), e.getTagSuffix());
+					eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), oldRank, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 			}
 			
+			if(utils.placeholderAPIStatus()) {
+				tagPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+				tagSuffix = PlaceholderAPI.setPlaceholders(p, tagSuffix);
+				chatPrefix = PlaceholderAPI.setPlaceholders(p, chatPrefix);
+				chatSuffix = PlaceholderAPI.setPlaceholders(p, chatSuffix);
+				tabPrefix = PlaceholderAPI.setPlaceholders(p, tabPrefix);
+				tabSuffix = PlaceholderAPI.setPlaceholders(p, tabSuffix);
+			}
+			
+			if(changePrefixAndSuffix && utils.luckPermsStatus())
+				new LuckPermsHook(p).updateNodes(tagPrefix, tagSuffix, e.getGroupName());
+			
+			if(changePrefixAndSuffix && utils.tabStatus())
+				new TABHook(p).update(nickName, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
+			
+			api.nickPlayer(nickName, e.getSkinName());
+			
+			if(changePrefixAndSuffix)
+				api.updatePrefixSuffix(tagPrefix, tagSuffix, chatPrefix, chatSuffix, tabPrefix, tabSuffix, e.getGroupName());
+			
 			if(!(e.isRenick()))
-				p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", e.getNickName()));
+				p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName));
 		}
 	}
 

@@ -28,7 +28,7 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 				return String.valueOf(api.isNicked());
 			
 			if(identifier.equals("display_name"))
-				return (!(api.isNicked() && ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(p.getUniqueId()))) ? (mysqlNickManager.getNickName(p.getUniqueId())) : p.getName());
+				return ((mysqlNickManager != null) ? ((mysqlNickManager.isPlayerNicked(p.getUniqueId()) && !(api.isNicked())) ? mysqlNickManager.getNickName(p.getUniqueId()) : p.getName()) : p.getName());
 			
 			if(identifier.equals("chat_prefix"))
 				return api.getChatPrefix();

@@ -394,7 +394,7 @@ public class Utils {
 				p.removeAttachment(pa);
 				p.recalculatePermissions();
 			} else
-				openNickList(p);
+				p.chat("/bookgui");
 		} else if(fileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
 			if(!(p.hasPermission("nick.gui"))) {
 				PermissionAttachment pa = p.addAttachment(eazyNick);
