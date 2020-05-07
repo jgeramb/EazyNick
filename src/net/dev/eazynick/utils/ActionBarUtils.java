@@ -29,7 +29,7 @@ public class ActionBarUtils {
 					public void run() {
 						i++;
 
-						if ((i == time) || (p == null))
+						if ((i == time) || !(p.isOnline()))
 							cancel();
 						else
 							sendPacket(p, chatPacket);

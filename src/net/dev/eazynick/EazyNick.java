@@ -134,6 +134,8 @@ public class EazyNick extends JavaPlugin {
 				mineSkinAPI = new MineSkinAPI();
 				nmsNickManager = new NMSNickManager();
 				
+				utils.reloadConfigs();
+				
 				utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 				utils.sendConsole("	§7Starting system...");
 				utils.sendConsole("	§7");
@@ -156,8 +158,6 @@ public class EazyNick extends JavaPlugin {
 
 					isCancelled = true;
 				} else {
-					utils.reloadConfigs();
-					
 					if (reflectVersion.equals("v1_7_R4")) {
 						utils.setNameField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "name"));
 						utils.setUUIDField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "id"));
