@@ -77,7 +77,7 @@ public class UUIDFetcher_1_7 {
 		return utils.getDefaultUUID();
 	}
 
-	public String getName(UUID uuid) {
+	public String getName(String name, UUID uuid) {
 		if (nameCache.containsKey(uuid))
 			return nameCache.get(uuid);
 
@@ -94,7 +94,7 @@ public class UUIDFetcher_1_7 {
 		} catch (Exception e) {
 		}
 
-		return null;
+		return name;
 	}
 
 }

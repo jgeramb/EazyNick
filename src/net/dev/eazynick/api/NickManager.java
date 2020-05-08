@@ -75,12 +75,14 @@ public class NickManager {
 	public void changeSkin(String skinName) {
 		NMSNickManager nmsNickManager = eazyNick.getNMSNickManager();
 		
-		if(eazyNick.getVersion().equals("1_7_R4"))
-			nmsNickManager.updateSkin_1_7_R4(p, skinName);
-		else if(eazyNick.getVersion().equals("1_8_R1"))
-			nmsNickManager.updateSkin_1_8_R1(p, skinName);
-		else
-			nmsNickManager.updateSkin(p, skinName);
+		if(skinName != null) {
+			if(eazyNick.getVersion().equals("1_7_R4"))
+				nmsNickManager.updateSkin_1_7_R4(p, skinName);
+			else if(eazyNick.getVersion().equals("1_8_R1"))
+				nmsNickManager.updateSkin_1_8_R1(p, skinName);
+			else
+				nmsNickManager.updateSkin(p, skinName);
+		}
 	}
 	
 	public void updatePlayer() {
@@ -251,7 +253,6 @@ public class NickManager {
 			p.setCustomName(nickName);
 		
 		setName(nickName);
-		changeSkin(nickName);
 		updatePlayer(isQuitUnnick ? UpdateType.QUIT : UpdateType.UNNICK, nickName, true);
 		
 		utils.getNickedPlayers().remove(p.getUniqueId());
@@ -385,11 +386,11 @@ public class NickManager {
 			realName = utils.getNameCache().get(p.getUniqueId());
 		else {
 			if(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))
-				realName = eazyNick.getUUIDFetcher_1_7().getName(p.getUniqueId());
+				realName = eazyNick.getUUIDFetcher_1_7().getName(realName, p.getUniqueId());
 			else if(eazyNick.getVersion().equalsIgnoreCase("1_8_R1"))
-				realName = eazyNick.getUUIDFetcher_1_8_R1().getName(p.getUniqueId());
+				realName = eazyNick.getUUIDFetcher_1_8_R1().getName(realName, p.getUniqueId());
 			else
-				realName = eazyNick.getUUIDFetcher().getName(p.getUniqueId());
+				realName = eazyNick.getUUIDFetcher().getName(realName, p.getUniqueId());
 		}
 		
 		return realName;

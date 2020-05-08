@@ -68,7 +68,7 @@ public class NickCommand implements CommandExecutor {
 											
 											if(!(isCancelled)) {
 												if(!(name.equalsIgnoreCase(p.getName())))
-													utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? ((eazyNick.getUUIDFetcher_1_7().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_7().getName(eazyNick.getUUIDFetcher_1_7().getUUID(name)) : name) : (eazyNick.getVersion().equals("1_8_R1") ? ((eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) != null) ? eazyNick.getUUIDFetcher_1_8_R1().getName(eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : name) : ((eazyNick.getUUIDFetcher().getUUID(name) != null) ? eazyNick.getUUIDFetcher().getName(eazyNick.getUUIDFetcher().getUUID(name)) : name))));
+													utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name)))));
 												else
 													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
 											} else

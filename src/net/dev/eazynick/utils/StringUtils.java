@@ -13,12 +13,6 @@ public class StringUtils {
 	public boolean isColoredString() {
 		return (getColoredString().contains("§"));
 	}
-
-	public StringUtils translateColorCodes() {
-		string = ChatColor.translateAlternateColorCodes('&', string);
-		
-		return this;
-	}
 	
 	public StringUtils removeColorCodes() {
 		string = ChatColor.stripColor(getColoredString());
@@ -31,7 +25,7 @@ public class StringUtils {
 	}
 	
 	private String getColoredString() {
-		return (string.replace("&", "§"));
+		return ChatColor.translateAlternateColorCodes('&', string);
 	}
 	
 }

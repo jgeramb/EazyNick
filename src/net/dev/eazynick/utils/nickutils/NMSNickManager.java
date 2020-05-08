@@ -292,8 +292,7 @@ public class NMSNickManager extends ReflectUtils {
 						if(uuidSpoof && !(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
 							updateUniqueId(p, uuidBefore);
 
-						if(skinName != null)
-							api.changeSkin(skinName);
+						api.changeSkin(skinName);
 						
 						if(version.startsWith("1_15")) {
 							Class<?> dimensionManager = getNMSClass("DimensionManager");
