@@ -208,6 +208,17 @@ public class PlayerJoinListener implements Listener {
 							
 							api.unnickPlayerWithoutRemovingMySQL(false);
 
+							if(utils.getLastSkinNames().containsKey(p.getUniqueId()))
+								utils.getLastSkinNames().remove(p.getUniqueId());
+							
+							if(utils.getLastNickNames().containsKey(p.getUniqueId()))
+								utils.getLastNickNames().remove(p.getUniqueId());
+							
+							utils.getLastSkinNames().put(p.getUniqueId(), skinName);
+							utils.getLastNickNames().put(p.getUniqueId(), nickName);
+							
+							new NickManager(p).setGroupName(rankName);
+							
 							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, true, rankName));
 						}
 					}
