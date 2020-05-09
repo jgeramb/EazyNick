@@ -409,6 +409,7 @@ public class Utils {
 				openNickList(p);
 		} else {
 			String name = customNickName.equals("RANDOM") ? nickNames.get((new Random().nextInt(nickNames.size()))) : customNickName;
+			
 			boolean nickNameIsInUse = false;
 			
 			for (String nickName : playerNicknames.values()) {
@@ -425,7 +426,7 @@ public class Utils {
 						nickNameIsInUse = true;
 				}
 			}
-
+			
 			boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
 			String nameWhithoutColors = ChatColor.stripColor(name);
 			String[] prefixSuffix = name.split(nameWhithoutColors);

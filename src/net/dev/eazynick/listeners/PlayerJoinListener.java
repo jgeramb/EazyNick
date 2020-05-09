@@ -1,5 +1,7 @@
 package net.dev.eazynick.listeners;
 
+import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,7 +15,7 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
-import net.dev.eazynick.utils.FileUtils;
+import net.dev.eazynick.utils.*;
 import net.dev.eazynick.utils.LanguageFileUtils;
 import net.dev.eazynick.utils.PacketInjector;
 import net.dev.eazynick.utils.PacketInjector_1_7;
@@ -27,6 +29,7 @@ public class PlayerJoinListener implements Listener {
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
@@ -160,12 +163,12 @@ public class PlayerJoinListener implements Listener {
 						}, 10);
 					}
 				} else if (!(fileUtils.cfg.getBoolean("DiconnectUnnick"))) {
-					if((eazyNick.getMySQL() != null) && eazyNick.getMySQL().isConnected()) {
-						if (api.isNicked()) {
+					if (api.isNicked()) {
+						if((eazyNick.getMySQL() != null) && eazyNick.getMySQL().isConnected()) {
 							api.unnickPlayerWithoutRemovingMySQL(false);
 							
 							Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
-	
+
 								@Override
 								public void run() {
 									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, api.getNickName(), mysqlNickManager.getSkinName(p.getUniqueId()),
@@ -180,8 +183,32 @@ public class PlayerJoinListener implements Listener {
 											"NONE"));
 								}
 							}, 10);
+						} else if(utils.getPlayerNicknames().containsKey(p.getUniqueId())) {
+							String nickName = utils.getPlayerNicknames().get(p.getUniqueId()), skinName = utils.getLastSkinNames().get(p.getUniqueId()), rankName = api.getGroupName(), chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "";
 							
-							return;
+							for (int i = 1; i <= 18; i++) {
+								if(rankName.equals(bookGUIFileUtils.cfg.getString("BookGUI.Rank" + i + ".RankName"))) {
+									chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
+									chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
+									tabPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
+									tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
+									tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
+									tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+								}
+							}
+							
+							String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
+							
+							chatPrefix = chatPrefix.replaceAll("%randomColor%", randomColor);
+							chatSuffix = chatSuffix.replaceAll("%randomColor%", randomColor);
+							tabPrefix = tabPrefix.replaceAll("%randomColor%", randomColor);
+							tabSuffix = tabSuffix.replaceAll("%randomColor%", randomColor);
+							tagPrefix = tagPrefix.replaceAll("%randomColor%", randomColor);
+							tagSuffix = tagSuffix.replaceAll("%randomColor%", randomColor);
+							
+							api.unnickPlayerWithoutRemovingMySQL(false);
+
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, true, rankName));
 						}
 					}
 				}
