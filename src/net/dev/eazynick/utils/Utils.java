@@ -587,29 +587,25 @@ public class Utils {
 	}
 
 	public GameProfile getDefaultGameProfile() {
-		GameProfile gameProfile = new GameProfile(getDefaultUUID(), "MHF_Question");
+		GameProfile gameProfile = new GameProfile(UUID.fromString("8667ba71-b85a-4004-af54-457a9734eed7"), "Steve");
 		gameProfile.getProperties().put("textures", new Property("textures", getDefaultSkinValue(), getDefaultSkinSignature()));
 		
 		return gameProfile;
 	}
 	
 	public net.minecraft.util.com.mojang.authlib.GameProfile getDefaultGameProfile_1_7() {
-		net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(getDefaultUUID(), "MHF_Question");
+		net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(UUID.fromString("8667ba71-b85a-4004-af54-457a9734eed7"), "Steve");
 		gameProfile.getProperties().put("textures", new net.minecraft.util.com.mojang.authlib.properties.Property("textures", getDefaultSkinValue(), getDefaultSkinSignature()));
 		
 		return gameProfile;
 	}
 	
 	public String getDefaultSkinValue() {
-		return "ewogICJ0aW1lc3RhbXAiIDogMTU4ODc3MTM4ODk5MCwKICAicHJvZmlsZUlkIiA6ICI2MDZlMmZmMGVkNzc0ODQyOWQ2Y2UxZDMzMjFjNzgzOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJNSEZfUXVlc3Rpb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDM0ZTA2M2NhZmI0NjdhNWM4ZGU0M2VjNzg2MTkzOTlmMzY5ZjRhNTI0MzRkYTgwMTdhOTgzY2RkOTI1MTZhMCIKICAgIH0KICB9Cn0=";
+		return "ewogICJ0aW1lc3RhbXAiIDogMTU4OTU2NzM1NzQyMSwKICAicHJvZmlsZUlkIiA6ICI5MzRiMmFhOGEyODQ0Yzc3ODg2NDhiNDBiY2IzYjAzMSIsCiAgInByb2ZpbGVOYW1lIiA6ICI0Z2wiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmQzYjA2YzM4NTA0ZmZjMDIyOWI5NDkyMTQ3YzY5ZmNmNTlmZDJlZDc4ODVmNzg1MDIxNTJmNzdiNGQ1MGRlMSIKICAgIH0KICB9Cn0=";
 	}
 	
 	public String getDefaultSkinSignature() {
-		return "vk8nqYneRFvGl7etPHuQ0brqjZONRVhR2azobdY2vBzk51m8vAT1OqvObHKXieuTr/EqiejViXEEbD6KJjQcG89F4Ab29IuGVIDFPaws2cyypv7XreI9mtCrqoA1ZjrxyT/ZZNAm4tNrPNznsMvmVge18rVia3nvd9i4IvmQvwNT+56iuuRisv0G5Ij9FinB3S23g1BStqrcIaiE/8gOSJwCgn4heqDHJNw9sKfyL4FOhKPijh7HkbENnQPm9R8S8C3DcHzjrhJe7oAxmPPnctGyFJwZ5TqPDNIV/4mNEv+oejlN5RDkBeW0XVZVh+dQ10zVv1tbMkXRTEqlbkRS23P7WVWBSPuhN/aIOfxoeNrIF45dJhEp2mJzlPdfIT9jcXHGzP5dXi+GyGhAwi/D95AuM/QFojHsOGx7oy/tEIOBpThVwzxdBFTg0xtwwBwd+8yVoa/yvJGjaJJ8Oy7xP2l1X9QIimAaq+nUMINZBh0/66+Dr38wnJvcFGKASrf64oLswAuOvRd4Pk+F6PZqt/ThF22E/EbI7BToMgzINoJv/NY7+LhmAEMi/0fX0lnni043pOgtwI8y/nVD8mxdP1B8qy4RamQfK9wnYpZVcHNNPNdCQIk3ayzd24JG6PoxkkbHrM+gOybx5UNBir/FaPHLClsnInlHHcdTdb71nD8=";
-	}
-	
-	public UUID getDefaultUUID() {
-		return UUID.fromString("606e2ff0-ed77-4842-9d6c-e1d3321c7838");
+		return "WMx2gG2+sM8D4qLHAjiiEWMNwxR6hT0H1uhqoiM1g2IJuM9dODDpgQOEEn7+9K1GxHr45Y7NQ4s9tFk7a5M1BL+IpLUNuZ3PIH2qAuoqVvaYrcYX05e9SBTuHLJCuSo+RjDqyT6AWkE4nYpD6vTLoOQS8Ku+ZXyPdFh2ALW95zQPHh2ZXrlaY+Ktdwf2TEq0vqr8agxzhDaksBxQBgbntu5VS4Z9yJ2hTeftZZALadewYegDI7Dkf/9yWr+6PEcCczhCyrf4xhHzBOjBLMDjg6ZRQhGGscv6dLP7hdqbIRPwvZ/tH0NW1GE1UWqof5TspCmlHNI592djxo2MqDhA0LrT4jbQfsnfZze0urQwMQG1V3fDDrf8kfZdD+7H29UmFAaTvfqMkwqKalPExm75oqeFole4qzxifl1Rv1i3bJy8ZZlgixZzxhl3idDIP5IkPnQHt9YFOEpOQLWtJV8dTixCP5TvYVQRtXkgFtzIUljDNkrqUmqlkeXPlZR27lEykuLIGPrV4U/bXanNVpHKcCMsD7vzFC1wu1XS0JWozN8SFZdwmVTCFpmBgqeKHBPbIuTqdOF0+YZ7xoxc7W869vgFJSaJ7jdlcTsHFt+AQcWUxlSqoV1n1kyQ7hF/zcjoi2YtAMy9XGh1IODS+UPl/edqs7Sq+fA054/ivaqzeh4=";
 	}
 	
 	public String getPrefix() {

@@ -76,7 +76,7 @@ public class UUIDFetcher_1_8_R1 {
 			}
 		}
 
-		return utils.getDefaultUUID();
+		return null;
 	}
 
 	public String getName(String name, UUID uuid) {
