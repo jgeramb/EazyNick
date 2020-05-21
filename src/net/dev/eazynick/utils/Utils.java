@@ -207,23 +207,23 @@ public class Utils {
 		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
 		NickNameFileUtils nickNameFileUtils = eazyNick.getNickNameFileUtils();
 		
-		fileUtils.cfg = YamlConfiguration.loadConfiguration(eazyNick.getFileUtils().getFile());
+		fileUtils.setConfig(YamlConfiguration.loadConfiguration(eazyNick.getFileUtils().getFile()));
 		fileUtils.saveFile();
 		
-		nickNameFileUtils.cfg = YamlConfiguration.loadConfiguration(nickNameFileUtils.getFile());
+		nickNameFileUtils.setConfig(YamlConfiguration.loadConfiguration(nickNameFileUtils.getFile()));
 		nickNameFileUtils.saveFile();
 		
-		bookGUIFileUtils.cfg = YamlConfiguration.loadConfiguration(bookGUIFileUtils.getFile());
+		bookGUIFileUtils.setConfig(YamlConfiguration.loadConfiguration(bookGUIFileUtils.getFile()));
 		bookGUIFileUtils.saveFile();
 		
-		languageFileUtils.cfg = YamlConfiguration.loadConfiguration(languageFileUtils.getFile());
+		languageFileUtils.setConfig(YamlConfiguration.loadConfiguration(languageFileUtils.getFile()));
 		languageFileUtils.saveFile();
 		
-		this.nickNames = nickNameFileUtils.cfg.getStringList("NickNames");
+		this.nickNames = nickNameFileUtils.getConfig().getStringList("NickNames");
 		
-		List<String> blackList = fileUtils.cfg.getStringList("BlackList");
-		List<String> worldsWithDisabledPrefixAndSuffix = fileUtils.cfg.getStringList("WorldsWithDisabledPrefixAndSuffix");
-		List<String> worldBlackList = fileUtils.cfg.getStringList("AutoNickWorldBlackList");
+		List<String> blackList = fileUtils.getConfig().getStringList("BlackList");
+		List<String> worldsWithDisabledPrefixAndSuffix = fileUtils.getConfig().getStringList("WorldsWithDisabledPrefixAndSuffix");
+		List<String> worldBlackList = fileUtils.getConfig().getStringList("AutoNickWorldBlackList");
 		
 		if (blackList.size() >= 1) {
 			ArrayList<String> toAdd = new ArrayList<>();
@@ -252,7 +252,7 @@ public class Utils {
 			this.worldBlackList = toAdd;
 		}
 		
-		this.mineSkinIds = fileUtils.cfg.getStringList("MineSkinIds");
+		this.mineSkinIds = fileUtils.getConfig().getStringList("MineSkinIds");
 
 		this.prefix = languageFileUtils.getConfigString("Messages.Prefix");
 		this.noPerm = languageFileUtils.getConfigString("Messages.NoPerm");
@@ -280,7 +280,7 @@ public class Utils {
 						nickNameIsInUse = true;
 				}
 
-				if(!(nickNameIsInUse) || fileUtils.cfg.getBoolean("AllowPlayersToUseSameNickName")) {
+				if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
 					boolean playerWithNameIsKnown = false;
 					
 					for (Player all : Bukkit.getOnlinePlayers()) {
@@ -295,7 +295,7 @@ public class Utils {
 						}
 					}
 					
-					if(!(fileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+					if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
 						isCancelled = true;
 					
 					if(!(isCancelled)) {
@@ -304,14 +304,14 @@ public class Utils {
 						for (int i = 1; i <= 18; i++) {
 							String permission = bookGUIFileUtils.getConfigString("BookGUI.Rank" + i + ".Permission");
 							
-							if(rankName.equalsIgnoreCase(bookGUIFileUtils.cfg.getString("BookGUI.Rank" + i + ".RankName")) && bookGUIFileUtils.cfg.getBoolean("BookGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission))) {
+							if(rankName.equalsIgnoreCase(bookGUIFileUtils.getConfig().getString("BookGUI.Rank" + i + ".RankName")) && bookGUIFileUtils.getConfig().getBoolean("BookGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission))) {
 								chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
 								chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
 								tabPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
 								tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
 								tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
 								tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
-								groupName = bookGUIFileUtils.cfg.getString("Settings.NickFormat.Rank" + i + ".GroupName");
+								groupName = bookGUIFileUtils.getConfig().getString("Settings.NickFormat.Rank" + i + ".GroupName");
 							}
 						}
 						
@@ -349,16 +349,16 @@ public class Utils {
 						
 						new NickManager(p).setGroupName(groupName);
 						
-						if(fileUtils.cfg.getBoolean("BungeeCord") && fileUtils.cfg.getBoolean("LobbyMode")) {
+						if(fileUtils.getConfig().getBoolean("BungeeCord") && fileUtils.getConfig().getBoolean("LobbyMode")) {
 							eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), name, skinName);
 							eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 							
-							if(bookGUIFileUtils.cfg.getBoolean("BookGUI.Page6.Enabled"))
+							if(bookGUIFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled"))
 								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
 						} else {
 							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
 						
-							if(bookGUIFileUtils.cfg.getBoolean("BookGUI.Page6.Enabled"))
+							if(bookGUIFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled"))
 								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
 						}
 					} else
@@ -385,7 +385,7 @@ public class Utils {
 		EazyNick eazyNick = EazyNick.getInstance();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		
-		if(fileUtils.cfg.getBoolean("OpenBookGUIOnNickCommand")) {
+		if(fileUtils.getConfig().getBoolean("OpenBookGUIOnNickCommand")) {
 			if(!(p.hasPermission("nick.gui"))) {
 				PermissionAttachment pa = p.addAttachment(eazyNick);
 				pa.setPermission("nick.gui", true);
@@ -397,7 +397,7 @@ public class Utils {
 				p.recalculatePermissions();
 			} else
 				p.chat("/bookgui");
-		} else if(fileUtils.cfg.getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
+		} else if(fileUtils.getConfig().getBoolean("OpenNicknameGUIInsteadOfRandomNick")) {
 			if(!(p.hasPermission("nick.gui"))) {
 				PermissionAttachment pa = p.addAttachment(eazyNick);
 				pa.setPermission("nick.gui", true);
@@ -463,7 +463,7 @@ public class Utils {
 
 			new NickManager(p).setGroupName(serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName"));
 			
-			Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, fileUtils.cfg.getBoolean("UseMineSkinAPI") ? "MineSkin" : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+			Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, fileUtils.getConfig().getBoolean("UseMineSkinAPI") ? "MineSkin" : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
 		}
 	}
 	
@@ -493,7 +493,7 @@ public class Utils {
 			}
 		}
 		
-		if(!(nickNameIsInUse) || fileUtils.cfg.getBoolean("AllowPlayersToUseSameNickName")) {
+		if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
 			boolean playerWithNameIsKnown = false;
 			
 			for (Player all : Bukkit.getOnlinePlayers()) {
@@ -508,7 +508,7 @@ public class Utils {
 				}
 			}
 			
-			if(!(fileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+			if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
 				isCancelled = true;
 			
 			if(!(isCancelled)) {
@@ -561,7 +561,7 @@ public class Utils {
 		
 		boolean hasItem = (p.getItemInHand() != null) && (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null) && (p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"));
 		
-		if(fileUtils.cfg.getBoolean("NeedItemToToggleNick") && !(hasItem))
+		if(fileUtils.getConfig().getBoolean("NeedItemToToggleNick") && !(hasItem))
 			return;
 		
 		if(mysqlNickManager.isPlayerNicked(p.getUniqueId())) {
@@ -569,7 +569,7 @@ public class Utils {
 			mysqlPlayerDataManager.removeData(p.getUniqueId());
 			
 			if(hasItem)
-				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), createItem(Material.getMaterial(fileUtils.cfg.getString("NickItem.ItemType.Disabled")), fileUtils.cfg.getInt("NickItem.ItemAmount.Disabled"), fileUtils.cfg.getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.cfg.getBoolean("NickItem.Enchanted.Disabled")));
+				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")));
 
 			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.BungeeAutoNickDisabled"));
 		} else {
@@ -578,7 +578,7 @@ public class Utils {
 			mysqlNickManager.addPlayer(p.getUniqueId(), name, name);
 			
 			if(hasItem)
-				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), createItem(Material.getMaterial(fileUtils.cfg.getString("NickItem.ItemType.Enabled")), fileUtils.cfg.getInt("NickItem.ItemAmount.Enabled"), fileUtils.cfg.getInt("NickItem.MetaData.Enabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), fileUtils.cfg.getBoolean("NickItem.Enchanted.Enabled")));
+				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")));
 
 			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.BungeeAutoNickEnabled"));
 		}

@@ -12,7 +12,7 @@ import net.dev.eazynick.EazyNick;
 public class BookGUIFileUtils {
 
 	private File directory, file;
-	public YamlConfiguration cfg;
+	private YamlConfiguration cfg;
 	
 	public BookGUIFileUtils() {
 		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
@@ -204,6 +204,14 @@ public class BookGUIFileUtils {
 	
 	public File getFile() {
 		return file;
+	}
+	
+	public YamlConfiguration getConfig() {
+		return cfg;
+	}
+	
+	public void setConfig(YamlConfiguration cfg) {
+		this.cfg = cfg;
 	}
 	
 }

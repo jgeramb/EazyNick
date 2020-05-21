@@ -55,7 +55,7 @@ public class UUIDFetcher_1_7 {
 		} catch (Exception e) {
 			NickNameFileUtils nickNameFileUtils = eazyNick.getNickNameFileUtils();
 
-			List<String> list = nickNameFileUtils.cfg.getStringList("NickNames");
+			List<String> list = nickNameFileUtils.getConfig().getStringList("NickNames");
 			ArrayList<String> toRemove = new ArrayList<>();
 			final String finalName = name;
 
@@ -67,7 +67,7 @@ public class UUIDFetcher_1_7 {
 					utils.getNickNames().remove(s);
 				});
 
-				nickNameFileUtils.cfg.set("NickNames", list);
+				nickNameFileUtils.getConfig().set("NickNames", list);
 				nickNameFileUtils.saveFile();
 
 				utils.sendConsole("§cThere is no account with username §6" + name + " §cin the mojang database");

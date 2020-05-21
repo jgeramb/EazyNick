@@ -13,7 +13,7 @@ import net.dev.eazynick.EazyNick;
 public class FileUtils {
 
 	private File directory, file;
-	public YamlConfiguration cfg;
+	private YamlConfiguration cfg;
 	
 	public FileUtils() {
 		EazyNick eazyNick = EazyNick.getInstance();
@@ -164,6 +164,14 @@ public class FileUtils {
 	
 	public File getFile() {
 		return file;
+	}
+	
+	public YamlConfiguration getConfig() {
+		return cfg;
+	}
+	
+	public void setConfig(YamlConfiguration cfg) {
+		this.cfg = cfg;
 	}
 	
 }

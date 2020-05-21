@@ -19,7 +19,7 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.use") && p.hasPermission("nick.item")) {
-				if (eazyNick.getFileUtils().cfg.getBoolean("BungeeCord"))
+				if (eazyNick.getFileUtils().getConfig().getBoolean("BungeeCord"))
 					utils.toggleBungeeNick(p);
 			} else
 				p.sendMessage(utils.getNoPerm());

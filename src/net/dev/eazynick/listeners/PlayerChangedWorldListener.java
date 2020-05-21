@@ -23,7 +23,7 @@ public class PlayerChangedWorldListener implements Listener {
 		NickManager api = new NickManager(p);
 		
 		if (!(utils.getWorldBlackList().contains(p.getWorld().getName().toUpperCase()))) {
-			if (fileUtils.cfg.getBoolean("NickOnWorldChange")) {
+			if (fileUtils.getConfig().getBoolean("NickOnWorldChange")) {
 				if (utils.getNickOnWorldChangePlayers().contains(p.getUniqueId())) {
 					if (!(api.isNicked()))
 						utils.performReNick(p);
@@ -40,7 +40,7 @@ public class PlayerChangedWorldListener implements Listener {
 									public void run() {
 										utils.performReNick(p);
 									}
-								}, 10 + (fileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+								}, 10 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 							}
 						}, 10);
 					}

@@ -26,7 +26,7 @@ public class AsyncPlayerChatListener implements Listener {
 
 		utils.setLastChatMessage(e.getMessage());
 		
-		if (fileUtils.cfg.getBoolean("ReplaceNickedChatFormat")) {
+		if (fileUtils.getConfig().getBoolean("ReplaceNickedChatFormat")) {
 			if (!(e.isCancelled())) {
 				NickManager api = new NickManager(p);
 	
@@ -44,7 +44,7 @@ public class AsyncPlayerChatListener implements Listener {
 	
 					for (Player all : Bukkit.getOnlinePlayers()) {
 						if (all.getName().equalsIgnoreCase(p.getName())) {
-							if (fileUtils.cfg.getBoolean("SeeNickSelf"))
+							if (fileUtils.getConfig().getBoolean("SeeNickSelf"))
 								all.sendMessage(format);
 							else
 								all.sendMessage(format.replace(p.getDisplayName(), api.getOldDisplayName()));

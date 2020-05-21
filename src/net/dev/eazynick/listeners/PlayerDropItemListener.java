@@ -17,7 +17,7 @@ public class PlayerDropItemListener implements Listener {
 		
 		if ((e.getItemDrop() != null) && (e.getItemDrop().getItemStack().getType() != Material.AIR) && (e.getItemDrop().getItemStack().getItemMeta() != null) && (e.getItemDrop().getItemStack().getItemMeta().getDisplayName() != null)) {
 			if (e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.DisplayName.Enabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.DisplayName.Disabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Enabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled")) || e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) {
-				if (eazyNick.getFileUtils().cfg.getBoolean("NickItem.InventorySettings.PlayersCanDropItem") == false)
+				if (!(eazyNick.getFileUtils().getConfig().getBoolean("NickItem.InventorySettings.PlayersCanDropItem")))
 					e.setCancelled(true);
 			}
 		}

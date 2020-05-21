@@ -21,7 +21,7 @@ public class PlayerDeathListener implements Listener {
 
 		if (deathMessage != null) {
 			if (api.isNicked()) {
-				if (EazyNick.getInstance().getFileUtils().cfg.getBoolean("SeeNickSelf") == false) {
+				if (!(EazyNick.getInstance().getFileUtils().getConfig().getBoolean("SeeNickSelf"))) {
 					e.setDeathMessage(null);
 
 					for (Player all : Bukkit.getOnlinePlayers()) {

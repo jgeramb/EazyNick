@@ -35,7 +35,7 @@ public class ChangeSkinCommand implements CommandExecutor {
 						
 						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.SkinChanged").replace("%skinName%", name));
 					} else {
-						String name = eazyNick.getFileUtils().cfg.getBoolean("UseMineSkinAPI") ? "MineSkin" : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+						String name = eazyNick.getFileUtils().getConfig().getBoolean("UseMineSkinAPI") ? "MineSkin" : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 						
 						api.changeSkin(name);
 						api.updatePlayer();

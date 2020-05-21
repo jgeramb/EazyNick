@@ -29,7 +29,7 @@ public class LuckPermsHook {
 		net.luckperms.api.LuckPerms api = net.luckperms.api.LuckPermsProvider.get();
 		net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
 		
-		if(fileUtils.cfg.getBoolean("ChangeLuckPermsPrefixAndSufix")) {
+		if(fileUtils.getConfig().getBoolean("ChangeLuckPermsPrefixAndSufix")) {
 			net.luckperms.api.node.NodeBuilderRegistry nodeFactory = api.getNodeBuilderRegistry();
 			net.luckperms.api.node.Node prefixNode = nodeFactory.forPrefix().priority(99).prefix(prefix).expiry(24 * 30, TimeUnit.HOURS).build();
 			net.luckperms.api.node.Node suffixNode = nodeFactory.forSuffix().priority(99).suffix(suffix).expiry(24 * 30, TimeUnit.HOURS).build();
@@ -41,7 +41,7 @@ public class LuckPermsHook {
 			utils.getLuckPermsSuffixes().put(p.getUniqueId(), suffixNode);
 		}
 		
-		if(fileUtils.cfg.getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
+		if(fileUtils.getConfig().getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
 			if(!(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())))
 				utils.getOldLuckPermsGroups().put(p.getUniqueId(), user.getPrimaryGroup());
 			
@@ -57,7 +57,7 @@ public class LuckPermsHook {
 		net.luckperms.api.LuckPerms api = net.luckperms.api.LuckPermsProvider.get();
 		net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
 		
-		if(fileUtils.cfg.getBoolean("ChangeLuckPermsPrefixAndSufix")) {
+		if(fileUtils.getConfig().getBoolean("ChangeLuckPermsPrefixAndSufix")) {
 			if(utils.getLuckPermsPrefixes().containsKey(p.getUniqueId()) && utils.getLuckPermsSuffixes().containsKey(p.getUniqueId())) {
 				user.transientData().remove((net.luckperms.api.node.Node) utils.getLuckPermsPrefixes().get(p.getUniqueId()));
 				user.transientData().remove((net.luckperms.api.node.Node) utils.getLuckPermsSuffixes().get(p.getUniqueId()));
@@ -67,7 +67,7 @@ public class LuckPermsHook {
 			}
 		}
 		
-		if(fileUtils.cfg.getBoolean("SwitchLuckPermsGroupByNicking")) {
+		if(fileUtils.getConfig().getBoolean("SwitchLuckPermsGroupByNicking")) {
 			removeAllGroups(user);
 			
 			user.data().add(net.luckperms.api.node.types.InheritanceNode.builder(utils.getOldLuckPermsGroups().get(p.getUniqueId())).build());

@@ -96,7 +96,7 @@ public class NMSNickManager extends ReflectUtils {
 								sendPacketNMS(all, packet);
 						}
 					} else {
-						if(eazyNick.getFileUtils().cfg.getBoolean("SeeNickSelf")) {
+						if(eazyNick.getFileUtils().getConfig().getBoolean("SeeNickSelf")) {
 							Object playerConenction = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
 							Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
 							int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
@@ -233,7 +233,7 @@ public class NMSNickManager extends ReflectUtils {
 		NickManager api = new NickManager(p);
 		String nickName = api.getNickName();
 		UUID uuidBefore = p.getUniqueId();
-		boolean uuidSpoof = fileUtils.cfg.getBoolean("Settings.ChangeOptions.UUID");
+		boolean uuidSpoof = fileUtils.getConfig().getBoolean("Settings.ChangeOptions.UUID");
 		UUID spoofedUUID = version.equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getUUID(nickName) : (version.equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(nickName) : eazyNick.getUUIDFetcher().getUUID(nickName));
 		
 		try {
@@ -266,12 +266,12 @@ public class NMSNickManager extends ReflectUtils {
 					return;
 				
 				if(type.equals(UpdateType.NICK)) {
-					if(fileUtils.cfg.getBoolean("NickMessage.OnNnick")) {
+					if(fileUtils.getConfig().getBoolean("NickMessage.OnNnick")) {
 						for(Player all : Bukkit.getOnlinePlayers())
 							all.sendMessage(fileUtils.getConfigString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getRealName()));
 					}
 				} else if(type.equals(UpdateType.UNNICK)) {
-					if(fileUtils.cfg.getBoolean("NickMessage.OnUnnick")) {
+					if(fileUtils.getConfig().getBoolean("NickMessage.OnUnnick")) {
 						for(Player all : Bukkit.getOnlinePlayers())
 							all.sendMessage(fileUtils.getConfigString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName()));
 					}
@@ -368,17 +368,17 @@ public class NMSNickManager extends ReflectUtils {
 							}
 
 							if(type.equals(UpdateType.NICK)) {
-								if(fileUtils.cfg.getBoolean("NickMessage.OnNnick")) {
+								if(fileUtils.getConfig().getBoolean("NickMessage.OnNnick")) {
 									for(Player all : Bukkit.getOnlinePlayers())
 										all.sendMessage(fileUtils.getConfigString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
 								}
 							} else if(type.equals(UpdateType.UNNICK)) {
-								if(fileUtils.cfg.getBoolean("NickMessage.OnUnnick")) {
+								if(fileUtils.getConfig().getBoolean("NickMessage.OnUnnick")) {
 									for(Player all : Bukkit.getOnlinePlayers())
 										all.sendMessage(fileUtils.getConfigString("NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
 								}
 							}
-						}, 4 + (fileUtils.cfg.getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
+						}, 4 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -389,18 +389,18 @@ public class NMSNickManager extends ReflectUtils {
 				updatePlayerCache(p);
 			
 			if(type.equals(UpdateType.NICK)) {
-				if(fileUtils.cfg.getBoolean("NickCommands.OnNick")) {
+				if(fileUtils.getConfig().getBoolean("NickCommands.OnNick")) {
 					if(utils.placeholderAPIStatus())
-						fileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
+						fileUtils.getConfig().getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.getConfig().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
 					else
-						fileUtils.cfg.getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
+						fileUtils.getConfig().getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.getConfig().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
 				}
 			} else {
-				if(fileUtils.cfg.getBoolean("NickCommands.OnUnnick")) {
+				if(fileUtils.getConfig().getBoolean("NickCommands.OnUnnick")) {
 					if(utils.placeholderAPIStatus())
-						fileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
+						fileUtils.getConfig().getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.getConfig().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, PlaceholderAPI.setPlaceholders(p, cmd)));
 					else
-						fileUtils.cfg.getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.cfg.getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
+						fileUtils.getConfig().getStringList("NickCommands.Unnick").forEach(cmd -> Bukkit.dispatchCommand(fileUtils.getConfig().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : p, cmd));
 				}
 			}
 		} catch (Exception ex) {
@@ -447,7 +447,7 @@ public class NMSNickManager extends ReflectUtils {
 				if(all.getEntityId() != p.getEntityId()) {
 					if(!(all.hasPermission("nick.bypass")) || forceUpdate)
 						sendPacketNMS(all, packet);
-				} else if(eazyNick.getFileUtils().cfg.getBoolean("SeeNickSelf") || forceUpdate)
+				} else if(eazyNick.getFileUtils().getConfig().getBoolean("SeeNickSelf") || forceUpdate)
 					sendPacketNMS(all, packet);
 			}
 		}

@@ -30,11 +30,11 @@ public class PlayerQuitListener implements Listener {
 			utils.getNameCache().remove(p.getUniqueId());
 		
 		if (api.isNicked()) {
-			if (fileUtils.cfg.getBoolean("DisconnectUnnick"))
+			if (fileUtils.getConfig().getBoolean("DisconnectUnnick"))
 				api.unnickPlayerWithoutRemovingMySQL(true);
 		}
 		
-		if(fileUtils.cfg.getBoolean("OverwriteJoinQuitMessages")) {
+		if(fileUtils.getConfig().getBoolean("OverwriteJoinQuitMessages")) {
 			String message = fileUtils.getConfigString("OverwrittenMessages.Quit");
 			
 			if(mysqlNickManager.isPlayerNicked(p.getUniqueId()))

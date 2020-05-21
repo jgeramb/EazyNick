@@ -103,7 +103,7 @@ public class ScoreboardTeamManager {
 				String suffixForPlayer = suffix;
 				List<String> contents = Arrays.asList(p.getName());
 				
-				if(t.hasPermission("nick.bypass") && fileUtils.cfg.getBoolean("BypassFormat.Show")) {
+				if(t.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("BypassFormat.Show")) {
 					contents = Arrays.asList(new NickManager(p).getRealName());
 					prefixForPlayer = fileUtils.getConfigString("BypassFormat.NameTagPrefix");
 					suffixForPlayer = fileUtils.getConfigString("BypassFormat.NameTagSuffix");

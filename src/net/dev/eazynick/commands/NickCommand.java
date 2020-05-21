@@ -48,7 +48,7 @@ public class NickCommand implements CommandExecutor {
 												nickNameIsInUse = true;
 										}
 
-										if(!(nickNameIsInUse) || fileUtils.cfg.getBoolean("AllowPlayersToUseSameNickName")) {
+										if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
 											boolean playerWithNameIsKnown = false;
 											
 											for (Player all : Bukkit.getOnlinePlayers()) {
@@ -63,7 +63,7 @@ public class NickCommand implements CommandExecutor {
 												}
 											}
 											
-											if(!(fileUtils.cfg.getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+											if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
 												isCancelled = true;
 											
 											if(!(isCancelled)) {

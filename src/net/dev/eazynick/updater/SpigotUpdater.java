@@ -42,7 +42,7 @@ public class SpigotUpdater {
 		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
 			System.out.println("[Updater] Found a new version (" + newVersion + ")");
 
-			if (eazyNick.getFileUtils().cfg.getBoolean("AutoUpdater")) {
+			if (eazyNick.getFileUtils().getConfig().getBoolean("AutoUpdater")) {
 				System.out.println("[Updater] Starting download...");
 
 				try {
@@ -98,7 +98,7 @@ public class SpigotUpdater {
 		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
 			p.sendMessage(utils.getPrefix() + "§3Updater §8» §rFound a new version (" + newVersion + ")");
 
-			if (eazyNick.getFileUtils().cfg.getBoolean("AutoUpdater")) {
+			if (eazyNick.getFileUtils().getConfig().getBoolean("AutoUpdater")) {
 				p.sendMessage(utils.getPrefix() + "§3Updater §8» §rStarting download...");
 
 				try {

@@ -29,7 +29,7 @@ public class PlayerNickListener implements Listener {
 		if(!(e.isCancelled())) {
 			Player p = e.getPlayer();
 			NickManager api = new NickManager(p);
-			boolean changePrefixAndSuffix = fileUtils.cfg.getBoolean("WorldsWithDisabledPrefixAndSuffix") || !(utils.getWorldsWithDisabledPrefixAndSuffix().contains(p.getWorld().getName().toUpperCase()));
+			boolean changePrefixAndSuffix = fileUtils.getConfig().getBoolean("WorldsWithDisabledPrefixAndSuffix") || !(utils.getWorldsWithDisabledPrefixAndSuffix().contains(p.getWorld().getName().toUpperCase()));
 			String nickName = e.getNickName(), tagPrefix = e.getTagPrefix(), tagSuffix = e.getTagSuffix(), chatPrefix = e.getChatPrefix(), chatSuffix = e.getChatSuffix(), tabPrefix = e.getTabPrefix(), tabSuffix = e.getTabSuffix();
 			
 			utils.getCanUseNick().put(p.getUniqueId(), false);
@@ -40,9 +40,9 @@ public class PlayerNickListener implements Listener {
 				public void run() {
 					utils.getCanUseNick().put(p.getUniqueId(), true);
 				}
-			}, fileUtils.cfg.getLong("Settings.NickDelay") * 20);
+			}, fileUtils.getConfig().getLong("Settings.NickDelay") * 20);
 			
-			if(fileUtils.cfg.getBoolean("BungeeCord")) {
+			if(fileUtils.getConfig().getBoolean("BungeeCord")) {
 				String oldRank = e.getGroupName();
 				
 				if(!(e.isJoinNick())) {

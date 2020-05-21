@@ -12,7 +12,7 @@ import net.dev.eazynick.EazyNick;
 public class LanguageFileUtils {
 
 	private File directory, file;
-	public YamlConfiguration cfg;
+	private YamlConfiguration cfg;
 	
 	public LanguageFileUtils(String language) {
 		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
@@ -176,6 +176,14 @@ public class LanguageFileUtils {
 	
 	public File getFile() {
 		return file;
+	}
+	
+	public YamlConfiguration getConfig() {
+		return cfg;
+	}
+	
+	public void setConfig(YamlConfiguration cfg) {
+		this.cfg = cfg;
 	}
 	
 }

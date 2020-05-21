@@ -184,7 +184,7 @@ public class EazyNick extends JavaPlugin {
 					else
 						new PacketInjector().init();
 					
-					if (fileUtils.cfg.getBoolean("APIMode") == false) {
+					if (fileUtils.getConfig().getBoolean("APIMode") == false) {
 						getCommand("eazynick").setExecutor(new HelpCommand());
 						getCommand("nickother").setExecutor(new NickOtherCommand());
 						getCommand("changeskin").setExecutor(new ChangeSkinCommand());
@@ -236,8 +236,8 @@ public class EazyNick extends JavaPlugin {
 					utils.sendConsole("	§7Loading §e" + version + " §7...");
 					utils.sendConsole("	§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
-					if (fileUtils.cfg.getBoolean("BungeeCord")) {
-						mysql = new MySQL(fileUtils.cfg.getString("BungeeMySQL.hostname"), fileUtils.cfg.getString("BungeeMySQL.port"), fileUtils.cfg.getString("BungeeMySQL.database"), fileUtils.cfg.getString("BungeeMySQL.username"), fileUtils.cfg.getString("BungeeMySQL.password"));
+					if (fileUtils.getConfig().getBoolean("BungeeCord")) {
+						mysql = new MySQL(fileUtils.getConfig().getString("BungeeMySQL.hostname"), fileUtils.getConfig().getString("BungeeMySQL.port"), fileUtils.getConfig().getString("BungeeMySQL.database"), fileUtils.getConfig().getString("BungeeMySQL.username"), fileUtils.getConfig().getString("BungeeMySQL.password"));
 						mysql.connect();
 
 						mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NickName varchar(64), SkinName varchar(64))");
@@ -263,7 +263,7 @@ public class EazyNick extends JavaPlugin {
 					}
 					
 					utils.sendConsole("	§7");
-					utils.sendConsole("	§7API-Mode§8: §3" + fileUtils.cfg.getBoolean("APIMode"));
+					utils.sendConsole("	§7API-Mode§8: §3" + fileUtils.getConfig().getBoolean("APIMode"));
 					utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
 					utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
 					utils.sendConsole("	§7Plugin-State§8: §aENABLED");
@@ -301,7 +301,7 @@ public class EazyNick extends JavaPlugin {
 		utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 		utils.sendConsole("	§7Disabling System...");
 
-		if (fileUtils.cfg.getBoolean("BungeeCord"))
+		if (fileUtils.getConfig().getBoolean("BungeeCord"))
 			mysql.disconnect();
 
 		utils.sendConsole("	§7System disabled §asuccessfully§7!");

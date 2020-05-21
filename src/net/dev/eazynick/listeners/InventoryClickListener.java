@@ -29,7 +29,7 @@ public class InventoryClickListener implements Listener {
 
 			if ((e.getCurrentItem() != null) && (e.getCurrentItem().getType() != Material.AIR) && (e.getCurrentItem().getItemMeta() != null) && (e.getCurrentItem().getItemMeta().getDisplayName() != null)) {
 				if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.DisplayName.Enabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.DisplayName.Disabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Enabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled")) || e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) {
-					if (fileUtils.cfg.getBoolean("NickItem.InventorySettings.PlayersCanMoveItem") == false)
+					if (fileUtils.getConfig().getBoolean("NickItem.InventorySettings.PlayersCanMoveItem") == false)
 						e.setCancelled(true);
 				}
 

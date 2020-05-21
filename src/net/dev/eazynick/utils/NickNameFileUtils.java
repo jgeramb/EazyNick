@@ -13,7 +13,7 @@ import net.dev.eazynick.EazyNick;
 public class NickNameFileUtils {
 
 	private File directory, file;
-	public YamlConfiguration cfg;
+	private YamlConfiguration cfg;
 	
 	public NickNameFileUtils() {
 		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
@@ -2363,6 +2363,14 @@ public class NickNameFileUtils {
 	
 	public File getFile() {
 		return file;
+	}
+	
+	public YamlConfiguration getConfig() {
+		return cfg;
+	}
+	
+	public void setConfig(YamlConfiguration cfg) {
+		this.cfg = cfg;
 	}
 	
 }
