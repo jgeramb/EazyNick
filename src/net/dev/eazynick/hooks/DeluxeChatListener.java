@@ -14,7 +14,7 @@ public class DeluxeChatListener implements Listener {
 
 	@EventHandler
 	public void onDeluxeChat(DeluxeChatEvent e) {
-		if(EazyNick.getInstance().getFileUtils().getConfig().getBoolean("ChangeNameAndPrefixandSuffixInDeluxeChatFormat")) {
+		if(EazyNick.getInstance().getFileUtils().getConfig().getBoolean("ChangeNameAndPrefixAndSuffixInDeluxeChatFormat")) {
 			Player p = e.getPlayer();
 			NickManager api = new NickManager(p);
 			

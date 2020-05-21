@@ -276,7 +276,7 @@ public class NickManager {
 		if(utils.luckPermsStatus())
 			new LuckPermsHook(p).resetNodes();
 		
-		if(utils.tabStatus())
+		if(utils.tabStatus() && fileUtils.getConfig().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
 			new TABHook(p).reset();
 		
 		if(utils.ultraPermissionsStatus()) {

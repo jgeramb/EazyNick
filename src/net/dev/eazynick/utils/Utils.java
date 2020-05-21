@@ -207,6 +207,8 @@ public class Utils {
 		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
 		NickNameFileUtils nickNameFileUtils = eazyNick.getNickNameFileUtils();
 		
+		new ArrayList<>(nickedPlayers).forEach(uuid -> new NickManager(Bukkit.getPlayer(uuid)).unnickPlayerWithoutRemovingMySQL(false));
+		
 		fileUtils.setConfig(YamlConfiguration.loadConfiguration(eazyNick.getFileUtils().getFile()));
 		fileUtils.saveFile();
 		

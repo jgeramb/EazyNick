@@ -2,6 +2,7 @@ package net.dev.eazynick;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -115,8 +116,6 @@ public class EazyNick extends JavaPlugin {
 			
 			@Override
 			public void run() {
-				long startMillis = System.currentTimeMillis();
-
 				PluginManager pm = Bukkit.getPluginManager();
 				
 				pluginFile = getFile();
@@ -136,10 +135,8 @@ public class EazyNick extends JavaPlugin {
 				
 				utils.reloadConfigs();
 				
-				utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
-				utils.sendConsole("	§7Starting system...");
-				utils.sendConsole("	§7");
-				utils.sendConsole("	§7Scanning active §3Minecraft-Version §7...");
+				utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
+				utils.sendConsole("");
 
 				String reflectVersion = reflectUtils.getVersion();
 				
@@ -150,11 +147,7 @@ public class EazyNick extends JavaPlugin {
 						|| reflectVersion.equals("v1_12_R1") || reflectVersion.equals("v1_13_R1")
 						|| reflectVersion.equals("v1_13_R2") || reflectVersion.equals("v1_14_R1")
 						|| reflectVersion.equals("v1_15_R1"))) {
-					utils.sendConsole("	§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
-					utils.sendConsole("	§7");
-					utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
-					utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
-					utils.sendConsole("	§7Plugin-State§8: §cCANCELLED");
+					utils.sendConsole("§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 
 					isCancelled = true;
 				} else {
@@ -233,8 +226,7 @@ public class EazyNick extends JavaPlugin {
 						}
 					}
 					
-					utils.sendConsole("	§7Loading §e" + version + " §7...");
-					utils.sendConsole("	§7Version §e" + version + " §7was loaded §asuccessfully§7!");
+					utils.sendConsole("§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
 					if (fileUtils.getConfig().getBoolean("BungeeCord")) {
 						mysql = new MySQL(fileUtils.getConfig().getString("BungeeMySQL.hostname"), fileUtils.getConfig().getString("BungeeMySQL.port"), fileUtils.getConfig().getString("BungeeMySQL.database"), fileUtils.getConfig().getString("BungeeMySQL.username"), fileUtils.getConfig().getString("BungeeMySQL.password"));
@@ -262,16 +254,13 @@ public class EazyNick extends JavaPlugin {
 						Bukkit.spigot().getConfig().set("settings.bungeecord", true);
 					}
 					
-					utils.sendConsole("	§7");
-					utils.sendConsole("	§7API-Mode§8: §3" + fileUtils.getConfig().getBoolean("APIMode"));
-					utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
-					utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
-					utils.sendConsole("	§7Plugin-State§8: §aENABLED");
-					utils.sendConsole("	§7");
-					utils.sendConsole("	§7System started in §e" + (System.currentTimeMillis() - startMillis) + "ms");
+					utils.sendConsole("");
+					utils.sendConsole("§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+					utils.sendConsole("§7Version§8: §3" + getDescription().getVersion());
 				}
 
-				utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
+				utils.sendConsole("");
+				utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
 
 				if (spigotUpdater.checkForUpdates())
 					isCancelled = true;
@@ -298,25 +287,17 @@ public class EazyNick extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
-		utils.sendConsole("	§7Disabling System...");
-
+		new ArrayList<>(utils.getNickedPlayers()).forEach(uuid -> new NickManager(Bukkit.getPlayer(uuid)).unnickPlayerWithoutRemovingMySQL(false));
+		
 		if (fileUtils.getConfig().getBoolean("BungeeCord"))
 			mysql.disconnect();
-
-		utils.sendConsole("	§7System disabled §asuccessfully§7!");
-		utils.sendConsole("	§7");
-		utils.sendConsole("	§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
-		utils.sendConsole("	§7Version§8: §3" + getDescription().getVersion());
-		utils.sendConsole("	§7Plugin-State§8: §cDISABLED");
-		utils.sendConsole("§7========== §8[ §5§lNickSystem §8] §7==========");
 		
-		for (Player all : Bukkit.getOnlinePlayers()) {
-			NickManager apiAll = new NickManager(all);
-			
-			if(apiAll.isNicked())
-				apiAll.unnickPlayerWithoutRemovingMySQL(false);
-		}
+		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
+		utils.sendConsole("");
+		utils.sendConsole("§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+		utils.sendConsole("§7Version§8: §3" + getDescription().getVersion());
+		utils.sendConsole("");
+		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
 	}
 	
 	public File getPluginFile() {

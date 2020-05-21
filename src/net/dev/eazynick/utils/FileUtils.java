@@ -71,7 +71,8 @@ public class FileUtils {
 		cfg.addDefault("SwitchPermissionsExGroupByNicking", false);
 		cfg.addDefault("ServerIsUsingCloudNETPrefixesAndSuffixes", false);
 		cfg.addDefault("ServerIsUsingVaultPrefixesAndSuffixes", false);
-		cfg.addDefault("ChangeNameAndPrefixandSuffixInDeluxeChatFormat", false);
+		cfg.addDefault("ChangeNameAndPrefixAndSuffixInDeluxeChatFormat", false);
+		cfg.addDefault("ChangeNameAndPrefixAndSuffixInTAB", false);
 		cfg.addDefault("ChangeLuckPermsPrefixAndSufix", false);
 		cfg.addDefault("RandomDisguiseDelay", false);
 		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);

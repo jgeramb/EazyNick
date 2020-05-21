@@ -78,7 +78,7 @@ public class PlayerNickListener implements Listener {
 			if(changePrefixAndSuffix && utils.luckPermsStatus())
 				new LuckPermsHook(p).updateNodes(tagPrefix, tagSuffix, e.getGroupName());
 			
-			if(changePrefixAndSuffix && utils.tabStatus())
+			if(changePrefixAndSuffix && utils.tabStatus() && fileUtils.getConfig().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
 				new TABHook(p).update(nickName, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 			
 			api.nickPlayer(nickName, e.getSkinName());
