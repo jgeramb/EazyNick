@@ -69,6 +69,8 @@ public class BookGUIFileUtils {
 		cfg.addDefault("BookGUI.SteveAlexSkin.Hover", "&fClick here to use a Steve/Alex skin");
 		cfg.addDefault("BookGUI.RandomSkin.Text", arrow + " &0Random skin\n");
 		cfg.addDefault("BookGUI.RandomSkin.Hover", "&fClick here to use a random skin");
+		cfg.addDefault("BookGUI.SkinFromName.Text", arrow + " &0Use skin of nickname\n");
+		cfg.addDefault("BookGUI.SkinFromName.Hover", "&fClick here to use the skin of your nickname");
 		cfg.addDefault("BookGUI.ReuseSkin.Text", arrow + " &0Reuse %skin%\n");
 		cfg.addDefault("BookGUI.ReuseSkin.Hover", "&fClick here to reuse your previous skin");
 		cfg.addDefault("BookGUI.EnterName.Text", arrow + " &0Enter a name\n");

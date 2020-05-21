@@ -583,6 +583,8 @@ public class NickManager {
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		
+		String finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix;
+		
 		if(utils.getChatPrefixes().containsKey(p.getUniqueId()))
 			utils.getChatPrefixes().remove(p.getUniqueId());
 			
@@ -600,8 +602,6 @@ public class NickManager {
 		utils.getTabPrefixes().put(p.getUniqueId(), tabPrefix);
 		utils.getTabSuffixes().put(p.getUniqueId(), tabSuffix);
 		
-		changeCloudNET(tagPrefix, tagSuffix);
-
 		if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.NameTag")) {
 			if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
 				utils.getScoreboardTeamManagers().remove(p.getUniqueId());
@@ -622,8 +622,8 @@ public class NickManager {
 						sbtm.createTeam();
 						
 						if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.PlayerListName")) {
-							String tmpTabPrefix = tabPrefix;
-							String tmpTabSuffix = tabSuffix;
+							String tmpTabPrefix = finalTabPrefix;
+							String tmpTabSuffix = finalTabSuffix;
 							
 							if(utils.placeholderAPIStatus()) {
 								tmpTabPrefix = PlaceholderAPI.setPlaceholders(p, tmpTabPrefix);
@@ -637,6 +637,15 @@ public class NickManager {
 				}
 			}, 0, 175);
 		}
+		
+		if(utils.placeholderAPIStatus()) {
+			tagPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
+			tagSuffix = PlaceholderAPI.setPlaceholders(p, tagSuffix);
+			tabPrefix = PlaceholderAPI.setPlaceholders(p, tabPrefix);
+			tabSuffix = PlaceholderAPI.setPlaceholders(p, tabSuffix);
+		}
+		
+		changeCloudNET(tagPrefix, tagSuffix);
 		
 		if(fileUtils.cfg.getBoolean("Settings.ChangeOptions.PlayerListName"))
 			setPlayerListName(tabPrefix + p.getName() + tabSuffix);

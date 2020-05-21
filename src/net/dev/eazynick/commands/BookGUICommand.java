@@ -88,17 +88,20 @@ public class BookGUICommand implements CommandExecutor {
 					option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " NORMAL"));
 					option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.SteveAlexSkin.Hover")) }));
 					TextComponent option3 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.RandomSkin.Text"));
-					option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " +args[1] + " RANDOM"));
+					option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " RANDOM"));
 					option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.RandomSkin.Hover")) }));
+					TextComponent option4 = new TextComponent(fileUtils.cfg.getBoolean("AllowBookGUISkinFromName") ? bookGUIFileUtils.getConfigString("BookGUI.SkinFromName.Text") : "");
+					option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " SKINFROMNAME"));
+					option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.SkinFromName.Hover")) }));
 					
-					TextComponent option4 = new TextComponent(utils.getLastSkinNames().containsKey(p.getUniqueId()) ? (bookGUIFileUtils.getConfigString("BookGUI.ReuseSkin.Text").replace("%skin%", utils.getLastSkinNames().get(p.getUniqueId()))) : "");
+					TextComponent option5 = new TextComponent(utils.getLastSkinNames().containsKey(p.getUniqueId()) ? (bookGUIFileUtils.getConfigString("BookGUI.ReuseSkin.Text").replace("%skin%", utils.getLastSkinNames().get(p.getUniqueId()))) : "");
 					
 					if(utils.getLastSkinNames().containsKey(p.getUniqueId())) {
-						option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + utils.getLastSkinNames().get(p.getUniqueId())));
-						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.ReuseSkin.Hover")) }));
+						option5.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + utils.getLastSkinNames().get(p.getUniqueId())));
+						option5.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] { new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.ReuseSkin.Hover")) }));
 					}
 						
-					nmsBookUtils.open(p, nmsBookBuilder.create(bookGUIFileUtils.getConfigString("BookGUI.Page3.Title"),  new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page3.Text")), option1, option2, option3, option4));
+					nmsBookUtils.open(p, nmsBookBuilder.create(bookGUIFileUtils.getConfigString("BookGUI.Page3.Title"),  new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page3.Text")), option1, option2, option3, option4, option5));
 				} else if(args.length == 3) {
 					TextComponent option1 = new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.EnterName.Text"));
 					option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2] + " ENTERNAME"));

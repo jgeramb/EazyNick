@@ -84,7 +84,7 @@ public class PlayerNickListener implements Listener {
 			api.nickPlayer(nickName, e.getSkinName());
 			
 			if(changePrefixAndSuffix)
-				api.updatePrefixSuffix(tagPrefix, tagSuffix, chatPrefix, chatSuffix, tabPrefix, tabSuffix, e.getGroupName());
+				api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), chatPrefix, chatSuffix, e.getTabPrefix(), e.getTabSuffix(), e.getGroupName());
 			
 			if(!(e.isRenick()))
 				p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName));

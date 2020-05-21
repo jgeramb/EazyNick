@@ -12,6 +12,8 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.ReflectUtils;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+
 public class ScoreboardTeamManager {
 
 	private EazyNick eazyNick;
@@ -105,6 +107,11 @@ public class ScoreboardTeamManager {
 					contents = Arrays.asList(new NickManager(p).getRealName());
 					prefixForPlayer = fileUtils.getConfigString("BypassFormat.NameTagPrefix");
 					suffixForPlayer = fileUtils.getConfigString("BypassFormat.NameTagSuffix");
+				}
+				
+				if(eazyNick.getUtils().placeholderAPIStatus()) {
+					prefixForPlayer = PlaceholderAPI.setPlaceholders(p, prefixForPlayer);
+					suffixForPlayer = PlaceholderAPI.setPlaceholders(p, suffixForPlayer);
 				}
 				
 				if(!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))) {

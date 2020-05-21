@@ -78,6 +78,7 @@ public class FileUtils {
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
 		cfg.addDefault("UseSignGUIForCustomName", true);
 		cfg.addDefault("AllowBookGUICustomName", true);
+		cfg.addDefault("AllowBookGUISkinFromName", false);
 		cfg.addDefault("UseMineSkinAPI", false);
 
 		cfg.addDefault("NickActionBarMessage", false);

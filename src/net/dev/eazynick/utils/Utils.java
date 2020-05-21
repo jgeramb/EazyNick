@@ -333,6 +333,8 @@ public class Utils {
 							skinName = new Random().nextBoolean() ? "Steve" : "Alex";
 						else if(skinType.equalsIgnoreCase("RANDOM"))
 							skinName = nickNames.get(new Random().nextInt(getNickNames().size()));
+						else if(skinType.equalsIgnoreCase("SKINFROMNAME"))
+							skinName = name;
 						else
 							skinName = skinType;
 						
@@ -557,14 +559,10 @@ public class Utils {
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
-		boolean hasItem = false;
+		boolean hasItem = (p.getItemInHand() != null) && (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null) && (p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"));
 		
-		if(fileUtils.cfg.getBoolean("NeedItemToToggleNick")) {
-			 if(!((p.getItemInHand() != null) && (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null) && (p.getItemInHand().getItemMeta().getDisplayName() .equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"))))
-				 return;
-			 else
-				 hasItem = true;
-		}
+		if(fileUtils.cfg.getBoolean("NeedItemToToggleNick") && !(hasItem))
+			return;
 		
 		if(mysqlNickManager.isPlayerNicked(p.getUniqueId())) {
 			mysqlNickManager.removePlayer(p.getUniqueId());
