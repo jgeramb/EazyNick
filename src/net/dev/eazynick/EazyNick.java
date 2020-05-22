@@ -172,10 +172,13 @@ public class EazyNick extends JavaPlugin {
 
 					version = reflectVersion.substring(1);
 					
-					if(version.equals("1_7_R4"))
-						new PacketInjector_1_7().init();
-					else
-						new PacketInjector().init();
+
+					if(fileUtils.getConfig().getBoolean("OverwriteMessagePackets")) {
+						if(version.equals("1_7_R4"))
+							new PacketInjector_1_7().init();
+						else
+							new PacketInjector().init();
+					}
 					
 					if (fileUtils.getConfig().getBoolean("APIMode") == false) {
 						getCommand("eazynick").setExecutor(new HelpCommand());

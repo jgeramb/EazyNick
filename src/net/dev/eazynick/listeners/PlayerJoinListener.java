@@ -15,10 +15,9 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
-import net.dev.eazynick.utils.*;
+import net.dev.eazynick.utils.BookGUIFileUtils;
+import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.PacketInjector;
-import net.dev.eazynick.utils.PacketInjector_1_7;
 import net.dev.eazynick.utils.Utils;
 
 public class PlayerJoinListener implements Listener {
@@ -35,11 +34,6 @@ public class PlayerJoinListener implements Listener {
 		
 		Player p = e.getPlayer();
 		NickManager api = new NickManager(p);
-
-		if(eazyNick.getVersion().equals("1_7_R4"))
-			new PacketInjector_1_7().init();
-		else
-			new PacketInjector().init();
 		
 		utils.getNameCache().put(p.getUniqueId(), p.getName());
 		

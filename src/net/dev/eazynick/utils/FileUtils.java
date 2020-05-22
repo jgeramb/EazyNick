@@ -81,6 +81,7 @@ public class FileUtils {
 		cfg.addDefault("AllowBookGUICustomName", true);
 		cfg.addDefault("AllowBookGUISkinFromName", false);
 		cfg.addDefault("UseMineSkinAPI", false);
+		cfg.addDefault("OverwriteMessagePackets", false);
 
 		cfg.addDefault("NickActionBarMessage", false);
 		
