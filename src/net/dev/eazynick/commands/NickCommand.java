@@ -28,7 +28,7 @@ public class NickCommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.use")) {
-				if((utils.getCanUseNick().get(p.getUniqueId()))) {
+				if(utils.getCanUseNick().get(p.getUniqueId())) {
 					if(utils.getNickedPlayers().contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					else {

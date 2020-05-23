@@ -322,7 +322,6 @@ public class NickManager {
 				
 				user.setPrefix(utils.getUltraPermissionsPrefixes().get(p.getUniqueId()));
 				user.setSuffix(utils.getUltraPermissionsSuffixes().get(p.getUniqueId()));
-				user.save();
 				
 				utils.getUltraPermissionsPrefixes().remove(p.getUniqueId());
 				utils.getUltraPermissionsSuffixes().remove(p.getUniqueId());
@@ -635,7 +634,7 @@ public class NickManager {
 					} else
 						cancel();
 				}
-			}, 0, 175);
+			}, 0, 1000);
 		}
 		
 		if(utils.placeholderAPIStatus()) {
@@ -683,7 +682,6 @@ public class NickManager {
 			
 			user.setPrefix(tabPrefix);
 			user.setSuffix(tabSuffix);
-			user.save();
 			
 			if(fileUtils.getConfig().getBoolean("SwitchUltraPermissionsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
 				if(!(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId())))
