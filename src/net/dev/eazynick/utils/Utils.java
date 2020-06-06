@@ -470,88 +470,90 @@ public class Utils {
 	}
 	
 	public void performReNick(Player p) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
-		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
-		
-		String name = nickOnWorldChangePlayers.contains(p.getUniqueId()) ? nickNames.get((new Random().nextInt(nickNames.size()))) : mysqlNickManager.getNickName(p.getUniqueId());
-		boolean isCancelled = false;
-		boolean nickNameIsInUse = false;
-		
-		for (String nickName : playerNicknames.values()) {
-			if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-				nickNameIsInUse = true;
-		}
-		
-		while (nickNameIsInUse) {
-			nickNameIsInUse = false;
-			name = nickNames.get((new Random().nextInt(nickNames.size())));
+		if(!(new NickManager(p).isNicked())) {
+			EazyNick eazyNick = EazyNick.getInstance();
+			FileUtils fileUtils = eazyNick.getFileUtils();
+			LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+			MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+			MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
+			
+			String name = nickOnWorldChangePlayers.contains(p.getUniqueId()) ? nickNames.get((new Random().nextInt(nickNames.size()))) : mysqlNickManager.getNickName(p.getUniqueId());
+			boolean isCancelled = false;
+			boolean nickNameIsInUse = false;
 			
 			for (String nickName : playerNicknames.values()) {
 				if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 					nickNameIsInUse = true;
 			}
-		}
-		
-		if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
-			boolean playerWithNameIsKnown = false;
 			
-			for (Player all : Bukkit.getOnlinePlayers()) {
-				if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-					playerWithNameIsKnown = true;
-			}
-			
-			if(Bukkit.getOfflinePlayers() != null) {
-				for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
-					if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-						playerWithNameIsKnown = true;
+			while (nickNameIsInUse) {
+				nickNameIsInUse = false;
+				name = nickNames.get((new Random().nextInt(nickNames.size())));
+				
+				for (String nickName : playerNicknames.values()) {
+					if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+						nickNameIsInUse = true;
 				}
 			}
 			
-			if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
-				isCancelled = true;
-			
-			if(!(isCancelled)) {
-				if(!(name.equalsIgnoreCase(p.getName()))) {
-					if(mysqlPlayerDataManager.isRegistered(p.getUniqueId())) {
-						new NickManager(p).setGroupName("Default");
-						
-						Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
-								mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()),
-								mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()),
-								mysqlPlayerDataManager.getTabPrefix(p.getUniqueId()),
-								mysqlPlayerDataManager.getTabSuffix(p.getUniqueId()),
-								mysqlPlayerDataManager.getTagPrefix(p.getUniqueId()),
-								mysqlPlayerDataManager.getTagSuffix(p.getUniqueId()),
-								true,
-								false,
-								"NONE"));
-					} else {
-						boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
-						String prefix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
-						String suffix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
-					
-						new NickManager(p).setGroupName("ServerFull");
-						
-						Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
-								serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"),
-								serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"),
-								serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"),
-								serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"),
-								prefix,
-								suffix,
-								true,
-								false,
-								(getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+			if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
+				boolean playerWithNameIsKnown = false;
+				
+				for (Player all : Bukkit.getOnlinePlayers()) {
+					if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+						playerWithNameIsKnown = true;
+				}
+				
+				if(Bukkit.getOfflinePlayers() != null) {
+					for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+						if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+							playerWithNameIsKnown = true;
 					}
+				}
+				
+				if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+					isCancelled = true;
+				
+				if(!(isCancelled)) {
+					if(!(name.equalsIgnoreCase(p.getName()))) {
+						if(mysqlPlayerDataManager.isRegistered(p.getUniqueId())) {
+							new NickManager(p).setGroupName("Default");
+							
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
+									mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()),
+									mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()),
+									mysqlPlayerDataManager.getTabPrefix(p.getUniqueId()),
+									mysqlPlayerDataManager.getTabSuffix(p.getUniqueId()),
+									mysqlPlayerDataManager.getTagPrefix(p.getUniqueId()),
+									mysqlPlayerDataManager.getTagSuffix(p.getUniqueId()),
+									true,
+									false,
+									"NONE"));
+						} else {
+							boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
+							String prefix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
+							String suffix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
+						
+							new NickManager(p).setGroupName("ServerFull");
+							
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
+									serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"),
+									serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"),
+									serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"),
+									serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"),
+									prefix,
+									suffix,
+									true,
+									false,
+									(getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+						}
+					} else
+						p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
 				} else
-					p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
+					p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
 			} else
-				p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
-		} else
-			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
+				p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
+		}
 	}
 
 	public void toggleBungeeNick(Player p) {

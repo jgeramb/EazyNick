@@ -32,19 +32,19 @@ public class PlayerQuitListener implements Listener {
 		if (api.isNicked()) {
 			if (fileUtils.getConfig().getBoolean("DisconnectUnnick"))
 				api.unnickPlayerWithoutRemovingMySQL(true);
-		}
-		
-		if(fileUtils.getConfig().getBoolean("OverwriteJoinQuitMessages")) {
-			String message = fileUtils.getConfigString("OverwrittenMessages.Quit");
 			
-			if(mysqlNickManager.isPlayerNicked(p.getUniqueId()))
-				message = message.replace("%name%", mysqlNickManager.getNickName(p.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()) + mysqlNickManager.getNickName(p.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()));
-			else if(utils.getPlayerNicknames().containsKey(p.getUniqueId()))
-				message = message.replace("%name%", utils.getPlayerNicknames().get(p.getUniqueId()).replace("%displayName%", utils.getChatPrefixes().get(p.getUniqueId()) + utils.getPlayerNicknames().get(p.getUniqueId()) + utils.getChatSuffixes().get(p.getUniqueId())));
-			else
-				message = message.replace("%name%", p.getName()).replace("%displayName%", p.getDisplayName());
-			
-			e.setQuitMessage(message);
+			if(fileUtils.getConfig().getBoolean("OverwriteJoinQuitMessages")) {
+				String message = fileUtils.getConfigString("OverwrittenMessages.Quit");
+				
+				if(fileUtils.getConfig().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(p.getUniqueId()))
+					message = message.replace("%name%", mysqlNickManager.getNickName(p.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()) + mysqlNickManager.getNickName(p.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()));
+				else if(utils.getPlayerNicknames().containsKey(p.getUniqueId()))
+					message = message.replace("%name%", utils.getPlayerNicknames().get(p.getUniqueId()).replace("%displayName%", utils.getChatPrefixes().get(p.getUniqueId()) + utils.getPlayerNicknames().get(p.getUniqueId()) + utils.getChatSuffixes().get(p.getUniqueId())));
+				else
+					message = message.replace("%name%", p.getName()).replace("%displayName%", p.getDisplayName());
+				
+				e.setQuitMessage(message);
+			}
 		}
 	}
 

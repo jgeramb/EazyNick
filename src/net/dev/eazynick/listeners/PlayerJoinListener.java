@@ -43,7 +43,7 @@ public class PlayerJoinListener implements Listener {
 		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(p.getName());
 
-		if(fileUtils.getConfig().getBoolean("OverwriteJoinQuitMessages")) {
+		if(fileUtils.getConfig().getBoolean("OverwriteJoinQuitMessages") && new NickManager(p).isNicked()) {
 			String message = fileUtils.getConfigString("OverwrittenMessages.Join");
 			
 			if(mysqlNickManager.isPlayerNicked(p.getUniqueId()))
