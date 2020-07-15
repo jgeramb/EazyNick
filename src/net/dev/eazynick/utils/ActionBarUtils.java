@@ -16,7 +16,7 @@ public class ActionBarUtils {
 			if (eazyNick.getVersion().startsWith("1_7_") || eazyNick.getVersion().startsWith("1_8_")) {
 				Class<?> chatSerializer = reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 
-				sendPacket(p, reflectUtils.getNMSClass("PacketPlayOutChat").getConstructor(reflectUtils.getNMSClass("IChatBaseComponent"), byte.class).newInstance(chatSerializer.getMethod("a", String.class).invoke(chatSerializer, "{\"text\":\"" + text + "\"}", (byte) 2)));
+				sendPacket(p, reflectUtils.getNMSClass("PacketPlayOutChat").getConstructor(reflectUtils.getNMSClass("IChatBaseComponent"), byte.class).newInstance(chatSerializer.getMethod("a", String.class).invoke(chatSerializer, "{\"text\":\"" + text + "\"}"), (byte) 2));
 			} else
 				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
 		} catch (Exception e) {
