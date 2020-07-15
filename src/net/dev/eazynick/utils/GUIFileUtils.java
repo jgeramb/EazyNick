@@ -9,16 +9,18 @@ import org.bukkit.plugin.PluginDescriptionFile;
 
 import net.dev.eazynick.EazyNick;
 
-public class BookGUIFileUtils {
+public class GUIFileUtils {
 
 	private File directory, file;
 	private YamlConfiguration cfg;
 	
-	public BookGUIFileUtils() {
-		PluginDescriptionFile desc = EazyNick.getInstance().getDescription();
+	public GUIFileUtils() {
+		EazyNick eazyNick = EazyNick.getInstance();
+		
+		PluginDescriptionFile desc = eazyNick.getDescription();
 		
 		directory = new File("plugins/" + desc.getName() + "/");
-		file = new File(directory, "bookgui.yml");
+		file = new File(directory, "guis.yml");
 				
 		if (!(directory.exists()))
 			directory.mkdir();
@@ -41,7 +43,20 @@ public class BookGUIFileUtils {
 				+ "\n");
 		
 		String arrow = "&0\u27A4";
+		boolean newMaterials = eazyNick.getUtils().isNewVersion();
 		
+		//Default NickGUI
+		cfg.addDefault("NickGUI.InventoryTitle", "&5Nick&8:");
+		cfg.addDefault("NickGUI.Nick.DisplayName", "&aNick");
+		cfg.addDefault("NickGUI.Unnick.DisplayName", "&cUnnick");
+		
+		//NickList
+		cfg.addDefault("NickNameGUI.InventoryTitle", "&5Nicknames &7[&aPage %currentPage%&7]&8:");
+		cfg.addDefault("NickNameGUI.Previous.DisplayName", "&7Previous page");
+		cfg.addDefault("NickNameGUI.Next.DisplayName", "&7Next page");
+		cfg.addDefault("NickNameGUI.NickName.DisplayName", "&b%nickName%");
+		
+		//BookGUI
 		cfg.addDefault("BookGUI.Page1.Title", "Info");
 		cfg.addDefault("BookGUI.Page1.Text", "&0Nicknames allow you to play with a different\nusername to not get recognized.\n\nAll rules still apply. You can still be reported and all name history is stored.\n\n");
 		cfg.addDefault("BookGUI.Page1.Enabled", true);
@@ -92,39 +107,80 @@ public class BookGUIFileUtils {
 		cfg.addDefault("SignGUI.Line4", "username here");
 		
 		cfg.addDefault("AnvilGUI.Title", "Enter name here");
-
-		cfg.addDefault("BookGUI.Rank1.Enabled", true);
-		cfg.addDefault("BookGUI.Rank1.Rank", "&8DEFAULT");
-		cfg.addDefault("BookGUI.Rank1.RankName", "DEFAULT");
-		cfg.addDefault("BookGUI.Rank1.Permission", "NONE");
-		cfg.addDefault("BookGUI.Rank2.Enabled", true);
-		cfg.addDefault("BookGUI.Rank2.Rank", "&aVIP");
-		cfg.addDefault("BookGUI.Rank2.RankName", "VIP");
-		cfg.addDefault("BookGUI.Rank2.Permission", "nick.rank.vip");
-		cfg.addDefault("BookGUI.Rank3.Enabled", true);
-		cfg.addDefault("BookGUI.Rank3.Rank", "&aVIP&6+");
-		cfg.addDefault("BookGUI.Rank3.RankName", "VIPPLUS");
-		cfg.addDefault("BookGUI.Rank3.Permission", "nick.rank.vipplus");
-		cfg.addDefault("BookGUI.Rank4.Enabled", true);
-		cfg.addDefault("BookGUI.Rank4.Rank", "&bMVP");
-		cfg.addDefault("BookGUI.Rank4.RankName", "MVP");
-		cfg.addDefault("BookGUI.Rank4.Permission", "nick.rank.mvp");
-		cfg.addDefault("BookGUI.Rank5.Enabled", true);
-		cfg.addDefault("BookGUI.Rank5.Rank", "&bMVP&c+");
-		cfg.addDefault("BookGUI.Rank5.RankName", "MVPPLUS");
-		cfg.addDefault("BookGUI.Rank5.Permission", "nick.rank.mvpplus");
-		cfg.addDefault("BookGUI.Rank6.Enabled", true);
-		cfg.addDefault("BookGUI.Rank6.Rank", "&6MVP&c++");
-		cfg.addDefault("BookGUI.Rank6.RankName", "MVPPLUSPLUS");
-		cfg.addDefault("BookGUI.Rank6.Permission", "nick.rank.mvpplusplus");
+		
+		//RankedNickGUI
+		//Step 1
+		cfg.addDefault("RankedNickGUI.Step1.InventoryTitle", "&5Choose a rank&8:");
+		cfg.addDefault("RankedNickGUI.Step1.NoRankAvailable.DisplayName", "&cYou do not have permission to nick yourself with a specific rank");
+		cfg.addDefault("RankedNickGUI.Step1.Rank1.ItemType", newMaterials ? "GRAY_WOOL" : "WOOL");
+		cfg.addDefault("RankedNickGUI.Step1.Rank1.MetaData", newMaterials ? 0 : 7);
+		cfg.addDefault("RankedNickGUI.Step1.Rank2.ItemType", newMaterials ? "LIME_WOOL" : "WOOL");
+		cfg.addDefault("RankedNickGUI.Step1.Rank2.MetaData", newMaterials ? 0 : 5);
+		cfg.addDefault("RankedNickGUI.Step1.Rank3.ItemType", newMaterials ? "LIME_WOOL" : "WOOL");
+		cfg.addDefault("RankedNickGUI.Step1.Rank3.MetaData", newMaterials ? 0 : 5);
+		cfg.addDefault("RankedNickGUI.Step1.Rank4.ItemType", newMaterials ? "LIGHT_BLUE_WOOL" : "WOOL");
+		cfg.addDefault("RankedNickGUI.Step1.Rank4.MetaData", newMaterials ? 0 : 3);
+		cfg.addDefault("RankedNickGUI.Step1.Rank5.ItemType", newMaterials ? "LIGHT_BLUE_WOOL" : "WOOL");
+		cfg.addDefault("RankedNickGUI.Step1.Rank5.MetaData", newMaterials ? 0 : 3);
+		cfg.addDefault("RankedNickGUI.Step1.Rank6.ItemType", newMaterials ? "ORANGE_WOOL" : "WOOL");
+		cfg.addDefault("RankedNickGUI.Step1.Rank6.MetaData", newMaterials ? 0 : 1);
 		
 		for (int i = 7; i <= 18; i++) {
-			cfg.addDefault("BookGUI.Rank" + i + ".Enabled", false);
-			cfg.addDefault("BookGUI.Rank" + i + ".Rank", "&dRank" + i);
-			cfg.addDefault("BookGUI.Rank" + i + ".RankName", "RANK" + i);
-			cfg.addDefault("BookGUI.Rank" + i + ".Permission", "nick.rank." + i);
+			cfg.addDefault("RankedNickGUI.Step1.Rank" + i + ".ItemType", newMaterials ? "LIGHT_GRAY_WOOL" : "WOOL");
+			cfg.addDefault("RankedNickGUI.Step1.Rank" + i + ".MetaData", newMaterials ? 0 : 8);
+		}
+		
+		//Step 2
+		cfg.addDefault("RankedNickGUI.Step2.InventoryTitle", "&5Choose a skin&8:");
+		cfg.addDefault("RankedNickGUI.Step2.Default.DisplayName", "&bMy normal skin");
+		cfg.addDefault("RankedNickGUI.Step2.Normal.DisplayName", "&bSteve/Alex skin");
+		cfg.addDefault("RankedNickGUI.Step2.Random.DisplayName", "&bRandom skin");
+		
+		//Step 3
+		cfg.addDefault("RankedNickGUI.Step3.InventoryTitle", "&5Choose a name&8:");
+		cfg.addDefault("RankedNickGUI.Step3.Custom.DisplayName", "&bEnter a name");
+		cfg.addDefault("RankedNickGUI.Step3.Random.DisplayName", "&bRandom name");
+		
+		//Step 4
+		cfg.addDefault("RankedNickGUI.Step4.InventoryTitle", "&5%nickName%&8:");
+		cfg.addDefault("RankedNickGUI.Step4.Use.DisplayName", "&bUse name");
+		cfg.addDefault("RankedNickGUI.Step4.Retry.DisplayName", "&bTry again");
+		cfg.addDefault("RankedNickGUI.Step4.Custom.DisplayName", "&bEnter a name");
+		
+		//Ranks
+		cfg.addDefault("RankGUI.Rank1.Enabled", true);
+		cfg.addDefault("RankGUI.Rank1.Rank", "&8DEFAULT");
+		cfg.addDefault("RankGUI.Rank1.RankName", "DEFAULT");
+		cfg.addDefault("RankGUI.Rank1.Permission", "NONE");
+		cfg.addDefault("RankGUI.Rank2.Enabled", true);
+		cfg.addDefault("RankGUI.Rank2.Rank", "&aVIP");
+		cfg.addDefault("RankGUI.Rank2.RankName", "VIP");
+		cfg.addDefault("RankGUI.Rank2.Permission", "nick.rank.vip");
+		cfg.addDefault("RankGUI.Rank3.Enabled", true);
+		cfg.addDefault("RankGUI.Rank3.Rank", "&aVIP&6+");
+		cfg.addDefault("RankGUI.Rank3.RankName", "VIPPLUS");
+		cfg.addDefault("RankGUI.Rank3.Permission", "nick.rank.vipplus");
+		cfg.addDefault("RankGUI.Rank4.Enabled", true);
+		cfg.addDefault("RankGUI.Rank4.Rank", "&bMVP");
+		cfg.addDefault("RankGUI.Rank4.RankName", "MVP");
+		cfg.addDefault("RankGUI.Rank4.Permission", "nick.rank.mvp");
+		cfg.addDefault("RankGUI.Rank5.Enabled", true);
+		cfg.addDefault("RankGUI.Rank5.Rank", "&bMVP&c+");
+		cfg.addDefault("RankGUI.Rank5.RankName", "MVPPLUS");
+		cfg.addDefault("RankGUI.Rank5.Permission", "nick.rank.mvpplus");
+		cfg.addDefault("RankGUI.Rank6.Enabled", true);
+		cfg.addDefault("RankGUI.Rank6.Rank", "&6MVP&c++");
+		cfg.addDefault("RankGUI.Rank6.RankName", "MVPPLUSPLUS");
+		cfg.addDefault("RankGUI.Rank6.Permission", "nick.rank.mvpplusplus");
+		
+		for (int i = 7; i <= 18; i++) {
+			cfg.addDefault("RankGUI.Rank" + i + ".Enabled", false);
+			cfg.addDefault("RankGUI.Rank" + i + ".Rank", "&dRank" + i);
+			cfg.addDefault("RankGUI.Rank" + i + ".RankName", "RANK" + i);
+			cfg.addDefault("RankGUI.Rank" + i + ".Permission", "nick.rank." + i);
 		}
 
+		//Rank-Formats
 		cfg.addDefault("Settings.NickFormat.Rank1.ChatPrefix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.ChatSuffix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.TabPrefix", "&7");

@@ -23,7 +23,7 @@ public class NickListCommand implements CommandExecutor {
 				if(utils.getNickedPlayers().contains(p.getUniqueId()))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 				
-				utils.openNickList(p);
+				utils.openNickList(p, 0);
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

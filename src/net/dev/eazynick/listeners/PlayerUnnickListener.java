@@ -11,7 +11,7 @@ import net.dev.eazynick.api.PlayerUnnickEvent;
 
 public class PlayerUnnickListener implements Listener {
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerUnnick(PlayerUnnickEvent e) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		

@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utils.ReflectUtils;
+import net.dev.eazynick.utils.Utils;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -24,9 +25,10 @@ public class SignGUI implements Listener {
 	public void open(Player p, String line1, String line2, String line3, String line4, EditCompleteListener listener) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		Utils utils = eazyNick.getUtils();
 		
-		Block b = p.getWorld().getBlockAt(p.getLocation().clone().add(0, 4, 0));
-		b.setType(Material.getMaterial((eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_15")) ? "OAK_SIGN" : (eazyNick.getVersion().startsWith("1_13") ? "SIGN" : "SIGN_POST")));
+		Block b = p.getWorld().getBlockAt(p.getLocation().clone().add(0, 5, 0));
+		b.setType(Material.getMaterial((utils.isNewVersion() && !(eazyNick.getVersion().startsWith("1_13"))) ? "OAK_SIGN" : (eazyNick.getVersion().startsWith("1_13") ? "SIGN" : "SIGN_POST")));
 		
 		Sign sign = (Sign) b.getState();
 		sign.setLine(0, line1);
@@ -35,12 +37,14 @@ public class SignGUI implements Listener {
 		sign.setLine(3, line4);
 		sign.update();
 		
+		Bukkit.getOnlinePlayers().stream().filter(all -> (all != p)).forEach(all -> all.sendBlockChange(b.getLocation(), Material.AIR, (byte) 0));
+		
 		Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 			
 			@Override
 			public void run() {
 				try {
-					boolean useCraftBlockEntityState = eazyNick.getVersion().startsWith("1_15") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_13") || eazyNick.getVersion().startsWith("1_12");
+					boolean useCraftBlockEntityState = utils.isNewVersion() || eazyNick.getVersion().startsWith("1_12");
 					Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 					Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
 
@@ -52,13 +56,13 @@ public class SignGUI implements Listener {
 					editable.setAccessible(true);
 					editable.set(tileSign, true);
 
-					Field handler = tileSign.getClass().getDeclaredField(eazyNick.getVersion().startsWith("1_15") ? "c" : (eazyNick.getVersion().startsWith("1_14") ? "j" : (eazyNick.getVersion().startsWith("1_13") ? "g" : "h")));
+					Field handler = tileSign.getClass().getDeclaredField((eazyNick.getVersion().startsWith("1_15") || eazyNick.getVersion().startsWith("1_16")) ? "c" : (eazyNick.getVersion().startsWith("1_14") ? "j" : (eazyNick.getVersion().startsWith("1_13") ? "g" : "h")));
 					handler.setAccessible(true);
 					handler.set(tileSign, entityPlayer);
 
 					playerConnection.getClass().getDeclaredMethod("sendPacket", reflectUtils.getNMSClass("Packet")).invoke(playerConnection, reflectUtils.getNMSClass("PacketPlayOutOpenSignEditor").getConstructor(reflectUtils.getNMSClass("BlockPosition")).newInstance(reflectUtils.getNMSClass("BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
-		            
-					Bukkit.getScheduler().runTaskLater(eazyNick, () -> b.setType(Material.AIR), 5);
+					
+					Bukkit.getScheduler().runTaskLater(eazyNick, () -> b.setType(Material.AIR), 3);
 					
 					Object networkManager = playerConnection.getClass().getDeclaredField("networkManager").get(playerConnection);
 					Channel channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
@@ -127,7 +131,7 @@ public class SignGUI implements Listener {
 		        	ex.printStackTrace();
 		        }
 			}
-		}, 5);
+		}, 3);
 	}
 	
 	public interface EditCompleteListener {

@@ -1,8 +1,8 @@
 package net.dev.eazynick.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -13,12 +13,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.Plugin;
 
@@ -30,9 +27,11 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
+import net.dev.eazynick.utils.anvilutils.AnvilGUI;
 import net.dev.eazynick.utils.bookutils.NMSBookBuilder;
 import net.dev.eazynick.utils.bookutils.NMSBookUtils;
 import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
+import net.dev.eazynick.utils.signutils.SignGUI;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class Utils {
@@ -44,8 +43,6 @@ public class Utils {
 
 	private Field nameField, uuidField;
 	
-	private PagesHandler<String> nickNamesHandler;
-
 	private List<String> nickNames = new ArrayList<>();
 	private List<String> blackList = new ArrayList<>();
 	private List<String> worldsWithDisabledPrefixAndSuffix = new ArrayList<>();
@@ -57,7 +54,7 @@ public class Utils {
 	private HashMap<UUID, String> oldDisplayNames = new HashMap<>();
 	private HashMap<UUID, String> oldPlayerListNames = new HashMap<>();
 	private HashMap<UUID, Boolean> canUseNick = new HashMap<>();
-	private HashMap<UUID, Integer> nickNameListPage = new HashMap<>();
+	private HashMap<UUID, Integer> nickNameListPages = new HashMap<>();
 	private HashMap<UUID, String[]> oldPermissionsExGroups = new HashMap<>();
 	private HashMap<UUID, String> oldPermissionsExPrefixes = new HashMap<>();
 	private HashMap<UUID, String> oldPermissionsExSuffixes = new HashMap<>();
@@ -81,6 +78,8 @@ public class Utils {
 	private HashMap<UUID, String> tabPrefixes = new HashMap<>();
 	private HashMap<UUID, String> tabSuffixes = new HashMap<>();
 	private HashMap<UUID, String> groupNames = new HashMap<>();
+	private HashMap<UUID, String> lastGUITexts = new HashMap<>();
+	private HashMap<UUID, String> playersTypingNameInChat = new HashMap<>();
 
 	public boolean placeholderAPIStatus() {
 		return (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null);
@@ -156,46 +155,10 @@ public class Utils {
 		Bukkit.getConsoleSender().sendMessage(prefix + msg);
 	}
 
-	public ItemStack createItem(Material mat, int amount, int metaData, String displayName, String lore, boolean enchantedItem) {
-		ItemStack is = new ItemStack(mat, amount, (byte) metaData);
-		ItemMeta m = is.getItemMeta();
-		m.setDisplayName(displayName.trim());
-		m.setLore(Arrays.asList(lore));
-
-		if (enchantedItem) {
-			m.addEnchant(Enchantment.DURABILITY, 1, true);
-
-			if(!(EazyNick.getInstance().getVersion().equalsIgnoreCase("1_7_R4")))
-				m.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE });
-		}
-
-		is.setItemMeta(m);
-		
-		return is;
+	public boolean isNewVersion() {
+		return (Integer.parseInt(EazyNick.getInstance().getVersion().split("_")[1]) > 12);
 	}
-
-	public ItemStack createItem(Material mat, int amount, int metaData, String displayName) {
-		ItemStack is = new ItemStack(mat, amount, (byte) metaData);
-		ItemMeta m = is.getItemMeta();
-		m.setDisplayName(displayName.trim());
-
-		is.setItemMeta(m);
-
-		return is;
-	}
-
-	public ItemStack createSkull(int amount, String displayName, String owner) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		
-		ItemStack is = new ItemStack(Material.getMaterial((eazyNick.getVersion().startsWith("1_13") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_15")) ? "PLAYER_HEAD" : "SKULL_ITEM"), amount, (byte) 3);
-		SkullMeta m = (SkullMeta) is.getItemMeta();
-		m.setDisplayName(displayName);
-		m.setOwner(owner);
-		is.setItemMeta(m);
-		
-		return is;
-	}
-
+	
 	public int getOnlinePlayerCount() {
 		return Bukkit.getOnlinePlayers().size();
 	}
@@ -204,7 +167,7 @@ public class Utils {
 		EazyNick eazyNick = EazyNick.getInstance();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
 		NickNameFileUtils nickNameFileUtils = eazyNick.getNickNameFileUtils();
 		
 		new ArrayList<>(nickedPlayers).forEach(uuid -> new NickManager(Bukkit.getPlayer(uuid)).unnickPlayerWithoutRemovingMySQL(false));
@@ -215,8 +178,8 @@ public class Utils {
 		nickNameFileUtils.setConfig(YamlConfiguration.loadConfiguration(nickNameFileUtils.getFile()));
 		nickNameFileUtils.saveFile();
 		
-		bookGUIFileUtils.setConfig(YamlConfiguration.loadConfiguration(bookGUIFileUtils.getFile()));
-		bookGUIFileUtils.saveFile();
+		guiFileUtils.setConfig(YamlConfiguration.loadConfiguration(guiFileUtils.getFile()));
+		guiFileUtils.saveFile();
 		
 		languageFileUtils.setConfig(YamlConfiguration.loadConfiguration(languageFileUtils.getFile()));
 		languageFileUtils.saveFile();
@@ -265,7 +228,7 @@ public class Utils {
 		EazyNick eazyNick = EazyNick.getInstance();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
 		NMSBookUtils nmsBookUtils = eazyNick.getNMSBookUtils();
 		NMSBookBuilder nmsBookBuilder = eazyNick.getNMSBookBuilder();
 		
@@ -304,16 +267,16 @@ public class Utils {
 						String groupName = "";
 						
 						for (int i = 1; i <= 18; i++) {
-							String permission = bookGUIFileUtils.getConfigString("BookGUI.Rank" + i + ".Permission");
+							String permission = guiFileUtils.getConfigString("RankGUI.Rank" + i + ".Permission");
 							
-							if(rankName.equalsIgnoreCase(bookGUIFileUtils.getConfig().getString("BookGUI.Rank" + i + ".RankName")) && bookGUIFileUtils.getConfig().getBoolean("BookGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission))) {
-								chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
-								chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
-								tabPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
-								tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
-								tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
-								tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
-								groupName = bookGUIFileUtils.getConfig().getString("Settings.NickFormat.Rank" + i + ".GroupName");
+							if(rankName.equalsIgnoreCase(guiFileUtils.getConfig().getString("RankGUI.Rank" + i + ".RankName")) && guiFileUtils.getConfig().getBoolean("RankGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission))) {
+								chatPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
+								chatSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
+								tabPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
+								tabSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
+								tagPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
+								tagSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+								groupName = guiFileUtils.getConfig().getString("Settings.NickFormat.Rank" + i + ".GroupName");
 							}
 						}
 						
@@ -355,13 +318,13 @@ public class Utils {
 							eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), name, skinName);
 							eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 							
-							if(bookGUIFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled"))
-								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
+							if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
+								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
 						} else {
 							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
 						
-							if(bookGUIFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled"))
-								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(bookGUIFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
+							if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
+								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
 						}
 					} else
 						p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
@@ -373,14 +336,36 @@ public class Utils {
 			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickTooLong"));
 	}
 
-	public void openNickList(Player p) {
-		nickNamesHandler = new PagesHandler(36);
-
-		for (String name : nickNames)
-			nickNamesHandler.addObject(name);
+	public void openNickList(Player p, int page) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
 		
-		nickNamesHandler.createPage(p, 0);
-		nickNameListPage.put(p.getUniqueId(), 0);
+		Inventory inv = Bukkit.createInventory(null, 45, guiFileUtils.getConfigString("NickNameGUI.InventoryTitle").replace("%currentPage%", String.valueOf(page + 1)));
+		ArrayList<String> toShow = new ArrayList<>();
+		
+		p.openInventory(inv);
+		
+		for (int i = 36 * page; i < nickNames.size(); i++) {
+			if(toShow.size() >= 36)
+				break;
+			
+			toShow.add(nickNames.get(i));
+		}
+		
+		int i = 0;
+		
+		for (String nickName : toShow) {
+			inv.setItem(i, new ItemBuilder(1).setDisplayName(guiFileUtils.getConfigString("NickNameGUI.NickName.DisplayName").replace("%nickName%", nickName)).setSkullOwner((toShow.size() > 12) ? "MHF_Question" : nickName).build());
+			i++;
+		}
+			
+		if(page != 0)
+			inv.setItem(36, new ItemBuilder(Material.ARROW).setDisplayName(guiFileUtils.getConfigString("NickNameGUI.Previous.DisplayName")).build());
+		
+		if(nickNames.size() > ((page + 1) * 36))
+			inv.setItem(44, new ItemBuilder(Material.ARROW).setDisplayName(guiFileUtils.getConfigString("NickNameGUI.Next.DisplayName")).build());
+		
+		nickNameListPages.put(p.getUniqueId(), page);
 	}
 
 	public void performNick(Player p, String customNickName) {
@@ -405,12 +390,12 @@ public class Utils {
 				pa.setPermission("nick.gui", true);
 				p.recalculatePermissions();
 				
-				openNickList(p);
+				openNickList(p, 0);
 				
 				p.removeAttachment(pa);
 				p.recalculatePermissions();
 			} else
-				openNickList(p);
+				openNickList(p, 0);
 		} else {
 			String name = customNickName.equals("RANDOM") ? nickNames.get((new Random().nextInt(nickNames.size()))) : customNickName;
 			
@@ -563,7 +548,7 @@ public class Utils {
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
-		boolean hasItem = (p.getItemInHand() != null) && (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null) && (p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"));
+		boolean hasItem = (p.getItemInHand() != null) && (p.getItemInHand().getType() != Material.AIR && p.getItemInHand().getItemMeta() != null && p.getItemInHand().getItemMeta().getDisplayName() != null) && (p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled")) || p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled")));
 		
 		if(fileUtils.getConfig().getBoolean("NeedItemToToggleNick") && !(hasItem))
 			return;
@@ -573,7 +558,7 @@ public class Utils {
 			mysqlPlayerDataManager.removeData(p.getUniqueId());
 			
 			if(hasItem)
-				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")));
+				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 
 			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.BungeeAutoNickDisabled"));
 		} else {
@@ -582,9 +567,324 @@ public class Utils {
 			mysqlNickManager.addPlayer(p.getUniqueId(), name, name);
 			
 			if(hasItem)
-				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")));
+				p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
 
 			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.BungeeAutoNickEnabled"));
+		}
+	}
+	
+	public void openCustomGUI(Player p, String rankName, String skinType) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		FileUtils fileUtils = eazyNick.getFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		
+		if(fileUtils.getConfig().getBoolean("UseSignGUIForCustomName")) {
+			eazyNick.getSignGUI().open(p, guiFileUtils.getConfigString("SignGUI.Line1"), guiFileUtils.getConfigString("SignGUI.Line2"), guiFileUtils.getConfigString("SignGUI.Line3"), guiFileUtils.getConfigString("SignGUI.Line4"), new SignGUI.EditCompleteListener() {
+				
+				@Override
+				public void onEditComplete(SignGUI.EditCompleteEvent e) {
+					performRankedNick(p, rankName, skinType, e.getLines()[0]);
+				}
+			});
+		} else {
+			AnvilGUI gui = new AnvilGUI(p, new AnvilGUI.AnvilClickEventHandler() {
+
+				@Override
+				public void onAnvilClick(AnvilGUI.AnvilClickEvent e) {
+					if (e.getSlot() == AnvilGUI.AnvilSlot.OUTPUT) {
+						e.setWillClose(true);
+						e.setWillDestroy(true);
+						
+						performRankedNick(p, rankName, skinType, e.getName());
+					} else {
+						e.setWillClose(false);
+						e.setWillDestroy(false);
+					}
+				}
+			});
+			
+			gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, new ItemBuilder(Material.PAPER).setDisplayName(guiFileUtils.getConfigString("AnvilGUI.Title")).build());
+
+			try {
+				gui.open();
+			} catch (IllegalAccessException | InvocationTargetException | InstantiationException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	public void openRankedNickGUI(Player p, String text) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		
+		lastGUITexts.put(p.getUniqueId(), text);
+		
+		String[] args = text.isEmpty() ? new String[0] : text.split(" ");
+		
+		if(args.length == 0) {
+			Inventory inv = Bukkit.createInventory(null, 27, guiFileUtils.getConfigString("RankedNickGUI.Step1.InventoryTitle"));
+			
+			for (int i = 0; i < inv.getSize(); i++)
+				inv.setItem(i, new ItemBuilder(Material.getMaterial(isNewVersion() ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, isNewVersion() ? 0 : 15).setDisplayName("§r").build());
+			
+			ArrayList<ItemStack> availableRanks = new ArrayList<>();
+			
+			for (int i = 1; i <= 18; i++) {
+				String permission = guiFileUtils.getConfigString("RankGUI.Rank" + i + ".Permission");
+				
+				if(guiFileUtils.getConfig().getBoolean("RankGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission)))
+					availableRanks.add(new ItemBuilder(Material.valueOf(guiFileUtils.getConfigString("RankedNickGUI.Step1.Rank" + i + ".ItemType")), 1, guiFileUtils.getConfig().getInt("RankedNickGUI.Step1.Rank" + i + ".MetaData")).setDisplayName(guiFileUtils.getConfigString("RankGUI.Rank" + i + ".Rank")).build());
+			}
+			
+			switch (availableRanks.size()) {
+				case 1:
+					inv.setItem(13, availableRanks.get(0));
+					break;
+				case 2:
+					inv.setItem(11, availableRanks.get(0));
+					inv.setItem(15, availableRanks.get(1));
+					break;
+				case 3:
+					inv.setItem(10, availableRanks.get(0));
+					inv.setItem(13, availableRanks.get(1));
+					inv.setItem(16, availableRanks.get(2));
+					break;
+				case 4:
+					inv.setItem(10, availableRanks.get(0));
+					inv.setItem(12, availableRanks.get(1));
+					inv.setItem(14, availableRanks.get(2));
+					inv.setItem(16, availableRanks.get(3));
+					break;
+				case 5:
+					inv.setItem(9, availableRanks.get(0));
+					inv.setItem(11, availableRanks.get(1));
+					inv.setItem(13, availableRanks.get(2));
+					inv.setItem(15, availableRanks.get(3));
+					inv.setItem(17, availableRanks.get(4));
+					break;
+				case 6:
+					inv.setItem(4, availableRanks.get(0));
+					inv.setItem(9, availableRanks.get(1));
+					inv.setItem(11, availableRanks.get(2));
+					inv.setItem(15, availableRanks.get(3));
+					inv.setItem(17, availableRanks.get(4));
+					inv.setItem(22, availableRanks.get(5));
+					break;
+				case 7:
+					inv.setItem(2, availableRanks.get(0));
+					inv.setItem(6, availableRanks.get(1));
+					inv.setItem(10, availableRanks.get(2));
+					inv.setItem(13, availableRanks.get(3));
+					inv.setItem(16, availableRanks.get(4));
+					inv.setItem(20, availableRanks.get(5));
+					inv.setItem(24, availableRanks.get(6));
+					break;
+				case 8:
+					inv.setItem(2, availableRanks.get(0));
+					inv.setItem(6, availableRanks.get(1));
+					inv.setItem(10, availableRanks.get(2));
+					inv.setItem(12, availableRanks.get(3));
+					inv.setItem(14, availableRanks.get(4));
+					inv.setItem(16, availableRanks.get(5));
+					inv.setItem(20, availableRanks.get(6));
+					inv.setItem(24, availableRanks.get(7));
+					break;
+				case 9:
+					inv.setItem(2, availableRanks.get(0));
+					inv.setItem(6, availableRanks.get(1));
+					inv.setItem(9, availableRanks.get(2));
+					inv.setItem(11, availableRanks.get(3));
+					inv.setItem(13, availableRanks.get(4));
+					inv.setItem(15, availableRanks.get(5));
+					inv.setItem(17, availableRanks.get(6));
+					inv.setItem(20, availableRanks.get(7));
+					inv.setItem(24, availableRanks.get(8));
+					break;
+				case 10:
+					inv.setItem(2, availableRanks.get(0));
+					inv.setItem(4, availableRanks.get(1));
+					inv.setItem(6, availableRanks.get(2));
+					inv.setItem(10, availableRanks.get(3));
+					inv.setItem(12, availableRanks.get(4));
+					inv.setItem(14, availableRanks.get(5));
+					inv.setItem(16, availableRanks.get(6));
+					inv.setItem(20, availableRanks.get(7));
+					inv.setItem(22, availableRanks.get(8));
+					inv.setItem(24, availableRanks.get(9));
+					break;
+				case 11:
+					inv.setItem(1, availableRanks.get(0));
+					inv.setItem(3, availableRanks.get(1));
+					inv.setItem(5, availableRanks.get(2));
+					inv.setItem(7, availableRanks.get(3));
+					inv.setItem(11, availableRanks.get(4));
+					inv.setItem(13, availableRanks.get(5));
+					inv.setItem(15, availableRanks.get(6));
+					inv.setItem(19, availableRanks.get(7));
+					inv.setItem(21, availableRanks.get(8));
+					inv.setItem(23, availableRanks.get(9));
+					inv.setItem(25, availableRanks.get(10));
+					break;
+				case 12:
+					inv.setItem(2, availableRanks.get(0));
+					inv.setItem(3, availableRanks.get(1));
+					inv.setItem(5, availableRanks.get(2));
+					inv.setItem(6, availableRanks.get(3));
+					inv.setItem(10, availableRanks.get(4));
+					inv.setItem(12, availableRanks.get(5));
+					inv.setItem(14, availableRanks.get(6));
+					inv.setItem(16, availableRanks.get(7));
+					inv.setItem(20, availableRanks.get(8));
+					inv.setItem(21, availableRanks.get(9));
+					inv.setItem(23, availableRanks.get(10));
+					inv.setItem(24, availableRanks.get(11));
+					break;
+				case 13:
+					inv.setItem(1, availableRanks.get(0));
+					inv.setItem(3, availableRanks.get(1));
+					inv.setItem(5, availableRanks.get(2));
+					inv.setItem(7, availableRanks.get(3));
+					inv.setItem(9, availableRanks.get(4));
+					inv.setItem(11, availableRanks.get(5));
+					inv.setItem(13, availableRanks.get(6));
+					inv.setItem(15, availableRanks.get(7));
+					inv.setItem(17, availableRanks.get(8));
+					inv.setItem(19, availableRanks.get(9));
+					inv.setItem(21, availableRanks.get(10));
+					inv.setItem(23, availableRanks.get(11));
+					inv.setItem(25, availableRanks.get(12));
+					break;
+				case 14:
+					inv.setItem(0, availableRanks.get(0));
+					inv.setItem(2, availableRanks.get(1));
+					inv.setItem(4, availableRanks.get(2));
+					inv.setItem(6, availableRanks.get(3));
+					inv.setItem(8, availableRanks.get(4));
+					inv.setItem(10, availableRanks.get(5));
+					inv.setItem(12, availableRanks.get(6));
+					inv.setItem(14, availableRanks.get(7));
+					inv.setItem(16, availableRanks.get(8));
+					inv.setItem(18, availableRanks.get(9));
+					inv.setItem(20, availableRanks.get(10));
+					inv.setItem(22, availableRanks.get(11));
+					inv.setItem(24, availableRanks.get(12));
+					inv.setItem(26, availableRanks.get(13));
+					break;
+				case 15:
+					inv.setItem(0, availableRanks.get(0));
+					inv.setItem(2, availableRanks.get(1));
+					inv.setItem(4, availableRanks.get(2));
+					inv.setItem(6, availableRanks.get(3));
+					inv.setItem(8, availableRanks.get(4));
+					inv.setItem(9, availableRanks.get(5));
+					inv.setItem(11, availableRanks.get(6));
+					inv.setItem(13, availableRanks.get(7));
+					inv.setItem(15, availableRanks.get(8));
+					inv.setItem(17, availableRanks.get(9));
+					inv.setItem(18, availableRanks.get(10));
+					inv.setItem(20, availableRanks.get(11));
+					inv.setItem(22, availableRanks.get(12));
+					inv.setItem(24, availableRanks.get(13));
+					inv.setItem(26, availableRanks.get(14));
+					break;
+				case 16:
+					inv.setItem(0, availableRanks.get(0));
+					inv.setItem(2, availableRanks.get(1));
+					inv.setItem(4, availableRanks.get(2));
+					inv.setItem(6, availableRanks.get(3));
+					inv.setItem(8, availableRanks.get(4));
+					inv.setItem(9, availableRanks.get(5));
+					inv.setItem(11, availableRanks.get(6));
+					inv.setItem(12, availableRanks.get(7));
+					inv.setItem(14, availableRanks.get(8));
+					inv.setItem(15, availableRanks.get(9));
+					inv.setItem(17, availableRanks.get(10));
+					inv.setItem(18, availableRanks.get(11));
+					inv.setItem(20, availableRanks.get(12));
+					inv.setItem(22, availableRanks.get(13));
+					inv.setItem(24, availableRanks.get(14));
+					inv.setItem(26, availableRanks.get(15));
+					break;
+				case 17:
+					inv.setItem(0, availableRanks.get(0));
+					inv.setItem(2, availableRanks.get(1));
+					inv.setItem(4, availableRanks.get(2));
+					inv.setItem(6, availableRanks.get(3));
+					inv.setItem(8, availableRanks.get(4));
+					inv.setItem(9, availableRanks.get(5));
+					inv.setItem(10, availableRanks.get(6));
+					inv.setItem(12, availableRanks.get(7));
+					inv.setItem(13, availableRanks.get(8));
+					inv.setItem(14, availableRanks.get(9));
+					inv.setItem(16, availableRanks.get(10));
+					inv.setItem(17, availableRanks.get(11));
+					inv.setItem(18, availableRanks.get(12));
+					inv.setItem(20, availableRanks.get(13));
+					inv.setItem(22, availableRanks.get(14));
+					inv.setItem(24, availableRanks.get(15));
+					inv.setItem(26, availableRanks.get(16));
+					break;
+				case 18:
+					inv.setItem(0, availableRanks.get(0));
+					inv.setItem(2, availableRanks.get(1));
+					inv.setItem(4, availableRanks.get(2));
+					inv.setItem(6, availableRanks.get(3));
+					inv.setItem(8, availableRanks.get(4));
+					inv.setItem(9, availableRanks.get(5));
+					inv.setItem(10, availableRanks.get(6));
+					inv.setItem(11, availableRanks.get(7));
+					inv.setItem(12, availableRanks.get(8));
+					inv.setItem(14, availableRanks.get(9));
+					inv.setItem(15, availableRanks.get(10));
+					inv.setItem(16, availableRanks.get(11));
+					inv.setItem(17, availableRanks.get(12));
+					inv.setItem(18, availableRanks.get(13));
+					inv.setItem(20, availableRanks.get(14));
+					inv.setItem(22, availableRanks.get(15));
+					inv.setItem(24, availableRanks.get(16));
+					inv.setItem(26, availableRanks.get(17));
+					break;
+				default:
+					inv.setItem(13, new ItemBuilder(Material.valueOf(isNewVersion() ? "RED_STAINED_GLASS" : "GLASS"), 1, isNewVersion() ? 0 : 14).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step1.NoRankAvailable.DisplayName")).build());
+					break;
+			}
+			
+			p.openInventory(inv);
+		} else if(args.length == 1) {
+			Inventory inv = Bukkit.createInventory(null, 27, guiFileUtils.getConfigString("RankedNickGUI.Step2.InventoryTitle"));
+			
+			for (int i = 0; i < inv.getSize(); i++)
+				inv.setItem(i, new ItemBuilder(Material.getMaterial(isNewVersion() ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, isNewVersion() ? 0 : 15).setDisplayName("§r").build());
+			
+			inv.setItem(11, new ItemBuilder(1).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step2.Default.DisplayName")).setSkullOwner(p.getName()).build());
+			inv.setItem(13, new ItemBuilder(1).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step2.Normal.DisplayName")).build());
+			inv.setItem(15, new ItemBuilder(1).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step2.Random.DisplayName")).setSkullOwner("MHF_Question").build());
+			
+			p.openInventory(inv);
+		} else if(args.length == 2) {
+			if(p.hasPermission("nick.customnickname")) {
+				Inventory inv = Bukkit.createInventory(null, 27, guiFileUtils.getConfigString("RankedNickGUI.Step3.InventoryTitle"));
+				
+				for (int i = 0; i < inv.getSize(); i++)
+					inv.setItem(i, new ItemBuilder(Material.getMaterial(isNewVersion() ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, isNewVersion() ? 0 : 15).setDisplayName("§r").build());
+				
+				inv.setItem(12, new ItemBuilder(Material.valueOf((isNewVersion() && !(eazyNick.getVersion().startsWith("1_13"))) ? "OAK_SIGN" : "SIGN")).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step3.Custom.DisplayName")).build());
+				inv.setItem(14, new ItemBuilder(1).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step3.Random.DisplayName")).setSkullOwner("MHF_Question").build());
+				
+				p.openInventory(inv);
+			} else
+				openRankedNickGUI(p, text + " RANDOM");
+		} else {
+			Inventory inv = Bukkit.createInventory(null, 27, guiFileUtils.getConfigString("RankedNickGUI.Step4.InventoryTitle").replace("%nickName%", args[2]));
+			
+			for (int i = 0; i < inv.getSize(); i++)
+				inv.setItem(i, new ItemBuilder(Material.getMaterial(isNewVersion() ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, isNewVersion() ? 0 : 15).setDisplayName("§r").build());
+			
+			inv.setItem(11, new ItemBuilder(Material.valueOf(isNewVersion() ? "LIME_WOOL" : "WOOL"), 1, isNewVersion() ? 0 : 5).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step4.Use.DisplayName")).build());
+			inv.setItem(13, new ItemBuilder(1).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step4.Retry.DisplayName")).build());
+			inv.setItem(15, new ItemBuilder(Material.valueOf((isNewVersion() && !(eazyNick.getVersion().startsWith("1_13"))) ? "OAK_SIGN" : "SIGN")).setDisplayName(guiFileUtils.getConfigString("RankedNickGUI.Step4.Custom.DisplayName")).build());
+			
+			p.openInventory(inv);
 		}
 	}
 
@@ -622,16 +922,16 @@ public class Utils {
 		return notPlayer;
 	}
 	
+	public String getLastChatMessage() {
+		return lastChatMessage;
+	}
+	
 	public Field getNameField() {
 		return nameField;
 	}
 	
 	public Field getUUIDField() {
 		return uuidField;
-	}
-	
-	public PagesHandler<String> getNickNamesHandler() {
-		return nickNamesHandler;
 	}
 	
 	public ArrayList<UUID> getNickedPlayers() {
@@ -678,8 +978,8 @@ public class Utils {
 		return canUseNick;
 	}
 	
-	public HashMap<UUID, Integer> getNickNameListPage() {
-		return nickNameListPage;
+	public HashMap<UUID, Integer> getNickNameListPages() {
+		return nickNameListPages;
 	}
 	
 	public HashMap<UUID, String[]> getOldPermissionsExGroups() {
@@ -774,12 +1074,12 @@ public class Utils {
 		return groupNames;
 	}
 	
-	public String getLastChatMessage() {
-		return lastChatMessage;
+	public HashMap<UUID, String> getLastGUITexts() {
+		return lastGUITexts;
 	}
 	
-	public void setNickNamesHandler(PagesHandler<String> nickNamesHandler) {
-		this.nickNamesHandler = nickNamesHandler;
+	public HashMap<UUID, String> getPlayersTypingNameInChat() {
+		return playersTypingNameInChat;
 	}
 	
 	public void setNameField(Field nameField) {

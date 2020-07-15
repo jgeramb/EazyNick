@@ -25,13 +25,13 @@ public class NMSBookBuilder {
 	}
 	
 	public ItemStack create(String title, BookPage... bookPages) {
-		ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-		BookMeta m = (BookMeta) is.getItemMeta();
-		m.setTitle(title);
-		m.setAuthor("");
+		ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK);
+		BookMeta bookMeta = (BookMeta) itemStack.getItemMeta();
+		bookMeta.setTitle(title);
+		bookMeta.setAuthor(eazyNick.getDescription().getName());
 		
 		try {
-			List<Object> list = (List<Object>) reflectUtils.getField(reflectUtils.getCraftClass("inventory.CraftMetaBook"), "pages").get(m);
+			List<Object> list = (List<Object>) reflectUtils.getField(reflectUtils.getCraftClass("inventory.CraftMetaBook"), "pages").get(bookMeta);
 			
 			for (BookPage bookPage : bookPages) {
 				if(!(bookPage.isEmpty()))
@@ -41,9 +41,9 @@ public class NMSBookBuilder {
 			e.printStackTrace();
 		}
 		
-		is.setItemMeta(m);
+		itemStack.setItemMeta(bookMeta);
 		
-		return is;
+		return itemStack;
 	}
 	
 }

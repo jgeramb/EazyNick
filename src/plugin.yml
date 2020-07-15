@@ -1,9 +1,9 @@
 name: EazyNick
-version: 2.17
+version: 2.18
 author: Justix
 main: net.dev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)
-website: https://www.spigotmc.org/resources/eazynick-autonicksystem-api-src-bungeecord-multiworld-1-7-10-1-15-x.51398/
+website: https://www.spigotmc.org/resources/eazynick-autonicksystem-api-src-bungeecord-multiworld-1-7-10-1-16-x.51398/
 api-version: 1.13
 softdepend: [PlaceholderAPI, CloudNetAPI, ColoredTags, NametagEdit, PermissionsEx, LuckPerms, Datenschutz, UltraPermissions, Vault, SurvivalGames, AuthMe, TAB, DeluxeChat, ChatControl]
 
@@ -56,9 +56,9 @@ commands:
       bookgui:
         permission: nick.gui
         description: Opens a Nick-GUI like HyPixel.net
-      booknick:
+      guinick:
         permission: nick.use
-        description: This command is only for the plugin, you do not require to know for what this is
+        description: This command is only for the plugin, you do not require to know what this is for
       reloadconfig:
         permission: nick.reload
         description: Reloads the configuration file

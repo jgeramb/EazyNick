@@ -15,8 +15,9 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
-import net.dev.eazynick.utils.BookGUIFileUtils;
 import net.dev.eazynick.utils.FileUtils;
+import net.dev.eazynick.utils.GUIFileUtils;
+import net.dev.eazynick.utils.ItemBuilder;
 import net.dev.eazynick.utils.LanguageFileUtils;
 import net.dev.eazynick.utils.Utils;
 
@@ -28,7 +29,7 @@ public class PlayerJoinListener implements Listener {
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		BookGUIFileUtils bookGUIFileUtils = eazyNick.getBookGUIFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
@@ -130,24 +131,24 @@ public class PlayerJoinListener implements Listener {
 					if (fileUtils.getConfig().getBoolean("NickItem.getOnJoin")) {
 						if (p.hasPermission("nick.item")) {
 							if (!(mysqlNickManager.isPlayerNicked(p.getUniqueId())))
-								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, utils.createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")));
+								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 							else
-								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, utils.createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled"), languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")));
+								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
 						}
 					}
 				} else {
 					if (fileUtils.getConfig().getBoolean("NickItem.getOnJoin")) {
 						if (p.hasPermission("nick.item")) {
 							if (fileUtils.getConfig().getBoolean("NickOnWorldChange"))
-								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, utils.createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")));
+								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 							else
-								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, utils.createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")));
+								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 						}
 					}
 				}
 				
 				if (fileUtils.getConfig().getBoolean("JoinNick")) {
-					if (!(api.isNicked())) {
+					if (!(api.isNicked()) && p.hasPermission("nick.use")) {
 						Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
 							@Override
@@ -181,13 +182,13 @@ public class PlayerJoinListener implements Listener {
 							String nickName = utils.getPlayerNicknames().get(p.getUniqueId()), skinName = utils.getLastSkinNames().get(p.getUniqueId()), rankName = api.getGroupName(), chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "";
 							
 							for (int i = 1; i <= 18; i++) {
-								if(rankName.equals(bookGUIFileUtils.getConfig().getString("BookGUI.Rank" + i + ".RankName"))) {
-									chatPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
-									chatSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
-									tabPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
-									tabSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
-									tagPrefix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
-									tagSuffix = bookGUIFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+								if(rankName.equals(guiFileUtils.getConfig().getString("RankGUI.Rank" + i + ".RankName"))) {
+									chatPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
+									chatSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
+									tabPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
+									tabSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
+									tagPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
+									tagSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
 								}
 							}
 							

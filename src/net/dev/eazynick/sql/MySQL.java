@@ -36,7 +36,7 @@ public class MySQL {
 				System.out.println(PREFIX + " Address: " + host + ":" + port);
 				System.out.println(PREFIX + " Database: " + database);
 				System.out.println(PREFIX + " Username: " + username);
-				System.out.println(PREFIX + " Password: " + username);
+				System.out.println(PREFIX + " Password: " + password);
 			}
 		}
 	}

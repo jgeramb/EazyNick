@@ -77,6 +77,7 @@ public class FileUtils {
 		cfg.addDefault("RandomDisguiseDelay", false);
 		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
+		cfg.addDefault("UseRankedNickGUI", false);
 		cfg.addDefault("UseSignGUIForCustomName", true);
 		cfg.addDefault("AllowBookGUICustomName", true);
 		cfg.addDefault("AllowBookGUISkinFromName", false);

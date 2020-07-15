@@ -53,15 +53,6 @@ public class LanguageFileUtils {
 			cfg.addDefault("NickItem.BungeeCord.DisplayName.Enabled", "&a&lAutomatischer Nickname &7(Rechtsklick)");
 			cfg.addDefault("NickItem.BungeeCord.DisplayName.Disabled", "&c&lAutomatischer Nickname &7(Rechtsklick)");
 	
-			cfg.addDefault("NickGUI.InventoryTitle", "&5Nick&8:");
-			cfg.addDefault("NickGUI.NickItem.DisplayName", "&aNick");
-			cfg.addDefault("NickGUI.UnnickItem.DisplayName", "&cUnnick");
-	
-			cfg.addDefault("NickNameGUI.InventoryTitle", "&5Nick &7[&aSeite %currentPage%&7]&8: ");
-			cfg.addDefault("NickNameGUI.BackItem.DisplayName", "&8[&e<--&8] &7Zurueck");
-			cfg.addDefault("NickNameGUI.NextItem.DisplayName", "&7Weiter &8[&e-->&8]");
-			cfg.addDefault("NickNameGUI.NickNameSkull.DisplayName", "&e&l%nickName%");
-			
 			cfg.addDefault("Messages.Prefix", "&8[&5NICK&8] ");
 			cfg.addDefault("Messages.Nick", "&4Du spielst als&8: &6%name%");
 			cfg.addDefault("Messages.Unnick", "&4Dein Nickname wurde entfernt");
@@ -83,9 +74,6 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.Other.RandomNick", "&4Du hast den Spieler &e%playerName% &4genickt");
 			cfg.addDefault("Messages.Other.SelectedNick", "&4Du hast den Nicknamen von dem Spieler &e%playerName% &4auf &e%nickName% &4gesetzt");
 			cfg.addDefault("Messages.Other.Unnick", "&4Du hast den Spieler &e%playerName% &4entnickt");
-			cfg.addDefault("Messages.NoMorePages", "&cEs sind keine weiteren Seiten verfuegbar");
-			cfg.addDefault("Messages.NoMorePagesCanBeLoaded", "&cEs koennen keine weiteren Seiten geladen werden!");
-			cfg.addDefault("Messages.CommandNotAvaiableForThatVersion", "&cDieser Befehl kann in dieser Minecraft-Version nicht benutzt werden!");
 			cfg.addDefault("Messages.ReloadConfig", "&4Die Konfigurationsdatei wurde &eneu geladen&4!");
 			cfg.addDefault("Messages.FixSkin", "&4Dein Skin wurde &aerfolgreich &4gefixxt!");
 			cfg.addDefault("Messages.ResetSkin", "&4Dein Skin wurde &aerfolgreich &4zurueckgesetzt!");
@@ -98,6 +86,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.NickedPlayers.CurrentNickedPlayers", "&4Hier ist eine Liste von allen genickten Spielern&8:");
 			cfg.addDefault("Messages.NickedPlayers.PlayerINFO", "&5%realName% &7-> &6%nickName%");
 			cfg.addDefault("Messages.NickedPlayers.NoPlayerIsNicked", "&cDerzeit ist kein Spieler genickt");
+			cfg.addDefault("Messages.TypeNameInChat", "&4Bitte schreibe den Namen in den Chat&8:");
 		} else {
 			cfg.addDefault("NickActionBarMessage", "%prefix%&4You are playing as&8: &6%nickName%");
 			
@@ -110,15 +99,6 @@ public class LanguageFileUtils {
 			cfg.addDefault("NickItem.WorldChange.DisplayName.Disabled", "&c&lAutomatic Nickname &7(rightclick)");
 			cfg.addDefault("NickItem.BungeeCord.DisplayName.Enabled", "&a&lAutomatic Nickname &7(rightclick)");
 			cfg.addDefault("NickItem.BungeeCord.DisplayName.Disabled", "&c&lAutomatic Nickname &7(rightclick)");
-	
-			cfg.addDefault("NickGUI.InventoryTitle", "&5Nick&8:");
-			cfg.addDefault("NickGUI.NickItem.DisplayName", "&aNick");
-			cfg.addDefault("NickGUI.UnnickItem.DisplayName", "&cUnnick");
-	
-			cfg.addDefault("NickNameGUI.InventoryTitle", "&5Nick &7[&aPage %currentPage%&7]&8: ");
-			cfg.addDefault("NickNameGUI.BackItem.DisplayName", "&8[&e<--&8] &7Back");
-			cfg.addDefault("NickNameGUI.NextItem.DisplayName", "&7Next &8[&e-->&8]");
-			cfg.addDefault("NickNameGUI.NickNameSkull.DisplayName", "&e&l%nickName%");
 			
 			cfg.addDefault("Messages.Prefix", "&8[&5NICK&8] ");
 			cfg.addDefault("Messages.Nick", "&4You are playing as&8: &6%name%");
@@ -141,8 +121,6 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.Other.RandomNick", "&4You nicked the player &e%playerName%");
 			cfg.addDefault("Messages.Other.SelectedNick", "&4You set the nickname of &e%playerName% &4to &e%nickName%");
 			cfg.addDefault("Messages.Other.Unnick", "&4You removed the nickname of player &e%playerName%");
-			cfg.addDefault("Messages.NoMorePages", "&cThere are no more pages");
-			cfg.addDefault("Messages.NoMorePagesCanBeLoaded", "&cNo more pages can be loaded.");
 			cfg.addDefault("Messages.CommandNotAvaiableForThatVersion", "&cThis command can't be used in this version");
 			cfg.addDefault("Messages.ReloadConfig", "&4The configuration file was &ereloaded&4!");
 			cfg.addDefault("Messages.FixSkin", "&4Your skin has been fixed &asuccessfully &4!");
@@ -156,6 +134,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.NickedPlayers.CurrentNickedPlayers", "&4Here is a list of all nicked players&8:");
 			cfg.addDefault("Messages.NickedPlayers.PlayerINFO", "&5%realName% &7-> &6%nickName%");
 			cfg.addDefault("Messages.NickedPlayers.NoPlayerIsNicked", "&cCurrently no player is nicked");
+			cfg.addDefault("Messages.TypeNameInChat", "&4Please type the name you want to use in chat&8:");
 		}
 		
 		cfg.options().copyDefaults(true);

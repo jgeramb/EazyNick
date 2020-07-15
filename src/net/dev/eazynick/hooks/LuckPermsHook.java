@@ -42,8 +42,7 @@ public class LuckPermsHook {
 		}
 		
 		if(fileUtils.getConfig().getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
-			if(!(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())))
-				utils.getOldLuckPermsGroups().put(p.getUniqueId(), user.getPrimaryGroup());
+			utils.getOldLuckPermsGroups().put(p.getUniqueId(), user.getPrimaryGroup());
 			
 			removeAllGroups(user);
 			
@@ -68,11 +67,13 @@ public class LuckPermsHook {
 		}
 		
 		if(fileUtils.getConfig().getBoolean("SwitchLuckPermsGroupByNicking")) {
-			removeAllGroups(user);
-			
-			user.data().add(net.luckperms.api.node.types.InheritanceNode.builder(utils.getOldLuckPermsGroups().get(p.getUniqueId())).build());
-			
-			utils.getOldLuckPermsGroups().remove(p.getUniqueId());
+			if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())) {
+				removeAllGroups(user);
+				
+				user.data().add(net.luckperms.api.node.types.InheritanceNode.builder(utils.getOldLuckPermsGroups().get(p.getUniqueId())).build());
+				
+				utils.getOldLuckPermsGroups().remove(p.getUniqueId());
+			}
 		}
 		
 		api.getUserManager().saveUser(user);

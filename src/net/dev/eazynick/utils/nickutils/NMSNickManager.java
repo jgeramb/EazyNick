@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -48,13 +49,13 @@ public class NMSNickManager extends ReflectUtils {
 			
 			Field f = getNMSClass("EntityPlayer").getDeclaredField("listName");
 			f.setAccessible(true);
-			f.set(entityPlayer, name.equals(playerName) ? null : ((eazyNick.getVersion().startsWith("1_15") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_13")) ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, name) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, name))[0]));
+			f.set(entityPlayer, name.equals(playerName) ? null : (utils.isNewVersion() ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, name) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, name))[0]));
 			f.setAccessible(false);
 
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 			
-			Class<?> enumPlayerInfoAction = eazyNick.getVersion().equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(eazyNick.getVersion().equals("1_11_R1") || eazyNick.getVersion().equals("1_12_R1") || eazyNick.getVersion().startsWith("1_13") || eazyNick.getVersion().startsWith("1_14") || eazyNick.getVersion().startsWith("1_15")) ? 1 : 2];
+			Class<?> enumPlayerInfoAction = eazyNick.getVersion().equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(eazyNick.getVersion().equals("1_11_R1") || eazyNick.getVersion().equals("1_12_R1") || utils.isNewVersion()) ? 1 : 2];
 			Object packet = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray);
 			
 			sendPacket(p, packet, false);
@@ -294,7 +295,12 @@ public class NMSNickManager extends ReflectUtils {
 
 						api.changeSkin(skinName);
 						
-						if(version.startsWith("1_15")) {
+						if(version.startsWith("1_16")) {
+							Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
+							Class<?> enumGameMode = getNMSClass("EnumGamemode");
+							
+							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, p.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
+						} else if(version.startsWith("1_15")) {
 							Class<?> dimensionManager = getNMSClass("DimensionManager");
 							Class<?> worldType = getNMSClass("WorldType");
 							Class<?> enumGameMode = getNMSClass("EnumGamemode");
@@ -432,7 +438,7 @@ public class NMSNickManager extends ReflectUtils {
 			for (String string : toRemove)
 				map.remove(string);
 			
-			map.put(p.getName(), p.getClass().getMethod("getHandle").invoke(p));
+			map.put(eazyNick.getVersion().startsWith("1_16") ? p.getName().toLowerCase(Locale.ROOT) : p.getName(), p.getClass().getMethod("getHandle").invoke(p));
 			
 			f.set(playerList, map);
 			f.setAccessible(false);

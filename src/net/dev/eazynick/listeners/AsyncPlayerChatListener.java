@@ -16,6 +16,23 @@ import me.clip.placeholderapi.PlaceholderAPI;
 
 public class AsyncPlayerChatListener implements Listener {
 
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onFirstAsyncPlayerChat(AsyncPlayerChatEvent e) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		Utils utils = eazyNick.getUtils();
+		
+		Player p = e.getPlayer();
+		
+		if(utils.getPlayersTypingNameInChat().containsKey(p.getUniqueId())) {
+			String[] args = (utils.getPlayersTypingNameInChat().get(p.getUniqueId()) + " " + e.getMessage().trim()).split(" ");
+			
+			utils.getPlayersTypingNameInChat().remove(p.getUniqueId());
+			utils.performRankedNick(p, args[0], args[1], args[2]);
+			
+			e.setCancelled(true);
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled=true)
 	public void onAsyncPlayerChat(AsyncPlayerChatEvent e) {
 		EazyNick eazyNick = EazyNick.getInstance();

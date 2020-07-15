@@ -24,6 +24,7 @@ import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.hooks.TABHook;
 import net.dev.eazynick.utils.ActionBarUtils;
 import net.dev.eazynick.utils.FileUtils;
+import net.dev.eazynick.utils.ItemBuilder;
 import net.dev.eazynick.utils.LanguageFileUtils;
 import net.dev.eazynick.utils.ReflectUtils;
 import net.dev.eazynick.utils.StringUtils;
@@ -116,8 +117,8 @@ public class NickManager {
 						reflectUtils.setField(survivalGames, "grace", grace);
 						
 						ArrayList<String> spectator = (ArrayList<String>) reflectUtils.getField(SurvivalGames.class, "spectator").get(survivalGames);
+						spectator.remove(p.getName());
 					    spectator.add(nickName);
-				    	spectator.remove(p.getName());
 					    reflectUtils.setField(survivalGames, "spectator", spectator);
 					}
 				} catch (Exception e) {
@@ -227,7 +228,7 @@ public class NickManager {
 				
 				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
 					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(eazyNick.getLanguageFileUtils().getConfigString("NickItem.DisplayName.Disabled")))
-						p.getInventory().setItem(slot, utils.createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled"), languageFileUtils.getConfigString("NickItem.DisplayName.Enabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")));
+						p.getInventory().setItem(slot, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
 				}
 			}
 		}
@@ -370,7 +371,7 @@ public class NickManager {
 				
 				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
 					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(eazyNick.getLanguageFileUtils().getConfigString("NickItem.DisplayName.Enabled")))
-						p.getInventory().setItem(slot, utils.createItem(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled"), languageFileUtils.getConfigString("NickItem.DisplayName.Disabled"), languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").replace("&n", "\n"), fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")));
+						p.getInventory().setItem(slot, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 				}
 			}
 		}

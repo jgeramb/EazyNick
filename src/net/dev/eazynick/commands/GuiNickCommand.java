@@ -9,7 +9,7 @@ import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.utils.Utils;
 
-public class BookNickCommand implements CommandExecutor {
+public class GuiNickCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

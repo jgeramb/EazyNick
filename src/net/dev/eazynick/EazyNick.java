@@ -12,20 +12,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mojang.authlib.GameProfile;
 
-import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.commands.BookGUICommand;
-import net.dev.eazynick.commands.BookNickCommand;
 import net.dev.eazynick.commands.ChangeSkinCommand;
-import net.dev.eazynick.commands.CommandNotAvaiableCommand;
 import net.dev.eazynick.commands.FixSkinCommand;
+import net.dev.eazynick.commands.GuiNickCommand;
 import net.dev.eazynick.commands.HelpCommand;
 import net.dev.eazynick.commands.NameCommand;
 import net.dev.eazynick.commands.NickCommand;
-import net.dev.eazynick.commands.NickGuiCommand;
+import net.dev.eazynick.commands.NickGUICommand;
 import net.dev.eazynick.commands.NickListCommand;
 import net.dev.eazynick.commands.NickOtherCommand;
 import net.dev.eazynick.commands.NickUpdateCheckCommand;
 import net.dev.eazynick.commands.NickedPlayersCommand;
+import net.dev.eazynick.commands.RankedNickGUICommand;
 import net.dev.eazynick.commands.ReNickCommand;
 import net.dev.eazynick.commands.RealNameCommand;
 import net.dev.eazynick.commands.ReloadConfigCommand;
@@ -52,8 +51,8 @@ import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
 import net.dev.eazynick.updater.SpigotUpdater;
 import net.dev.eazynick.utils.ActionBarUtils;
-import net.dev.eazynick.utils.BookGUIFileUtils;
 import net.dev.eazynick.utils.FileUtils;
+import net.dev.eazynick.utils.GUIFileUtils;
 import net.dev.eazynick.utils.LanguageFileUtils;
 import net.dev.eazynick.utils.MineSkinAPI;
 import net.dev.eazynick.utils.NickNameFileUtils;
@@ -93,7 +92,7 @@ public class EazyNick extends JavaPlugin {
 	private ActionBarUtils actionBarUtils;
 	private FileUtils fileUtils;
 	private NickNameFileUtils nickNameFileUtils;
-	private BookGUIFileUtils bookGUIFileUtils;
+	private GUIFileUtils guiFileUtils;
 	private LanguageFileUtils languageFileUtils;
 	private ReflectUtils reflectUtils;
 	private NMSBookBuilder nmsBookBuilder;
@@ -116,7 +115,12 @@ public class EazyNick extends JavaPlugin {
 			
 			@Override
 			public void run() {
+				reflectUtils = new ReflectUtils();
+				
 				PluginManager pm = Bukkit.getPluginManager();
+				String reflectVersion = reflectUtils.getVersion();
+				
+				version = reflectVersion.substring(1);
 				
 				pluginFile = getFile();
 
@@ -124,9 +128,8 @@ public class EazyNick extends JavaPlugin {
 				actionBarUtils = new ActionBarUtils();
 				fileUtils = new FileUtils();
 				nickNameFileUtils = new NickNameFileUtils();
-				bookGUIFileUtils = new BookGUIFileUtils();
+				guiFileUtils = new GUIFileUtils();
 				spigotUpdater = new SpigotUpdater();
-				reflectUtils = new ReflectUtils();
 				signGUI = new SignGUI();
 				nmsBookBuilder = new NMSBookBuilder();
 				nmsBookUtils = new NMSBookUtils();
@@ -138,15 +141,13 @@ public class EazyNick extends JavaPlugin {
 				utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
 				utils.sendConsole("");
 
-				String reflectVersion = reflectUtils.getVersion();
-				
 				if (!(reflectVersion.equals("v1_7_R4") || reflectVersion.equals("v1_8_R1")
 						|| reflectVersion.equals("v1_8_R2") || reflectVersion.equals("v1_8_R3")
 						|| reflectVersion.equals("v1_9_R1") || reflectVersion.equals("v1_9_R2")
 						|| reflectVersion.equals("v1_10_R1") || reflectVersion.equals("v1_11_R1")
 						|| reflectVersion.equals("v1_12_R1") || reflectVersion.equals("v1_13_R1")
 						|| reflectVersion.equals("v1_13_R2") || reflectVersion.equals("v1_14_R1")
-						|| reflectVersion.equals("v1_15_R1"))) {
+						|| reflectVersion.equals("v1_15_R1") || reflectVersion.equals("v1_16_R1"))) {
 					utils.sendConsole("§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 
 					isCancelled = true;
@@ -170,9 +171,6 @@ public class EazyNick extends JavaPlugin {
 						}
 					}
 
-					version = reflectVersion.substring(1);
-					
-
 					if(fileUtils.getConfig().getBoolean("OverwriteMessagePackets")) {
 						if(version.equals("1_7_R4"))
 							new PacketInjector_1_7().init();
@@ -180,7 +178,7 @@ public class EazyNick extends JavaPlugin {
 							new PacketInjector().init();
 					}
 					
-					if (fileUtils.getConfig().getBoolean("APIMode") == false) {
+					if (!(fileUtils.getConfig().getBoolean("APIMode"))) {
 						getCommand("eazynick").setExecutor(new HelpCommand());
 						getCommand("nickother").setExecutor(new NickOtherCommand());
 						getCommand("changeskin").setExecutor(new ChangeSkinCommand());
@@ -197,15 +195,9 @@ public class EazyNick extends JavaPlugin {
 						getCommand("nickupdatecheck").setExecutor(new NickUpdateCheckCommand());
 						getCommand("togglebungeenick").setExecutor(new ToggleBungeeNickCommand());
 						getCommand("realname").setExecutor(new RealNameCommand());
-						getCommand("nickgui").setExecutor(new NickGuiCommand());
-
-						if(!(version.equalsIgnoreCase("1_7_R4"))) {
-							getCommand("bookgui").setExecutor(new BookGUICommand());
-							getCommand("booknick").setExecutor(new BookNickCommand());
-						} else {
-							getCommand("bookgui").setExecutor(new CommandNotAvaiableCommand());
-							getCommand("booknick").setExecutor(new CommandNotAvaiableCommand());
-						}
+						getCommand("nickgui").setExecutor(fileUtils.getConfig().getBoolean("UseRankedNickGUI") ? new RankedNickGUICommand() : new NickGUICommand());
+						getCommand("guinick").setExecutor(new GuiNickCommand());
+						getCommand("bookgui").setExecutor(version.startsWith("1_7") ? new RankedNickGUICommand() : new BookGUICommand());
 						
 						pm.registerEvents(new PlayerNickListener(), instance);
 						pm.registerEvents(new PlayerUnnickListener(), instance);
@@ -290,7 +282,7 @@ public class EazyNick extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		new ArrayList<>(utils.getNickedPlayers()).forEach(uuid -> new NickManager(Bukkit.getPlayer(uuid)).unnickPlayerWithoutRemovingMySQL(false));
+		new ArrayList<>(utils.getNickedPlayers()).forEach(uuid -> Bukkit.getPlayer(uuid).kickPlayer("§cYou will need to reconnect in order to be able to play properly"));
 		
 		if (fileUtils.getConfig().getBoolean("BungeeCord"))
 			mysql.disconnect();
@@ -343,8 +335,8 @@ public class EazyNick extends JavaPlugin {
 		return nickNameFileUtils;
 	}
 	
-	public BookGUIFileUtils getBookGUIFileUtils() {
-		return bookGUIFileUtils;
+	public GUIFileUtils getGuiFileUtils() {
+		return guiFileUtils;
 	}
 	
 	public LanguageFileUtils getLanguageFileUtils() {

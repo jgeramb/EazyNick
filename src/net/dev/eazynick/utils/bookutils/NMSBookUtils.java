@@ -17,40 +17,48 @@ public class NMSBookUtils extends ReflectUtils {
 		
 		ItemStack hand = p.getItemInHand();
 		
-		try {
-			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
-			Class<?> craftItemStackClass = getCraftClass("inventory.CraftItemStack");
-			Object nmsItemStack = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class).invoke(craftItemStackClass, book);
-			
-			p.setItemInHand(book);
-			
-			if(!(eazyNick.getVersion().startsWith("1_8"))) {
-				Class<?> enumHand = getNMSClass("EnumHand");
-				Object mainHand = getField(enumHand, "MAIN_HAND").get(enumHand);
+		p.setItemInHand(book);
+		
+		Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
+			try {
+				Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
+				Class<?> craftItemStackClass = getCraftClass("inventory.CraftItemStack");
+				Object nmsItemStack = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, book);
 				
-				if(Bukkit.getVersion().contains("1.14.4") || eazyNick.getVersion().startsWith("1_15")) {
-					Class<?> itemWrittenBook = getNMSClass("ItemWrittenBook");
+				if(!(eazyNick.getVersion().startsWith("1_7") || eazyNick.getVersion().startsWith("1_8"))) {
+					Class<?> enumHand = getNMSClass("EnumHand");
+					Object mainHand = getField(enumHand, "MAIN_HAND").get(enumHand);
 					
-					if ((boolean) itemWrittenBook.getMethod("a", getNMSClass("ItemStack"), getNMSClass("CommandListenerWrapper"), getNMSClass("EntityHuman")).invoke(itemWrittenBook, nmsItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {
-						Object activeContainer = entityPlayer.getClass().getField("activeContainer").get(entityPlayer);
+					if(Bukkit.getVersion().contains("1.14.4") || eazyNick.getVersion().startsWith("1_15") || eazyNick.getVersion().startsWith("1_16")) {
+						Class<?> itemWrittenBook = getNMSClass("ItemWrittenBook");
 						
-		                activeContainer.getClass().getMethod("c").invoke(activeContainer);
-		            }
+						if ((boolean) itemWrittenBook.getMethod("a", getNMSClass("ItemStack"), getNMSClass("CommandListenerWrapper"), getNMSClass("EntityHuman")).invoke(itemWrittenBook, nmsItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {
+							Object activeContainer = entityPlayer.getClass().getField("activeContainer").get(entityPlayer);
+							
+			                activeContainer.getClass().getMethod("c").invoke(activeContainer);
+			            }
+						
+			            Object packet = getNMSClass("PacketPlayOutOpenBook").getConstructor(enumHand).newInstance(mainHand);
+						Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
+						playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
+					} else
+						entityPlayer.getClass().getMethod("a", getNMSClass("ItemStack"), enumHand).invoke(entityPlayer, nmsItemStack, mainHand);
+				} else {
+					Object packet;
 					
-		            Object packet = getNMSClass("PacketPlayOutOpenBook").getConstructor(enumHand).newInstance(mainHand);
+					if(eazyNick.getVersion().startsWith("1_7"))
+						packet = getNMSClass("PacketPlayOutCustomPayload").getConstructor(String.class, net.minecraft.util.io.netty.buffer.ByteBuf.class).newInstance("MC|BOpen", net.minecraft.util.io.netty.buffer.Unpooled.EMPTY_BUFFER);
+					else
+						packet = getNMSClass("PacketPlayOutCustomPayload").getConstructor(String.class, getNMSClass("PacketDataSerializer")).newInstance("MC|BOpen", getNMSClass("PacketDataSerializer").getConstructor(ByteBuf.class).newInstance(Unpooled.EMPTY_BUFFER));
+				
 					Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
 					playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
-				} else
-					entityPlayer.getClass().getMethod("a", getNMSClass("ItemStack"), enumHand).invoke(entityPlayer, nmsItemStack, mainHand);
-			} else {
-				Object packet = getNMSClass("PacketPlayOutCustomPayload").getConstructor(String.class, getNMSClass("PacketDataSerializer")).newInstance("MC|BOpen", getNMSClass("PacketDataSerializer").getConstructor(ByteBuf.class).newInstance(Unpooled.buffer()));
-				Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
-				playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			} finally {
+				p.setItemInHand(hand);
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			p.setItemInHand(hand);
-		}
+		}, 2);
 	}
 }

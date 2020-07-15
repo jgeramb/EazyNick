@@ -25,15 +25,23 @@ public class BookPage {
 		EazyNick eazyNick = EazyNick.getInstance();
 		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
 		
+		Class<?> chatSerializer = (eazyNick.getVersion().startsWith("1_7") || eazyNick.getVersion().equals("1_8_R1")) ? reflectUtils.getNMSClass("ChatSerializer") : reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
+		
 		try {
-			Class<?> chatSerializer = eazyNick.getVersion().equals("1_8_R1") ? reflectUtils.getNMSClass("ChatSerializer") : reflectUtils.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
-			
+			return chatSerializer.getMethod("a", String.class).invoke(chatSerializer, getAsString());
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	private String getAsString() {
+		try {
 			TextComponent text = new TextComponent("");
 			
 			for (TextComponent tc : texts)
 				text.addExtra(tc);
 			
-			return chatSerializer.getMethod("a", String.class).invoke(chatSerializer, ComponentSerializer.toString(text));
+			return ComponentSerializer.toString(text);
 		} catch (Exception e) {
 			return null;
 		}

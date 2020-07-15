@@ -1,14 +1,17 @@
 package net.dev.eazynick.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.api.NickManager;
+import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.utils.Utils;
 
-public class CommandNotAvaiableCommand implements CommandExecutor {
+public class RankedNickGUICommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -18,14 +21,17 @@ public class CommandNotAvaiableCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			
-			if(p.hasPermission("nick.use"))
-				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString("Messages.CommandNotAvaiableForThatVersion"));
-			else
+			if(p.hasPermission("nick.gui")) {
+				if(new NickManager(p).isNicked())
+					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
+				else
+					utils.openRankedNickGUI(p, "");
+			} else
 				p.sendMessage(utils.getNoPerm());
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		
 		return true;
 	}
-	
+
 }

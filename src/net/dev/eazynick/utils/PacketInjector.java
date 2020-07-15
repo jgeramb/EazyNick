@@ -101,7 +101,7 @@ public class PacketInjector {
 				Class<?> chatSerializer = version.equals("1_8_R1") ? reflectUtils.getNMSClass("ChatSerializer") : iChatBaseComponentClass.getDeclaredClasses()[0];
 				
 				String fullText = "";
-				Method method = iChatBaseComponentClass.getDeclaredMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15")) ? "getSiblings" : "a");
+				Method method = iChatBaseComponentClass.getDeclaredMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16")) ? "getSiblings" : "a");
 				method.setAccessible(true);
 				
 				for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {
