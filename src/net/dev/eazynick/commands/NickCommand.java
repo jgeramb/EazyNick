@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.PlayerUnnickEvent;
@@ -32,7 +33,23 @@ public class NickCommand implements CommandExecutor {
 					if(utils.getNickedPlayers().contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					else {
-						if(args.length == 0)
+						if(fileUtils.getConfig().getBoolean("OpenBookGUIOnNickCommand")) {
+							if(!(p.hasPermission("nick.gui"))) {
+								PermissionAttachment pa = p.addAttachment(eazyNick);
+								pa.setPermission("nick.gui", true);
+								p.recalculatePermissions();
+								
+								p.chat("/bookgui");
+								
+								p.removeAttachment(pa);
+								p.recalculatePermissions();
+							} else
+								p.chat("/bookgui");
+						} else if(fileUtils.getConfig().getBoolean("OpenNickListGUIOnNickCommand"))
+							utils.openNickList(p, 0);
+						else if(fileUtils.getConfig().getBoolean("OpenRankedNickGUIOnNickCommand"))
+							utils.openRankedNickGUI(p, "");
+						else if(args.length == 0)
 							utils.performNick(p, "RANDOM");
 						else {
 							if(p.hasPermission("nick.customnickname")) {

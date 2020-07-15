@@ -36,6 +36,7 @@ import net.dev.eazynick.hooks.DeluxeChatListener;
 import net.dev.eazynick.hooks.PlaceHolderExpansion;
 import net.dev.eazynick.listeners.AsyncPlayerChatListener;
 import net.dev.eazynick.listeners.InventoryClickListener;
+import net.dev.eazynick.listeners.InventoryCloseListener;
 import net.dev.eazynick.listeners.PlayerChangedWorldListener;
 import net.dev.eazynick.listeners.PlayerCommandPreprocessListener;
 import net.dev.eazynick.listeners.PlayerDeathListener;
@@ -195,7 +196,7 @@ public class EazyNick extends JavaPlugin {
 						getCommand("nickupdatecheck").setExecutor(new NickUpdateCheckCommand());
 						getCommand("togglebungeenick").setExecutor(new ToggleBungeeNickCommand());
 						getCommand("realname").setExecutor(new RealNameCommand());
-						getCommand("nickgui").setExecutor(fileUtils.getConfig().getBoolean("UseRankedNickGUI") ? new RankedNickGUICommand() : new NickGUICommand());
+						getCommand("nickgui").setExecutor(fileUtils.getConfig().getBoolean("OpenRankedNickGUIOnNickGUICommand") ? new RankedNickGUICommand() : new NickGUICommand());
 						getCommand("guinick").setExecutor(new GuiNickCommand());
 						getCommand("bookgui").setExecutor(version.startsWith("1_7") ? new RankedNickGUICommand() : new BookGUICommand());
 						
@@ -206,6 +207,7 @@ public class EazyNick extends JavaPlugin {
 						pm.registerEvents(new PlayerCommandPreprocessListener(), instance);
 						pm.registerEvents(new PlayerDropItemListener(), instance);
 						pm.registerEvents(new InventoryClickListener(), instance);
+						pm.registerEvents(new InventoryCloseListener(), instance);
 						pm.registerEvents(new PlayerInteractListener(), instance);
 						pm.registerEvents(new PlayerChangedWorldListener(), instance);
 						pm.registerEvents(new PlayerDeathListener(), instance);

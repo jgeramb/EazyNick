@@ -39,103 +39,7 @@ public class InventoryClickListener implements Listener {
 						e.setCancelled(true);
 				}
 				
-				String[] step4Parts = guiFileUtils.getConfigString("RankedNickGUI.Step4.InventoryTitle").split("%nickName%");
-
-				if (title.equalsIgnoreCase(guiFileUtils.getConfigString("RankedNickGUI.Step1.InventoryTitle"))) {
-					e.setCancelled(true);
-					
-					if(!(displayName.equals("§r"))) {
-						for (int i = 1; i <= 18; i++) {
-							if(displayName.equals(guiFileUtils.getConfigString("RankGUI.Rank" + i + ".Rank"))) {
-								utils.openRankedNickGUI(p, guiFileUtils.getConfigString("RankGUI.Rank" + i + ".RankName"));
-								return;
-							}
-						}
-					}
-				} else if (title.equalsIgnoreCase(guiFileUtils.getConfigString("RankedNickGUI.Step2.InventoryTitle"))) {
-					e.setCancelled(true);
-					
-					if(!(displayName.equals("§r")))
-						utils.openRankedNickGUI(p, utils.getLastGUITexts().get(p.getUniqueId()) + (displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step2.Default.DisplayName")) ? " DEFAULT" : (displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step2.Normal.DisplayName")) ? " NORMAL" : " RANDOM")));
-				} else if (title.equalsIgnoreCase(guiFileUtils.getConfigString("RankedNickGUI.Step3.InventoryTitle"))) {
-					e.setCancelled(true);
-					
-					String lastText = utils.getLastGUITexts().get(p.getUniqueId());
-					
-					if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step3.Custom.DisplayName"))) {
-						if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1")) {
-							utils.getPlayersTypingNameInChat().put(p.getUniqueId(), lastText);
-							
-							p.closeInventory();
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.TypeNameInChat"));
-						} else {
-							String[] args = lastText.split(" ");
-							
-							utils.openCustomGUI(p, args[0], args[1]);
-						}
-					} else if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step3.Random.DisplayName"))) {
-						String name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
-						boolean nickNameIsInUse = false;
-						
-						for (String nickName : utils.getPlayerNicknames().values()) {
-							if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-								nickNameIsInUse = true;
-						}
-						
-						while (nickNameIsInUse) {
-							nickNameIsInUse = false;
-							name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
-							
-							for (String nickName : utils.getPlayerNicknames().values()) {
-								if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-									nickNameIsInUse = true;
-							}
-						}
-						
-						utils.openRankedNickGUI(p, lastText + " " + name);
-					}
-				} else if (title.startsWith(step4Parts[0]) && title.endsWith(step4Parts[1])) {
-					e.setCancelled(true);
-					
-					String lastText = utils.getLastGUITexts().get(p.getUniqueId());
-					String[] args = lastText.split(" ");
-					
-					utils.getLastGUITexts().put(p.getUniqueId(), (lastText = args[0] + " " + args[1]));
-					
-					if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step4.Use.DisplayName"))) {
-						p.closeInventory();
-						
-						utils.performRankedNick(p, args[0], args[1], title.replace(step4Parts[0], "").replace(step4Parts[1], ""));
-					} else if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step4.Retry.DisplayName"))) {
-						String name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
-						boolean nickNameIsInUse = false;
-						
-						for (String nickName : utils.getPlayerNicknames().values()) {
-							if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-								nickNameIsInUse = true;
-						}
-						
-						while (nickNameIsInUse) {
-							nickNameIsInUse = false;
-							name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
-							
-							for (String nickName : utils.getPlayerNicknames().values()) {
-								if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-									nickNameIsInUse = true;
-							}
-						}
-						
-						utils.openRankedNickGUI(p, lastText + " " + name);
-					} else if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step4.Custom.DisplayName"))) {
-						if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1")) {
-							utils.getPlayersTypingNameInChat().put(p.getUniqueId(), lastText);
-							
-							p.closeInventory();
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.TypeNameInChat"));
-						} else
-							utils.openCustomGUI(p, args[0], args[1]);
-					}
-				} else if (title.equalsIgnoreCase(guiFileUtils.getConfigString("NickGUI.InventoryTitle"))) {
+				if (title.equalsIgnoreCase(guiFileUtils.getConfigString("NickGUI.InventoryTitle"))) {
 					e.setCancelled(true);
 
 					if (displayName.equalsIgnoreCase(guiFileUtils.getConfigString("NickGUI.Nick.DisplayName"))) {
@@ -156,6 +60,104 @@ public class InventoryClickListener implements Listener {
 						else if(!(displayName.equals("§r"))) {
 							p.closeInventory();
 							utils.performNick(p, displayName.replace(guiFileUtils.getConfigString("NickNameGUI.NickName.DisplayName").replace("%nickName%", ""), ""));
+						}
+					}
+				} else {
+					String[] step4Parts = guiFileUtils.getConfigString("RankedNickGUI.Step4.InventoryTitle").split("%nickName%");
+
+					if (title.equalsIgnoreCase(guiFileUtils.getConfigString("RankedNickGUI.Step1.InventoryTitle"))) {
+						e.setCancelled(true);
+						
+						if(!(displayName.equals("§r"))) {
+							for (int i = 1; i <= 18; i++) {
+								if(displayName.equals(guiFileUtils.getConfigString("RankGUI.Rank" + i + ".Rank"))) {
+									utils.openRankedNickGUI(p, guiFileUtils.getConfigString("RankGUI.Rank" + i + ".RankName"));
+									return;
+								}
+							}
+						}
+					} else if (title.equalsIgnoreCase(guiFileUtils.getConfigString("RankedNickGUI.Step2.InventoryTitle"))) {
+						e.setCancelled(true);
+						
+						if(!(displayName.equals("§r")))
+							utils.openRankedNickGUI(p, utils.getLastGUITexts().get(p.getUniqueId()) + (displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step2.Default.DisplayName")) ? " DEFAULT" : (displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step2.Normal.DisplayName")) ? " NORMAL" : " RANDOM")));
+					} else if (title.equalsIgnoreCase(guiFileUtils.getConfigString("RankedNickGUI.Step3.InventoryTitle"))) {
+						e.setCancelled(true);
+						
+						String lastText = utils.getLastGUITexts().get(p.getUniqueId());
+						
+						if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step3.Custom.DisplayName"))) {
+							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1")) {
+								utils.getPlayersTypingNameInChat().put(p.getUniqueId(), lastText);
+								
+								p.closeInventory();
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.TypeNameInChat"));
+							} else {
+								String[] args = lastText.split(" ");
+								
+								utils.openCustomGUI(p, args[0], args[1]);
+							}
+						} else if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step3.Random.DisplayName"))) {
+							String name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+							boolean nickNameIsInUse = false;
+							
+							for (String nickName : utils.getPlayerNicknames().values()) {
+								if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+									nickNameIsInUse = true;
+							}
+							
+							while (nickNameIsInUse) {
+								nickNameIsInUse = false;
+								name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+								
+								for (String nickName : utils.getPlayerNicknames().values()) {
+									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+										nickNameIsInUse = true;
+								}
+							}
+							
+							utils.openRankedNickGUI(p, lastText + " " + name);
+						}
+					} else if (title.startsWith(step4Parts[0]) && ((step4Parts.length == 1) || title.endsWith(step4Parts[1]))) {
+						e.setCancelled(true);
+						
+						String lastText = utils.getLastGUITexts().get(p.getUniqueId());
+						String[] args = lastText.split(" ");
+						
+						utils.getLastGUITexts().put(p.getUniqueId(), (lastText = args[0] + " " + args[1]));
+						
+						if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step4.Use.DisplayName"))) {
+							p.closeInventory();
+							
+							utils.performRankedNick(p, args[0], args[1], title.replace(step4Parts[0], "").replace(step4Parts[1], ""));
+						} else if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step4.Retry.DisplayName"))) {
+							String name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+							boolean nickNameIsInUse = false;
+							
+							for (String nickName : utils.getPlayerNicknames().values()) {
+								if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+									nickNameIsInUse = true;
+							}
+							
+							while (nickNameIsInUse) {
+								nickNameIsInUse = false;
+								name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+								
+								for (String nickName : utils.getPlayerNicknames().values()) {
+									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+										nickNameIsInUse = true;
+								}
+							}
+							
+							utils.openRankedNickGUI(p, lastText + " " + name);
+						} else if(displayName.equals(guiFileUtils.getConfigString("RankedNickGUI.Step4.Custom.DisplayName"))) {
+							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1")) {
+								utils.getPlayersTypingNameInChat().put(p.getUniqueId(), lastText);
+								
+								p.closeInventory();
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.TypeNameInChat"));
+							} else
+								utils.openCustomGUI(p, args[0], args[1]);
 						}
 					}
 				}

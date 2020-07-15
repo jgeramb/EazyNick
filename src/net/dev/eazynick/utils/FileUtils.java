@@ -75,14 +75,15 @@ public class FileUtils {
 		cfg.addDefault("ChangeNameAndPrefixAndSuffixInTAB", false);
 		cfg.addDefault("ChangeLuckPermsPrefixAndSufix", false);
 		cfg.addDefault("RandomDisguiseDelay", false);
-		cfg.addDefault("OpenNicknameGUIInsteadOfRandomNick", false);
-		cfg.addDefault("OpenBookGUIOnNickCommand", false);
-		cfg.addDefault("UseRankedNickGUI", false);
 		cfg.addDefault("UseSignGUIForCustomName", true);
 		cfg.addDefault("AllowBookGUICustomName", true);
 		cfg.addDefault("AllowBookGUISkinFromName", false);
 		cfg.addDefault("UseMineSkinAPI", false);
 		cfg.addDefault("OverwriteMessagePackets", false);
+		cfg.addDefault("OpenNickListGUIOnNickCommand", false);
+		cfg.addDefault("OpenBookGUIOnNickCommand", false);
+		cfg.addDefault("OpenRankedNickGUIOnNickCommand", false);
+		cfg.addDefault("OpenRankedNickGUIOnNickGUICommand", false);
 
 		cfg.addDefault("NickActionBarMessage", false);
 		
