@@ -43,27 +43,27 @@ public class PlayerNickListener implements Listener {
 			}, fileUtils.getConfig().getLong("Settings.NickDelay") * 20);
 			
 			if(fileUtils.getConfig().getBoolean("BungeeCord")) {
-				String oldRank = e.getGroupName();
+				String groupName = e.getGroupName();
 				
 				if(!(e.isJoinNick())) {
 					if(utils.ultraPermissionsStatus()) {
 						if(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId()))
-							oldRank = utils.getOldUltraPermissionsGroups().get(p.getUniqueId()).toString();
+							groupName = utils.getOldUltraPermissionsGroups().get(p.getUniqueId()).toString();
 					}
 					
 					if(utils.luckPermsStatus()) {
 						if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId()))
-							oldRank = utils.getOldLuckPermsGroups().get(p.getUniqueId());
+							groupName = utils.getOldLuckPermsGroups().get(p.getUniqueId());
 					}
 					
 					if(utils.permissionsExStatus()) {
 						if(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId()))
-							oldRank = utils.getOldPermissionsExGroups().get(p.getUniqueId()).toString();
+							groupName = utils.getOldPermissionsExGroups().get(p.getUniqueId()).toString();
 					}
 				}
 				
-				if(!(oldRank.equals("NONE")))
-					eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), oldRank, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
+				if(!(groupName.equals("NONE")))
+					eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 			}
 			
 			if(utils.placeholderAPIStatus()) {

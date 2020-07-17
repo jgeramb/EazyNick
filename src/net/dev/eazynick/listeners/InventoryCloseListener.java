@@ -12,7 +12,7 @@ import net.dev.eazynick.utils.Utils;
 public class InventoryCloseListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerUnnick(InventoryCloseEvent e) {
+	public void onInventoryClose(InventoryCloseEvent e) {
 		Utils utils = EazyNick.getInstance().getUtils();
 		
 		if (e.getPlayer() instanceof Player) {

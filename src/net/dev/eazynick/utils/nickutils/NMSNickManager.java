@@ -29,6 +29,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 public class NMSNickManager extends ReflectUtils {
 
 	private EazyNick eazyNick;
+	private FileUtils fileUtils;
 	private MineSkinAPI mineSkinAPI;
 	private Utils utils;
 	
@@ -36,29 +37,38 @@ public class NMSNickManager extends ReflectUtils {
 		eazyNick = EazyNick.getInstance();
 		mineSkinAPI = eazyNick.getMineSkinAPI();
 		utils = eazyNick.getUtils();
+		fileUtils = eazyNick.getFileUtils();
+	}
+	
+	public Object getAsCraftChatMessage(String s) {
+		Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
+		
+		try {
+			return (utils.isNewVersion() ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, s) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, s))[0]);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 	
 	public void updatePlayerListName(Player p, String name) {
 		try {
+			Class<?> enumPlayerInfoAction = eazyNick.getVersion().equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(eazyNick.getVersion().equals("1_11_R1") || eazyNick.getVersion().equals("1_12_R1") || utils.isNewVersion()) ? 1 : 2];
 			Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
-			Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
-			String playerName = (String) entityPlayer.getClass().getMethod("getName").invoke(entityPlayer);
-
-			if(name == null)
-				name = playerName;
-			
-			Field f = getNMSClass("EntityPlayer").getDeclaredField("listName");
-			f.setAccessible(true);
-			f.set(entityPlayer, name.equals(playerName) ? null : (utils.isNewVersion() ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, name) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, name))[0]));
-			f.setAccessible(false);
-
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
+			
 			Array.set(entityPlayerArray, 0, entityPlayer);
 			
-			Class<?> enumPlayerInfoAction = eazyNick.getVersion().equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(eazyNick.getVersion().equals("1_11_R1") || eazyNick.getVersion().equals("1_12_R1") || utils.isNewVersion()) ? 1 : 2];
-			Object packet = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray);
-			
-			sendPacket(p, packet, false);
+			Bukkit.getScheduler().runTask(eazyNick, () -> {
+				try {
+					Field f = getNMSClass("EntityPlayer").getDeclaredField("listName");
+					f.setAccessible(true);
+					f.set(entityPlayer, getAsCraftChatMessage(name));
+					
+					sendPacket(p, getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray), false);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -84,7 +94,7 @@ public class NMSNickManager extends ReflectUtils {
 			for(Player all : Bukkit.getOnlinePlayers()) {
 				if(all.canSee(p)) {
 					if(!(all.getUniqueId().equals(p.getUniqueId()))) {
-						if(!(all.hasPermission("nick.bypass"))) {
+						if(!(all.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission"))) {
 							Object entityPlayerAll = all.getClass().getMethod("getHandle").invoke(all);
 							Object playerConenction = entityPlayerAll.getClass().getDeclaredField("playerConnection").get(entityPlayerAll);
 							Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
@@ -97,7 +107,7 @@ public class NMSNickManager extends ReflectUtils {
 								sendPacketNMS(all, packet);
 						}
 					} else {
-						if(eazyNick.getFileUtils().getConfig().getBoolean("SeeNickSelf")) {
+						if(fileUtils.getConfig().getBoolean("SeeNickSelf")) {
 							Object playerConenction = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
 							Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
 							int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
@@ -157,7 +167,7 @@ public class NMSNickManager extends ReflectUtils {
 				try {
 					gp = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
 				} catch (Exception e) {
-					p.sendMessage(utils.getPrefix() + "§cThe mojang session servers are currently not responding. Try again later!");
+					p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
 				}
 				
 				if(gp == null)
@@ -185,7 +195,7 @@ public class NMSNickManager extends ReflectUtils {
 				try {
 					gp = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
 				} catch (Exception e) {
-					p.sendMessage(utils.getPrefix() + "§cThe mojang session servers are currently not responding. Try again later!");
+					p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
 				}
 				
 				if(gp == null)
@@ -213,7 +223,7 @@ public class NMSNickManager extends ReflectUtils {
 				try {
 					gp = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
 				} catch (Exception e) {
-					p.sendMessage(utils.getPrefix() + "§cThe mojang session servers are currently not responding. Try again later!");
+					p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
 				}
 				
 				if(gp == null)
@@ -228,8 +238,6 @@ public class NMSNickManager extends ReflectUtils {
 	}
 	
 	public void updatePlayer(Player p, UpdateType type, String skinName, boolean forceUpdate) {
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		
 		String version = eazyNick.getVersion();
 		NickManager api = new NickManager(p);
 		String nickName = api.getNickName();
@@ -350,7 +358,7 @@ public class NMSNickManager extends ReflectUtils {
 							sendPacketExceptSelf(p, packetNamedEntitySpawn, forceUpdate);
 							
 							if(uuidSpoof && (type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE))) {
-								Bukkit.getOnlinePlayers().stream().filter(all -> (!(all.hasPermission("nick.bypass")) && (all != p))).forEach(all -> {
+								Bukkit.getOnlinePlayers().stream().filter(all -> (!(all.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission")) && (all != p))).forEach(all -> {
 									all.hidePlayer(p);
 									all.showPlayer(p);
 									
@@ -451,9 +459,9 @@ public class NMSNickManager extends ReflectUtils {
 		for (Player all : Bukkit.getOnlinePlayers()) {
 			if((all.canSee(p) && all.getWorld().getName().equals(p.getWorld().getName())) || forceUpdate) {
 				if(all.getEntityId() != p.getEntityId()) {
-					if(!(all.hasPermission("nick.bypass")) || forceUpdate)
+					if(!(all.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission")) || forceUpdate)
 						sendPacketNMS(all, packet);
-				} else if(eazyNick.getFileUtils().getConfig().getBoolean("SeeNickSelf") || forceUpdate)
+				} else if(fileUtils.getConfig().getBoolean("SeeNickSelf") || forceUpdate)
 					sendPacketNMS(all, packet);
 			}
 		}
@@ -463,7 +471,7 @@ public class NMSNickManager extends ReflectUtils {
 		for (Player all : Bukkit.getOnlinePlayers()) {
 			if(all.getWorld().getName().equals(p.getWorld().getName()) || forceUpdate) {
 				if(all.getEntityId() != p.getEntityId()) {
-					if(!(all.hasPermission("nick.bypass")) || forceUpdate)
+					if(!(all.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission")) || forceUpdate)
 						sendPacketNMS(all, packet);
 				}
 			}

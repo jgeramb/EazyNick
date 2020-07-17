@@ -29,7 +29,7 @@ public class PlayerJoinListener implements Listener {
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
@@ -73,7 +73,7 @@ public class PlayerJoinListener implements Listener {
 
 			@EventHandler
 			public void run() {
-				if(p.hasPermission("nick.bypass")) {
+				if(p.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission")) {
 					if((eazyNick.getMySQL() != null) && eazyNick.getMySQL().isConnected()) {
 						for (Player all : Bukkit.getOnlinePlayers()) {
 							NickManager apiAll = new NickManager(all);

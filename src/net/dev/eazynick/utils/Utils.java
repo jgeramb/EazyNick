@@ -150,6 +150,10 @@ public class Utils {
 		return (Bukkit.getPluginManager().getPlugin("ChatControl") != null);
 	}
 	
+	public boolean skinsRestorerStatus() {
+		return (Bukkit.getPluginManager().getPlugin("SkinsRestorer") != null);
+	}
+	
 	public void sendConsole(String msg) {
 		Bukkit.getConsoleSender().sendMessage(prefix + msg);
 	}
@@ -166,7 +170,7 @@ public class Utils {
 		EazyNick eazyNick = EazyNick.getInstance();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		NickNameFileUtils nickNameFileUtils = eazyNick.getNickNameFileUtils();
 		
 		new ArrayList<>(nickedPlayers).forEach(uuid -> new NickManager(Bukkit.getPlayer(uuid)).unnickPlayerWithoutRemovingMySQL(false));
@@ -227,7 +231,7 @@ public class Utils {
 		EazyNick eazyNick = EazyNick.getInstance();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		NMSBookUtils nmsBookUtils = eazyNick.getNMSBookUtils();
 		NMSBookBuilder nmsBookBuilder = eazyNick.getNMSBookBuilder();
 		
@@ -337,7 +341,7 @@ public class Utils {
 
 	public void openNickList(Player p, int page) {
 		EazyNick eazyNick = EazyNick.getInstance();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		
 		Inventory inv = Bukkit.createInventory(null, 45, guiFileUtils.getConfigString("NickNameGUI.InventoryTitle").replace("%currentPage%", String.valueOf(page + 1)));
 		ArrayList<String> toShow = new ArrayList<>();
@@ -549,7 +553,7 @@ public class Utils {
 	public void openCustomGUI(Player p, String rankName, String skinType) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		FileUtils fileUtils = eazyNick.getFileUtils();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		
 		if(fileUtils.getConfig().getBoolean("UseSignGUIForCustomName")) {
 			eazyNick.getSignGUI().open(p, guiFileUtils.getConfigString("SignGUI.Line1"), guiFileUtils.getConfigString("SignGUI.Line2"), guiFileUtils.getConfigString("SignGUI.Line3"), guiFileUtils.getConfigString("SignGUI.Line4"), new SignGUI.EditCompleteListener() {
@@ -588,7 +592,7 @@ public class Utils {
 	
 	public void openRankedNickGUI(Player p, String text) {
 		EazyNick eazyNick = EazyNick.getInstance();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		
 		lastGUITexts.put(p.getUniqueId(), text);
 		

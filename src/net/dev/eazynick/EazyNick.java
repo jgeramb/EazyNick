@@ -46,6 +46,7 @@ import net.dev.eazynick.listeners.PlayerJoinListener;
 import net.dev.eazynick.listeners.PlayerKickListener;
 import net.dev.eazynick.listeners.PlayerNickListener;
 import net.dev.eazynick.listeners.PlayerQuitListener;
+import net.dev.eazynick.listeners.PlayerRespawnListener;
 import net.dev.eazynick.listeners.PlayerUnnickListener;
 import net.dev.eazynick.sql.MySQL;
 import net.dev.eazynick.sql.MySQLNickManager;
@@ -211,6 +212,7 @@ public class EazyNick extends JavaPlugin {
 						pm.registerEvents(new PlayerInteractListener(), instance);
 						pm.registerEvents(new PlayerChangedWorldListener(), instance);
 						pm.registerEvents(new PlayerDeathListener(), instance);
+						pm.registerEvents(new PlayerRespawnListener(), instance);
 						pm.registerEvents(new PlayerJoinListener(), instance);
 						pm.registerEvents(new PlayerKickListener(), instance);
 						pm.registerEvents(new PlayerQuitListener(), instance);
@@ -337,7 +339,7 @@ public class EazyNick extends JavaPlugin {
 		return nickNameFileUtils;
 	}
 	
-	public GUIFileUtils getGuiFileUtils() {
+	public GUIFileUtils getGUIFileUtils() {
 		return guiFileUtils;
 	}
 	

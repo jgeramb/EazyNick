@@ -67,7 +67,7 @@ public class GameProfileBuilder_1_7 {
 				if(!forceNew && cache.containsKey(uuid))
 					return cache.get(uuid).profile;
 			}
-            
+			
 			JsonObject error = (JsonObject) new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine());
             throw new IOException(error.get("error").getAsString() + ": " + error.get("errorMessage").getAsString());
 		}

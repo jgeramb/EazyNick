@@ -41,7 +41,7 @@ public class LuckPermsHook {
 			utils.getLuckPermsSuffixes().put(p.getUniqueId(), suffixNode);
 		}
 		
-		if(fileUtils.getConfig().getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
+		if(fileUtils.getConfig().getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE")) && (user.getPrimaryGroup() != null) && !(user.getPrimaryGroup().isEmpty())) {
 			utils.getOldLuckPermsGroups().put(p.getUniqueId(), user.getPrimaryGroup());
 			
 			removeAllGroups(user);

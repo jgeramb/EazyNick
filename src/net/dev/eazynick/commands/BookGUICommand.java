@@ -29,7 +29,7 @@ public class BookGUICommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		NMSBookUtils nmsBookUtils = eazyNick.getNMSBookUtils();
 		NMSBookBuilder nmsBookBuilder = eazyNick.getNMSBookBuilder();
 		

@@ -83,6 +83,15 @@ public class NickManager {
 				nmsNickManager.updateSkin_1_8_R1(p, skinName);
 			else
 				nmsNickManager.updateSkin(p, skinName);
+			
+			if(eazyNick.getUtils().skinsRestorerStatus()) {
+				try {
+					skinsrestorer.bukkit.SkinsRestorerBukkitAPI skinsRestorerBukkitAPI = ((skinsrestorer.bukkit.SkinsRestorer) Bukkit.getPluginManager().getPlugin("SkinsRestorer")).getSkinsRestorerBukkitAPI();
+					skinsRestorerBukkitAPI.setSkin(p.getName(), skinName);
+					skinsRestorerBukkitAPI.applySkin(p);
+				} catch (Exception e) {
+				}
+			}
 		}
 	}
 	
@@ -356,11 +365,13 @@ public class NickManager {
 				
 				@Override
 				public void run() {
-					p.setDisplayName(oldDisplayName);
-					p.setPlayerListName(oldPlayerListName);
-					
-					utils.getOldDisplayNames().remove(uuid);
-					utils.getOldPlayerListNames().remove(uuid);
+					if(p.isOnline()) {
+						p.setDisplayName(oldDisplayName);
+						setPlayerListName(oldPlayerListName);
+						
+						utils.getOldDisplayNames().remove(uuid);
+						utils.getOldPlayerListNames().remove(uuid);
+					}
 				}
 			}, 5 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? 40 : 0));
 		}
@@ -618,7 +629,7 @@ public class NickManager {
 
 					sbtm.destroyTeam();
 					
-					if(eazyNick.isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline()) {
+					if(eazyNick.isEnabled() && utils.getNickedPlayers().contains(uuid) && p.isOnline()) {
 						sbtm.createTeam();
 						
 						if(fileUtils.getConfig().getBoolean("Settings.ChangeOptions.PlayerListName")) {

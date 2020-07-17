@@ -84,6 +84,7 @@ public class FileUtils {
 		cfg.addDefault("OpenBookGUIOnNickCommand", false);
 		cfg.addDefault("OpenRankedNickGUIOnNickCommand", false);
 		cfg.addDefault("OpenRankedNickGUIOnNickGUICommand", false);
+		cfg.addDefault("EnableBypassPermission", false);
 
 		cfg.addDefault("NickActionBarMessage", false);
 		
@@ -129,11 +130,11 @@ public class FileUtils {
 		cfg.addDefault("Settings.ChangeOptions.PlayerListName", true);
 		cfg.addDefault("Settings.ChangeOptions.NameTag", true);
 		cfg.addDefault("Settings.NickFormat.Chat.Prefix", "&7");
-		cfg.addDefault("Settings.NickFormat.Chat.Suffix", "&7");
+		cfg.addDefault("Settings.NickFormat.Chat.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.PlayerList.Prefix", "&7");
-		cfg.addDefault("Settings.NickFormat.PlayerList.Suffix", "&7");
+		cfg.addDefault("Settings.NickFormat.PlayerList.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.NameTag.Prefix", "&7");
-		cfg.addDefault("Settings.NickFormat.NameTag.Suffix", "&7");
+		cfg.addDefault("Settings.NickFormat.NameTag.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.GroupName", "Default");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Prefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Suffix", "&r");

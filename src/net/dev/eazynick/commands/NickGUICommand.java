@@ -19,7 +19,7 @@ public class NickGUICommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		
 		if(sender instanceof Player) {
 			Player p = (Player) sender;

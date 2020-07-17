@@ -25,7 +25,7 @@ public class InventoryClickListener implements Listener {
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		GUIFileUtils guiFileUtils = eazyNick.getGuiFileUtils();
+		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		
 		if (e.getWhoClicked() instanceof Player) {
 			Player p = (Player) e.getWhoClicked();
