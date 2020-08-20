@@ -86,7 +86,7 @@ public class PlayerRespawnListener implements Listener {
 					
 					Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nickName, skinName, finalChatPrefix, finalChatSuffix, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, false, true, rankName));
 				}
-			}, 20);
+			}, 22 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? 60 : 0));
 		}
 	}
 

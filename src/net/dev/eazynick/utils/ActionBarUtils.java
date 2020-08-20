@@ -19,8 +19,7 @@ public class ActionBarUtils {
 				sendPacket(p, reflectUtils.getNMSClass("PacketPlayOutChat").getConstructor(reflectUtils.getNMSClass("IChatBaseComponent"), byte.class).newInstance(chatSerializer.getMethod("a", String.class).invoke(chatSerializer, "{\"text\":\"" + text + "\"}"), (byte) 2));
 			} else
 				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
 		}
 	}
 	

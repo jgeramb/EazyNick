@@ -85,6 +85,7 @@ public class FileUtils {
 		cfg.addDefault("OpenRankedNickGUIOnNickCommand", false);
 		cfg.addDefault("OpenRankedNickGUIOnNickGUICommand", false);
 		cfg.addDefault("EnableBypassPermission", false);
+		cfg.addDefault("ShowProfileErrorMessages", true);
 
 		cfg.addDefault("NickActionBarMessage", false);
 		

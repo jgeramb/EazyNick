@@ -222,9 +222,11 @@ public class NickManager {
 					ActionBarUtils actionBarUtils = eazyNick.getActionBarUtils();
 					
 					if(eazyNick.isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline())
-						actionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), eazyNick.getLanguageFileUtils().getConfigString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", utils.getPrefix()));
+						actionBarUtils.sendActionBar(p, eazyNick.getLanguageFileUtils().getConfigString("NickActionBarMessage").replace("%nickName%", nickName).replace("%prefix%", utils.getPrefix()));
 					else {
-						actionBarUtils.sendActionBar(Bukkit.getPlayer(uuid), "");
+						if(p != null)
+							actionBarUtils.sendActionBar(p, "");
+						
 						cancel();
 					}
 				}

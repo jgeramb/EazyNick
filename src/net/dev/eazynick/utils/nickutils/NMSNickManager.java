@@ -167,7 +167,8 @@ public class NMSNickManager extends ReflectUtils {
 				try {
 					gp = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
 				} catch (Exception e) {
-					p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
+					if(fileUtils.getConfig().getBoolean("ShowProfileErrorMessages"))
+						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
 				}
 				
 				if(gp == null)
@@ -195,7 +196,8 @@ public class NMSNickManager extends ReflectUtils {
 				try {
 					gp = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
 				} catch (Exception e) {
-					p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
+					if(fileUtils.getConfig().getBoolean("ShowProfileErrorMessages"))
+						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
 				}
 				
 				if(gp == null)
@@ -223,7 +225,8 @@ public class NMSNickManager extends ReflectUtils {
 				try {
 					gp = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
 				} catch (Exception e) {
-					p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
+					if(fileUtils.getConfig().getBoolean("ShowProfileErrorMessages"))
+						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
 				}
 				
 				if(gp == null)
@@ -306,8 +309,8 @@ public class NMSNickManager extends ReflectUtils {
 						if(version.startsWith("1_16")) {
 							Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
 							Class<?> enumGameMode = getNMSClass("EnumGamemode");
-							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, p.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
+
+							packetRespawnPlayer = version.equals("1_16_R1") ? getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, p.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true) : getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getDimensionManager").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, p.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
 						} else if(version.startsWith("1_15")) {
 							Class<?> dimensionManager = getNMSClass("DimensionManager");
 							Class<?> worldType = getNMSClass("WorldType");
