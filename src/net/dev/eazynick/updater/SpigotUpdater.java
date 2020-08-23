@@ -79,7 +79,7 @@ public class SpigotUpdater {
 		
 		PluginDescriptionFile desc = eazyNick.getDescription();
 		
-		p.sendMessage(utils.getPrefix() + "§3Updater §8» §rChecking for updates...");
+		p.sendMessage(utils.getPrefix() + "§3Updater §8» §fChecking for updates...");
 		
 		ReadableByteChannel channel = null;
 		double newVersion = 0.0;
@@ -96,10 +96,10 @@ public class SpigotUpdater {
 		}
 
 		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
-			p.sendMessage(utils.getPrefix() + "§3Updater §8» §rFound a new version (" + newVersion + ")");
+			p.sendMessage(utils.getPrefix() + "§3Updater §8» §fFound a new version (" + newVersion + ")");
 
 			if (eazyNick.getFileUtils().getConfig().getBoolean("AutoUpdater")) {
-				p.sendMessage(utils.getPrefix() + "§3Updater §8» §rStarting download...");
+				p.sendMessage(utils.getPrefix() + "§3Updater §8» §fStarting download...");
 
 				try {
 					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/download_file?id=1&version=v" + newVersion).openConnection();
@@ -118,11 +118,11 @@ public class SpigotUpdater {
 					throw new RuntimeException("File could not be saved", e);
 				}
 
-				p.sendMessage(utils.getPrefix() + "§3Updater §8» §rSuccessfully updated plugin to version " + newVersion + ". Please restart/reload your server");
+				p.sendMessage(utils.getPrefix() + "§3Updater §8» §fSuccessfully updated plugin to version " + newVersion + ". Please restart/reload your server");
 			} else
-				p.sendMessage(utils.getPrefix() + "§3Updater §8» §rDownload the update here: " + desc.getWebsite());
+				p.sendMessage(utils.getPrefix() + "§3Updater §8» §fDownload the update here: " + desc.getWebsite());
 		} else
-			p.sendMessage(utils.getPrefix() + "§3Updater §8» §rNo new version available");
+			p.sendMessage(utils.getPrefix() + "§3Updater §8» §fNo new version available");
 	}
 
 }

@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import com.google.common.primitives.Chars;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -235,106 +236,112 @@ public class Utils {
 		NMSBookUtils nmsBookUtils = eazyNick.getNMSBookUtils();
 		NMSBookBuilder nmsBookBuilder = eazyNick.getNMSBookBuilder();
 		
-		String chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "";
+		String chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "", nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
 		String skinName = "";
 		boolean isCancelled = false;
 		
-		if(new StringUtils(name).removeColorCodes().getString().length() <= 16) {
-			if(!(blackList.contains(name.toUpperCase()))) {
-				boolean nickNameIsInUse = false;
-				
-				for (String nickName : playerNicknames.values()) {
-					if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-						nickNameIsInUse = true;
-				}
-
-				if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
-					boolean playerWithNameIsKnown = false;
-					
-					for (Player all : Bukkit.getOnlinePlayers()) {
-						if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-							playerWithNameIsKnown = true;
-					}
-					
-					if(Bukkit.getOfflinePlayers() != null) {
-						for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
-							if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-								playerWithNameIsKnown = true;
-						}
-					}
-					
-					if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
-						isCancelled = true;
-					
-					if(!(isCancelled)) {
-						String groupName = "";
+		if(nameWithoutColors.length() <= 16) {
+			if(!(fileUtils.getConfig().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
+				if(!(containsSpecialChars(nameWithoutColors))) {
+					if(!(blackList.contains(name.toUpperCase()))) {
+						boolean nickNameIsInUse = false;
 						
-						for (int i = 1; i <= 18; i++) {
-							String permission = guiFileUtils.getConfigString("RankGUI.Rank" + i + ".Permission");
+						for (String nickName : playerNicknames.values()) {
+							if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+								nickNameIsInUse = true;
+						}
+		
+						if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
+							boolean playerWithNameIsKnown = false;
 							
-							if(rankName.equalsIgnoreCase(guiFileUtils.getConfig().getString("RankGUI.Rank" + i + ".RankName")) && guiFileUtils.getConfig().getBoolean("RankGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission))) {
-								chatPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
-								chatSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
-								tabPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
-								tabSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
-								tagPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
-								tagSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
-								groupName = guiFileUtils.getConfig().getString("Settings.NickFormat.Rank" + i + ".GroupName");
+							for (Player all : Bukkit.getOnlinePlayers()) {
+								if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+									playerWithNameIsKnown = true;
 							}
-						}
-						
-						if(groupName.isEmpty())
-							return;
-						
-						String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
-						
-						chatPrefix = chatPrefix.replaceAll("%randomColor%", randomColor);
-						chatSuffix = chatSuffix.replaceAll("%randomColor%", randomColor);
-						tabPrefix = tabPrefix.replaceAll("%randomColor%", randomColor);
-						tabSuffix = tabSuffix.replaceAll("%randomColor%", randomColor);
-						tagPrefix = tagPrefix.replaceAll("%randomColor%", randomColor);
-						tagSuffix = tagSuffix.replaceAll("%randomColor%", randomColor);
-						
-						if(skinType.equalsIgnoreCase("DEFAULT"))
-							skinName = p.getName();
-						else if(skinType.equalsIgnoreCase("NORMAL"))
-							skinName = new Random().nextBoolean() ? "Steve" : "Alex";
-						else if(skinType.equalsIgnoreCase("RANDOM"))
-							skinName = nickNames.get(new Random().nextInt(getNickNames().size()));
-						else if(skinType.equalsIgnoreCase("SKINFROMNAME"))
-							skinName = name;
-						else
-							skinName = skinType;
-						
-						if(lastSkinNames.containsKey(p.getUniqueId()))
-							lastSkinNames.remove(p.getUniqueId());
-						
-						if(lastNickNames.containsKey(p.getUniqueId()))
-							lastNickNames.remove(p.getUniqueId());
-						
-						lastSkinNames.put(p.getUniqueId(), skinName);
-						lastNickNames.put(p.getUniqueId(), name);
-						
-						new NickManager(p).setGroupName(groupName);
-						
-						if(fileUtils.getConfig().getBoolean("BungeeCord") && fileUtils.getConfig().getBoolean("LobbyMode")) {
-							eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), name, skinName);
-							eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 							
-							if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
-								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
-						} else {
-							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
-						
-							if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
-								nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
-						}
+							if(Bukkit.getOfflinePlayers() != null) {
+								for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+									if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+										playerWithNameIsKnown = true;
+								}
+							}
+							
+							if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+								isCancelled = true;
+							
+							if(!(isCancelled)) {
+								String groupName = "";
+								
+								for (int i = 1; i <= 18; i++) {
+									String permission = guiFileUtils.getConfigString("RankGUI.Rank" + i + ".Permission");
+									
+									if(rankName.equalsIgnoreCase(guiFileUtils.getConfig().getString("RankGUI.Rank" + i + ".RankName")) && guiFileUtils.getConfig().getBoolean("RankGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || p.hasPermission(permission))) {
+										chatPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
+										chatSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
+										tabPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
+										tabSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
+										tagPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
+										tagSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+										groupName = guiFileUtils.getConfig().getString("Settings.NickFormat.Rank" + i + ".GroupName");
+									}
+								}
+								
+								if(groupName.isEmpty())
+									return;
+								
+								String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
+								
+								chatPrefix = chatPrefix.replaceAll("%randomColor%", randomColor);
+								chatSuffix = chatSuffix.replaceAll("%randomColor%", randomColor);
+								tabPrefix = tabPrefix.replaceAll("%randomColor%", randomColor);
+								tabSuffix = tabSuffix.replaceAll("%randomColor%", randomColor);
+								tagPrefix = tagPrefix.replaceAll("%randomColor%", randomColor);
+								tagSuffix = tagSuffix.replaceAll("%randomColor%", randomColor);
+								
+								if(skinType.equalsIgnoreCase("DEFAULT"))
+									skinName = p.getName();
+								else if(skinType.equalsIgnoreCase("NORMAL"))
+									skinName = new Random().nextBoolean() ? "Steve" : "Alex";
+								else if(skinType.equalsIgnoreCase("RANDOM"))
+									skinName = nickNames.get(new Random().nextInt(getNickNames().size()));
+								else if(skinType.equalsIgnoreCase("SKINFROMNAME"))
+									skinName = name;
+								else
+									skinName = skinType;
+								
+								if(lastSkinNames.containsKey(p.getUniqueId()))
+									lastSkinNames.remove(p.getUniqueId());
+								
+								if(lastNickNames.containsKey(p.getUniqueId()))
+									lastNickNames.remove(p.getUniqueId());
+								
+								lastSkinNames.put(p.getUniqueId(), skinName);
+								lastNickNames.put(p.getUniqueId(), name);
+								
+								new NickManager(p).setGroupName(groupName);
+								
+								if(fileUtils.getConfig().getBoolean("BungeeCord") && fileUtils.getConfig().getBoolean("LobbyMode")) {
+									eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), name, skinName);
+									eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
+									
+									if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
+										nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
+								} else {
+									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
+								
+									if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
+										nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
+								}
+							} else
+								p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
+						} else
+							p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
 					} else
-						p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
+						p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NameNotAllowed"));
 				} else
-					p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
+					p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickContainsSpecialCharacters"));
 			} else
-				p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NameNotAllowed"));
+				p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickTooShort"));
 		} else
 			p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.NickTooLong"));
 	}
@@ -863,6 +870,17 @@ public class Utils {
 			
 			p.openInventory(inv);
 		}
+	}
+	
+	public boolean containsSpecialChars(String s) {
+		List<Character> allowCharacters = Chars.asList("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".toCharArray());
+		
+		for (char c : s.toCharArray()) {
+			if(!(allowCharacters.contains(c)))
+				return true;
+		}
+		
+		return false;
 	}
 
 	public GameProfile getDefaultGameProfile() {

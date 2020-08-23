@@ -51,54 +51,58 @@ public class NickCommand implements CommandExecutor {
 							utils.openRankedNickGUI(p, "");
 						else if(args.length == 0)
 							utils.performNick(p, "RANDOM");
-						else {
-							if(p.hasPermission("nick.customnickname")) {
-								String name = args[0].replace("\"", "");
-								boolean isCancelled = false;
-								
-								if(new StringUtils(name).removeColorCodes().getString().length() <= 16) {
-									if(!(utils.getBlackList().contains(args[0].toUpperCase()))) {
-										boolean nickNameIsInUse = false;
-										
-										for (String nickName : utils.getPlayerNicknames().values()) {
-											if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-												nickNameIsInUse = true;
-										}
-
-										if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
-											boolean playerWithNameIsKnown = false;
+						else if(p.hasPermission("nick.customnickname")) {
+							String name = args[0].replace("\"", ""), nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
+							boolean isCancelled = false;
+							
+							if(nameWithoutColors.length() <= 16) {
+								if(!(fileUtils.getConfig().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
+									if(!(utils.containsSpecialChars(nameWithoutColors))) {
+										if(!(utils.getBlackList().contains(args[0].toUpperCase()))) {
+											boolean nickNameIsInUse = false;
 											
-											for (Player all : Bukkit.getOnlinePlayers()) {
-												if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-													playerWithNameIsKnown = true;
+											for (String nickName : utils.getPlayerNicknames().values()) {
+												if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+													nickNameIsInUse = true;
 											}
+		
+											if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
+												boolean playerWithNameIsKnown = false;
 												
-											if(Bukkit.getOfflinePlayers() != null) {
-												for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
-													if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+												for (Player all : Bukkit.getOnlinePlayers()) {
+													if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 														playerWithNameIsKnown = true;
 												}
-											}
-											
-											if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
-												isCancelled = true;
-											
-											if(!(isCancelled)) {
-												if(!(name.equalsIgnoreCase(p.getName())))
-													utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name)))));
-												else
-													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
+													
+												if(Bukkit.getOfflinePlayers() != null) {
+													for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+														if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+															playerWithNameIsKnown = true;
+													}
+												}
+												
+												if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+													isCancelled = true;
+												
+												if(!(isCancelled)) {
+													if(!(name.equalsIgnoreCase(p.getName())))
+														utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name)))));
+													else
+														p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
+												} else
+													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
 											} else
-												p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
+												p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
 										} else
-											p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
+											p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NameNotAllowed"));
 									} else
-										p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NameNotAllowed"));
+										p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickContainsSpecialCharacters"));
 								} else
-									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickTooLong"));
+									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickTooShort"));
 							} else
-								p.sendMessage(utils.getNoPerm());
-						}
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickTooLong"));
+						} else
+							p.sendMessage(utils.getNoPerm());
 					}
 				} else
 					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickDelay"));

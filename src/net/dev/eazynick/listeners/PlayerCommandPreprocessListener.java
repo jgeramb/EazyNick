@@ -9,8 +9,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 
-import me.clip.placeholderapi.PlaceholderAPI;
-
 public class PlayerCommandPreprocessListener implements Listener {
 
 	@EventHandler
@@ -30,18 +28,17 @@ public class PlayerCommandPreprocessListener implements Listener {
 			}
 		}
 		
-		if(eazyNick.getUtils().placeholderAPIStatus())
-			msg = PlaceholderAPI.setPlaceholders(p, msg);
-		
 		e.setMessage(msg);
 		
-		if (e.getMessage().toLowerCase().startsWith("/help nick") || e.getMessage().toLowerCase().startsWith("/help eazynick") || e.getMessage().toLowerCase().startsWith("/? nick") || e.getMessage().toLowerCase().startsWith("/? eazynick")) {
+		String msg2 = msg.toLowerCase().replace("bukkit:", "");
+		
+		if (msg2.startsWith("/help nick") || msg2.startsWith("/help eazynick") || msg2.startsWith("/? nick") || msg2.startsWith("/? eazynick")) {
 			if (p.hasPermission("bukkit.command.help")) {
 				e.setCancelled(true);
 
 				p.sendMessage("§e--------- §fHelp: " + eazyNick.getDescription().getName() + " §e----------------------");
 				p.sendMessage("§7Below is a list of all " + eazyNick.getDescription().getName() + " commands:");
-				p.sendMessage("§6/eazynick: §r" + eazyNick.getCommand("eazynick").getDescription());
+				p.sendMessage("§6/eazynick: §f" + eazyNick.getCommand("eazynick").getDescription());
 			}
 		}
 	}

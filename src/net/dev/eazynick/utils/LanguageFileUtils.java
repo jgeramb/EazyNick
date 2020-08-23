@@ -60,8 +60,10 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.SkinChanged", "&4Du hast einen neuen Skin erhalten&7: &6%skinName%");
 			cfg.addDefault("Messages.NameChanged", "&4Du hast einen neuen Namen erhalten&7: &6%nickName%");
 			cfg.addDefault("Messages.NotNicked", "&cDu bist nicht genickt");
-			cfg.addDefault("Messages.NickTooLong", "&cDieser Nickname darf nicht laenger als &616 Zeichen &csein");
-			cfg.addDefault("Messages.NickNameAlreadyInUse", "&cDein Nickname wird derzeit schon verwendet");
+			cfg.addDefault("Messages.NickTooLong", "&cDer Nickname darf nicht laenger als &616 Zeichen &csein");
+			cfg.addDefault("Messages.NickTooShort", "&cDer Nickname darf nicht kuerzer als &63 Zeichen &csein");
+			cfg.addDefault("Messages.NickContainsSpecialCharacters", "&cDer Nickname darf nur die Zeichen &6a-z, A-Z, 0-9 &cund &6_ &centhalten");
+			cfg.addDefault("Messages.NickNameAlreadyInUse", "&cDieser Nickname wird derzeit schon verwendet");
 			cfg.addDefault("Messages.CanNotNickAsSelf", "&cDu kannst dich nicht als &6du selbst &cnicken");
 			cfg.addDefault("Messages.PlayerWithThisNameIsKnown", "&cEin Spieler mit diesem Namen ist dem Server bekannt, weshalb du dich nicht in diesen Spieler verwandeln kannst");
 			cfg.addDefault("Messages.NoPerm", "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
@@ -107,8 +109,10 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.SkinChanged", "&4You have received a new skin&7: &6%skinName%");
 			cfg.addDefault("Messages.NameChanged", "&4You have received a new name&7: &6%nickName%");
 			cfg.addDefault("Messages.NotNicked", "&cYou are not nicked");
-			cfg.addDefault("Messages.NickTooLong", "&cYour nickname can not be longer than &616 characters");
-			cfg.addDefault("Messages.NickNameAlreadyInUse", "&cYour nickname is currently in use");
+			cfg.addDefault("Messages.NickTooLong", "&cThe nickname may not be longer than &616 characters");
+			cfg.addDefault("Messages.NickTooShort", "&cThe nickname may not be shorter than &63 characters");
+			cfg.addDefault("Messages.NickContainsSpecialCharacters", "&cThe nickname may not contain any other characters than &6a-z, A-Z, 0-9 &cand &6_");
+			cfg.addDefault("Messages.NickNameAlreadyInUse", "&cThis nickname is currently in use");
 			cfg.addDefault("Messages.CanNotNickAsSelf", "&cYou can't disguise as &6yourself");
 			cfg.addDefault("Messages.PlayerWithThisNameIsKnown", "&cYou can't disguise as this player, because a player with that name is known on this Server");
 			cfg.addDefault("Messages.NoPerm", "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");

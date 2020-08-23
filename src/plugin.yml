@@ -1,87 +1,101 @@
 name: EazyNick
-version: 2.21
+version: 2.22
 author: Justix
 main: net.dev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)
-website: https://www.spigotmc.org/resources/eazynick-autonicksystem-api-src-bungeecord-multiworld-1-7-10-1-16-x.51398/
+website: https://www.spigotmc.org/resources/51398/
 api-version: 1.13
 softdepend: [PlaceholderAPI, CloudNetAPI, ColoredTags, NametagEdit, PermissionsEx, LuckPerms, Datenschutz, UltraPermissions, Vault, SurvivalGames, AuthMe, TAB, DeluxeChat, ChatControl]
 
 commands:
-      nick:
-        permission: nick.use
-        description: Changes your identity(skin, name, nametag, tabname, chatname)
-        aliases:
-        - d
-        - disguise
-      unnick:
-        permission: nick.use
-        description: Resets your complete identity
-        aliases:
-        - ud
-        - undisguise
-      realname:
-        permission: nick.realname
-        description: Shows the real name of a nicked player
-        aliases:
-        - rd
-        - realdisguise
-      nickgui:
-        permission: nick.gui
-        description: Opens a gui to change/reset your identity
-        aliases:
-        - dgui
-        - disguisegui
-      nickother:
-        permission: nick.other
-        description: Changes/Resets the identity of other players
-        aliases:
-        - do
-        - disguiseother
-      changeskin:
-        permission: nick.skin
-        description: Changes your skin
-      resetskin:
-        permission: nick.skin
-        description: Resets your skin
-      resetname:
-        permission: nick.name
-        description: Resets your name
-      nicklist:
-        permission: nick.gui
-        description: Opens a GUI with all random nicknames
-        aliases:
-        - dlist
-        - disgusielist
-      bookgui:
-        permission: nick.gui
-        description: Opens a Nick-GUI like HyPixel.net
-      guinick:
-        permission: nick.use
-        description: This command is only for the plugin, you do not require to know what this is for
-      reloadconfig:
-        permission: nick.reload
-        description: Reloads the configuration file
-      fixskin:
-        permission: nick.fixskin
-        description: Fixes your skin, if it was not loaded correctly
-      renick:
-        description: This command is only for the plugin, you do not require to know for what this is
-      name:
-        permission: nick.use
-        description: Shows your active nickname
-      nickedplayers:
-        permission: nick.nickedplayers
-        description: Shows a list of all players, who are currently nicked
-      eazynick:
-        description: Shows some informations of the plugin/a list of commands
-      nickupdatecheck:
-        permission: nick.checkforupdates
-        description: Checks for updates of the plugin
-      togglebungeenick:
-        permission: nick.item
-        description: Toggles the automatic nickname on server switch
-        aliases:
-        - togglenick
-        - togglebungeedisguise
-        - toggledisguise
+  nick:
+    description: Changes your identity(skin, name, nametag, tabname, chatname)
+    aliases:
+    - d
+    - disguise
+  unnick:
+    description: Resets your complete identity
+    aliases:
+    - ud
+    - undisguise
+  realname:
+    description: Shows the real name of a nicked player
+    aliases:
+    - rd
+    - realdisguise
+  nickgui:
+    description: Opens a gui to change/reset your identity
+    aliases:
+    - dgui
+    - disguisegui
+  nickother:
+    description: Changes/Resets the identity of other players
+    aliases:
+    - do
+    - disguiseother
+  changeskin:
+    description: Changes your skin
+  resetskin:
+    description: Resets your skin
+  resetname:
+    description: Resets your name
+  nicklist:
+    description: Opens a GUI with all random nicknames
+    aliases:
+    - dlist
+    - disgusielist
+  bookgui:
+    description: Opens a Nick-GUI like on hypixel.net
+  guinick:
+    description: This command is only for the plugin, you do not require to know what this is for
+  reloadconfig:
+    description: Reloads the configuration file
+  fixskin:
+    description: Fixes your skin, if it was not loaded correctly
+  renick:
+    description: This command is only for the plugin, you do not require to know for what this is
+  name:
+    description: Shows your active nickname
+  nickedplayers:
+    description: Shows a list of all players, who are currently nicked
+  eazynick:
+    description: Shows some information about the plugin and its commands
+  nickupdatecheck:
+    description: Checks for updates of the plugin
+  togglebungeenick:
+    description: Toggles the automatic nickname on server switch
+    aliases:
+    - togglenick
+    - togglebungeedisguise
+    - toggledisguise
+    
+permissions:
+  nick.showhelp:
+    description: Allows you to use /eazynick
+  nick.realname:
+    description: Allows you to use /realname
+  nick.use:
+    description: Allows you to use /nick, /unnick, /name
+  nick.customnickname:
+    description: Allows you to use /nick «name»
+  nick.skin:
+    description: Allows you to use /changeskin, /changeskin «name» and /resetskin
+  nick.name:
+    description: Allows you to use /resetname
+  nick.gui:
+    description: Allows you to use /nickgui, /nicklist, /bookgui
+  nick.other:
+    description: Allows you to use /nickother «player» and /nickother «player» «name»
+  nick.nickedplayers:
+    description: Allows you to use /nickedplayers
+  nick.reload:
+    description: Allows you to use /reloadconfig
+  nick.fixskin:
+    description: Allows you to use /fixskin
+  nick.checkforupdates:
+    description: Allows you to use /nickupdatecheck
+  nick.item:
+    description: Lets you receive the nick item (if enabled in setup.yml) and allows you to use /togglebungeenick
+  nick.bypass:
+    description: See every player undisguised (if enabled in setup.yml)
+    default: false
