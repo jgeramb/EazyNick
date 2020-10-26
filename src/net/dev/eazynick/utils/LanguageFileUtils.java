@@ -127,7 +127,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.Other.Unnick", "&4You removed the nickname of player &e%playerName%");
 			cfg.addDefault("Messages.CommandNotAvaiableForThatVersion", "&cThis command can't be used in this version");
 			cfg.addDefault("Messages.ReloadConfig", "&4The configuration file was &ereloaded&4!");
-			cfg.addDefault("Messages.FixSkin", "&4Your skin has been fixed &asuccessfully &4!");
+			cfg.addDefault("Messages.FixSkin", "&4Your skin has been fixed &asuccessfully&4!");
 			cfg.addDefault("Messages.ResetSkin", "&4Your skin has been reset &asuccessfully&4!");
 			cfg.addDefault("Messages.ResetName", "&4Your name has been reset &asuccessfully&4!");
 			cfg.addDefault("Messages.BungeeAutoNickEnabled", "&4The automatic nickname was &aactivated");

@@ -57,7 +57,7 @@ public class NickCommand implements CommandExecutor {
 							
 							if(nameWithoutColors.length() <= 16) {
 								if(!(fileUtils.getConfig().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
-									if(!(utils.containsSpecialChars(nameWithoutColors))) {
+									if(!(utils.containsSpecialChars(nameWithoutColors)) || fileUtils.getConfig().getBoolean("AllowSpecialCharactersInCustomName")) {
 										if(!(utils.getBlackList().contains(args[0].toUpperCase()))) {
 											boolean nickNameIsInUse = false;
 											

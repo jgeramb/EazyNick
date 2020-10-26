@@ -88,6 +88,7 @@ public class FileUtils {
 		cfg.addDefault("ShowProfileErrorMessages", true);
 		cfg.addDefault("AllowSpecialCharactersInCustomName", false);
 		cfg.addDefault("AllowCustomNamesShorterThanThreeCharacters", false);
+		cfg.addDefault("LogNicknames", false);
 
 		cfg.addDefault("NickActionBarMessage", false);
 		

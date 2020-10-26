@@ -17,13 +17,9 @@ import me.clip.placeholderapi.PlaceholderAPI;
 public class ScoreboardTeamManager {
 
 	private EazyNick eazyNick;
-	
-	private String teamName;
-	
-	public Player p;
-	public String prefix;
-	public String suffix;
-	
+
+	private Player p;
+	private String teamName, prefix, suffix;
 	private Object packet;
 	
 	public ScoreboardTeamManager(Player p, String prefix, String suffix) {
@@ -33,14 +29,20 @@ public class ScoreboardTeamManager {
 		this.suffix = suffix;
 		this.teamName = "9999" + p.getName();
 		
-		if(teamName.length() > 16)
-			teamName = teamName.substring(0, 16);
+		if(this.teamName.length() > 16)
+			this.teamName = this.teamName.substring(0, 16);
 		
 		if(this.prefix == null)
 			this.prefix = "";
 		
 		if(this.suffix == null)
 			this.suffix = "";
+		
+		if(this.prefix.length() > 16)
+			this.prefix = this.prefix.substring(0, 16);
+		
+		if(this.suffix.length() > 16)
+			this.suffix = this.suffix.substring(0, 16);
 	}
 	
 	public void destroyTeam() {
@@ -189,6 +191,22 @@ public class ScoreboardTeamManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getPrefix() {
+		return prefix;
+	}
+	
+	public String getSuffix() {
+		return suffix;
+	}
+	
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+	
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
 	}
 
 }

@@ -44,7 +44,7 @@ public class SignGUI implements Listener {
 			@Override
 			public void run() {
 				try {
-					boolean useCraftBlockEntityState = utils.isNewVersion() || eazyNick.getVersion().startsWith("1_12");
+					boolean useCraftBlockEntityState = utils.isNewVersion() || Bukkit.getVersion().contains("1.12.2") || Bukkit.getVersion().contains("1.12.1");
 					Object entityPlayer = p.getClass().getMethod("getHandle").invoke(p);
 					Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
 

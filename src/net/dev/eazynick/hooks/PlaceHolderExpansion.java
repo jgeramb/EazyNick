@@ -49,6 +49,12 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 			if(identifier.equals("tab_suffix"))
 				return api.getTabSuffix();
 			
+			if(identifier.equals("tag_prefix"))
+				return api.getTagPrefix();
+			
+			if(identifier.equals("tag_suffix"))
+				return api.getTagSuffix();
+			
 			if(identifier.equals("real_name"))
 				return api.getRealName();
 			

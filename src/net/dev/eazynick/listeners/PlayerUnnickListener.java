@@ -17,8 +17,12 @@ public class PlayerUnnickListener implements Listener {
 		
 		if(!(e.isCancelled())) {
 			Player p = e.getPlayer();
-			
+			String name = p.getName();
+	
 			new NickManager(p).unnickPlayer();
+			
+			if(eazyNick.getFileUtils().getConfig().getBoolean("LogNicknames"))
+				eazyNick.getUtils().sendConsole("§6" + name + " §7(" + p.getUniqueId().toString() + ") §4reset his nickname to §a" + p.getName());
 			
 			p.sendMessage(eazyNick.getUtils().getPrefix() + eazyNick.getLanguageFileUtils().getConfigString("Messages.Unnick"));
 		}

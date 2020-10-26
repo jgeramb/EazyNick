@@ -197,8 +197,11 @@ public class NickManager {
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
 		
-		utils.getOldDisplayNames().put(p.getUniqueId(), (p.getDisplayName() != null) ? p.getDisplayName() : p.getName());
-		utils.getOldPlayerListNames().put(p.getUniqueId(), (p.getPlayerListName() != null) ? p.getPlayerListName() :  p.getName());
+		if(!(utils.getOldDisplayNames().containsKey(p.getUniqueId())))
+			utils.getOldDisplayNames().put(p.getUniqueId(), (p.getDisplayName() != null) ? p.getDisplayName() : p.getName());
+		
+		if(!(utils.getOldPlayerListNames().containsKey(p.getUniqueId())))
+			utils.getOldPlayerListNames().put(p.getUniqueId(), (p.getPlayerListName() != null) ? p.getPlayerListName() :  p.getName());
 		
 		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
 			p.setCustomName(nickName);
@@ -532,6 +535,32 @@ public class NickManager {
 			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
 		}
 	}
+	
+	public String getTagPrefix() {
+		Utils utils = eazyNick.getUtils();
+		
+		return (utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()) ? utils.getScoreboardTeamManagers().get(p.getUniqueId()).getPrefix() : "");
+	}
+
+	public void setTagPrefix(String tagPrefix) {
+		Utils utils = eazyNick.getUtils();
+		
+		if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
+			utils.getScoreboardTeamManagers().get(p.getUniqueId()).setPrefix(tagPrefix);
+	}
+
+	public String getTagSuffix() {
+		Utils utils = eazyNick.getUtils();
+		
+		return (utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()) ? utils.getScoreboardTeamManagers().get(p.getUniqueId()).getSuffix() : "");
+	}
+
+	public void setTagSuffix(String tagSuffix) {
+		Utils utils = eazyNick.getUtils();
+		
+		if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
+			utils.getScoreboardTeamManagers().get(p.getUniqueId()).setSuffix(tagSuffix);
+	}
 
 	public boolean isNicked() {
 		return eazyNick.getUtils().getNickedPlayers().contains(p.getUniqueId());
@@ -680,6 +709,7 @@ public class NickManager {
 
 			nametagEditAPI.setPrefix(p, tagPrefix);
 			nametagEditAPI.setSuffix(p, tagSuffix);
+			nametagEditAPI.reloadNametag(p);
 		}
 		
 		if(utils.ultraPermissionsStatus()) {

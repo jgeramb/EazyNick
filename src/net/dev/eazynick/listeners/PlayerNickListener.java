@@ -80,6 +80,9 @@ public class PlayerNickListener implements Listener {
 			
 			if(changePrefixAndSuffix && utils.tabStatus() && fileUtils.getConfig().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
 				new TABHook(p).update(nickName, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
+
+			if(fileUtils.getConfig().getBoolean("LogNicknames"))
+				eazyNick.getUtils().sendConsole("§a" + p.getName() + " §7(" + p.getUniqueId().toString() + ") §4set his nickname to §6" + nickName);
 			
 			api.nickPlayer(nickName, e.getSkinName());
 			

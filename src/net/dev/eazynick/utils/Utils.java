@@ -16,6 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.Plugin;
 
 import com.google.common.primitives.Chars;
@@ -242,7 +243,7 @@ public class Utils {
 		
 		if(nameWithoutColors.length() <= 16) {
 			if(!(fileUtils.getConfig().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
-				if(!(containsSpecialChars(nameWithoutColors))) {
+				if(!(containsSpecialChars(nameWithoutColors)) || fileUtils.getConfig().getBoolean("AllowSpecialCharactersInCustomName")) {
 					if(!(blackList.contains(name.toUpperCase()))) {
 						boolean nickNameIsInUse = false;
 						
@@ -317,6 +318,13 @@ public class Utils {
 								
 								lastSkinNames.put(p.getUniqueId(), skinName);
 								lastNickNames.put(p.getUniqueId(), name);
+								
+								for (ItemStack item : p.getInventory().getContents()) {
+									if((item != null) && item.getType().equals(Material.WRITTEN_BOOK)) {
+										if(((BookMeta) item.getItemMeta()).getAuthor().equals(eazyNick.getDescription().getName()))
+											p.getInventory().remove(item);
+									}
+								}
 								
 								new NickManager(p).setGroupName(groupName);
 								

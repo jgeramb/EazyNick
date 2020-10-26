@@ -123,7 +123,7 @@ public class AnvilGUI {
 			Class<?> playerInventoryClass = reflectUtils.getNMSClass("PlayerInventory"), worldClass = reflectUtils.getNMSClass("World");
 			Object player = p.getClass().getMethod("getHandle").invoke(p), playerInventory = getPlayerField(p, "inventory"), world = getPlayerField(p, "world"), blockPosition = blockPositionClass.getConstructor(int.class, int.class, int.class).newInstance(0, 0, 0);
 			int c = (int) invokeMethod("nextContainerCounter", player);
-			Object container = version.startsWith("1_16") ? containerAnvil.getConstructor(int.class, playerInventoryClass, reflectUtils.getNMSClass("ContainerAccess")).newInstance(c, playerInventory, reflectUtils.getNMSClass("ContainerAccess").getMethod("at", worldClass, blockPositionClass).invoke(null, world, blockPosition)) : containerAnvil.getConstructor(playerInventoryClass, worldClass, blockPositionClass, entityHuman).newInstance(playerInventory, world, blockPosition, player);
+			Object container = (version.startsWith("1_16") || version.startsWith("1_15") || version.startsWith("1_14")) ? containerAnvil.getConstructor(int.class, playerInventoryClass, reflectUtils.getNMSClass("ContainerAccess")).newInstance(c, playerInventory, reflectUtils.getNMSClass("ContainerAccess").getMethod("at", worldClass, blockPositionClass).invoke(null, world, blockPosition)) : containerAnvil.getConstructor(playerInventoryClass, worldClass, blockPositionClass, entityHuman).newInstance(playerInventory, world, blockPosition, player);
 			
 			reflectUtils.getField(reflectUtils.getNMSClass("Container"), "checkReachable").set(container, false);
 
