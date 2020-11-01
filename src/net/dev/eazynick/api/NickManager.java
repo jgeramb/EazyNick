@@ -618,10 +618,10 @@ public class NickManager {
 	}
 	
 	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix) {
-		updatePrefixSuffix(tagPrefix, tagSuffix, chatPrefix, chatSuffix, tabPrefix, tabSuffix, "NONE");
+		updatePrefixSuffix(tagPrefix, tagSuffix, chatPrefix, chatSuffix, tabPrefix, tabSuffix, 9999, "NONE");
 	}
 	
-	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String groupName) {
+	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, int sortID, String groupName) {
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
 		
@@ -648,7 +648,7 @@ public class NickManager {
 			if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
 				utils.getScoreboardTeamManagers().remove(p.getUniqueId());
 				
-			utils.getScoreboardTeamManagers().put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix));
+			utils.getScoreboardTeamManagers().put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix, sortID, groupName));
 			
 			ScoreboardTeamManager sbtm = utils.getScoreboardTeamManagers().get(p.getUniqueId());
 			

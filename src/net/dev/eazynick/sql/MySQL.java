@@ -36,7 +36,13 @@ public class MySQL {
 				System.out.println(PREFIX + " Address: " + host + ":" + port);
 				System.out.println(PREFIX + " Database: " + database);
 				System.out.println(PREFIX + " Username: " + username);
-				System.out.println(PREFIX + " Password: " + password);
+				
+				String censoredPassword = "";
+				
+				for (int i = 0; i < password.length(); i++)
+					censoredPassword += "*";
+				
+				System.out.println(PREFIX + " Password: " + censoredPassword);
 			}
 		}
 	}
@@ -73,8 +79,16 @@ public class MySQL {
 						Statement s = con.createStatement();
 						s.executeUpdate(sql);
 						s.close();
-					} catch (SQLException e) {
-						System.out.println(PREFIX + "An error occured while executing mysql update (" + e.getMessage() + ")!");
+					} catch (SQLException ex) {
+						String msg = ex.getMessage();
+						
+						System.out.println(PREFIX + "An error occured while executing mysql update (" + msg + ")!");
+						
+						if(msg.contains("The driver has not received any packets from the server.")) {
+							con = null;
+							
+							connect();
+						}
 					}
 				}
 			}, 1).run();
@@ -89,19 +103,33 @@ public class MySQL {
 				final FutureTask<ResultSet> task = new FutureTask<ResultSet>(new Callable<ResultSet>() {
 					
 					@Override
-					public ResultSet call() throws SQLException {
-						Statement s = con.createStatement();
-						ResultSet rs = s.executeQuery(qry);
+					public ResultSet call() {
 						
-						return rs;
+						try {
+							Statement s = con.createStatement();
+							ResultSet rs = s.executeQuery(qry);
+							
+							return rs;
+						} catch (SQLException ex) {
+							String msg = ex.getMessage();
+							
+							System.out.println(PREFIX + "An error occured while executing mysql query (" + msg + ")!");
+							
+							if(msg.contains("The driver has not received any packets from the server.")) {
+								con = null;
+								
+								connect();
+							}
+						}
+						
+						return null;
 					}
 				});
 				
 				task.run();
 			
 				return task.get();
-			} catch (InterruptedException | ExecutionException e) {
-				System.out.println(PREFIX + "An error occured while executing mysql query (" + e.getMessage() + ")!");
+			} catch (InterruptedException | ExecutionException ex) {
 			}
 		}
 		

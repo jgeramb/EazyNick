@@ -30,6 +30,7 @@ public class PlayerRespawnListener implements Listener {
 		
 		if(utils.getPlayerNicknames().containsKey(p.getUniqueId())) {
 			String nickName = utils.getPlayerNicknames().get(p.getUniqueId()), skinName = utils.getLastSkinNames().containsKey(p.getUniqueId()) ? utils.getLastSkinNames().get(p.getUniqueId()) : nickName, rankName = api.getGroupName(), chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "";
+			int sortID = 9999;
 			
 			if(rankName.equals(fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName"))) {
 				chatPrefix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix");
@@ -38,6 +39,7 @@ public class PlayerRespawnListener implements Listener {
 				tabSuffix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix");
 				tagPrefix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix");
 				tagSuffix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix");
+				sortID = fileUtils.getConfig().getInt("Settings.NickFormat.ServerFullRank.SortID");
 			} else if(rankName.equals(fileUtils.getConfigString("Settings.NickFormat.GroupName"))) {
 				chatPrefix = fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix");
 				chatSuffix = fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix");
@@ -45,6 +47,7 @@ public class PlayerRespawnListener implements Listener {
 				tabSuffix = fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix");
 				tagPrefix = fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
 				tagSuffix = fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
+				sortID = fileUtils.getConfig().getInt("Settings.NickFormat.SortID");
 			} else {
 				for (int i = 1; i <= 18; i++) {
 					if(rankName.equals(guiFileUtils.getConfig().getString("RankGUI.Rank" + i + ".RankName"))) {
@@ -54,6 +57,7 @@ public class PlayerRespawnListener implements Listener {
 						tabSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
 						tagPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
 						tagSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+						sortID = guiFileUtils.getConfig().getInt("Settings.NickFormat.Rank" + i + ".SortID");
 					}
 				}
 				
@@ -79,12 +83,13 @@ public class PlayerRespawnListener implements Listener {
 			utils.getLastNickNames().put(p.getUniqueId(), nickName);
 			
 			String finalChatPrefix = chatPrefix, finalChatSuffix = chatSuffix, finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix, finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
-
+			int finalSortID = sortID;
+			
 			Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 				if(p.isOnline()) {
 					new NickManager(p).setGroupName(rankName);
 					
-					Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nickName, skinName, finalChatPrefix, finalChatSuffix, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, false, true, rankName));
+					Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nickName, skinName, finalChatPrefix, finalChatSuffix, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, false, true, finalSortID, rankName));
 				}
 			}, 22 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? 60 : 0));
 		}

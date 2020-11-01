@@ -22,12 +22,12 @@ public class ScoreboardTeamManager {
 	private String teamName, prefix, suffix;
 	private Object packet;
 	
-	public ScoreboardTeamManager(Player p, String prefix, String suffix) {
+	public ScoreboardTeamManager(Player p, String prefix, String suffix, int sortID, String rank) {
 		this.eazyNick = EazyNick.getInstance();
 		this.p = p;
 		this.prefix = prefix;
 		this.suffix = suffix;
-		this.teamName = "9999" + p.getName();
+		this.teamName = sortID + rank + p.getUniqueId().toString().substring(0, 14);
 		
 		if(this.teamName.length() > 16)
 			this.teamName = this.teamName.substring(0, 16);

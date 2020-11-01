@@ -139,6 +139,7 @@ public class FileUtils {
 		cfg.addDefault("Settings.NickFormat.PlayerList.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.NameTag.Prefix", "&7");
 		cfg.addDefault("Settings.NickFormat.NameTag.Suffix", "&r");
+		cfg.addDefault("Settings.NickFormat.SortID", 9999);
 		cfg.addDefault("Settings.NickFormat.GroupName", "Default");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Prefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.Chat.Suffix", "&r");
@@ -146,6 +147,7 @@ public class FileUtils {
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Suffix", "&r");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Prefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Suffix", "&r");
+		cfg.addDefault("Settings.NickFormat.ServerFullRank.SortID", 9998);
 		cfg.addDefault("Settings.NickFormat.ServerFullRank.GroupName", "VIP");
 		cfg.addDefault("WorldsWithDisabledPrefixAndSuffix", Arrays.asList("example_world"));
 		cfg.addDefault("AutoNickWorldBlackList", Arrays.asList("example_world"));

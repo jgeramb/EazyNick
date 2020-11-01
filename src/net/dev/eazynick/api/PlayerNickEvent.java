@@ -12,8 +12,9 @@ public class PlayerNickEvent extends Event implements Cancellable {
 	private Player p;
 	private String nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName;
 	private boolean isBungeeOrJoinNick, isRenick;
+	private int sortID;
 	
-	public PlayerNickEvent(Player p, String nickName, String skinName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, boolean isBungeeOrJoinNick, boolean isRenick, String groupName) {
+	public PlayerNickEvent(Player p, String nickName, String skinName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, boolean isBungeeOrJoinNick, boolean isRenick, int sortID, String groupName) {
 		this.p = p;
 		
 		this.nickName = nickName;
@@ -28,6 +29,8 @@ public class PlayerNickEvent extends Event implements Cancellable {
 		
 		this.isBungeeOrJoinNick = isBungeeOrJoinNick;
 		this.isRenick = isRenick;
+		
+		this.sortID = sortID;
 		
 		this.groupName = groupName;
 	}
@@ -106,6 +109,14 @@ public class PlayerNickEvent extends Event implements Cancellable {
 	
 	public boolean isRenick() {
 		return isRenick;
+	}
+	
+	public int getSortID() {
+		return sortID;
+	}
+	
+	public void setSortID(int sortID) {
+		this.sortID = sortID;
 	}
 	
 	public String getGroupName() {

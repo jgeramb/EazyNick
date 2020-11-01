@@ -187,6 +187,7 @@ public class GUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank1.TabSuffix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.TagPrefix", "&7");
 		cfg.addDefault("Settings.NickFormat.Rank1.TagSuffix", "&7");
+		cfg.addDefault("Settings.NickFormat.Rank1.SortID", 9997);
 		cfg.addDefault("Settings.NickFormat.Rank1.GroupName", "Default");
 		
 		cfg.addDefault("Settings.NickFormat.Rank2.ChatPrefix", "&a[VIP] ");
@@ -195,6 +196,7 @@ public class GUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank2.TabSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank2.TagPrefix", "&a[VIP] ");
 		cfg.addDefault("Settings.NickFormat.Rank2.TagSuffix", "&r");
+		cfg.addDefault("Settings.NickFormat.Rank2.SortID", 9996);
 		cfg.addDefault("Settings.NickFormat.Rank2.GroupName", "VIP");
 		
 		cfg.addDefault("Settings.NickFormat.Rank3.ChatPrefix", "&a[VIP&6+&a] ");
@@ -203,6 +205,7 @@ public class GUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank3.TabSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank3.TagPrefix", "&a[VIP&6+&a] ");
 		cfg.addDefault("Settings.NickFormat.Rank3.TagSuffix", "&r");
+		cfg.addDefault("Settings.NickFormat.Rank3.SortID", 9995);
 		cfg.addDefault("Settings.NickFormat.Rank3.GroupName", "VIPPlus");
 		
 		cfg.addDefault("Settings.NickFormat.Rank4.ChatPrefix", "&b[MVP] ");
@@ -211,6 +214,7 @@ public class GUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank4.TabSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank4.TagPrefix", "&b[MVP] ");
 		cfg.addDefault("Settings.NickFormat.Rank4.TagSuffix", "&r");
+		cfg.addDefault("Settings.NickFormat.Rank4.SortID", 9994);
 		cfg.addDefault("Settings.NickFormat.Rank4.GroupName", "MVP");
 		
 		cfg.addDefault("Settings.NickFormat.Rank5.ChatPrefix", "&b[MVP%randomColor%+&b] ");
@@ -219,6 +223,7 @@ public class GUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank5.TabSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank5.TagPrefix", "&b[MVP%randomColor%+&b] ");
 		cfg.addDefault("Settings.NickFormat.Rank5.TagSuffix", "&r");
+		cfg.addDefault("Settings.NickFormat.Rank5.SortID", 9993);
 		cfg.addDefault("Settings.NickFormat.Rank5.GroupName", "MVPPlus");
 		
 		cfg.addDefault("Settings.NickFormat.Rank6.ChatPrefix", "&6[MVP%randomColor%++&6] ");
@@ -227,6 +232,7 @@ public class GUIFileUtils {
 		cfg.addDefault("Settings.NickFormat.Rank6.TabSuffix", "&r");
 		cfg.addDefault("Settings.NickFormat.Rank6.TagPrefix", "&6[MVP%randomColor%++&6] ");
 		cfg.addDefault("Settings.NickFormat.Rank6.TagSuffix", "&r");
+		cfg.addDefault("Settings.NickFormat.Rank6.SortID", 9992);
 		cfg.addDefault("Settings.NickFormat.Rank6.GroupName", "MVPPlusPlus");
 		
 		for (int i = 7; i <= 18; i++) {
@@ -238,6 +244,7 @@ public class GUIFileUtils {
 			cfg.addDefault("Settings.NickFormat.Rank" + i + ".TabSuffix", suffix);
 			cfg.addDefault("Settings.NickFormat.Rank" + i + ".TagPrefix", prefix);
 			cfg.addDefault("Settings.NickFormat.Rank" + i + ".TagSuffix", suffix);
+			cfg.addDefault("Settings.NickFormat.Rank" + i + ".SortID", 9997 - i);
 			cfg.addDefault("Settings.NickFormat.Rank" + i + ".GroupName", "Rank" + i);
 		}
 

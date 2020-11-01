@@ -240,6 +240,7 @@ public class Utils {
 		String chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "", nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
 		String skinName = "";
 		boolean isCancelled = false;
+		int sortID = 9999;
 		
 		if(nameWithoutColors.length() <= 16) {
 			if(!(fileUtils.getConfig().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
@@ -335,7 +336,7 @@ public class Utils {
 									if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
 										nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString("BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
 								} else {
-									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, groupName));
+									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, sortID, groupName));
 								
 									if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
 										nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString("BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
@@ -443,7 +444,7 @@ public class Utils {
 
 		new NickManager(p).setGroupName(serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName"));
 		
-		Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, fileUtils.getConfig().getBoolean("UseMineSkinAPI") ? "MineSkin" : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+		Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nameWhithoutColors, fileUtils.getConfig().getBoolean("UseMineSkinAPI") ? "MineSkin" : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? fileUtils.getConfig().getInt("Settings.NickFormat.ServerFullRank.SortID") : fileUtils.getConfig().getInt("Settings.NickFormat.SortID"), serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
 	}
 	
 	public void performReNick(Player p) {
@@ -496,16 +497,7 @@ public class Utils {
 						if(mysqlPlayerDataManager.isRegistered(p.getUniqueId())) {
 							new NickManager(p).setGroupName("Default");
 							
-							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
-									mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()),
-									mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()),
-									mysqlPlayerDataManager.getTabPrefix(p.getUniqueId()),
-									mysqlPlayerDataManager.getTabSuffix(p.getUniqueId()),
-									mysqlPlayerDataManager.getTagPrefix(p.getUniqueId()),
-									mysqlPlayerDataManager.getTagSuffix(p.getUniqueId()),
-									true,
-									false,
-									"NONE"));
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()), mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()), mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()), mysqlPlayerDataManager.getTabPrefix(p.getUniqueId()), mysqlPlayerDataManager.getTabSuffix(p.getUniqueId()), mysqlPlayerDataManager.getTagPrefix(p.getUniqueId()), mysqlPlayerDataManager.getTagSuffix(p.getUniqueId()), true, false, 9999, "NONE"));
 						} else {
 							boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
 							String prefix = serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
@@ -513,16 +505,7 @@ public class Utils {
 						
 							new NickManager(p).setGroupName("ServerFull");
 							
-							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()),
-									serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"),
-									serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"),
-									serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"),
-									serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"),
-									prefix,
-									suffix,
-									true,
-									false,
-									(getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()), serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix"), serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix"), serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix"), serverFull ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix"), prefix, suffix, true, false, (getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfig().getInt("Settings.NickFormat.ServerFullRank.SortID") : fileUtils.getConfig().getInt("Settings.NickFormat.GrSortIDoupName"), (getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName") : fileUtils.getConfigString("Settings.NickFormat.GroupName")));
 						}
 					} else
 						p.sendMessage(prefix + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
