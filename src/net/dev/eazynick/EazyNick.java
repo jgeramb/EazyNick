@@ -150,7 +150,7 @@ public class EazyNick extends JavaPlugin {
 						|| reflectVersion.equals("v1_12_R1") || reflectVersion.equals("v1_13_R1")
 						|| reflectVersion.equals("v1_13_R2") || reflectVersion.equals("v1_14_R1")
 						|| reflectVersion.equals("v1_15_R1") || reflectVersion.equals("v1_16_R1")
-						|| reflectVersion.equals("v1_16_R2"))) {
+						|| reflectVersion.equals("v1_16_R2") || reflectVersion.equals("v1_16_R3"))) {
 					utils.sendConsole("§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 
 					isCancelled = true;

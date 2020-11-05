@@ -59,7 +59,7 @@ public class SignGUI implements Listener {
 					Field handler = tileSign.getClass().getDeclaredField((eazyNick.getVersion().startsWith("1_15") || eazyNick.getVersion().startsWith("1_16")) ? "c" : (eazyNick.getVersion().startsWith("1_14") ? "j" : (eazyNick.getVersion().startsWith("1_13") ? "g" : "h")));
 					handler.setAccessible(true);
 					handler.set(tileSign, entityPlayer);
-
+					
 					playerConnection.getClass().getDeclaredMethod("sendPacket", reflectUtils.getNMSClass("Packet")).invoke(playerConnection, reflectUtils.getNMSClass("PacketPlayOutOpenSignEditor").getConstructor(reflectUtils.getNMSClass("BlockPosition")).newInstance(reflectUtils.getNMSClass("BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
 					
 					Bukkit.getScheduler().runTaskLater(eazyNick, () -> b.setType(Material.AIR), 3);
