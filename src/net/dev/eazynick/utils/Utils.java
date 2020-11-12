@@ -412,8 +412,13 @@ public class Utils {
 		
 		boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
 		String nameWhithoutColors = ChatColor.stripColor(name);
-		String[] prefixSuffix = name.split(nameWhithoutColors);
+		String[] prefixSuffix = new String[] {};
 		String chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix;
+		
+		try {
+			prefixSuffix = name.split(nameWhithoutColors);
+		} catch (Exception ex) {
+		}
 		
 		if(prefixSuffix.length >= 1) {
 			chatPrefix = ChatColor.translateAlternateColorCodes('&', prefixSuffix[0]);
