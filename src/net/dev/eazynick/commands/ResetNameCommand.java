@@ -24,8 +24,8 @@ public class ResetNameCommand implements CommandExecutor {
 				api.setName(api.getRealName());
 				api.updatePlayer();
 
-				eazyNick.getMySQLPlayerDataManager().removeData(p.getUniqueId());
-				eazyNick.getMySQLNickManager().removePlayer(p.getUniqueId());
+				if(eazyNick.getMySQLNickManager() != null)
+					eazyNick.getMySQLNickManager().removePlayer(p.getUniqueId());
 				
 				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString("Messages.ResetName"));
 			} else
