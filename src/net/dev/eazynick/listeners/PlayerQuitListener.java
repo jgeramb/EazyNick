@@ -34,7 +34,7 @@ public class PlayerQuitListener implements Listener {
 				api.unnickPlayerWithoutRemovingMySQL(true);
 			
 			if(fileUtils.getConfig().getBoolean("OverwriteJoinQuitMessages")) {
-				String message = fileUtils.getConfigString("OverwrittenMessages.Quit");
+				String message = fileUtils.getConfigString(p, "OverwrittenMessages.Quit");
 				
 				if(fileUtils.getConfig().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(p.getUniqueId()))
 					message = message.replace("%name%", mysqlNickManager.getNickName(p.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()) + mysqlNickManager.getNickName(p.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()));

@@ -6,9 +6,12 @@ import java.util.Arrays;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import net.dev.eazynick.EazyNick;
+
+import me.clip.placeholderapi.PlaceholderAPI;
 
 public class FileUtils {
 
@@ -169,8 +172,13 @@ public class FileUtils {
 		}
 	}
 	
-	public String getConfigString(String path) {
-		return ChatColor.translateAlternateColorCodes('&', cfg.getString(path));
+	public String getConfigString(Player p, String path) {
+		String string = ChatColor.translateAlternateColorCodes('&', cfg.getString(path));
+		
+		if(EazyNick.getInstance().getUtils().placeholderAPIStatus() && (p != null))
+			string = PlaceholderAPI.setPlaceholders(p, string);
+		
+		return string;
 	}
 	
 	public File getFile() {

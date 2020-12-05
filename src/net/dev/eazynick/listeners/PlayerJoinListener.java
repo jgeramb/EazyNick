@@ -45,7 +45,7 @@ public class PlayerJoinListener implements Listener {
 			p.setCustomName(p.getName());
 
 		if(fileUtils.getConfig().getBoolean("OverwriteJoinQuitMessages") && new NickManager(p).isNicked()) {
-			String message = fileUtils.getConfigString("OverwrittenMessages.Join");
+			String message = fileUtils.getConfigString(p, "OverwrittenMessages.Join");
 			
 			if(fileUtils.getConfig().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(p.getUniqueId()))
 				message = message.replace("%name%", mysqlNickManager.getNickName(p.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()) + mysqlNickManager.getNickName(p.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()));
@@ -111,17 +111,17 @@ public class PlayerJoinListener implements Listener {
 					if (fileUtils.getConfig().getBoolean("NickItem.getOnJoin")) {
 						if (p.hasPermission("nick.item")) {
 							if (!(mysqlNickManager.isPlayerNicked(p.getUniqueId())))
-								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
+								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 							else
-								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
+								p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
 						}
 					}
 				} else if (fileUtils.getConfig().getBoolean("NickItem.getOnJoin")) {
 					if (p.hasPermission("nick.item")) {
 						if (fileUtils.getConfig().getBoolean("NickOnWorldChange"))
-							p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
+							p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 						else
-							p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
+							p.getInventory().setItem(fileUtils.getConfig().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 					}
 				}
 				
@@ -146,12 +146,12 @@ public class PlayerJoinListener implements Listener {
 							
 							for (int i = 1; i <= 18; i++) {
 								if(rankName.equals(guiFileUtils.getConfig().getString("RankGUI.Rank" + i + ".RankName"))) {
-									chatPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
-									chatSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
-									tabPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
-									tabSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
-									tagPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
-									tagSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+									chatPrefix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".ChatPrefix");
+									chatSuffix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".ChatSuffix");
+									tabPrefix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TabPrefix");
+									tabSuffix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TabSuffix");
+									tagPrefix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TagPrefix");
+									tagSuffix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TagSuffix");
 									sortID = guiFileUtils.getConfig().getInt("Settings.NickFormat.Rank" + i + ".SortID");
 								}
 							}

@@ -55,7 +55,7 @@ public class HelpCommand implements CommandExecutor {
 					} else if(args[0].equalsIgnoreCase("reload") && p.hasPermission("nick.reload")) {
 						utils.reloadConfigs();
 						
-						p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString("Messages.ReloadConfig"));
+						p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString(p, "Messages.ReloadConfig"));
 					} else
 						p.sendMessage(utils.getPrefix() + "§cPage §e" + args[0] + " could not be found (Pages: 1-3)");
 				}

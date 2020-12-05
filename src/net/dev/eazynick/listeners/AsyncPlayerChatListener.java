@@ -12,8 +12,6 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.utils.FileUtils;
 import net.dev.eazynick.utils.Utils;
 
-import me.clip.placeholderapi.PlaceholderAPI;
-
 public class AsyncPlayerChatListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -50,10 +48,7 @@ public class AsyncPlayerChatListener implements Listener {
 				if (api.isNicked()) {
 					e.setCancelled(true);
 					
-					String format = fileUtils.getConfigString("Settings.ChatFormat").replace("%displayName%", p.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", p.getName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", e.getMessage().replaceAll("%", "%%"));
-					
-					if(utils.placeholderAPIStatus())
-						format = PlaceholderAPI.setPlaceholders(p, format);
+					String format = fileUtils.getConfigString(p, "Settings.ChatFormat").replace("%displayName%", p.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", p.getName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", e.getMessage()).replaceAll("%", "%%");
 					
 					e.setFormat(format);
 					

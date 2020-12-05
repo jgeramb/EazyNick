@@ -25,7 +25,7 @@ public class ResetSkinCommand implements CommandExecutor {
 				api.changeSkin(api.getRealName());
 				api.updatePlayer();
 				
-				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString("Messages.ResetSkin"));
+				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString(p, "Messages.ResetSkin"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

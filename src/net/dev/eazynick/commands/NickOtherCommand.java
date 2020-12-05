@@ -32,9 +32,9 @@ public class NickOtherCommand implements CommandExecutor {
 						if(!(utils.getNickedPlayers().contains(t.getUniqueId()))) {
 							if(args.length >= 2) {
 								if(args[1].length() <= 16) {
-									String name = args[1].trim();
+									String name = args[1].trim(), formattedName = ChatColor.translateAlternateColorCodes('&', name);
 									
-									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.SelectedNick").replace("%playerName%", t.getName()).replace("%nickName%", ChatColor.translateAlternateColorCodes('&', name)));
+									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(t, "Messages.Other.SelectedNick").replace("%playerName%", t.getName()).replace("%playername%", t.getName()).replace("%nickName%", formattedName).replace("%nickname%", formattedName));
 									
 									if((!(t.hasPermission("nick.use"))) || !(t.hasPermission("nick.customnickname"))) {
 										PermissionAttachment pa = t.addAttachment(eazyNick);
@@ -48,11 +48,10 @@ public class NickOtherCommand implements CommandExecutor {
 										t.recalculatePermissions();
 									} else
 										utils.performNick(t, name);
-								} else {
-									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickTooLong"));
-								}
+								} else
+									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickTooLong"));
 							} else {
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.RandomNick").replace("%playerName%", t.getName()));
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(t, "Messages.Other.RandomNick").replace("%playerName%", t.getName()).replace("%playername%", t.getName()));
 								
 								if(!(t.hasPermission("nick.use"))) {
 									PermissionAttachment pa = t.addAttachment(eazyNick);
@@ -67,10 +66,9 @@ public class NickOtherCommand implements CommandExecutor {
 									utils.performNick(t, "RANDOM");
 							}
 						} else {
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Other.Unnick").replace("%playerName%", t.getName()));
+							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(t, "Messages.Other.Unnick").replace("%playerName%", t.getName()).replace("%playername%", t.getName()));
 							
-							if(utils.getNickedPlayers().contains(p.getUniqueId()))
-								Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(t));
+							Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(t));
 							
 							if(!(t.hasPermission("nick.use"))) {
 								PermissionAttachment pa = t.addAttachment(eazyNick);
@@ -82,7 +80,7 @@ public class NickOtherCommand implements CommandExecutor {
 							}
 						}
 					} else
-						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerNotFound"));
+						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerNotFound"));
 				}
 			} else
 				p.sendMessage(utils.getNoPerm());

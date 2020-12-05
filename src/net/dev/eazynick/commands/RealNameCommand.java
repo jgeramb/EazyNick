@@ -27,12 +27,14 @@ public class RealNameCommand implements CommandExecutor {
 					Player t = Bukkit.getPlayer(args[0]);
 					
 					if(t != null) {
-						if(utils.getNickedPlayers().contains(t.getUniqueId()))
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.RealName").replace("%realName%", new NickManager(t).getRealName()));
-						else
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerNotNicked"));
+						if(utils.getNickedPlayers().contains(t.getUniqueId())) {
+							String realName = new NickManager(t).getRealName();
+							
+							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.RealName").replace("%realName%", realName).replace("%realname%", realName));
+						} else
+							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerNotNicked"));
 					} else
-						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerNotFound"));
+						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerNotFound"));
 				}
 			} else
 				p.sendMessage(utils.getNoPerm());

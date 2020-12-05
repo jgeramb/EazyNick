@@ -88,24 +88,24 @@ public class NickCommand implements CommandExecutor {
 													if(!(name.equalsIgnoreCase(p.getName())))
 														utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name)))));
 													else
-														p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.CanNotNickAsSelf"));
+														p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.CanNotNickAsSelf"));
 												} else
-													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.PlayerWithThisNameIsKnown"));
+													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerWithThisNameIsKnown"));
 											} else
-												p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickNameAlreadyInUse"));
+												p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickNameAlreadyInUse"));
 										} else
-											p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NameNotAllowed"));
+											p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NameNotAllowed"));
 									} else
-										p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickContainsSpecialCharacters"));
+										p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickContainsSpecialCharacters"));
 								} else
-									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickTooShort"));
+									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickTooShort"));
 							} else
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickTooLong"));
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickTooLong"));
 						} else
 							p.sendMessage(utils.getNoPerm());
 					}
 				} else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickDelay"));
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickDelay"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

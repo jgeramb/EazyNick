@@ -21,7 +21,7 @@ public class ReloadConfigCommand implements CommandExecutor {
 			if(p.hasPermission("nick.reload")) {
 				utils.reloadConfigs();
 				
-				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString("Messages.ReloadConfig"));
+				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString(p, "Messages.ReloadConfig"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

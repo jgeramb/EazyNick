@@ -26,7 +26,7 @@ public class UnnickCommand implements CommandExecutor {
 				if(utils.getNickedPlayers().contains(p.getUniqueId()))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 				else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NotNicked"));
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NotNicked"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

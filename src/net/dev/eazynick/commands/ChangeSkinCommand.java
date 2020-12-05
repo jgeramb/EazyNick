@@ -33,17 +33,17 @@ public class ChangeSkinCommand implements CommandExecutor {
 						api.changeSkin(name);
 						api.updatePlayer();
 						
-						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.SkinChanged").replace("%skinName%", name));
+						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.SkinChanged").replace("%skinName%", name).replace("%skinname%", name));
 					} else {
 						String name = eazyNick.getFileUtils().getConfig().getBoolean("UseMineSkinAPI") ? "MineSkin" : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 						
 						api.changeSkin(name);
 						api.updatePlayer();
 						
-						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.SkinChanged").replace("%skinName%", name));
+						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.SkinChanged").replace("%skinName%", name).replace("%skinname%", name));
 					}
 				} else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickDelay"));
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickDelay"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

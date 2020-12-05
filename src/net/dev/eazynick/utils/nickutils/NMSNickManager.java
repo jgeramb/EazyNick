@@ -168,7 +168,7 @@ public class NMSNickManager extends ReflectUtils {
 					gp = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
 				} catch (Exception e) {
 					if(fileUtils.getConfig().getBoolean("ShowProfileErrorMessages"))
-						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
+						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile§7, §cthis is NOT a plugin error§7!");
 				}
 				
 				if(gp == null)
@@ -197,7 +197,7 @@ public class NMSNickManager extends ReflectUtils {
 					gp = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
 				} catch (Exception e) {
 					if(fileUtils.getConfig().getBoolean("ShowProfileErrorMessages"))
-						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
+						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile§7, §cthis is NOT a plugin error§7!");
 				}
 				
 				if(gp == null)
@@ -226,7 +226,7 @@ public class NMSNickManager extends ReflectUtils {
 					gp = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
 				} catch (Exception e) {
 					if(fileUtils.getConfig().getBoolean("ShowProfileErrorMessages"))
-						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile");
+						p.sendMessage(utils.getPrefix() + "§cAn error occured while preparing new profile§7, §cthis is NOT a plugin error§7!");
 				}
 				
 				if(gp == null)
@@ -280,12 +280,12 @@ public class NMSNickManager extends ReflectUtils {
 				if(type.equals(UpdateType.NICK)) {
 					if(fileUtils.getConfig().getBoolean("NickMessage.OnNnick")) {
 						for(Player all : Bukkit.getOnlinePlayers())
-							all.sendMessage(fileUtils.getConfigString("NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getRealName()));
+							all.sendMessage(fileUtils.getConfigString(p, "NickMessage.Nick.Quit").replace("%displayName%", p.getDisplayName()).replace("%displayname%", p.getDisplayName()).replace("%name%", api.getRealName()));
 					}
 				} else if(type.equals(UpdateType.UNNICK)) {
 					if(fileUtils.getConfig().getBoolean("NickMessage.OnUnnick")) {
 						for(Player all : Bukkit.getOnlinePlayers())
-							all.sendMessage(fileUtils.getConfigString("NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%name%", api.getNickName()));
+							all.sendMessage(fileUtils.getConfigString(p, "NickMessage.Unnick.Quit").replace("%displayName%", p.getDisplayName()).replace("%displayname%", p.getDisplayName()).replace("%name%", api.getNickName()));
 					}
 				}
 				
@@ -387,12 +387,12 @@ public class NMSNickManager extends ReflectUtils {
 							if(type.equals(UpdateType.NICK)) {
 								if(fileUtils.getConfig().getBoolean("NickMessage.OnNnick")) {
 									for(Player all : Bukkit.getOnlinePlayers())
-										all.sendMessage(fileUtils.getConfigString("NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
+										all.sendMessage(fileUtils.getConfigString(p, "NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%displayname%", p.getDisplayName()).replace("%name%", p.getName()));
 								}
 							} else if(type.equals(UpdateType.UNNICK)) {
 								if(fileUtils.getConfig().getBoolean("NickMessage.OnUnnick")) {
 									for(Player all : Bukkit.getOnlinePlayers())
-										all.sendMessage(fileUtils.getConfigString("NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%name%", p.getName()));
+										all.sendMessage(fileUtils.getConfigString(p, "NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%displayname%", p.getDisplayName()).replace("%name%", p.getName()));
 								}
 							}
 						}, 4 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));

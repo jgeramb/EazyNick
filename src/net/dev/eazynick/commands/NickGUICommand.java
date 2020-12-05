@@ -25,13 +25,13 @@ public class NickGUICommand implements CommandExecutor {
 			Player p = (Player) sender;
 			
 			if(p.hasPermission("nick.gui")) {
-				Inventory inv = Bukkit.createInventory(null, 27, guiFileUtils.getConfigString("NickGUI.InventoryTitle"));
+				Inventory inv = Bukkit.createInventory(null, 27, guiFileUtils.getConfigString(p, "NickGUI.InventoryTitle"));
 				
 				for (int i = 0; i < inv.getSize(); i++)
 					inv.setItem(i, new ItemBuilder(Material.getMaterial(utils.isNewVersion() ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, utils.isNewVersion() ? 0 : 15).setDisplayName("§r").build());
 				
-				inv.setItem(11, new ItemBuilder(Material.NAME_TAG).setDisplayName(guiFileUtils.getConfigString("NickGUI.Nick.DisplayName")).build());
-				inv.setItem(15, new ItemBuilder(Material.GLASS, 1, 14).setDisplayName(guiFileUtils.getConfigString("NickGUI.Unnick.DisplayName")).build());
+				inv.setItem(11, new ItemBuilder(Material.NAME_TAG).setDisplayName(guiFileUtils.getConfigString(p, "NickGUI.Nick.DisplayName")).build());
+				inv.setItem(15, new ItemBuilder(Material.GLASS, 1, 14).setDisplayName(guiFileUtils.getConfigString(p, "NickGUI.Unnick.DisplayName")).build());
 				
 				p.openInventory(inv);
 			} else

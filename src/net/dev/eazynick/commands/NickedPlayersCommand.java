@@ -33,16 +33,16 @@ public class NickedPlayersCommand implements CommandExecutor {
 				}
 				
 				if(playerIsNicked) {
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickedPlayers.CurrentNickedPlayers"));
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickedPlayers.CurrentNickedPlayers"));
 					
 					for (Player all : Bukkit.getOnlinePlayers()) {
 						NickManager api = new NickManager(all);
 						
 						if(api.isNicked())
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickedPlayers.PlayerINFO").replace("%realName%", api.getRealName()).replace("%nickName%", api.getNickName()));
+							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickedPlayers.PlayerINFO").replace("%realName%", api.getRealName()).replace("%realname%", api.getRealName()).replace("%nickName%", api.getNickName()).replace("%nickname%", api.getNickName()));
 					}
 				} else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NickedPlayers.NoPlayerIsNicked"));
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickedPlayers.NoPlayerIsNicked"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

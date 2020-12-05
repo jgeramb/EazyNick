@@ -32,31 +32,31 @@ public class PlayerRespawnListener implements Listener {
 			String nickName = utils.getPlayerNicknames().get(p.getUniqueId()), skinName = utils.getLastSkinNames().containsKey(p.getUniqueId()) ? utils.getLastSkinNames().get(p.getUniqueId()) : nickName, rankName = api.getGroupName(), chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "";
 			int sortID = 9999;
 			
-			if(rankName.equals(fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.GroupName"))) {
-				chatPrefix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix");
-				chatSuffix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix");
-				tabPrefix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix");
-				tabSuffix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix");
-				tagPrefix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix");
-				tagSuffix = fileUtils.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix");
+			if(rankName.equals(fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.GroupName"))) {
+				chatPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.Chat.Prefix");
+				chatSuffix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.Chat.Suffix");
+				tabPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.PlayerList.Prefix");
+				tabSuffix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.PlayerList.Suffix");
+				tagPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.NameTag.Prefix");
+				tagSuffix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.NameTag.Suffix");
 				sortID = fileUtils.getConfig().getInt("Settings.NickFormat.ServerFullRank.SortID");
-			} else if(rankName.equals(fileUtils.getConfigString("Settings.NickFormat.GroupName"))) {
-				chatPrefix = fileUtils.getConfigString("Settings.NickFormat.Chat.Prefix");
-				chatSuffix = fileUtils.getConfigString("Settings.NickFormat.Chat.Suffix");
-				tabPrefix = fileUtils.getConfigString("Settings.NickFormat.PlayerList.Prefix");
-				tabSuffix = fileUtils.getConfigString("Settings.NickFormat.PlayerList.Suffix");
-				tagPrefix = fileUtils.getConfigString("Settings.NickFormat.NameTag.Prefix");
-				tagSuffix = fileUtils.getConfigString("Settings.NickFormat.NameTag.Suffix");
+			} else if(rankName.equals(fileUtils.getConfigString(p, "Settings.NickFormat.GroupName"))) {
+				chatPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.Chat.Prefix");
+				chatSuffix = fileUtils.getConfigString(p, "Settings.NickFormat.Chat.Suffix");
+				tabPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.PlayerList.Prefix");
+				tabSuffix = fileUtils.getConfigString(p, "Settings.NickFormat.PlayerList.Suffix");
+				tagPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.NameTag.Prefix");
+				tagSuffix = fileUtils.getConfigString(p, "Settings.NickFormat.NameTag.Suffix");
 				sortID = fileUtils.getConfig().getInt("Settings.NickFormat.SortID");
 			} else {
 				for (int i = 1; i <= 18; i++) {
 					if(rankName.equals(guiFileUtils.getConfig().getString("RankGUI.Rank" + i + ".RankName"))) {
-						chatPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
-						chatSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
-						tabPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
-						tabSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
-						tagPrefix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
-						tagSuffix = guiFileUtils.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+						chatPrefix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".ChatPrefix");
+						chatSuffix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".ChatSuffix");
+						tabPrefix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TabPrefix");
+						tabSuffix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TabSuffix");
+						tagPrefix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TagPrefix");
+						tagSuffix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TagSuffix");
 						sortID = guiFileUtils.getConfig().getInt("Settings.NickFormat.Rank" + i + ".SortID");
 					}
 				}

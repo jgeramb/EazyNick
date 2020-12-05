@@ -90,7 +90,7 @@ public class PlayerNickListener implements Listener {
 				api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), chatPrefix, chatSuffix, e.getTabPrefix(), e.getTabSuffix(), e.getSortID(), e.getGroupName());
 			
 			if(!(e.isRenick()))
-				p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName));
+				p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName));
 		}
 	}
 

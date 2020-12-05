@@ -107,8 +107,8 @@ public class ScoreboardTeamManager {
 				
 				if(t.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission") && fileUtils.getConfig().getBoolean("BypassFormat.Show")) {
 					contents = Arrays.asList(new NickManager(p).getRealName());
-					prefixForPlayer = fileUtils.getConfigString("BypassFormat.NameTagPrefix");
-					suffixForPlayer = fileUtils.getConfigString("BypassFormat.NameTagSuffix");
+					prefixForPlayer = fileUtils.getConfigString(p, "BypassFormat.NameTagPrefix");
+					suffixForPlayer = fileUtils.getConfigString(p, "BypassFormat.NameTagSuffix");
 				}
 				
 				if(eazyNick.getUtils().placeholderAPIStatus()) {

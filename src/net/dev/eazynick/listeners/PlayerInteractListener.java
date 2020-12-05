@@ -32,42 +32,42 @@ public class PlayerInteractListener implements Listener {
 			
 			if (fileUtils.getConfig().getBoolean("NickItem.getOnJoin")) {
 				if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-					if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.DisplayName.Disabled"))) {
+					if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Disabled"))) {
 						e.setCancelled(true);
 						utils.performNick(p, "RANDOM");
 
-						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
-					} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.DisplayName.Enabled"))) {
+						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
+					} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Enabled"))) {
 						e.setCancelled(true);
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 
-						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
+						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 					} else {
 						if (fileUtils.getConfig().getBoolean("NickOnWorldChange")) {
-							if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled"))) {
+							if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Disabled"))) {
 								e.setCancelled(true);
 
 								utils.getNickOnWorldChangePlayers().add(p.getUniqueId());
-								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
+								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
 
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.WorldChangeAutoNickEnabled"));
-							} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Enabled"))) {
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.WorldChangeAutoNickEnabled"));
+							} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Enabled"))) {
 								e.setCancelled(true);
 
 								utils.getNickOnWorldChangePlayers().remove(p.getUniqueId());
-								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString("NickItem.WorldChange.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString("NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
+								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
 
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.WorldChangeAutoNickDisabled"));
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.WorldChangeAutoNickDisabled"));
 							}
 						}
 
 						if (fileUtils.getConfig().getBoolean("BungeeCord")) {
 							if (!(utils.getNickedPlayers().contains(p.getUniqueId()))) {
-								if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Disabled"))) {
+								if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.BungeeCord.DisplayName.Disabled"))) {
 									e.setCancelled(true);
 
 									utils.toggleBungeeNick(p);
-								} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString("NickItem.BungeeCord.DisplayName.Enabled"))) {
+								} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.BungeeCord.DisplayName.Enabled"))) {
 									e.setCancelled(true);
 
 									utils.toggleBungeeNick(p);

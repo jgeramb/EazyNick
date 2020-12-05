@@ -23,7 +23,7 @@ public class FixSkinCommand implements CommandExecutor {
 				NickManager api = new NickManager(p);
 				api.updatePlayer();
 
-				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString("Messages.FixSkin"));
+				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString(p, "Messages.FixSkin"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

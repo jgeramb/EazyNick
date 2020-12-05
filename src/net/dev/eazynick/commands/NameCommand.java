@@ -25,9 +25,9 @@ public class NameCommand implements CommandExecutor {
 				NickManager api = new NickManager(p);
 				
 				if(api.isNicked()) {
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.Name").replace("%name%", api.getNickName()));
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.Name").replace("%name%", api.getNickName()));
 				} else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString("Messages.NotNicked"));
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NotNicked"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else
