@@ -2,11 +2,8 @@ package net.dev.eazynick.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachment;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.PlayerUnnickEvent;
@@ -36,48 +33,18 @@ public class NickOtherCommand implements CommandExecutor {
 									
 									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(t, "Messages.Other.SelectedNick").replace("%playerName%", t.getName()).replace("%playername%", t.getName()).replace("%nickName%", formattedName).replace("%nickname%", formattedName));
 									
-									if((!(t.hasPermission("nick.use"))) || !(t.hasPermission("nick.customnickname"))) {
-										PermissionAttachment pa = t.addAttachment(eazyNick);
-										pa.setPermission("nick.use", true);
-										pa.setPermission("nick.customnickname", true);
-										t.recalculatePermissions();
-										
-										utils.performNick(t, name);
-										
-										t.removeAttachment(pa);
-										t.recalculatePermissions();
-									} else
-										utils.performNick(t, name);
+									utils.performNick(t, name);
 								} else
 									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickTooLong"));
 							} else {
 								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(t, "Messages.Other.RandomNick").replace("%playerName%", t.getName()).replace("%playername%", t.getName()));
 								
-								if(!(t.hasPermission("nick.use"))) {
-									PermissionAttachment pa = t.addAttachment(eazyNick);
-									pa.setPermission("nick.use", true);
-									t.recalculatePermissions();
-									
-									utils.performNick(t, "RANDOM");
-									
-									t.removeAttachment(pa);
-									t.recalculatePermissions();
-								} else
-									utils.performNick(t, "RANDOM");
+								utils.performNick(t, "RANDOM");
 							}
-						} else {
+						} else { 
 							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(t, "Messages.Other.Unnick").replace("%playerName%", t.getName()).replace("%playername%", t.getName()));
 							
 							Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(t));
-							
-							if(!(t.hasPermission("nick.use"))) {
-								PermissionAttachment pa = t.addAttachment(eazyNick);
-								pa.setPermission("nick.use", true);
-								t.recalculatePermissions();
-								
-								t.removeAttachment(pa);
-								t.recalculatePermissions();
-							}
 						}
 					} else
 						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerNotFound"));
