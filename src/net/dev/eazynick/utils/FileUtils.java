@@ -155,6 +155,7 @@ public class FileUtils {
 		cfg.addDefault("WorldsWithDisabledPrefixAndSuffix", Arrays.asList("example_world"));
 		cfg.addDefault("AutoNickWorldBlackList", Arrays.asList("example_world"));
 		cfg.addDefault("BlackList", Arrays.asList("ExampleName"));
+		cfg.addDefault("DisabledNickWorlds", Arrays.asList("ExampleName"));
 		cfg.addDefault("MineSkinIds", Arrays.asList("1416741364", "898982494", "186233253"));
 		
 		cfg.options().copyDefaults(true);

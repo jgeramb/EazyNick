@@ -48,7 +48,7 @@ public class AsyncPlayerChatListener implements Listener {
 				if (api.isNicked()) {
 					e.setCancelled(true);
 					
-					String format = fileUtils.getConfigString(p, "Settings.ChatFormat").replace("%displayName%", p.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", p.getName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", e.getMessage()).replaceAll("%", "%%");
+					String format = fileUtils.getConfigString(p, "Settings.ChatFormat").replace("%displayName%", p.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", p.getName()).replace("%displayname%", p.getDisplayName()).replace("%nickname%", api.getNickName()).replace("%playername%", p.getName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", e.getMessage()).replaceAll("%", "%%");
 					
 					e.setFormat(format);
 					

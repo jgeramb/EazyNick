@@ -14,7 +14,8 @@ public class NickListCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		Utils utils = EazyNick.getInstance().getUtils();
+		EazyNick eazyNick = EazyNick.getInstance();
+		Utils utils = eazyNick.getUtils();
 		
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
@@ -23,7 +24,10 @@ public class NickListCommand implements CommandExecutor {
 				if(utils.getNickedPlayers().contains(p.getUniqueId()))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 				
-				utils.openNickList(p, 0);
+				if(!(eazyNick.getFileUtils().getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
+					utils.openNickList(p, 0);
+				else
+					p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString(p, "Messages.DisabledWorld"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

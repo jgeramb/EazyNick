@@ -49,9 +49,12 @@ public class NickCommand implements CommandExecutor {
 							utils.openNickList(p, 0);
 						else if(fileUtils.getConfig().getBoolean("OpenRankedNickGUIOnNickCommand"))
 							utils.openRankedNickGUI(p, "");
-						else if(args.length == 0)
-							utils.performNick(p, "RANDOM");
-						else if(p.hasPermission("nick.customnickname")) {
+						else if(args.length == 0) {
+							if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
+								utils.performNick(p, "RANDOM");
+							else
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
+						} else if(p.hasPermission("nick.customnickname")) {
 							String name = args[0].replace("\"", ""), nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
 							boolean isCancelled = false;
 							
@@ -85,9 +88,12 @@ public class NickCommand implements CommandExecutor {
 													isCancelled = true;
 												
 												if(!(isCancelled)) {
-													if(!(name.equalsIgnoreCase(p.getName())))
-														utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name)))));
-													else
+													if(!(name.equalsIgnoreCase(p.getName()))) {
+														if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
+															utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name)))));
+														else
+															p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
+													} else
 														p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.CanNotNickAsSelf"));
 												} else
 													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerWithThisNameIsKnown"));

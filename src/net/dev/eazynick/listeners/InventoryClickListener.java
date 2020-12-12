@@ -44,9 +44,14 @@ public class InventoryClickListener implements Listener {
 
 					if (displayName.equalsIgnoreCase(guiFileUtils.getConfigString(p, "NickGUI.Nick.DisplayName"))) {
 						p.closeInventory();
-						utils.performNick(p, "RANDOM");
+						
+						if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
+							utils.performNick(p, "RANDOM");
+						else
+							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
 					} else if (displayName.equalsIgnoreCase(guiFileUtils.getConfigString(p, "NickGUI.Unnick.DisplayName"))) {
 						p.closeInventory();
+						
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					}
 				} else if (utils.getNickNameListPages().containsKey(p.getUniqueId())) {
@@ -61,7 +66,11 @@ public class InventoryClickListener implements Listener {
 							utils.openNickList(p, utils.getNickNameListPages().get(p.getUniqueId()) + 1);
 						else if(!(displayName.equals("§r"))) {
 							p.closeInventory();
-							utils.performNick(p, displayName.replace(guiFileUtils.getConfigString(p, "NickNameGUI.NickName.DisplayName").replace("%nickName%", "").replace("%nickname%", ""), ""));
+							
+							if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
+								utils.performNick(p, displayName.replace(guiFileUtils.getConfigString(p, "NickNameGUI.NickName.DisplayName").replace("%nickName%", "").replace("%nickname%", ""), ""));
+							else
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
 						}
 					}
 				} else {
@@ -134,7 +143,10 @@ public class InventoryClickListener implements Listener {
 						if(displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step4.Use.DisplayName"))) {
 							p.closeInventory();
 							
-							utils.performRankedNick(p, args[0], args[1], title.replace(step4Parts[0], "").replace(step4Parts[1], ""));
+							if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
+								utils.performRankedNick(p, args[0], args[1], title.replace(step4Parts[0], "").replace(step4Parts[1], ""));
+							else
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
 						} else if(displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step4.Retry.DisplayName"))) {
 							String name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 							boolean nickNameIsInUse = false;

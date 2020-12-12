@@ -79,6 +79,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.Other.RandomNick", "&4Du hast den Spieler &e%playerName% &4genickt");
 			cfg.addDefault("Messages.Other.SelectedNick", "&4Du hast den Nicknamen von dem Spieler &e%playerName% &4auf &e%nickName% &4gesetzt");
 			cfg.addDefault("Messages.Other.Unnick", "&4Du hast den Spieler &e%playerName% &4entnickt");
+			cfg.addDefault("Messages.Other.DisabledWorld", "&cDer Spieler &e%playerName% &ckann in dieser Welt nicht genickt werden");
 			cfg.addDefault("Messages.ReloadConfig", "&4Die Konfigurationsdatei wurde &eneu geladen&4!");
 			cfg.addDefault("Messages.FixSkin", "&4Dein Skin wurde &aerfolgreich &4gefixxt!");
 			cfg.addDefault("Messages.ResetSkin", "&4Dein Skin wurde &aerfolgreich &4zurueckgesetzt!");
@@ -92,6 +93,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.NickedPlayers.PlayerINFO", "&5%realName% &7-> &6%nickName%");
 			cfg.addDefault("Messages.NickedPlayers.NoPlayerIsNicked", "&cDerzeit ist kein Spieler genickt");
 			cfg.addDefault("Messages.TypeNameInChat", "&4Bitte schreibe den Namen in den Chat&8:");
+			cfg.addDefault("Messages.DisabledWorld", "&cDu kannst dich in dieser Welt nicht nicken");
 		} else {
 			cfg.addDefault("NickActionBarMessage", "%prefix%&4You are playing as&8: &6%nickName%");
 			
@@ -128,6 +130,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.Other.RandomNick", "&4You nicked the player &e%playerName%");
 			cfg.addDefault("Messages.Other.SelectedNick", "&4You set the nickname of &e%playerName% &4to &e%nickName%");
 			cfg.addDefault("Messages.Other.Unnick", "&4You removed the nickname of player &e%playerName%");
+			cfg.addDefault("Messages.Other.DisabledWorld", "&cThe player &e%playerName% &ccan't be nicked in that world");
 			cfg.addDefault("Messages.CommandNotAvaiableForThatVersion", "&cThis command can't be used in this version");
 			cfg.addDefault("Messages.ReloadConfig", "&4The configuration file was &ereloaded&4!");
 			cfg.addDefault("Messages.FixSkin", "&4Your skin has been fixed &asuccessfully&4!");
@@ -142,6 +145,7 @@ public class LanguageFileUtils {
 			cfg.addDefault("Messages.NickedPlayers.PlayerINFO", "&5%realName% &7-> &6%nickName%");
 			cfg.addDefault("Messages.NickedPlayers.NoPlayerIsNicked", "&cCurrently no player is nicked");
 			cfg.addDefault("Messages.TypeNameInChat", "&4Please type the name you want to use in chat&8:");
+			cfg.addDefault("Messages.DisabledWorld", "&cYou can't nick yourself in this world");
 		}
 		
 		cfg.options().copyDefaults(true);

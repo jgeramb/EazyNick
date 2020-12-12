@@ -25,8 +25,10 @@ public class ReNickCommand implements CommandExecutor {
 			if(utils.getNickOnWorldChangePlayers().contains(p.getUniqueId()) || ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(p.getUniqueId()))) {
 				if(utils.getNickedPlayers().contains(p.getUniqueId()))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
-				else
+				else if(!(eazyNick.getFileUtils().getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
 					utils.performReNick(p);
+				else
+					p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString(p, "Messages.DisabledWorld"));
 			}
 		} else
 			utils.sendConsole(utils.getNotPlayer());
