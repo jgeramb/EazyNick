@@ -146,7 +146,7 @@ public class AnvilGUI {
 			if (activeContainerField != null) {
 				activeContainerField.set(player, container);
 
-				reflectUtils.getField(reflectUtils.getNMSClass("ContainerAnvil"), (version.startsWith("1_1") && (version.startsWith("1_10") || version.startsWith("1_11"))) ? "l" : "renameText").set(activeContainerField.get(player), "Type in some text");
+				reflectUtils.getField(reflectUtils.getNMSClass("ContainerAnvil"), (version.startsWith("1_1") && (version.startsWith("1_10") || version.startsWith("1_11"))) ? "renameText" : "l").set(activeContainerField.get(player), "Type in some text");
 				reflectUtils.getField(reflectUtils.getNMSClass("Container"), "windowId").set(activeContainerField.get(player), c);
 
 				activeContainerField.get(player).getClass().getMethod("addSlotListener", reflectUtils.getNMSClass("ICrafting")).invoke(activeContainerField.get(player), player);
