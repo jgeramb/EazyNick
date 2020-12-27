@@ -79,6 +79,7 @@ public class FileUtils {
 		cfg.addDefault("ChangeLuckPermsPrefixAndSufix", false);
 		cfg.addDefault("RandomDisguiseDelay", false);
 		cfg.addDefault("UseSignGUIForCustomName", true);
+		cfg.addDefault("UseAnvilGUIForCustomName", false);
 		cfg.addDefault("AllowBookGUICustomName", true);
 		cfg.addDefault("AllowBookGUISkinFromName", false);
 		cfg.addDefault("UseMineSkinAPI", false);

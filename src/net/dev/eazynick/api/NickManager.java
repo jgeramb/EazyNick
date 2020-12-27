@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nametagedit.plugin.NametagEdit;
 import com.nametagedit.plugin.api.INametagApi;
+import com.nametagedit.plugin.api.data.FakeTeam;
 import com.nametagedit.plugin.api.data.Nametag;
 
 import net.dev.eazynick.EazyNick;
@@ -346,15 +347,15 @@ public class NickManager {
 		if(utils.nameTagEditStatus()) {
 			if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) && utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
 				INametagApi nametagEditAPI = NametagEdit.getApi();
-				String prefix = utils.getNametagEditPrefixes().get(p.getUniqueId());
-				String suffix = utils.getNametagEditSuffixes().get(p.getUniqueId());
 				
-				nametagEditAPI.setPrefix(p, prefix);
-				nametagEditAPI.setSuffix(p, suffix);
+				nametagEditAPI.setPrefix(p, utils.getNametagEditPrefixes().get(p.getUniqueId()));
+				nametagEditAPI.setSuffix(p, utils.getNametagEditSuffixes().get(p.getUniqueId()));
+				nametagEditAPI.getFakeTeam(p).setName(utils.getNametagEditTeams().get(p.getUniqueId()));
 				nametagEditAPI.reloadNametag(p);
 				
 				utils.getNametagEditPrefixes().remove(p.getUniqueId());
 				utils.getNametagEditSuffixes().remove(p.getUniqueId());
+				utils.getNametagEditTeams().remove(p.getUniqueId());
 			}
 		}
 		
@@ -696,19 +697,27 @@ public class NickManager {
 			p.setDisplayName(chatPrefix + p.getName() + chatSuffix);
 		
 		if(utils.nameTagEditStatus()) {
-			if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) && utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
-				utils.getNametagEditPrefixes().remove(p.getUniqueId());
-				utils.getNametagEditSuffixes().remove(p.getUniqueId());
-			}
+			utils.getNametagEditPrefixes().remove(p.getUniqueId());
+			utils.getNametagEditSuffixes().remove(p.getUniqueId());
+			utils.getNametagEditTeams().remove(p.getUniqueId());
 			
 			INametagApi nametagEditAPI = NametagEdit.getApi();
 			Nametag nametag = nametagEditAPI.getNametag(p);
-
+			FakeTeam fakeTeam = nametagEditAPI.getFakeTeam(p);
+			
 			utils.getNametagEditPrefixes().put(p.getUniqueId(), nametag.getPrefix());
 			utils.getNametagEditSuffixes().put(p.getUniqueId(), nametag.getSuffix());
+			utils.getNametagEditSuffixes().put(p.getUniqueId(), fakeTeam.getName());
 
 			nametagEditAPI.setPrefix(p, tagPrefix);
 			nametagEditAPI.setSuffix(p, tagSuffix);
+			
+			String teamName = sortID + p.getName();
+			
+			if(teamName.length() > 16)
+				teamName = teamName.substring(0, 16);
+			
+			fakeTeam.setName(teamName);
 			nametagEditAPI.reloadNametag(p);
 		}
 		

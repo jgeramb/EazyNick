@@ -12,9 +12,7 @@ import org.bukkit.entity.Player;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerUnnickEvent;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.GUIFileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.*;
 import net.dev.eazynick.utils.bookutils.BookPage;
 import net.dev.eazynick.utils.bookutils.NMSBookBuilder;
 import net.dev.eazynick.utils.bookutils.NMSBookUtils;
@@ -29,6 +27,7 @@ public class BookGUICommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		FileUtils fileUtils = eazyNick.getFileUtils();
+		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
 		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
 		NMSBookUtils nmsBookUtils = eazyNick.getNMSBookUtils();
 		NMSBookBuilder nmsBookBuilder = eazyNick.getNMSBookBuilder();
@@ -151,11 +150,18 @@ public class BookGUICommand implements CommandExecutor {
 						else
 							nmsBookUtils.open(p, nmsBookBuilder.create(guiFileUtils.getConfigString(p, "BookGUI.Page5.Title"), new TextComponent(guiFileUtils.getConfigString(p, "BookGUI.Page5.Text").replace("%name%", name)), option1, option2));
 					} else if(args[3].equalsIgnoreCase("ENTERNAME")) {
-						if(fileUtils.getConfig().getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname")))
-							utils.openCustomGUI(p, args[1], args[2]);
+						if(fileUtils.getConfig().getBoolean("AllowBookGUICustomName") && (p.hasPermission("nick.customnickname"))) {
+							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1") || !(fileUtils.getConfig().getBoolean("UseSignGUIForCustomName") || fileUtils.getConfig().getBoolean("UseAnvilGUIForCustomName"))) {
+								utils.getPlayersTypingNameInChat().put(p.getUniqueId(), args[1] + " " + args[2]);
+								
+								p.closeInventory();
+								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.TypeNameInChat"));
+							} else
+								utils.openCustomGUI(p, args[1], args[2]);
+						}
 					}
 				} else
-					p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString(p, "Messages.DisabledWorld"));
+					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
 			} else
 				p.sendMessage(utils.getNoPerm());
 		} else

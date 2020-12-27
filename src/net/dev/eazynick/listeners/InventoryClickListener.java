@@ -168,7 +168,7 @@ public class InventoryClickListener implements Listener {
 							
 							utils.openRankedNickGUI(p, lastText + " " + name);
 						} else if(displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step4.Custom.DisplayName"))) {
-							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1")) {
+							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1") || !(fileUtils.getConfig().getBoolean("UseSignGUIForCustomName") || fileUtils.getConfig().getBoolean("UseAnvilGUIForCustomName"))) {
 								utils.getPlayersTypingNameInChat().put(p.getUniqueId(), lastText);
 								
 								p.closeInventory();

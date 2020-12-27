@@ -23,30 +23,27 @@ public class PlayerChangedWorldListener implements Listener {
 		NickManager api = new NickManager(p);
 		
 		if (!(utils.getWorldBlackList().contains(p.getWorld().getName().toUpperCase()))) {
-			if (fileUtils.getConfig().getBoolean("NickOnWorldChange")) {
-				if (utils.getNickOnWorldChangePlayers().contains(p.getUniqueId())) {
-					if (!(api.isNicked()))
-						utils.performReNick(p);
-					else {
+			if (fileUtils.getConfig().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(p.getUniqueId()) && !(api.isNicked()))
+				utils.performReNick(p);
+			else {
+				Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
+
+					@Override
+					public void run() {
+						api.unnickPlayer();
+						
 						Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 
 							@Override
 							public void run() {
-								api.unnickPlayer();
-								
-								Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
-
-									@Override
-									public void run() {
-										utils.performReNick(p);
-									}
-								}, 10 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+								utils.performReNick(p);
 							}
-						}, 10);
+						}, 10 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 					}
-				}
+				}, 10);
 			}
-		}
+		} else if(api.isNicked())
+			api.unnickPlayer();
 	}
 
 }

@@ -29,8 +29,9 @@ public class PlayerNickListener implements Listener {
 		if(!(e.isCancelled())) {
 			Player p = e.getPlayer();
 			NickManager api = new NickManager(p);
-			boolean changePrefixAndSuffix = fileUtils.getConfig().getBoolean("WorldsWithDisabledPrefixAndSuffix") || !(utils.getWorldsWithDisabledPrefixAndSuffix().contains(p.getWorld().getName().toUpperCase()));
+			boolean changePrefixAndSuffix = !(utils.getWorldsWithDisabledPrefixAndSuffix().contains(p.getWorld().getName().toUpperCase()));
 			String nickName = e.getNickName(), tagPrefix = e.getTagPrefix(), tagSuffix = e.getTagSuffix(), chatPrefix = e.getChatPrefix(), chatSuffix = e.getChatSuffix(), tabPrefix = e.getTabPrefix(), tabSuffix = e.getTabSuffix();
+			int sortID = e.getSortID();
 			
 			utils.getCanUseNick().put(p.getUniqueId(), false);
 			
@@ -79,7 +80,7 @@ public class PlayerNickListener implements Listener {
 				new LuckPermsHook(p).updateNodes(tagPrefix, tagSuffix, e.getGroupName());
 			
 			if(changePrefixAndSuffix && utils.tabStatus() && fileUtils.getConfig().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
-				new TABHook(p).update(nickName, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
+				new TABHook(p).update(nickName, tabPrefix, tabSuffix, tagPrefix, tagSuffix, sortID);
 
 			if(fileUtils.getConfig().getBoolean("LogNicknames"))
 				eazyNick.getUtils().sendConsole("§a" + p.getName() + " §7(" + p.getUniqueId().toString() + ") §4set his nickname to §6" + nickName);
@@ -87,7 +88,7 @@ public class PlayerNickListener implements Listener {
 			api.nickPlayer(nickName, e.getSkinName());
 			
 			if(changePrefixAndSuffix)
-				api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), chatPrefix, chatSuffix, e.getTabPrefix(), e.getTabSuffix(), e.getSortID(), e.getGroupName());
+				api.updatePrefixSuffix(e.getTagPrefix(), e.getTagSuffix(), chatPrefix, chatSuffix, e.getTabPrefix(), e.getTabSuffix(), sortID, e.getGroupName());
 			
 			if(!(e.isRenick()))
 				p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages." + (e.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName));

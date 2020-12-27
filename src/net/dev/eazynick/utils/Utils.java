@@ -70,6 +70,8 @@ public class Utils {
 	private HashMap<UUID, String> ultraPermissionsSuffixes = new HashMap<>();
 	private HashMap<UUID, String> nametagEditPrefixes = new HashMap<>();
 	private HashMap<UUID, String> nametagEditSuffixes = new HashMap<>();
+	private HashMap<UUID, String> nametagEditTeams = new HashMap<>();
+	private HashMap<UUID, String> tabTeams = new HashMap<>();
 	private HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
 	private HashMap<UUID, String> nameCache = new HashMap<>();
 	private HashMap<UUID, String> lastSkinNames = new HashMap<>();
@@ -82,6 +84,10 @@ public class Utils {
 	private HashMap<UUID, String> lastGUITexts = new HashMap<>();
 	private HashMap<UUID, String> playersTypingNameInChat = new HashMap<>();
 
+	public boolean essentialsStatus() {
+		return (Bukkit.getPluginManager().getPlugin("Essentials") != null);
+	}
+	
 	public boolean placeholderAPIStatus() {
 		return (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null);
 	}
@@ -1027,6 +1033,14 @@ public class Utils {
 	
 	public HashMap<UUID, String> getNametagEditSuffixes() {
 		return nametagEditSuffixes;
+	}
+	
+	public HashMap<UUID, String> getNametagEditTeams() {
+		return nametagEditTeams;
+	}
+	
+	public HashMap<UUID, String> getTABTeams() {
+		return tabTeams;
 	}
 	
 	public HashMap<UUID, ScoreboardTeamManager> getScoreboardTeamManagers() {

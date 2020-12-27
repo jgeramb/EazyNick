@@ -117,6 +117,7 @@ public class AnvilGUI {
 		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
 		
 		p.setLevel(p.getLevel() + 1);
+		p.closeInventory();
 
 		try {
 			String version = eazyNick.getVersion();
@@ -145,7 +146,7 @@ public class AnvilGUI {
 			if (activeContainerField != null) {
 				activeContainerField.set(player, container);
 
-				reflectUtils.getField(reflectUtils.getNMSClass("Container"), "title").set(activeContainerField.get(player), chatMessageConstructor.newInstance("Type in some text", new Object[] {}));
+				reflectUtils.getField(reflectUtils.getNMSClass("ContainerAnvil"), (version.startsWith("1_1") && (version.startsWith("1_10") || version.startsWith("1_11"))) ? "l" : "renameText").set(activeContainerField.get(player), "Type in some text");
 				reflectUtils.getField(reflectUtils.getNMSClass("Container"), "windowId").set(activeContainerField.get(player), c);
 
 				activeContainerField.get(player).getClass().getMethod("addSlotListener", reflectUtils.getNMSClass("ICrafting")).invoke(activeContainerField.get(player), player);

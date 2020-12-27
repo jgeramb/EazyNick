@@ -73,8 +73,8 @@ public class GUIFileUtils {
 		cfg.addDefault("BookGUI.Page5.Text", "&0We've generated a random username for you:\n&l%name%\n\n");
 		cfg.addDefault("BookGUI.Page5.Text2", "\n&0To go back to being your usual self, type:\n&l/nick reset");
 		cfg.addDefault("BookGUI.Page6.Title", "Done");
-		cfg.addDefault("BookGUI.Page6.Text.SingleServer", "&0You have finished setting up your nickname!\n\nYou are now nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
-		cfg.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!\n\nWhen you go into a game, you will be nicked as %name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
+		cfg.addDefault("BookGUI.Page6.Text.SingleServer", "&0You have finished setting up your nickname!\n\nYou are now nicked as\n%name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
+		cfg.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!\n\nWhen you go into a game, you will be nicked as\n%name%&0.\n\nTo go back to being your usual self, type:\n&l/nick reset");
 		cfg.addDefault("BookGUI.Page6.Enabled", true);
 		
 		cfg.addDefault("BookGUI.Accept.Text", arrow + " &nI understand, set\n&nup my nickname");

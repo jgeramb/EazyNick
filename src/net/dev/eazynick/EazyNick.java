@@ -115,13 +115,9 @@ public class EazyNick extends JavaPlugin {
 		
 		reflectUtils = new ReflectUtils();
 		
-		PluginManager pm = Bukkit.getPluginManager();
-		String reflectVersion = reflectUtils.getVersion();
-		
-		version = reflectVersion.substring(1);
-		
+		version = reflectUtils.getVersion().substring(1);
 		pluginFile = getFile();
-
+		
 		utils = new Utils();
 		actionBarUtils = new ActionBarUtils();
 		fileUtils = new FileUtils();
@@ -134,24 +130,45 @@ public class EazyNick extends JavaPlugin {
 		mineSkinAPI = new MineSkinAPI();
 		nmsNickManager = new NMSNickManager();
 		
-		utils.reloadConfigs();
+		if(utils.essentialsStatus())
+			Bukkit.getScheduler().runTaskLater(this, () -> initiatePlugin(), 20);
+		else
+			initiatePlugin();
+	}
+
+	@Override
+	public void onDisable() {
+		new ArrayList<>(utils.getNickedPlayers()).forEach(uuid -> Bukkit.getPlayer(uuid).kickPlayer("§cYou will need to reconnect in order to be able to play properly"));
+		
+		if (fileUtils.getConfig().getBoolean("BungeeCord"))
+			mysql.disconnect();
 		
 		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
 		utils.sendConsole("");
+		utils.sendConsole("§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
+		utils.sendConsole("§7Version§8: §3" + getDescription().getVersion());
+		utils.sendConsole("");
+		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
+	}
+	
+	private void initiatePlugin() {
+		PluginManager pm = Bukkit.getPluginManager();
+		
+		utils.reloadConfigs();
+		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
+		utils.sendConsole("");
 
-		if (!(reflectVersion.equals("v1_7_R4") || reflectVersion.equals("v1_8_R1")
-				|| reflectVersion.equals("v1_8_R2") || reflectVersion.equals("v1_8_R3")
-				|| reflectVersion.equals("v1_9_R1") || reflectVersion.equals("v1_9_R2")
-				|| reflectVersion.equals("v1_10_R1") || reflectVersion.equals("v1_11_R1")
-				|| reflectVersion.equals("v1_12_R1") || reflectVersion.equals("v1_13_R1")
-				|| reflectVersion.equals("v1_13_R2") || reflectVersion.equals("v1_14_R1")
-				|| reflectVersion.equals("v1_15_R1") || reflectVersion.equals("v1_16_R1")
-				|| reflectVersion.equals("v1_16_R2") || reflectVersion.equals("v1_16_R3"))) {
+		if (!(version.equals("1_7_R4") || version.equals("1_8_R1") || version.equals("1_8_R2")
+				|| version.equals("1_8_R3") || version.equals("1_9_R1") || version.equals("1_9_R2")
+				|| version.equals("1_10_R1") || version.equals("1_11_R1") || version.equals("1_12_R1")
+				|| version.equals("1_13_R1") || version.equals("1_13_R2") || version.equals("1_14_R1")
+				|| version.equals("1_15_R1") || version.equals("1_16_R1") || version.equals("1_16_R2")
+				|| version.equals("1_16_R3"))) {
 			utils.sendConsole("§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 
 			isCancelled = true;
 		} else {
-			if (reflectVersion.equals("v1_7_R4")) {
+			if (version.equals("1_7_R4")) {
 				utils.setNameField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "name"));
 				utils.setUUIDField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "id"));
 				
@@ -161,7 +178,7 @@ public class EazyNick extends JavaPlugin {
 				utils.setNameField(reflectUtils.getField(GameProfile.class, "name"));
 				utils.setUUIDField(reflectUtils.getField(GameProfile.class, "id"));
 				
-				if(reflectVersion.equals("v1_8_R1")) {
+				if(version.equals("1_8_R1")) {
 					gameProfileBuilder_1_8_R1 = new GameProfileBuilder_1_8_R1();
 					uuidFetcher_1_8_R1 = new UUIDFetcher_1_8_R1();
 				} else {
@@ -277,21 +294,6 @@ public class EazyNick extends JavaPlugin {
 			
 			utils.sendConsole("§7DeluxeChat hooked successfully!");
 		}
-	}
-
-	@Override
-	public void onDisable() {
-		new ArrayList<>(utils.getNickedPlayers()).forEach(uuid -> Bukkit.getPlayer(uuid).kickPlayer("§cYou will need to reconnect in order to be able to play properly"));
-		
-		if (fileUtils.getConfig().getBoolean("BungeeCord"))
-			mysql.disconnect();
-		
-		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
-		utils.sendConsole("");
-		utils.sendConsole("§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
-		utils.sendConsole("§7Version§8: §3" + getDescription().getVersion());
-		utils.sendConsole("");
-		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
 	}
 	
 	public File getPluginFile() {
