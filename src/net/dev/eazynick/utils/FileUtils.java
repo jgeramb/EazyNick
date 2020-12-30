@@ -61,6 +61,7 @@ public class FileUtils {
 		cfg.addDefault("NeedItemToToggleNick", true);
 		cfg.addDefault("GetNewNickOnEveryServerSwitch", false);
 		cfg.addDefault("NickOnWorldChange", false);
+		cfg.addDefault("KeepNickOnWorldChange", true);
 		cfg.addDefault("JoinNick", false);
 		cfg.addDefault("DisconnectUnnick", true);
 		cfg.addDefault("SeeNickSelf", true);

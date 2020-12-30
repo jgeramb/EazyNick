@@ -2,12 +2,7 @@ package net.dev.eazynick.utils.nickutils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -289,117 +284,125 @@ public class NMSNickManager extends ReflectUtils {
 					}
 				}
 				
-				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-					try {
-						Object packetNamedEntitySpawn;
-						Object packetPlayOutPlayerInfoAdd;
-						Object worldClient = entityPlayer.getClass().getMethod("getWorld").invoke(entityPlayer);
-						Object worldData = worldClient.getClass().getMethod("getWorldData").invoke(worldClient);
-						Object interactManager = entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer);
-						Object packetRespawnPlayer;
-
-						if(uuidSpoof)
-							sendPacket(p, packetPlayOutPlayerInfoRemove, forceUpdate);
-						
-						if(uuidSpoof && !(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
-							updateUniqueId(p, uuidBefore);
-
-						api.changeSkin(skinName);
-						
-						if(version.startsWith("1_16")) {
-							Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
-							Class<?> enumGameMode = getNMSClass("EnumGamemode");
-
-							packetRespawnPlayer = version.equals("1_16_R1") ? getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, p.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true) : getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getDimensionManager").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, p.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
-						} else if(version.startsWith("1_15")) {
-							Class<?> dimensionManager = getNMSClass("DimensionManager");
-							Class<?> worldType = getNMSClass("WorldType");
-							Class<?> enumGameMode = getNMSClass("EnumGamemode");
-							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, long.class, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, p.getWorld().getEnvironment().getId()), Hashing.sha256().hashLong(p.getWorld().getSeed()).asLong(), worldType.getMethod("getType", String.class).invoke(worldType, p.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, p.getGameMode().getValue()));
-						} else if(version.startsWith("1_14")) {
-							Class<?> dimensionManager = getNMSClass("DimensionManager");
-							Class<?> worldType = getNMSClass("WorldType");
-							Class<?> enumGameMode = getNMSClass("EnumGamemode");
-							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, p.getWorld().getEnvironment().getId()), worldType.getMethod("getType", String.class).invoke(worldType, p.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, p.getGameMode().getValue()));
-						} else if(version.equals("1_13_R2")) {
-							Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
-							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldClient.getClass().getDeclaredField("dimension").get(craftWorld), worldClient.getClass().getMethod("getDifficulty").invoke(worldClient), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
-						} else {
-							Class<?> enumGameMode = (version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1") || version.equals("1_9_R2")) ? getNMSClass("WorldSettings").getDeclaredClasses()[0] : getNMSClass("EnumGamemode");
-							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(int.class, getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), enumGameMode).newInstance(p.getWorld().getEnvironment().getId(), (version.equals("1_7_R4") ? getNMSClass("World").getDeclaredField("difficulty").get(worldClient) : worldClient.getClass().getMethod("getDifficulty").invoke(worldClient)), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
-						}
-						
-						sendPacketNMS(p, packetRespawnPlayer);
-						
-						if(uuidSpoof && (type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
-							updateUniqueId(p, spoofedUUID);
-						
-						packetNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer);
-						
-						if(version.equals("1_7_R4")) {
-							Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
-							
-							packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
-						} else {
-							Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
-							
-							packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
-						}
-						
-						p.teleport(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch()));
-						p.updateInventory();
-						
-						if(!(eazyNick.isEnabled()) || !(p.isOnline()))
-							return;
-						
-						Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-							sendPacket(p, packetPlayOutPlayerInfoAdd, forceUpdate);
-							sendPacketExceptSelf(p, packetNamedEntitySpawn, forceUpdate);
-							
-							if(uuidSpoof && (type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE))) {
-								Bukkit.getOnlinePlayers().stream().filter(all -> (!(all.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission")) && (all != p))).forEach(all -> {
-									all.hidePlayer(p);
-									all.showPlayer(p);
-									
-									sendPacketNMS(all, packetPlayOutPlayerInfoRemove);
-								});
-							}
-							
+				new Timer().schedule(new TimerTask() {
+					
+					@Override
+					public void run() {
+						try {
+							Object packetNamedEntitySpawn;
+							Object packetPlayOutPlayerInfoAdd;
+							Object worldClient = entityPlayer.getClass().getMethod("getWorld").invoke(entityPlayer);
+							Object worldData = worldClient.getClass().getMethod("getWorldData").invoke(worldClient);
+							Object interactManager = entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer);
+							Object packetRespawnPlayer;
+	
 							if(uuidSpoof)
-								updateUniqueId(p, uuidBefore);
+								sendPacket(p, packetPlayOutPlayerInfoRemove, forceUpdate);
 							
-							try {
-								Object packetEntityLook = ((version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
-								Object packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
-								setField(packetHeadRotation, "a", p.getEntityId());
-								setField(packetHeadRotation, "b", (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)));
+							if(uuidSpoof && !(type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
+								updateUniqueId(p, uuidBefore);
+	
+							api.changeSkin(skinName);
+							
+							if(version.startsWith("1_16")) {
+								Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
+								Class<?> enumGameMode = getNMSClass("EnumGamemode");
+	
+								packetRespawnPlayer = version.equals("1_16_R1") ? getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, p.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true) : getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getDimensionManager").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, p.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
+							} else if(version.startsWith("1_15")) {
+								Class<?> dimensionManager = getNMSClass("DimensionManager");
+								Class<?> worldType = getNMSClass("WorldType");
+								Class<?> enumGameMode = getNMSClass("EnumGamemode");
 								
-								sendPacketExceptSelf(p, packetEntityLook, forceUpdate);
-								sendPacketExceptSelf(p, packetHeadRotation, forceUpdate);
-							} catch (Exception e) {
-								e.printStackTrace();
+								packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, long.class, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, p.getWorld().getEnvironment().getId()), Hashing.sha256().hashLong(p.getWorld().getSeed()).asLong(), worldType.getMethod("getType", String.class).invoke(worldType, p.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, p.getGameMode().getValue()));
+							} else if(version.startsWith("1_14")) {
+								Class<?> dimensionManager = getNMSClass("DimensionManager");
+								Class<?> worldType = getNMSClass("WorldType");
+								Class<?> enumGameMode = getNMSClass("EnumGamemode");
+								
+								packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, p.getWorld().getEnvironment().getId()), worldType.getMethod("getType", String.class).invoke(worldType, p.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, p.getGameMode().getValue()));
+							} else if(version.equals("1_13_R2")) {
+								Object craftWorld = p.getWorld().getClass().getMethod("getHandle").invoke(p.getWorld());
+								
+								packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldClient.getClass().getDeclaredField("dimension").get(craftWorld), worldClient.getClass().getMethod("getDifficulty").invoke(worldClient), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
+							} else {
+								Class<?> enumGameMode = (version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1") || version.equals("1_9_R2")) ? getNMSClass("WorldSettings").getDeclaredClasses()[0] : getNMSClass("EnumGamemode");
+								
+								packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(int.class, getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), enumGameMode).newInstance(p.getWorld().getEnvironment().getId(), (version.equals("1_7_R4") ? getNMSClass("World").getDeclaredField("difficulty").get(worldClient) : worldClient.getClass().getMethod("getDifficulty").invoke(worldClient)), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
 							}
-
-							if(type.equals(UpdateType.NICK)) {
-								if(fileUtils.getConfig().getBoolean("NickMessage.OnNnick")) {
-									for(Player all : Bukkit.getOnlinePlayers())
-										all.sendMessage(fileUtils.getConfigString(p, "NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%displayname%", p.getDisplayName()).replace("%name%", p.getName()));
-								}
-							} else if(type.equals(UpdateType.UNNICK)) {
-								if(fileUtils.getConfig().getBoolean("NickMessage.OnUnnick")) {
-									for(Player all : Bukkit.getOnlinePlayers())
-										all.sendMessage(fileUtils.getConfigString(p, "NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%displayname%", p.getDisplayName()).replace("%name%", p.getName()));
-								}
+							
+							sendPacketNMS(p, packetRespawnPlayer);
+							
+							if(uuidSpoof && (type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE)))
+								updateUniqueId(p, spoofedUUID);
+							
+							packetNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer);
+							
+							if(version.equals("1_7_R4")) {
+								Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+								
+								packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+							} else {
+								Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+								
+								packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 							}
-						}, 4 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
-					} catch (Exception ex) {
-						ex.printStackTrace();
+							
+							p.teleport(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch()));
+							p.updateInventory();
+							
+							if(!(eazyNick.isEnabled()) || !(p.isOnline()))
+								return;
+							
+							new Timer().schedule(new TimerTask() {
+								
+								@Override
+								public void run() {
+									sendPacket(p, packetPlayOutPlayerInfoAdd, forceUpdate);
+									sendPacketExceptSelf(p, packetNamedEntitySpawn, forceUpdate);
+									
+									if(uuidSpoof && (type.equals(UpdateType.NICK) || type.equals(UpdateType.UPDATE))) {
+										Bukkit.getOnlinePlayers().stream().filter(all -> (!(all.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission")) && (all != p))).forEach(all -> {
+											all.hidePlayer(p);
+											all.showPlayer(p);
+											
+											sendPacketNMS(all, packetPlayOutPlayerInfoRemove);
+										});
+									}
+									
+									if(uuidSpoof)
+										updateUniqueId(p, uuidBefore);
+									
+									try {
+										Object packetEntityLook = ((version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
+										Object packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
+										setField(packetHeadRotation, "a", p.getEntityId());
+										setField(packetHeadRotation, "b", (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)));
+										
+										sendPacketExceptSelf(p, packetEntityLook, forceUpdate);
+										sendPacketExceptSelf(p, packetHeadRotation, forceUpdate);
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+		
+									if(type.equals(UpdateType.NICK)) {
+										if(fileUtils.getConfig().getBoolean("NickMessage.OnNnick")) {
+											for(Player all : Bukkit.getOnlinePlayers())
+												all.sendMessage(fileUtils.getConfigString(p, "NickMessage.Nick.Join").replace("%displayName%", p.getDisplayName()).replace("%displayname%", p.getDisplayName()).replace("%name%", p.getName()));
+										}
+									} else if(type.equals(UpdateType.UNNICK)) {
+										if(fileUtils.getConfig().getBoolean("NickMessage.OnUnnick")) {
+											for(Player all : Bukkit.getOnlinePlayers())
+												all.sendMessage(fileUtils.getConfigString(p, "NickMessage.Unnick.Join").replace("%displayName%", p.getDisplayName()).replace("%displayname%", p.getDisplayName()).replace("%name%", p.getName()));
+										}
+									}
+								}
+							}, 200 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (1000 * new Random().nextInt(3)) : 0));
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
 					}
-				}, 1);
+				}, 50);
 			}
 				
 			if(!(version.equals("1_7_R4") || version.equals("1_8_R1") || version.equals("1_8_R2")))

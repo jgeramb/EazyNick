@@ -33,7 +33,7 @@ public class MySQLNickManager {
 			}
 		}
 		
-		return "";
+		return "NaN";
 	}
 	
 	public String getSkinName(UUID uuid) {
@@ -57,7 +57,7 @@ public class MySQLNickManager {
 			}
 		}
 		
-		return "";
+		return "Error";
 	}
 	
 	public void addPlayer(UUID uuid, String nickName, String skinName) {

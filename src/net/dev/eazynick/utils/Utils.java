@@ -70,7 +70,6 @@ public class Utils {
 	private HashMap<UUID, String> ultraPermissionsSuffixes = new HashMap<>();
 	private HashMap<UUID, String> nametagEditPrefixes = new HashMap<>();
 	private HashMap<UUID, String> nametagEditSuffixes = new HashMap<>();
-	private HashMap<UUID, String> nametagEditTeams = new HashMap<>();
 	private HashMap<UUID, String> tabTeams = new HashMap<>();
 	private HashMap<UUID, ScoreboardTeamManager> scoreboardTeamManagers = new HashMap<>();
 	private HashMap<UUID, String> nameCache = new HashMap<>();
@@ -459,6 +458,10 @@ public class Utils {
 	}
 	
 	public void performReNick(Player p) {
+		performReNick(p, nickOnWorldChangePlayers.contains(p.getUniqueId()) ? nickNames.get((new Random().nextInt(nickNames.size()))) : EazyNick.getInstance().getMySQLNickManager().getNickName(p.getUniqueId()));
+	}
+	
+	public void performReNick(Player p, String name) {
 		if(!(new NickManager(p).isNicked())) {
 			EazyNick eazyNick = EazyNick.getInstance();
 			FileUtils fileUtils = eazyNick.getFileUtils();
@@ -466,7 +469,6 @@ public class Utils {
 			MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 			MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 			
-			String name = nickOnWorldChangePlayers.contains(p.getUniqueId()) ? nickNames.get((new Random().nextInt(nickNames.size()))) : mysqlNickManager.getNickName(p.getUniqueId());
 			boolean isCancelled = false;
 			boolean nickNameIsInUse = false;
 			
@@ -505,7 +507,7 @@ public class Utils {
 				
 				if(!(isCancelled)) {
 					if(!(name.equalsIgnoreCase(p.getName()))) {
-						if(mysqlPlayerDataManager.isRegistered(p.getUniqueId())) {
+						if((mysqlPlayerDataManager != null) && mysqlPlayerDataManager.isRegistered(p.getUniqueId())) {
 							new NickManager(p).setGroupName("Default");
 							
 							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, mysqlNickManager.getSkinName(p.getUniqueId()), mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()), mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()), mysqlPlayerDataManager.getTabPrefix(p.getUniqueId()), mysqlPlayerDataManager.getTabSuffix(p.getUniqueId()), mysqlPlayerDataManager.getTagPrefix(p.getUniqueId()), mysqlPlayerDataManager.getTagSuffix(p.getUniqueId()), true, false, 9999, "NONE"));
@@ -526,7 +528,7 @@ public class Utils {
 				p.sendMessage(prefix + languageFileUtils.getConfigString(p, "Messages.NickNameAlreadyInUse"));
 		}
 	}
-
+	
 	public void toggleBungeeNick(Player p) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		FileUtils fileUtils = eazyNick.getFileUtils();
@@ -1033,10 +1035,6 @@ public class Utils {
 	
 	public HashMap<UUID, String> getNametagEditSuffixes() {
 		return nametagEditSuffixes;
-	}
-	
-	public HashMap<UUID, String> getNametagEditTeams() {
-		return nametagEditTeams;
 	}
 	
 	public HashMap<UUID, String> getTABTeams() {

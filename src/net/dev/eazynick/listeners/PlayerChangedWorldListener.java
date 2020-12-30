@@ -1,6 +1,8 @@
 package net.dev.eazynick.listeners;
 
-import org.bukkit.Bukkit;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,24 +25,28 @@ public class PlayerChangedWorldListener implements Listener {
 		NickManager api = new NickManager(p);
 		
 		if (!(utils.getWorldBlackList().contains(p.getWorld().getName().toUpperCase()))) {
-			if (fileUtils.getConfig().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(p.getUniqueId()) && !(api.isNicked()))
+			if (fileUtils.getConfig().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(p.getUniqueId()) && !(api.isNicked()) && p.hasPermission("nick.use"))
 				utils.performReNick(p);
-			else {
-				Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
-
+			else if(api.isNicked()) {
+				new Timer().schedule(new TimerTask() {
+					
 					@Override
 					public void run() {
+						String name = api.getNickName();
+						
 						api.unnickPlayer();
 						
-						Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
-
-							@Override
-							public void run() {
-								utils.performReNick(p);
-							}
-						}, 10 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+						if(fileUtils.getConfig().getBoolean("KeepNickOnWorldChange")) {
+							new Timer().schedule(new TimerTask() {
+								
+								@Override
+								public void run() {
+									utils.performReNick(p, name);
+								}
+							}, 500 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (1000 * 2) : 0));
+						}
 					}
-				}, 10);
+				}, 500);
 			}
 		} else if(api.isNicked())
 			api.unnickPlayer();

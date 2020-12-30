@@ -35,7 +35,7 @@ public class SignGUI implements Listener {
 		sign.setLine(1, line2);
 		sign.setLine(2, line3);
 		sign.setLine(3, line4);
-		sign.update();
+		sign.update(false, false);
 		
 		Bukkit.getOnlinePlayers().stream().filter(all -> (all != p)).forEach(all -> all.sendBlockChange(b.getLocation(), Material.AIR, (byte) 0));
 		

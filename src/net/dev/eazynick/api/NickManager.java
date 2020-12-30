@@ -1,35 +1,20 @@
 package net.dev.eazynick.api;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nametagedit.plugin.NametagEdit;
 import com.nametagedit.plugin.api.INametagApi;
-import com.nametagedit.plugin.api.data.FakeTeam;
 import com.nametagedit.plugin.api.data.Nametag;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.hooks.TABHook;
-import net.dev.eazynick.utils.ActionBarUtils;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.ItemBuilder;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.ReflectUtils;
-import net.dev.eazynick.utils.StringUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.*;
 import net.dev.eazynick.utils.nickutils.NMSNickManager;
 import net.dev.eazynick.utils.nickutils.NMSNickManager.UpdateType;
 import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
@@ -39,9 +24,7 @@ import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.UltraPermissionsAPI;
 import me.TechsCode.UltraPermissions.storage.objects.Group;
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.wazup.survivalgames.PlayerData;
-import me.wazup.survivalgames.SurvivalGames;
-import me.wazup.survivalgames.SurvivalGamesAPI;
+import me.wazup.survivalgames.*;
 
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
@@ -334,10 +317,14 @@ public class NickManager {
 		
 		if(utils.ultraPermissionsStatus()) {
 			if(utils.getUltraPermissionsPrefixes().containsKey(p.getUniqueId()) && utils.getUltraPermissionsSuffixes().containsKey(p.getUniqueId())) {
+				String prefix = utils.getUltraPermissionsPrefixes().get(p.getUniqueId()), suffix = utils.getUltraPermissionsSuffixes().get(p.getUniqueId());
 				me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
 				
-				user.setPrefix(utils.getUltraPermissionsPrefixes().get(p.getUniqueId()));
-				user.setSuffix(utils.getUltraPermissionsSuffixes().get(p.getUniqueId()));
+				if((prefix != null) && !(prefix.isEmpty()))
+					user.setPrefix(prefix);
+				
+				if((suffix != null) && !(suffix.isEmpty()))
+					user.setSuffix(suffix);
 				
 				utils.getUltraPermissionsPrefixes().remove(p.getUniqueId());
 				utils.getUltraPermissionsSuffixes().remove(p.getUniqueId());
@@ -345,17 +332,20 @@ public class NickManager {
 		}
 		
 		if(utils.nameTagEditStatus()) {
-			if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) && utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
+			if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
+				String prefix = utils.getNametagEditPrefixes().get(p.getUniqueId()), suffix = utils.getNametagEditSuffixes().get(p.getUniqueId());
 				INametagApi nametagEditAPI = NametagEdit.getApi();
 				
-				nametagEditAPI.setPrefix(p, utils.getNametagEditPrefixes().get(p.getUniqueId()));
-				nametagEditAPI.setSuffix(p, utils.getNametagEditSuffixes().get(p.getUniqueId()));
-				nametagEditAPI.getFakeTeam(p).setName(utils.getNametagEditTeams().get(p.getUniqueId()));
+				if((prefix != null) && !(prefix.isEmpty()))
+					nametagEditAPI.setPrefix(p, prefix);
+				
+				if((suffix != null) && !(suffix.isEmpty()))
+					nametagEditAPI.setSuffix(p, suffix);
+				
 				nametagEditAPI.reloadNametag(p);
 				
 				utils.getNametagEditPrefixes().remove(p.getUniqueId());
 				utils.getNametagEditSuffixes().remove(p.getUniqueId());
-				utils.getNametagEditTeams().remove(p.getUniqueId());
 			}
 		}
 		
@@ -699,25 +689,15 @@ public class NickManager {
 		if(utils.nameTagEditStatus()) {
 			utils.getNametagEditPrefixes().remove(p.getUniqueId());
 			utils.getNametagEditSuffixes().remove(p.getUniqueId());
-			utils.getNametagEditTeams().remove(p.getUniqueId());
 			
 			INametagApi nametagEditAPI = NametagEdit.getApi();
 			Nametag nametag = nametagEditAPI.getNametag(p);
-			FakeTeam fakeTeam = nametagEditAPI.getFakeTeam(p);
 			
 			utils.getNametagEditPrefixes().put(p.getUniqueId(), nametag.getPrefix());
 			utils.getNametagEditSuffixes().put(p.getUniqueId(), nametag.getSuffix());
-			utils.getNametagEditSuffixes().put(p.getUniqueId(), fakeTeam.getName());
 
 			nametagEditAPI.setPrefix(p, tagPrefix);
 			nametagEditAPI.setSuffix(p, tagSuffix);
-			
-			String teamName = sortID + p.getName();
-			
-			if(teamName.length() > 16)
-				teamName = teamName.substring(0, 16);
-			
-			fakeTeam.setName(teamName);
 			nametagEditAPI.reloadNametag(p);
 		}
 		
