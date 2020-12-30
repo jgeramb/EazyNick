@@ -1,7 +1,4 @@
 # This is the SourceCode of EazyNick
 
-## Please support me by donating some money
+## You can donate for my work here
 https://www.paypal.me/JustixDevelopment
-
-## All dependencies for the source code
-https://workupload.com/archive/7urGKUBT
