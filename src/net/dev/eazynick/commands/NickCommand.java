@@ -1,20 +1,13 @@
 package net.dev.eazynick.commands;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.*;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.PlayerUnnickEvent;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.StringUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.*;
 
 public class NickCommand implements CommandExecutor {
 
@@ -33,7 +26,7 @@ public class NickCommand implements CommandExecutor {
 					if(utils.getNickedPlayers().contains(p.getUniqueId()))
 						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
 					else {
-						if(fileUtils.getConfig().getBoolean("OpenBookGUIOnNickCommand")) {
+						if(fileUtils.getConfig().getBoolean("OpenBookGUIOnNickCommand") && !(eazyNick.getVersion().startsWith("1_7"))) {
 							if(!(p.hasPermission("nick.gui"))) {
 								PermissionAttachment pa = p.addAttachment(eazyNick);
 								pa.setPermission("nick.gui", true);

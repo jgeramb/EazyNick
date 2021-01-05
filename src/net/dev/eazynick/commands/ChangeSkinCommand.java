@@ -2,9 +2,7 @@ package net.dev.eazynick.commands;
 
 import java.util.Random;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;

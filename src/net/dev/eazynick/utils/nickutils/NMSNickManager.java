@@ -14,10 +14,7 @@ import com.mojang.authlib.properties.Property;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.MineSkinAPI;
-import net.dev.eazynick.utils.ReflectUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.*;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 
@@ -348,8 +345,10 @@ public class NMSNickManager extends ReflectUtils {
 								packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 							}
 							
-							p.teleport(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch()));
-							p.updateInventory();
+							Bukkit.getScheduler().runTask(eazyNick, () -> {
+								p.teleport(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch()));
+								p.updateInventory();
+							});
 							
 							if(!(eazyNick.isEnabled()) || !(p.isOnline()))
 								return;

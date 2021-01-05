@@ -5,9 +5,7 @@ import org.bukkit.entity.Player;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utils.Utils;
 
-import me.neznamy.tab.api.EnumProperty;
-import me.neznamy.tab.api.TABAPI;
-import me.neznamy.tab.api.TabPlayer;
+import me.neznamy.tab.api.*;
 
 public class TABHook {
 
@@ -45,14 +43,17 @@ public class TABHook {
 		Utils utils = EazyNick.getInstance().getUtils();
 		
 		TabPlayer tabPlayer = TABAPI.getPlayer(p.getUniqueId());
-		tabPlayer.removeTemporaryValue(EnumProperty.TABPREFIX);
-		tabPlayer.removeTemporaryValue(EnumProperty.TABSUFFIX);
-		tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTABNAME);
-		tabPlayer.removeTemporaryValue(EnumProperty.TAGPREFIX);
-		tabPlayer.removeTemporaryValue(EnumProperty.TAGSUFFIX);
-		tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTAGNAME);
-		tabPlayer.setTeamName(utils.getTABTeams().get(p.getUniqueId()));
-		tabPlayer.forceRefresh();
+		
+		if(tabPlayer != null) {
+			tabPlayer.removeTemporaryValue(EnumProperty.TABPREFIX);
+			tabPlayer.removeTemporaryValue(EnumProperty.TABSUFFIX);
+			tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTABNAME);
+			tabPlayer.removeTemporaryValue(EnumProperty.TAGPREFIX);
+			tabPlayer.removeTemporaryValue(EnumProperty.TAGSUFFIX);
+			tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTAGNAME);
+			tabPlayer.setTeamName(utils.getTABTeams().get(p.getUniqueId()));
+			tabPlayer.forceRefresh();
+		}
 		
 		utils.getTABTeams().remove(p.getUniqueId());
 	}

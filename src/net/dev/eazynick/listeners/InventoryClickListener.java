@@ -5,17 +5,12 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.PlayerUnnickEvent;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.GUIFileUtils;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.*;
 
 public class InventoryClickListener implements Listener {
 

@@ -2,9 +2,7 @@ package net.dev.eazynick.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,10 +10,7 @@ import org.bukkit.entity.Player;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 
 public class PacketInjector {
 

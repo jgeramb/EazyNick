@@ -16,9 +16,7 @@ import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utils.ReflectUtils;
 import net.dev.eazynick.utils.Utils;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.*;
 
 public class SignGUI implements Listener {
 

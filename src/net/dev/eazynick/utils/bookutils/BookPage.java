@@ -1,12 +1,10 @@
 package net.dev.eazynick.utils.bookutils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utils.ReflectUtils;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class BookPage {
@@ -34,21 +32,35 @@ public class BookPage {
 		}
 	}
 	
-	private String getAsString() {
-		try {
-			TextComponent text = new TextComponent("");
+	public String getAsString() {
+		List<BaseComponent> baseComponents = new ArrayList<>();
+		
+		for (TextComponent textComponent : texts) {
+			BaseComponent[] toAdd = TextComponent.fromLegacyText(textComponent.getText());
+
+			for (BaseComponent baseComponent : toAdd) {
+				if(textComponent.getClickEvent() != null)
+					baseComponent.setClickEvent(textComponent.getClickEvent());
+				
+				if(textComponent.getHoverEvent() != null)
+					baseComponent.setHoverEvent(textComponent.getHoverEvent());
+			}
 			
-			for (TextComponent tc : texts)
-				text.addExtra(tc);
-			
-			return ComponentSerializer.toString(text);
-		} catch (Exception e) {
-			return null;
+			baseComponents.addAll(Arrays.asList(toAdd));
 		}
+		
+		return ComponentSerializer.toString(new TextComponent(baseComponents.toArray(new BaseComponent[0])));
 	}
 	
 	public boolean isEmpty() {
-		return texts.isEmpty();
+		boolean empty = true;
+		
+		for (TextComponent textComponent : texts) {
+			if(!(textComponent.getText().isEmpty()))
+				empty = false;
+		}
+		
+		return empty;
 	}
 	
 }

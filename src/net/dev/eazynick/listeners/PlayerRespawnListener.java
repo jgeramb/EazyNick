@@ -1,20 +1,16 @@
 package net.dev.eazynick.listeners;
 
-import java.util.Random;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.GUIFileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.*;
 
 public class PlayerRespawnListener implements Listener {
 
@@ -38,7 +34,7 @@ public class PlayerRespawnListener implements Listener {
 				tabPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.PlayerList.Prefix");
 				tabSuffix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.PlayerList.Suffix");
 				tagPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.NameTag.Prefix");
-				tagSuffix = fileUtils.getConfigString(p, "Settings.NickFormat.ServerFullRank.NameTag.Suffix");
+				tagSuffix = fileUtils.getConfigString(p, "Seyttings.NickFormat.ServerFullRank.NameTag.Suffix");
 				sortID = fileUtils.getConfig().getInt("Settings.NickFormat.ServerFullRank.SortID");
 			} else if(rankName.equals(fileUtils.getConfigString(p, "Settings.NickFormat.GroupName"))) {
 				chatPrefix = fileUtils.getConfigString(p, "Settings.NickFormat.Chat.Prefix");
@@ -50,7 +46,7 @@ public class PlayerRespawnListener implements Listener {
 				sortID = fileUtils.getConfig().getInt("Settings.NickFormat.SortID");
 			} else {
 				for (int i = 1; i <= 18; i++) {
-					if(rankName.equals(guiFileUtils.getConfig().getString("RankGUI.Rank" + i + ".RankName"))) {
+					if(rankName.equals(guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".GroupName"))) {
 						chatPrefix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".ChatPrefix");
 						chatSuffix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".ChatSuffix");
 						tabPrefix = guiFileUtils.getConfigString(p, "Settings.NickFormat.Rank" + i + ".TabPrefix");
@@ -85,13 +81,17 @@ public class PlayerRespawnListener implements Listener {
 			String finalChatPrefix = chatPrefix, finalChatSuffix = chatSuffix, finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix, finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
 			int finalSortID = sortID;
 			
-			Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-				if(p.isOnline()) {
-					new NickManager(p).setGroupName(rankName);
-					
-					Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nickName, skinName, finalChatPrefix, finalChatSuffix, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, false, true, finalSortID, rankName));
+			new Timer().schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					if(p.isOnline()) {
+						new NickManager(p).setGroupName(rankName);
+						
+						Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, nickName, skinName, finalChatPrefix, finalChatSuffix, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, false, true, finalSortID, rankName));
+					}
 				}
-			}, 22 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? 60 : 0));
+			}, 1000 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? (1000 * 2) : 0));
 		}
 	}
 

@@ -2,9 +2,7 @@ package net.dev.eazynick.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 import net.dev.eazynick.EazyNick;
@@ -17,7 +15,7 @@ public class PlayerDeathListener implements Listener {
 		Player p = e.getEntity();
 
 		NickManager api = new NickManager(p);
-		String deathMessage = (e.getDeathMessage() != null && e.getDeathMessage() != "") ? e.getDeathMessage() : null;
+		String deathMessage = ((e.getDeathMessage() == null) || e.getDeathMessage().isEmpty()) ? null : e.getDeathMessage();
 
 		if (deathMessage != null) {
 			if (api.isNicked()) {
@@ -27,12 +25,8 @@ public class PlayerDeathListener implements Listener {
 					for (Player all : Bukkit.getOnlinePlayers()) {
 						if (all != p)
 							all.sendMessage(deathMessage);
-						else {
-							String msg = deathMessage;
-							msg = msg.replace(api.getNickFormat(), api.getOldDisplayName());
-
-							all.sendMessage(msg);
-						}
+						else
+							all.sendMessage(deathMessage.replace(api.getNickFormat(), api.getOldDisplayName()));
 					}
 				}
 			}

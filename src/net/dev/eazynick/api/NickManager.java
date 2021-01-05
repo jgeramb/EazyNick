@@ -331,23 +331,25 @@ public class NickManager {
 			}
 		}
 		
-		if(utils.nameTagEditStatus()) {
-			if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
-				String prefix = utils.getNametagEditPrefixes().get(p.getUniqueId()), suffix = utils.getNametagEditSuffixes().get(p.getUniqueId());
-				INametagApi nametagEditAPI = NametagEdit.getApi();
-				
-				if((prefix != null) && !(prefix.isEmpty()))
-					nametagEditAPI.setPrefix(p, prefix);
-				
-				if((suffix != null) && !(suffix.isEmpty()))
-					nametagEditAPI.setSuffix(p, suffix);
-				
-				nametagEditAPI.reloadNametag(p);
-				
-				utils.getNametagEditPrefixes().remove(p.getUniqueId());
-				utils.getNametagEditSuffixes().remove(p.getUniqueId());
+		Bukkit.getScheduler().runTask(eazyNick, () -> {
+			if(utils.nameTagEditStatus()) {
+				if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
+					String prefix = utils.getNametagEditPrefixes().get(p.getUniqueId()), suffix = utils.getNametagEditSuffixes().get(p.getUniqueId());
+					INametagApi nametagEditAPI = NametagEdit.getApi();
+					
+					if((prefix != null) && !(prefix.isEmpty()))
+						nametagEditAPI.setPrefix(p, prefix);
+					
+					if((suffix != null) && !(suffix.isEmpty()))
+						nametagEditAPI.setSuffix(p, suffix);
+					
+					nametagEditAPI.reloadNametag(p);
+					
+					utils.getNametagEditPrefixes().remove(p.getUniqueId());
+					utils.getNametagEditSuffixes().remove(p.getUniqueId());
+				}
 			}
-		}
+		});
 		
 		if(!(eazyNick.isEnabled()))
 			return;
@@ -686,20 +688,24 @@ public class NickManager {
 		if(fileUtils.getConfig().getBoolean("Settings.ChangeOptions.DisplayName"))
 			p.setDisplayName(chatPrefix + p.getName() + chatSuffix);
 		
-		if(utils.nameTagEditStatus()) {
-			utils.getNametagEditPrefixes().remove(p.getUniqueId());
-			utils.getNametagEditSuffixes().remove(p.getUniqueId());
-			
-			INametagApi nametagEditAPI = NametagEdit.getApi();
-			Nametag nametag = nametagEditAPI.getNametag(p);
-			
-			utils.getNametagEditPrefixes().put(p.getUniqueId(), nametag.getPrefix());
-			utils.getNametagEditSuffixes().put(p.getUniqueId(), nametag.getSuffix());
+		String finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
+		
+		Bukkit.getScheduler().runTask(eazyNick, () -> {
+			if(utils.nameTagEditStatus()) {
+				utils.getNametagEditPrefixes().remove(p.getUniqueId());
+				utils.getNametagEditSuffixes().remove(p.getUniqueId());
+				
+				INametagApi nametagEditAPI = NametagEdit.getApi();
+				Nametag nametag = nametagEditAPI.getNametag(p);
+				
+				utils.getNametagEditPrefixes().put(p.getUniqueId(), nametag.getPrefix());
+				utils.getNametagEditSuffixes().put(p.getUniqueId(), nametag.getSuffix());
 
-			nametagEditAPI.setPrefix(p, tagPrefix);
-			nametagEditAPI.setSuffix(p, tagSuffix);
-			nametagEditAPI.reloadNametag(p);
-		}
+				nametagEditAPI.setPrefix(p, finalTagPrefix);
+				nametagEditAPI.setSuffix(p, finalTagSuffix);
+				nametagEditAPI.reloadNametag(p);
+			}
+		});
 		
 		if(utils.ultraPermissionsStatus()) {
 			if(utils.getUltraPermissionsPrefixes().containsKey(p.getUniqueId()) && utils.getUltraPermissionsSuffixes().containsKey(p.getUniqueId())) {

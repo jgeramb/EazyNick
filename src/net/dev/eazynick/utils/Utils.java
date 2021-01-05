@@ -2,16 +2,9 @@ package net.dev.eazynick.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -29,8 +22,7 @@ import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
 import net.dev.eazynick.utils.anvilutils.AnvilGUI;
-import net.dev.eazynick.utils.bookutils.NMSBookBuilder;
-import net.dev.eazynick.utils.bookutils.NMSBookUtils;
+import net.dev.eazynick.utils.bookutils.*;
 import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
 import net.dev.eazynick.utils.signutils.SignGUI;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -338,13 +330,25 @@ public class Utils {
 									eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), name, skinName);
 									eazyNick.getMySQLPlayerDataManager().insertData(p.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 									
-									if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
-										nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString(p, "BookGUI.Page6.Text.BungeeCord").replace("%name%", tagPrefix + name + tagSuffix))));
+									if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
+										ArrayList<TextComponent> textComponents = new ArrayList<>();
+										
+										for(String s : guiFileUtils.getConfigString(p, "BookGUI.Page6.Text.BungeeCord").replace("%name%", chatPrefix + name + chatSuffix).split("\n"))
+											textComponents.add(new TextComponent(s + "\n"));
+										
+										nmsBookUtils.open(p, nmsBookBuilder.create("Done", new BookPage(textComponents)));
+									}
 								} else {
 									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(p, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, sortID, groupName));
 								
-									if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4")))
-										nmsBookUtils.open(p, nmsBookBuilder.create("Done", new TextComponent(guiFileUtils.getConfigString(p, "BookGUI.Page6.Text.SingleServer").replace("%name%", tagPrefix + name + tagSuffix))));
+									if(guiFileUtils.getConfig().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
+										ArrayList<TextComponent> textComponents = new ArrayList<>();
+										
+										for(String s : guiFileUtils.getConfigString(p, "BookGUI.Page6.Text.SingleServer").replace("%name%", chatPrefix + name + chatSuffix).split("\n"))
+											textComponents.add(new TextComponent(s + "\n"));
+										
+										nmsBookUtils.open(p, nmsBookBuilder.create("Done", new BookPage(textComponents)));
+									}
 								}
 							} else
 								p.sendMessage(prefix + languageFileUtils.getConfigString(p, "Messages.PlayerWithThisNameIsKnown"));

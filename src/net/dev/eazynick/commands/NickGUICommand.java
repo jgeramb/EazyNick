@@ -2,16 +2,12 @@ package net.dev.eazynick.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.utils.GUIFileUtils;
-import net.dev.eazynick.utils.ItemBuilder;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.*;
 
 public class NickGUICommand implements CommandExecutor {
 

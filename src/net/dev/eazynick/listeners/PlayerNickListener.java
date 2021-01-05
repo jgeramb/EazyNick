@@ -2,18 +2,14 @@ package net.dev.eazynick.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerNickEvent;
 import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.hooks.TABHook;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utils.*;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 
