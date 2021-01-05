@@ -373,12 +373,20 @@ public class NMSNickManager extends ReflectUtils {
 										updateUniqueId(p, uuidBefore);
 									
 									try {
-										Object packetEntityLook = ((version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()[0]).getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true);
 										Object packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
 										setField(packetHeadRotation, "a", p.getEntityId());
 										setField(packetHeadRotation, "b", (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)));
 										
-										sendPacketExceptSelf(p, packetEntityLook, forceUpdate);
+										Class<?> packetPlayOutEntityLook = (version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : null;
+										
+										if(packetPlayOutEntityLook == null) {
+											for (Class<?> clazz : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()) {
+												if(clazz.getSimpleName().equals("PacketPlayOutEntityLook"))
+													packetPlayOutEntityLook = clazz;
+											}
+										}
+										
+										sendPacketExceptSelf(p, packetPlayOutEntityLook.getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(p.getEntityId(), (byte) ((int) (p.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (p.getLocation().getPitch() * 256.0F / 360.0F)), true), forceUpdate);
 										sendPacketExceptSelf(p, packetHeadRotation, forceUpdate);
 									} catch (Exception e) {
 										e.printStackTrace();
