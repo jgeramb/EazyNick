@@ -23,6 +23,7 @@ import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import net.milkbowl.vault.chat.Chat;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
+import net.skinsrestorer.shared.exception.SkinRequestException;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.UltraPermissionsAPI;
@@ -279,12 +280,17 @@ public class NickManager extends ReflectionHelper {
 			updatePlayer();
 			
 			if(utils.skinsRestorerStatus()) {
-				try {
+				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 					SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
-					skinsRestorerAPI.setSkin(player.getName(), skinName);
+					
+					try {
+						skinsRestorerAPI.setSkin(player.getName(), skinName);
+					} catch (SkinRequestException ex) {
+						ex.printStackTrace();
+					}
+					
 					skinsRestorerAPI.applySkin(new PlayerWrapper(player));
-				} catch (Exception ex) {
-				}
+				}, 6 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 			}
 		}
 	}
