@@ -1,8 +1,7 @@
 package net.dev.eazynick.nms;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -19,6 +18,7 @@ public class ScoreboardTeamHandler {
 	private Player player;
 	private String teamName, nickName, realName, prefix, suffix;
 	private Object packet;
+	private ArrayList<Player> receivedPacket;
 	
 	public ScoreboardTeamHandler(Player player, String nickName, String realName, String prefix, String suffix, int sortID, String rank) {
 		this.eazyNick = EazyNick.getInstance();
@@ -28,6 +28,7 @@ public class ScoreboardTeamHandler {
 		this.prefix = prefix;
 		this.suffix = suffix;
 		this.teamName = sortID + rank + player.getUniqueId().toString().substring(0, 14);
+		this.receivedPacket = new ArrayList<>();
 		
 		if(this.teamName.length() > 16)
 			this.teamName = this.teamName.substring(0, 16);
@@ -86,8 +87,7 @@ public class ScoreboardTeamHandler {
 				}
 			}
 			
-			for(Player currentPlayer : Bukkit.getOnlinePlayers())
-				sendPacket(currentPlayer, packet);
+			Bukkit.getOnlinePlayers().stream().filter(receivedPacket::contains).forEach(currentPlayer -> sendPacket(currentPlayer, packet));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -97,8 +97,8 @@ public class ScoreboardTeamHandler {
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
 		
-		try {
-			for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
+		Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
+			try {
 				packet = reflectionHelper.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor().newInstance();
 				
 				String prefixForPlayer = prefix;
@@ -238,10 +238,12 @@ public class ScoreboardTeamHandler {
 				}
 			
 				sendPacket(currentPlayer, packet);
+				
+				receivedPacket.add(currentPlayer);
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		});
 	}
 	
 	private Object getAsIChatBaseComponent(String txt) {

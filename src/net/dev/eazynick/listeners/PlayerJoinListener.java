@@ -89,7 +89,7 @@ public class PlayerJoinListener implements Listener {
 			}
 			
 			if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
-				if (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode"))) {
+				if (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) {
 					if (mysqlNickManager.isPlayerNicked(player.getUniqueId()))
 						utils.performReNick(player);
 				} else if (mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("GetNewNickOnEveryServerSwitch")) {

@@ -66,18 +66,16 @@ public class PacketInjector_1_7 {
 										
 										super.write(ctx, msg, promise);
 									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
-										if(reflectionHelper.getField(msg.getClass(), "action").getInt(msg) != 4) {
-											Object playerObject = reflectionHelper.getField(msg.getClass(), "player").get(msg);
+										Object playerObject = reflectionHelper.getField(msg.getClass(), "player").get(msg);
+										
+										if(playerObject != null) {
+											UUID uuid = ((GameProfile) playerObject).getId();
 											
-											if(playerObject != null) {
-												UUID uuid = ((GameProfile) playerObject).getId();
+											if(utils.getNickedPlayers().containsKey(uuid)) {
+												NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uuid);
 												
-												if(utils.getNickedPlayers().containsKey(uuid)) {
-													NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uuid);
-													
-													reflectionHelper.setField(msg, "player", nickedPlayerData.getFakeGameProfile(false));
-													reflectionHelper.setField(msg, "username", nickedPlayerData.getNickName());
-												}
+												reflectionHelper.setField(msg, "player", nickedPlayerData.getFakeGameProfile(false));
+												reflectionHelper.setField(msg, "username", nickedPlayerData.getNickName());
 											}
 										}
 										

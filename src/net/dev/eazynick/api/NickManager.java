@@ -62,7 +62,7 @@ public class NickManager extends ReflectionHelper {
 	private void sendPacketExceptSelf(Player player, Object packet) {
 		for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
 			if(currentPlayer.getWorld().getName().equals(player.getWorld().getName())) {
-				if((!(player.getGameMode().equals(GameMode.SPECTATOR)) || currentPlayer.getGameMode().equals(GameMode.SPECTATOR)) && (currentPlayer.getEntityId() != player.getEntityId())) {
+				if((eazyNick.getVersion().startsWith("1_7") ? true : (!(player.getGameMode().equals(GameMode.SPECTATOR)) || currentPlayer.getGameMode().equals(GameMode.SPECTATOR))) && (currentPlayer.getEntityId() != player.getEntityId())) {
 					if(!(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
 						sendPacketNMS(currentPlayer, packet);
 				}
@@ -367,10 +367,9 @@ public class NickManager extends ReflectionHelper {
 		else
 			utils.getLastNickDatas().remove(player.getUniqueId());
 		
-		setName(nickName);
-
 		Bukkit.getScheduler().runTaskLater(eazyNick, () -> utils.getNickedPlayers().remove(player.getUniqueId()), 3);
 		
+		updatePlayer();
 		resetCloudNET();
 		
 		if(utils.ultraPermissionsStatus()) {
@@ -644,22 +643,20 @@ public class NickManager extends ReflectionHelper {
 				
 			utils.getScoreboardTeamManagers().put(player.getUniqueId(), new ScoreboardTeamHandler(player, nickName, realName, tagPrefix, tagSuffix, sortID, groupName));
 			
-			ScoreboardTeamHandler sbtm = utils.getScoreboardTeamManagers().get(player.getUniqueId());
+			ScoreboardTeamHandler scoreboardTeamHandler = utils.getScoreboardTeamManagers().get(player.getUniqueId());
 			
 			new AsyncTask(new AsyncRunnable() {
 				
 				@Override
 				public void run() {
 					UUID uuid = player.getUniqueId();
-
-					sbtm.destroyTeam();
 					
-					if(eazyNick.isEnabled() && utils.getNickedPlayers().containsKey(uuid) && player.isOnline()) {
-						sbtm.createTeam();
+					if(eazyNick.isEnabled() && utils.getScoreboardTeamManagers().containsKey(uuid) && player.isOnline()) {
+						scoreboardTeamHandler.destroyTeam();
+						scoreboardTeamHandler.createTeam();
 						
 						if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
-							String tmpTabPrefix = finalTabPrefix;
-							String tmpTabSuffix = finalTabSuffix;
+							String tmpTabPrefix = finalTabPrefix, tmpTabSuffix = finalTabSuffix;
 							
 							if(utils.placeholderAPIStatus()) {
 								tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
