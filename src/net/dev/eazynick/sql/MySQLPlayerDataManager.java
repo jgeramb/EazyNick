@@ -12,14 +12,14 @@ public class MySQLPlayerDataManager {
 		this.mysql = mysql;
 	}
 	
-	public String getOldRank(UUID uuid) {
+	public String getGroupName(UUID uuid) {
 		if(mysql.isConnected()) {
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 					
 					if(rs.next()) {
-						String s = rs.getString("OldRank");
+						String s = rs.getString("GroupName");
 						
 						rs.close();
 						
@@ -27,8 +27,8 @@ public class MySQLPlayerDataManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -51,8 +51,8 @@ public class MySQLPlayerDataManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -75,8 +75,8 @@ public class MySQLPlayerDataManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -99,8 +99,8 @@ public class MySQLPlayerDataManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -123,8 +123,8 @@ public class MySQLPlayerDataManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -147,8 +147,8 @@ public class MySQLPlayerDataManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -171,8 +171,8 @@ public class MySQLPlayerDataManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -180,12 +180,12 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public void insertData(UUID uuid, String oldRank, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
+	public void insertData(UUID uuid, String GroupName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
 		if(mysql.isConnected()) {
 			if(isRegistered(uuid))
 				removeData(uuid);
 			
-			mysql.update("INSERT INTO NickedPlayerDatas (UUID, OldRank, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + oldRank + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
+			mysql.update("INSERT INTO NickedPlayerDatas (UUID, GroupName, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + GroupName + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
 		}
 	}
 	

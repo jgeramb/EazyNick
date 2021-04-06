@@ -1,175 +1,299 @@
 package net.dev.eazynick.api;
 
-import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.*;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.hash.Hashing;
 import com.nametagedit.plugin.NametagEdit;
 import com.nametagedit.plugin.api.INametagApi;
 import com.nametagedit.plugin.api.data.Nametag;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.hooks.LuckPermsHook;
-import net.dev.eazynick.hooks.TABHook;
-import net.dev.eazynick.utils.*;
-import net.dev.eazynick.utils.nickutils.NMSNickManager;
-import net.dev.eazynick.utils.nickutils.NMSNickManager.UpdateType;
-import net.dev.eazynick.utils.scoreboard.ScoreboardTeamManager;
+import net.dev.eazynick.nms.ReflectionHelper;
+import net.dev.eazynick.nms.ScoreboardTeamHandler;
+import net.dev.eazynick.utilities.*;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
+import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import net.milkbowl.vault.chat.Chat;
+import net.skinsrestorer.api.PlayerWrapper;
+import net.skinsrestorer.api.SkinsRestorerAPI;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.UltraPermissionsAPI;
-import me.TechsCode.UltraPermissions.storage.objects.Group;
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.wazup.survivalgames.*;
 
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
 import de.dytanic.cloudnet.lib.player.permission.PermissionEntity;
-import fr.xephi.authme.AuthMe;
-import fr.xephi.authme.api.NewAPI;
-import fr.xephi.authme.api.v3.AuthMeApi;
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
-public class NickManager {
+public class NickManager extends ReflectionHelper {
 
 	private EazyNick eazyNick;
-	private Player p;
+	private SetupYamlFile setupYamlFile;
+	private Utils utils;
+	private Player player;
 	
-	public NickManager(Player p) {
+	public NickManager(Player player) {
 		this.eazyNick = EazyNick.getInstance();
-		this.p = p;
+		this.setupYamlFile = eazyNick.getSetupYamlFile();
+		this.utils = eazyNick.getUtils();
+		this.player = player;
 	}
 	
-	public void setPlayerListName(String name) {
-		NMSNickManager nmsNickManager = eazyNick.getNMSNickManager();
-		
-		if(eazyNick.getFileUtils().getConfig().getBoolean("Settings.ChangeOptions.PlayerListName")) {
-			if(eazyNick.getVersion().equals("1_7_R4"))
-				nmsNickManager.updatePlayerListName_1_7_R4(p, name);
-			else
-				nmsNickManager.updatePlayerListName(p, name);
+	private void sendPacket(Player nickedPlayer, Player player, Object packet) {
+		if((player.canSee(nickedPlayer) && player.getWorld().getName().equals(nickedPlayer.getWorld().getName()))) {
+			if(player.getEntityId() != nickedPlayer.getEntityId()) {
+				if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
+					sendPacketNMS(player, packet);
+			} else if(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))
+				sendPacketNMS(player, packet);
 		}
 	}
 	
-	public void changeSkin(String skinName) {
-		NMSNickManager nmsNickManager = eazyNick.getNMSNickManager();
-		
-		if(skinName != null) {
-			if(eazyNick.getVersion().equals("1_7_R4"))
-				nmsNickManager.updateSkin_1_7_R4(p, skinName);
-			else if(eazyNick.getVersion().equals("1_8_R1"))
-				nmsNickManager.updateSkin_1_8_R1(p, skinName);
-			else
-				nmsNickManager.updateSkin(p, skinName);
-			
-			if(eazyNick.getUtils().skinsRestorerStatus()) {
+	private void sendPacketExceptSelf(Player player, Object packet) {
+		for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+			if(currentPlayer.getWorld().getName().equals(player.getWorld().getName())) {
+				if((!(player.getGameMode().equals(GameMode.SPECTATOR)) || currentPlayer.getGameMode().equals(GameMode.SPECTATOR)) && (currentPlayer.getEntityId() != player.getEntityId())) {
+					if(!(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
+						sendPacketNMS(currentPlayer, packet);
+				}
+			}
+		}
+	}
+	
+	private void sendPacketNMS(Player player, Object packet) {
+		try {
+			Object handle = player.getClass().getMethod("getHandle").invoke(player);
+			Object playerConnection = handle.getClass().getDeclaredField("playerConnection").get(handle);
+			playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void setPlayerListName(String name) {
+		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
+			if(eazyNick.getVersion().equals("1_7_R4")) {
 				try {
-					skinsrestorer.bukkit.SkinsRestorerBukkitAPI skinsRestorerBukkitAPI = ((skinsrestorer.bukkit.SkinsRestorer) Bukkit.getPluginManager().getPlugin("SkinsRestorer")).getSkinsRestorerBukkitAPI();
-					skinsRestorerBukkitAPI.setSkin(p.getName(), skinName);
-					skinsRestorerBukkitAPI.applySkin(p);
-				} catch (Exception e) {
+					Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+
+					if (name.length() > 16)
+						name = name.substring(0, 16);
+						
+					Field f = getNMSClass("EntityPlayer").getDeclaredField("listName");
+					f.setAccessible(true);
+					f.set(entityPlayer, name);
+					f.setAccessible(false);
+
+					Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+					Object packet = playOutPlayerInfo.getMethod("updateDisplayName", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+					Object packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+					Object packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+					
+					for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
+						if(currentPlayer.canSee(player)) {
+							if(!(currentPlayer.getUniqueId().equals(player.getUniqueId()))) {
+								if(!(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+									Object playerConenction = getNMSClass("EntityPlayer").getDeclaredField("playerConnection").get(currentPlayer.getClass().getMethod("getHandle").invoke(currentPlayer));
+									Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
+									int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
+									
+									if (version < 28) {
+										sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
+										sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
+									} else
+										sendPacketNMS(currentPlayer, packet);
+								}
+							} else {
+								if(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")) {
+									Object playerConenction = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
+									Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
+									int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
+									
+									if (version < 28) {
+										sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
+										sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
+									} else
+										sendPacketNMS(currentPlayer, packet);
+								}
+							}
+						}
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			} else {
+				try {
+					Class<?> enumPlayerInfoAction = eazyNick.getVersion().equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(eazyNick.getVersion().equals("1_11_R1") || eazyNick.getVersion().equals("1_12_R1") || utils.isNewVersion()) ? 1 : 2];
+					Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+					Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
+					
+					Array.set(entityPlayerArray, 0, entityPlayer);
+					
+					final String finalName = name;
+					
+					Bukkit.getScheduler().runTask(eazyNick, () -> {
+						try {
+							Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
+							Field f = getNMSClass("EntityPlayer").getDeclaredField("listName");
+							f.setAccessible(true);
+							f.set(entityPlayer, utils.isNewVersion() ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, finalName) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, finalName))[0]);
+							
+							for(Player currentPlayer : Bukkit.getOnlinePlayers())
+								sendPacket(player, currentPlayer, getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray));
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					});
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
 	}
 	
 	public void updatePlayer() {
-		updatePlayer(UpdateType.UPDATE, null, false);
+		try {
+			String version = eazyNick.getVersion();
+			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
+			Array.set(entityPlayerArray, 0, entityPlayer);
+			
+			Object worldClient = entityPlayer.getClass().getMethod("getWorld").invoke(entityPlayer), worldData = worldClient.getClass().getMethod("getWorldData").invoke(worldClient), interactManager = entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer);
+			
+			for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
+				sendPacket(player, currentPlayer, getNMSClass("PacketPlayOutEntityDestroy").getConstructor(int[].class).newInstance(new int[] { player.getEntityId() }));
+				
+				Object packetPlayOutPlayerInfoRemove;
+				
+				if(version.equals("1_7_R4")) {
+					Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+					
+					packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+				} else {
+					Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+					
+					packetPlayOutPlayerInfoRemove = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+				}
+				
+				sendPacket(player, currentPlayer, packetPlayOutPlayerInfoRemove);
+			}
+			
+			Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
+				if(!(eazyNick.isEnabled()) || !(player.isOnline()))
+					return;
+				
+				try {
+					for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
+						Object packetPlayOutPlayerInfoAdd;
+						
+						if(version.equals("1_7_R4")) {
+							Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+							
+							packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+						} else {
+							Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+							
+							packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+						}
+						
+						sendPacket(player, currentPlayer, packetPlayOutPlayerInfoAdd);
+					}
+					
+					sendPacketExceptSelf(player, getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer));
+					
+					Object packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
+					setField(packetHeadRotation, "a", player.getEntityId());
+					setField(packetHeadRotation, "b", (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)));
+					
+					Class<?> packetPlayOutEntityLook = (version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : null;
+					
+					if(packetPlayOutEntityLook == null) {
+						for (Class<?> clazz : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()) {
+							if(clazz.getSimpleName().equals("PacketPlayOutEntityLook"))
+								packetPlayOutEntityLook = clazz;
+						}
+					}
+					
+					sendPacketExceptSelf(player, packetPlayOutEntityLook.getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(player.getEntityId(), (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (player.getLocation().getPitch() * 256.0F / 360.0F)), true));
+					sendPacketExceptSelf(player, packetHeadRotation);
+					
+					Object packetRespawnPlayer;
+					
+					if(version.startsWith("1_16")) {
+						Object craftWorld = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
+						Class<?> enumGameMode = getNMSClass("EnumGamemode");
+
+						packetRespawnPlayer = version.equals("1_16_R1") ? getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true) : getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getDimensionManager").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
+					} else if(version.startsWith("1_15")) {
+						Class<?> dimensionManager = getNMSClass("DimensionManager");
+						Class<?> worldType = getNMSClass("WorldType");
+						Class<?> enumGameMode = getNMSClass("EnumGamemode");
+						
+						packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, long.class, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, player.getWorld().getEnvironment().getId()), Hashing.sha256().hashLong(player.getWorld().getSeed()).asLong(), worldType.getMethod("getType", String.class).invoke(worldType, player.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, player.getGameMode().getValue()));
+					} else if(version.startsWith("1_14")) {
+						Class<?> dimensionManager = getNMSClass("DimensionManager");
+						Class<?> worldType = getNMSClass("WorldType");
+						Class<?> enumGameMode = getNMSClass("EnumGamemode");
+						
+						packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, player.getWorld().getEnvironment().getId()), worldType.getMethod("getType", String.class).invoke(worldType, player.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, player.getGameMode().getValue()));
+					} else if(version.equals("1_13_R2")) {
+						Object craftWorld = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
+						
+						packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldClient.getClass().getDeclaredField("dimension").get(craftWorld), worldClient.getClass().getMethod("getDifficulty").invoke(worldClient), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
+					} else {
+						Class<?> enumGameMode = (version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1") || version.equals("1_9_R2")) ? getNMSClass("WorldSettings").getDeclaredClasses()[0] : getNMSClass("EnumGamemode");
+						
+						packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(int.class, getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), enumGameMode).newInstance(player.getWorld().getEnvironment().getId(), (version.equals("1_7_R4") ? getNMSClass("World").getDeclaredField("difficulty").get(worldClient) : worldClient.getClass().getMethod("getDifficulty").invoke(worldClient)), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
+					}
+					
+					sendPacketNMS(player, packetRespawnPlayer);
+
+					Bukkit.getScheduler().runTask(eazyNick, () -> {
+						player.teleport(new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
+						player.updateInventory();
+					});
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}, 5 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
-	public void updatePlayer(UpdateType type, String skinName, boolean forceUpdate) {
-		eazyNick.getNMSNickManager().updatePlayer(p, type, skinName, forceUpdate);
+	public void changeSkin(String skinName) {
+		if(skinName != null) {
+			if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+				utils.getNickedPlayers().get(player.getUniqueId()).setSkinName(skinName);
+			
+			updatePlayer();
+			
+			if(utils.skinsRestorerStatus()) {
+				try {
+					SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
+					skinsRestorerAPI.setSkin(player.getName(), skinName);
+					skinsRestorerAPI.applySkin(new PlayerWrapper(player));
+				} catch (Exception ex) {
+				}
+			}
+		}
 	}
 	
 	public void setName(String nickName) {
-		Utils utils = eazyNick.getUtils();
-		NMSNickManager nmsNickManager = eazyNick.getNMSNickManager();
-		ReflectUtils reflectUtils = eazyNick.getReflectUtils();
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setNickName(nickName);
 		
-		if(utils.survivalGamesStatus()) {
-			if(nickName != p.getName()) {
-				try {
-					SurvivalGames survivalGames = (SurvivalGames) reflectUtils.getField(SurvivalGamesAPI.class, "plugin").get(SurvivalGames.api);
-					HashMap<String, PlayerData> playerData = (HashMap<String, PlayerData>) reflectUtils.getField(SurvivalGames.class, "playerData").get(survivalGames);
-					playerData.put(nickName, playerData.get(p.getName()));
-					playerData.remove(p.getName());
-					reflectUtils.setField(survivalGames, "playerData", playerData);
-					
-					Object config = (Object) reflectUtils.getField(SurvivalGames.class, "config").get(survivalGames);
-					
-					if((boolean) reflectUtils.getField(config.getClass(), "BungeeMode").get(config)) {
-						ArrayList<String> grace = (ArrayList<String>) reflectUtils.getField(SurvivalGames.class, "grace").get(survivalGames);
-						grace.add(nickName);
-						grace.remove(p.getName());
-						reflectUtils.setField(survivalGames, "grace", grace);
-						
-						ArrayList<String> spectator = (ArrayList<String>) reflectUtils.getField(SurvivalGames.class, "spectator").get(survivalGames);
-						spectator.remove(p.getName());
-					    spectator.add(nickName);
-					    reflectUtils.setField(survivalGames, "spectator", spectator);
-					}
-				} catch (Exception e) {
-				}
-			}
-		}
-		
-		nmsNickManager.updateName(p, nickName);
-		
-		if(utils.survivalGamesStatus()) {
-			if(nickName != p.getName()) {
-				try {
-					SurvivalGames survivalGames = (SurvivalGames) reflectUtils.getField(SurvivalGamesAPI.class, "plugin").get(SurvivalGames.api);
-					HashMap<String, PlayerData> playerData = (HashMap<String, PlayerData>) reflectUtils.getField(SurvivalGames.class, "playerData").get(survivalGames);
-					PlayerData data = playerData.get(nickName);
-					playerData.remove(nickName);
-					PlayerData.class.getMethod("loadStats", Player.class).invoke(playerData, p);
-					playerData.put(nickName, data);
-					reflectUtils.setField(survivalGames, "playerData", playerData);
-				} catch (Exception e) {
-				}
-			}
-		}
-		
-		performAuthMeLogin();
-		
-		if(utils.datenschutzStatus()) {
-			try {
-				me.tim.Main.Main.PlayerDatenschutz_Config.set(p.getName() + ".Entscheidung", true);
-				me.tim.Main.Main.PlayerDatenschutz_Config.save(me.tim.Main.Main.PlayerDatenschutz);
-			} catch (IOException e) {
-			}
-		}
-	}
-	
-	private void performAuthMeLogin() {
-		Utils utils = eazyNick.getUtils();
-		
-		try {
-			if(utils.authMeReloadedStatus("5.5.0")) {
-				NewAPI api = AuthMe.getApi();
-				String name = p.getName();
-				
-				if(!(api.isRegistered(name)))
-					api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
-				else
-					api.forceLogin(p);
-			} else if(utils.authMeReloadedStatus("5.5.1") || utils.authMeReloadedStatus("5.6.0")) {
-				AuthMeApi api = AuthMeApi.getInstance();
-				String name = p.getName();
-				
-				if(!(api.isRegistered(name)))
-					api.forceRegister(p, Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(0, 10), true);
-				else
-					api.forceLogin(p);
-			}
-		} catch (Exception ex) {
-		}
+		updatePlayer();
 	}
 
 	public void nickPlayer(String nickName) {
@@ -177,176 +301,145 @@ public class NickManager {
 	}
 	
 	public void nickPlayer(String nickName, String skinName) {
-		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		
-		if(!(utils.getOldDisplayNames().containsKey(p.getUniqueId())))
-			utils.getOldDisplayNames().put(p.getUniqueId(), (p.getDisplayName() != null) ? p.getDisplayName() : p.getName());
-		
-		if(!(utils.getOldPlayerListNames().containsKey(p.getUniqueId())))
-			utils.getOldPlayerListNames().put(p.getUniqueId(), (p.getPlayerListName() != null) ? p.getPlayerListName() :  p.getName());
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		
 		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
-			p.setCustomName(nickName);
+			player.setCustomName(nickName);
 		
-		if(fileUtils.getConfig().getBoolean("BungeeCord"))
-			eazyNick.getMySQLNickManager().addPlayer(p.getUniqueId(), nickName, skinName);
-		
-		utils.getNickedPlayers().add(p.getUniqueId());
-		utils.getPlayerNicknames().put(p.getUniqueId(), nickName);
+		if(setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
+			eazyNick.getMySQLNickManager().addPlayer(player.getUniqueId(), nickName, skinName);
 		
 		setName(new StringUtils(nickName).removeColorCodes().getString());
-		updatePlayer(UpdateType.NICK, new StringUtils(skinName).removeColorCodes().getString(), false);
 		
-		if(fileUtils.getConfig().getBoolean("NickActionBarMessage")) {
-			new Timer().schedule(new TimerTask() {
-				
-				UUID uuid = p.getUniqueId();
+		if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage")) {
+			new AsyncTask(new AsyncRunnable() {
 				
 				@Override
 				public void run() {
 					ActionBarUtils actionBarUtils = eazyNick.getActionBarUtils();
 					
-					if(eazyNick.isEnabled() && utils.getNickedPlayers().contains(uuid) && (p != null) && p.isOnline())
-						actionBarUtils.sendActionBar(p, eazyNick.getLanguageFileUtils().getConfigString(p, "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%prefix%", utils.getPrefix()));
-					else {
-						if(p != null)
-							actionBarUtils.sendActionBar(p, "");
+					if(eazyNick.isEnabled() && utils.getNickedPlayers().containsKey(player.getUniqueId()) && (player != null) && player.isOnline() && !(utils.getWorldsWithDisabledActionBar().contains(player.getWorld().getName().toUpperCase()))) {
+						NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId());
 						
+						actionBarUtils.sendActionBar(player, eazyNick.getLanguageYamlFile().getConfigString(player, player.hasPermission("nick.otheractionbarmessage") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", nickedPlayerData.getChatPrefix()).replace("%nickprefix%", nickedPlayerData.getChatPrefix()).replace("%nickSuffix%", nickedPlayerData.getChatSuffix()).replace("%nicksuffix%", nickedPlayerData.getChatSuffix()).replace("%prefix%", utils.getPrefix()));
+					} else {
+						if(player != null)
+							actionBarUtils.sendActionBar(player, "");
+
 						cancel();
 					}
 				}
-			}, 0, 1000);
+			}, 0, 1000).run();
 		}
 		
-		if(fileUtils.getConfig().getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
-			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
-				ItemStack item = p.getInventory().getItem(slot);
+		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("nick.item"))) {
+			for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
+				ItemStack item = player.getInventory().getItem(slot);
 				
 				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(eazyNick.getLanguageFileUtils().getConfigString(p, "NickItem.DisplayName.Disabled")))
-						p.getInventory().setItem(slot, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
+					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(eazyNick.getLanguageYamlFile().getConfigString(player, "NickItem.DisplayName.Disabled")))
+						player.getInventory().setItem(slot, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Enabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled")).build());
 				}
 			}
 		}
 	}
 	
 	public void unnickPlayer() {
-		if(eazyNick.getFileUtils().getConfig().getBoolean("BungeeCord")) {
-			eazyNick.getMySQLNickManager().removePlayer(p.getUniqueId());
-			eazyNick.getMySQLPlayerDataManager().removeData(p.getUniqueId());
+		if(setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+			eazyNick.getMySQLNickManager().removePlayer(player.getUniqueId());
+			eazyNick.getMySQLPlayerDataManager().removeData(player.getUniqueId());
 		}
 		
 		unnickPlayerWithoutRemovingMySQL(false);
 	}
 	
-	public void unnickPlayerWithoutRemovingMySQL(boolean isQuitUnnick) {
-		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+	public void unnickPlayerWithoutRemovingMySQL(boolean keepNick) {
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		
+		NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId());
 		String nickName = getRealName();
 		
 		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
-			p.setCustomName(nickName);
+			player.setCustomName(nickName);
+		
+		if(keepNick)
+			utils.getLastNickDatas().put(player.getUniqueId(), nickedPlayerData.clone());
+		else
+			utils.getLastNickDatas().remove(player.getUniqueId());
 		
 		setName(nickName);
-		updatePlayer(isQuitUnnick ? UpdateType.QUIT : UpdateType.UNNICK, nickName, true);
+
+		Bukkit.getScheduler().runTaskLater(eazyNick, () -> utils.getNickedPlayers().remove(player.getUniqueId()), 3);
 		
-		utils.getNickedPlayers().remove(p.getUniqueId());
-		utils.getPlayerNicknames().remove(p.getUniqueId());
-		
-		if(utils.getChatPrefixes().containsKey(p.getUniqueId()))
-			utils.getChatPrefixes().remove(p.getUniqueId());
-			
-		if(utils.getChatSuffixes().containsKey(p.getUniqueId()))
-			utils.getChatSuffixes().remove(p.getUniqueId());
-		
-		if(utils.getTabPrefixes().containsKey(p.getUniqueId()))
-			utils.getTabPrefixes().remove(p.getUniqueId());
-		
-		if(utils.getTabSuffixes().containsKey(p.getUniqueId()))
-			utils.getTabSuffixes().remove(p.getUniqueId());
-		
-		unsetGroupName();
 		resetCloudNET();
-		
-		if(utils.luckPermsStatus())
-			new LuckPermsHook(p).resetNodes();
-		
-		if(utils.tabStatus() && fileUtils.getConfig().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
-			new TABHook(p).reset();
 		
 		if(utils.ultraPermissionsStatus()) {
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
-			me.TechsCode.UltraPermissions.storage.objects.User user = api.getUsers().uuid(p.getUniqueId());
+			Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
 		
-			if(fileUtils.getConfig().getBoolean("SwitchUltraPermissionsGroupByNicking")) {
-				if(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId())) {
-					HashMap<String, Long> data = utils.getOldUltraPermissionsGroups().get(p.getUniqueId());
+			if(userOptional.isPresent()) {
+				me.TechsCode.UltraPermissions.storage.objects.User user = userOptional.get();
+				
+				if(utils.getOldUltraPermissionsGroups().containsKey(player.getUniqueId())) {
+					HashMap<String, Long> data = utils.getOldUltraPermissionsGroups().get(player.getUniqueId());
 					
-					data.keySet().forEach(group -> user.addGroup(api.getGroups().name(group), data.get(group)));
+					data.keySet().forEach(group -> user.addGroup(api.getGroups().name(group).get(), data.get(group)));
 					
-					utils.getOldUltraPermissionsGroups().remove(p.getUniqueId());
+					utils.getOldUltraPermissionsGroups().remove(player.getUniqueId());
+				}
+			
+				if(utils.getUltraPermissionsPrefixes().containsKey(player.getUniqueId())) {
+					user.setPrefix(utils.getUltraPermissionsPrefixes().get(player.getUniqueId()));
+					
+					utils.getUltraPermissionsPrefixes().remove(player.getUniqueId());
+				}
+				
+				if(utils.getUltraPermissionsSuffixes().containsKey(player.getUniqueId())) {
+					user.setSuffix(utils.getUltraPermissionsSuffixes().get(player.getUniqueId()));
+					
+					utils.getUltraPermissionsSuffixes().remove(player.getUniqueId());
 				}
 			}
 		}
 		
 		if(utils.permissionsExStatus()) {
-			PermissionUser user = PermissionsEx.getUser(p);
+			PermissionUser user = PermissionsEx.getUser(player);
 		
-			if(fileUtils.getConfig().getBoolean("SwitchPermissionsExGroupByNicking")) {
-				if(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId())) {
-					user.setGroups(utils.getOldPermissionsExGroups().get(p.getUniqueId()));
+			if(setupYamlFile.getConfiguration().getBoolean("SwitchPermissionsExGroupByNicking")) {
+				if(utils.getOldPermissionsExGroups().containsKey(player.getUniqueId())) {
+					user.setGroups(utils.getOldPermissionsExGroups().get(player.getUniqueId()));
 					
-					utils.getOldPermissionsExGroups().remove(p.getUniqueId());
+					utils.getOldPermissionsExGroups().remove(player.getUniqueId());
 				}
-			} else if(utils.getOldPermissionsExPrefixes().containsKey(p.getUniqueId()) && utils.getOldPermissionsExSuffixes().containsKey(p.getUniqueId())) {
-				user.setPrefix(utils.getOldPermissionsExPrefixes().get(p.getUniqueId()), p.getWorld().getName());
-				user.setSuffix(utils.getOldPermissionsExSuffixes().get(p.getUniqueId()), p.getWorld().getName());
+			} else if(utils.getOldPermissionsExPrefixes().containsKey(player.getUniqueId()) && utils.getOldPermissionsExSuffixes().containsKey(player.getUniqueId())) {
+				user.setPrefix(utils.getOldPermissionsExPrefixes().get(player.getUniqueId()), player.getWorld().getName());
+				user.setSuffix(utils.getOldPermissionsExSuffixes().get(player.getUniqueId()), player.getWorld().getName());
 			}
 		}
 		
-		if(fileUtils.getConfig().getBoolean("Settings.ChangeOptions.NameTag")) {
-			if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId())) {
-				utils.getScoreboardTeamManagers().get(p.getUniqueId()).destroyTeam();
-				utils.getScoreboardTeamManagers().remove(p.getUniqueId());
-			}
-		}
-		
-		if(utils.ultraPermissionsStatus()) {
-			if(utils.getUltraPermissionsPrefixes().containsKey(p.getUniqueId()) && utils.getUltraPermissionsSuffixes().containsKey(p.getUniqueId())) {
-				String prefix = utils.getUltraPermissionsPrefixes().get(p.getUniqueId()), suffix = utils.getUltraPermissionsSuffixes().get(p.getUniqueId());
-				me.TechsCode.UltraPermissions.storage.objects.User user = UltraPermissions.getAPI().getUsers().uuid(p.getUniqueId());
-				
-				if((prefix != null) && !(prefix.isEmpty()))
-					user.setPrefix(prefix);
-				
-				if((suffix != null) && !(suffix.isEmpty()))
-					user.setSuffix(suffix);
-				
-				utils.getUltraPermissionsPrefixes().remove(p.getUniqueId());
-				utils.getUltraPermissionsSuffixes().remove(p.getUniqueId());
+		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
+			if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId())) {
+				utils.getScoreboardTeamManagers().get(player.getUniqueId()).destroyTeam();
+				utils.getScoreboardTeamManagers().remove(player.getUniqueId());
 			}
 		}
 		
 		Bukkit.getScheduler().runTask(eazyNick, () -> {
 			if(utils.nameTagEditStatus()) {
-				if(utils.getNametagEditPrefixes().containsKey(p.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(p.getUniqueId())) {
-					String prefix = utils.getNametagEditPrefixes().get(p.getUniqueId()), suffix = utils.getNametagEditSuffixes().get(p.getUniqueId());
+				if(utils.getNametagEditPrefixes().containsKey(player.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(player.getUniqueId())) {
+					String prefix = utils.getNametagEditPrefixes().get(player.getUniqueId()), suffix = utils.getNametagEditSuffixes().get(player.getUniqueId());
 					INametagApi nametagEditAPI = NametagEdit.getApi();
 					
 					if((prefix != null) && !(prefix.isEmpty()))
-						nametagEditAPI.setPrefix(p, prefix);
+						nametagEditAPI.setPrefix(player, prefix);
 					
 					if((suffix != null) && !(suffix.isEmpty()))
-						nametagEditAPI.setSuffix(p, suffix);
+						nametagEditAPI.setSuffix(player, suffix);
 					
-					nametagEditAPI.reloadNametag(p);
+					nametagEditAPI.reloadNametag(player);
 					
-					utils.getNametagEditPrefixes().remove(p.getUniqueId());
-					utils.getNametagEditSuffixes().remove(p.getUniqueId());
+					utils.getNametagEditPrefixes().remove(player.getUniqueId());
+					utils.getNametagEditSuffixes().remove(player.getUniqueId());
 				}
 			}
 		});
@@ -354,225 +447,171 @@ public class NickManager {
 		if(!(eazyNick.isEnabled()))
 			return;
 		
-		if(utils.getOldDisplayNames().containsKey(p.getUniqueId()) && utils.getOldPlayerListNames().containsKey(p.getUniqueId())) {
-			UUID uuid = p.getUniqueId();
-			String oldDisplayName = getOldDisplayName();
-			String oldPlayerListName = getOldPlayerListName();
+		Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
 			
-			Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
-				
-				@Override
-				public void run() {
-					if(p.isOnline()) {
-						p.setDisplayName(oldDisplayName);
-						setPlayerListName(oldPlayerListName);
-						
-						utils.getOldDisplayNames().remove(uuid);
-						utils.getOldPlayerListNames().remove(uuid);
-					}
+			@Override
+			public void run() {
+				if(player.isOnline()) {
+					player.setDisplayName(nickedPlayerData.getOldDisplayName());
+					setPlayerListName(nickedPlayerData.getOldPlayerListName());
 				}
-			}, 5 + (fileUtils.getConfig().getBoolean("RandomDisguiseDelay") ? 40 : 0));
-		}
+			}
+		}, 20 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 40 : 0));
 		
-		if(fileUtils.getConfig().getBoolean("NickItem.getOnJoin")  && (p.hasPermission("nick.item"))) {
-			for (int slot = 0; slot < p.getInventory().getSize(); slot++) {
-				ItemStack item = p.getInventory().getItem(slot);
+		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("nick.item"))) {
+			for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
+				ItemStack item = player.getInventory().getItem(slot);
 				
 				if((item != null) && (item.getType() != Material.AIR) && (item.getItemMeta() != null) && (item.getItemMeta().getDisplayName() != null)) {
-					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(eazyNick.getLanguageFileUtils().getConfigString(p, "NickItem.DisplayName.Enabled")))
-						p.getInventory().setItem(slot, new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
+					if(item.getItemMeta().getDisplayName().equalsIgnoreCase(eazyNick.getLanguageYamlFile().getConfigString(player, "NickItem.DisplayName.Enabled")))
+						player.getInventory().setItem(slot, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
 				}
 			}
 		}
 	}
 	
 	public String getRealName() {
-		Utils utils = eazyNick.getUtils();
-		
-		String realName = p.getName();
-		
-		if(!(Bukkit.getOnlineMode()) && utils.getNameCache().containsKey(p.getUniqueId()))
-			realName = utils.getNameCache().get(p.getUniqueId());
-		else {
-			if(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))
-				realName = eazyNick.getUUIDFetcher_1_7().getName(realName, p.getUniqueId());
-			else if(eazyNick.getVersion().equalsIgnoreCase("1_8_R1"))
-				realName = eazyNick.getUUIDFetcher_1_8_R1().getName(realName, p.getUniqueId());
-			else
-				realName = eazyNick.getUUIDFetcher().getName(realName, p.getUniqueId());
-		}
-		
-		return realName;
+		return player.getName();
 	}
 	
 	public String getChatPrefix() {
-		Utils utils = eazyNick.getUtils();
-		
-		return utils.getChatPrefixes().containsKey(p.getUniqueId()) ? utils.getChatPrefixes().get(p.getUniqueId()) : ((utils.vaultStatus() && eazyNick.getFileUtils().getConfig().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getChatPrefix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
 	}
 
 	public void setChatPrefix(String chatPrefix) {
-		Utils utils = eazyNick.getUtils();
-		
-		if(utils.getChatPrefixes().containsKey(p.getUniqueId()))
-			utils.getChatPrefixes().remove(p.getUniqueId());
-		
-		utils.getChatPrefixes().put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatPrefix));
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setChatPrefix(chatPrefix);
 		
 		if(eazyNick.getVersion().equals("1_7_R4")) {
-			String nameFormatChat = utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId());
-			String nameFormatTab = utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId());
+			String nameFormatChat = getChatPrefix() + getNickName() + getChatSuffix();
+			String nameFormatTab = getTabPrefix() + getNickName() + getTabSuffix();
 			
 			if(nameFormatTab.length() <= 16) {
-				p.setDisplayName(nameFormatChat);
+				player.setDisplayName(nameFormatChat);
 				setPlayerListName(nameFormatTab);
 			} else {
-				p.setDisplayName(nameFormatChat.substring(0, 16));
-				setPlayerListName(p.getName());
+				player.setDisplayName(nameFormatChat.substring(0, 16));
+				setPlayerListName(getNickName());
 			}
 		} else {
-			p.setDisplayName(utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId()));
-			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
+			player.setDisplayName(getChatPrefix() + getNickName() + getChatSuffix());
+			setPlayerListName(getTabPrefix() + getNickName() + getTabSuffix());
 		}
 	}
 
 	public String getChatSuffix() {
-		Utils utils = eazyNick.getUtils();
-		
-		return utils.getChatSuffixes().containsKey(p.getUniqueId()) ? utils.getChatSuffixes().get(p.getUniqueId()) : ((utils.vaultStatus() && eazyNick.getFileUtils().getConfig().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getChatSuffix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
 	}
 
 	public void setChatSuffix(String chatSuffix) {
-		Utils utils = eazyNick.getUtils();
-		
-		if(utils.getChatSuffixes().containsKey(p.getUniqueId()))
-			utils.getChatSuffixes().remove(p.getUniqueId());
-		
-		utils.getChatSuffixes().put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', chatSuffix));
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setChatSuffix(chatSuffix);
 		
 		if(eazyNick.getVersion().equals("1_7_R4")) {
-			String nameFormatChat = utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId());
-			String nameFormatTab = utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId());
+			String nameFormatChat = getChatPrefix() + getNickName() + getChatSuffix();
+			String nameFormatTab = getTabPrefix() + getNickName() + getTabSuffix();
 			
 			if(nameFormatTab.length() <= 16) {
-				p.setDisplayName(nameFormatChat);
+				player.setDisplayName(nameFormatChat);
 				setPlayerListName(nameFormatTab);
 			} else {
-				p.setDisplayName(nameFormatChat.substring(0, 16));
-				setPlayerListName(p.getName());
+				player.setDisplayName(nameFormatChat.substring(0, 16));
+				setPlayerListName(getNickName());
 			}
 		} else {
-			p.setDisplayName(utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId()));
-			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
+			player.setDisplayName(getChatPrefix() + getNickName() + getChatSuffix());
+			setPlayerListName(getTabPrefix() + getNickName() + getTabSuffix());
 		}
 	}
 
 	public String getTabPrefix() {
-		Utils utils = eazyNick.getUtils();
-		
-		return utils.getTabPrefixes().containsKey(p.getUniqueId()) ? utils.getTabPrefixes().get(p.getUniqueId()) : ((utils.vaultStatus() && eazyNick.getFileUtils().getConfig().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(p) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTabPrefix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
 	}
 
 	public void setTabPrefix(String tabPrefix) {
-		Utils utils = eazyNick.getUtils();
-		
-		if(utils.getTabPrefixes().containsKey(p.getUniqueId()))
-			utils.getTabPrefixes().remove(p.getUniqueId());
-		
-		utils.getTabPrefixes().put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabPrefix));
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setTabPrefix(tabPrefix);
 		
 		if(eazyNick.getVersion().equals("1_7_R4")) {
-			String nameFormatChat = utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId());
-			String nameFormatTab = utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId());
+			String nameFormatChat = getChatPrefix() + getNickName() + getChatSuffix();
+			String nameFormatTab = getTabPrefix() + getNickName() + getTabSuffix();
 			
 			if(nameFormatTab.length() <= 16) {
-				p.setDisplayName(nameFormatChat);
+				player.setDisplayName(nameFormatChat);
 				setPlayerListName(nameFormatTab);
 			} else {
-				p.setDisplayName(nameFormatChat.substring(0, 16));
-				setPlayerListName(p.getName());
+				player.setDisplayName(nameFormatChat.substring(0, 16));
+				setPlayerListName(getNickName());
 			}
 		} else {
-			p.setDisplayName(utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId()));
-			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
+			player.setDisplayName(getChatPrefix() + getNickName() + getChatSuffix());
+			setPlayerListName(getTabPrefix() + getNickName() + getTabSuffix());
 		}
 	}
 
 	public String getTabSuffix() {
-		Utils utils = eazyNick.getUtils();
-		
-		return utils.getTabSuffixes().containsKey(p.getUniqueId()) ? utils.getTabSuffixes().get(p.getUniqueId()) : ((utils.vaultStatus() && eazyNick.getFileUtils().getConfig().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(p) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTabSuffix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
 	}
 
 	public void setTabSuffix(String tabSuffix) {
-		Utils utils = eazyNick.getUtils();
-		
-		if(utils.getTabSuffixes().containsKey(p.getUniqueId()))
-			utils.getTabSuffixes().remove(p.getUniqueId());
-		
-		utils.getTabSuffixes().put(p.getUniqueId(), ChatColor.translateAlternateColorCodes('&', tabSuffix));
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setTabSuffix(tabSuffix);
 		
 		if(eazyNick.getVersion().equals("1_7_R4")) {
-			String nameFormatChat = utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId());
-			String nameFormatTab = utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId());
+			String nameFormatChat = getChatPrefix() + getNickName() + getChatSuffix();
+			String nameFormatTab = getTabPrefix() + getNickName() + getTabSuffix();
 			
 			if(nameFormatTab.length() <= 16) {
-				p.setDisplayName(nameFormatChat);
+				player.setDisplayName(nameFormatChat);
 				setPlayerListName(nameFormatTab);
 			} else {
-				p.setDisplayName(nameFormatChat.substring(0, 16));
-				setPlayerListName(p.getName());
+				player.setDisplayName(nameFormatChat.substring(0, 16));
+				setPlayerListName(getNickName());
 			}
 		} else {
-			p.setDisplayName(utils.getChatPrefixes().get(p.getUniqueId()) + getNickName() + utils.getChatSuffixes().get(p.getUniqueId()));
-			setPlayerListName(utils.getTabPrefixes().get(p.getUniqueId()) + getNickName() + utils.getTabSuffixes().get(p.getUniqueId()));
+			player.setDisplayName(getChatPrefix() + getNickName() + getChatSuffix());
+			setPlayerListName(getTabPrefix() + getNickName() + getTabSuffix());
 		}
 	}
 	
 	public String getTagPrefix() {
-		Utils utils = eazyNick.getUtils();
-		
-		return (utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()) ? utils.getScoreboardTeamManagers().get(p.getUniqueId()).getPrefix() : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagPrefix() : "";
 	}
 
 	public void setTagPrefix(String tagPrefix) {
-		Utils utils = eazyNick.getUtils();
+		if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId()))
+			utils.getScoreboardTeamManagers().get(player.getUniqueId()).setPrefix(tagPrefix);
 		
-		if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
-			utils.getScoreboardTeamManagers().get(p.getUniqueId()).setPrefix(tagPrefix);
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setTagPrefix(tagPrefix);
 	}
 
 	public String getTagSuffix() {
-		Utils utils = eazyNick.getUtils();
-		
-		return (utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()) ? utils.getScoreboardTeamManagers().get(p.getUniqueId()).getSuffix() : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagSuffix() : "";
 	}
 
 	public void setTagSuffix(String tagSuffix) {
-		Utils utils = eazyNick.getUtils();
+		if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId()))
+			utils.getScoreboardTeamManagers().get(player.getUniqueId()).setSuffix(tagSuffix);
 		
-		if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
-			utils.getScoreboardTeamManagers().get(p.getUniqueId()).setSuffix(tagSuffix);
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setTagSuffix(tagSuffix);
 	}
 
 	public boolean isNicked() {
-		return eazyNick.getUtils().getNickedPlayers().contains(p.getUniqueId());
+		return utils.getNickedPlayers().containsKey(player.getUniqueId());
 	}
 	
 	public String getRandomStringFromList(ArrayList<String> list) {
-		return list.size() != 0 ? list.get((new Random()).nextInt(list.size())) : p.getName();
+		return list.size() != 0 ? list.get((new Random()).nextInt(list.size())) : player.getName();
 	}
 	
 	public String getRandomName() {
-		Utils utils = eazyNick.getUtils();
-		
 		return utils.getNickNames().get((new Random()).nextInt(utils.getNickNames().size()));
 	}
 	
 	public String getNickName() {
-		Utils utils = eazyNick.getUtils();
-		
-		return (utils.getPlayerNicknames().containsKey(p.getUniqueId()) ? utils.getPlayerNicknames().get(p.getUniqueId()) : p.getName());
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getNickName() : player.getName();
 	}
 	
 	public String getNickFormat() {
@@ -580,211 +619,188 @@ public class NickManager {
 	}
 	
 	public String getOldDisplayName() {
-		Utils utils = eazyNick.getUtils();
-		
-		return utils.getOldDisplayNames().containsKey(p.getUniqueId()) ? utils.getOldDisplayNames().get(p.getUniqueId()) : p.getName();
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getOldDisplayName() : player.getName();
 	}
 	
 	public String getOldPlayerListName() {
-		Utils utils = eazyNick.getUtils();
-		
-		return utils.getOldPlayerListNames().containsKey(p.getUniqueId()) ? utils.getOldPlayerListNames().get(p.getUniqueId()) : p.getName();
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getOldPlayerListName() : player.getName();
 	}
 	
 	public String getGroupName() {
-		Utils utils = eazyNick.getUtils();
-		
-		return utils.getGroupNames().containsKey(p.getUniqueId()) ? utils.getGroupNames().get(p.getUniqueId()) : "NONE";
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getGroupName() : "NONE";
 	}
 	
-	public void setGroupName(String rank) {
-		Utils utils = eazyNick.getUtils();
-		
-		utils.getGroupNames().put(p.getUniqueId(), rank);
+	public void setGroupName(String groupName) {
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setGroupName(groupName);
 	}
 	
-	public void unsetGroupName() {
-		Utils utils = eazyNick.getUtils();
-		
-		if(utils.getGroupNames().containsKey(p.getUniqueId()))
-			utils.getGroupNames().remove(p.getUniqueId());
-	}
-	
-	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix) {
-		updatePrefixSuffix(tagPrefix, tagSuffix, chatPrefix, chatSuffix, tabPrefix, tabSuffix, 9999, "NONE");
-	}
-	
-	public void updatePrefixSuffix(String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, int sortID, String groupName) {
-		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		
+	public void updatePrefixSuffix(String nickName, String realName, String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, int sortID, String groupName) {
 		String finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix;
 		
-		if(utils.getChatPrefixes().containsKey(p.getUniqueId()))
-			utils.getChatPrefixes().remove(p.getUniqueId());
-			
-		if(utils.getChatSuffixes().containsKey(p.getUniqueId()))
-			utils.getChatSuffixes().remove(p.getUniqueId());
-		
-		if(utils.getTabPrefixes().containsKey(p.getUniqueId()))
-			utils.getTabPrefixes().remove(p.getUniqueId());
-		
-		if(utils.getTabSuffixes().containsKey(p.getUniqueId()))
-			utils.getTabSuffixes().remove(p.getUniqueId());
-		
-		utils.getChatPrefixes().put(p.getUniqueId(), chatPrefix);
-		utils.getChatSuffixes().put(p.getUniqueId(), chatSuffix);
-		utils.getTabPrefixes().put(p.getUniqueId(), tabPrefix);
-		utils.getTabSuffixes().put(p.getUniqueId(), tabSuffix);
-		
-		if(fileUtils.getConfig().getBoolean("Settings.ChangeOptions.NameTag")) {
-			if(utils.getScoreboardTeamManagers().containsKey(p.getUniqueId()))
-				utils.getScoreboardTeamManagers().remove(p.getUniqueId());
+		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
+			if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId()))
+				utils.getScoreboardTeamManagers().remove(player.getUniqueId());
 				
-			utils.getScoreboardTeamManagers().put(p.getUniqueId(), new ScoreboardTeamManager(p, tagPrefix, tagSuffix, sortID, groupName));
+			utils.getScoreboardTeamManagers().put(player.getUniqueId(), new ScoreboardTeamHandler(player, nickName, realName, tagPrefix, tagSuffix, sortID, groupName));
 			
-			ScoreboardTeamManager sbtm = utils.getScoreboardTeamManagers().get(p.getUniqueId());
+			ScoreboardTeamHandler sbtm = utils.getScoreboardTeamManagers().get(player.getUniqueId());
 			
-			new Timer().schedule(new TimerTask() {
+			new AsyncTask(new AsyncRunnable() {
 				
 				@Override
 				public void run() {
-					UUID uuid = p.getUniqueId();
+					UUID uuid = player.getUniqueId();
 
 					sbtm.destroyTeam();
 					
-					if(eazyNick.isEnabled() && utils.getNickedPlayers().contains(uuid) && p.isOnline()) {
+					if(eazyNick.isEnabled() && utils.getNickedPlayers().containsKey(uuid) && player.isOnline()) {
 						sbtm.createTeam();
 						
-						if(fileUtils.getConfig().getBoolean("Settings.ChangeOptions.PlayerListName")) {
+						if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
 							String tmpTabPrefix = finalTabPrefix;
 							String tmpTabSuffix = finalTabSuffix;
 							
 							if(utils.placeholderAPIStatus()) {
-								tmpTabPrefix = PlaceholderAPI.setPlaceholders(p, tmpTabPrefix);
-								tmpTabSuffix = PlaceholderAPI.setPlaceholders(p, tmpTabSuffix);
+								tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
+								tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
 							}
 							
-							setPlayerListName(tmpTabPrefix + p.getName() + tmpTabSuffix);
+							setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
 						}
 					} else
 						cancel();
 				}
-			}, 0, 1000);
+			}, 1000, 1000).run();
 		}
 		
 		if(utils.placeholderAPIStatus()) {
-			tagPrefix = PlaceholderAPI.setPlaceholders(p, tagPrefix);
-			tagSuffix = PlaceholderAPI.setPlaceholders(p, tagSuffix);
-			tabPrefix = PlaceholderAPI.setPlaceholders(p, tabPrefix);
-			tabSuffix = PlaceholderAPI.setPlaceholders(p, tabSuffix);
+			tagPrefix = PlaceholderAPI.setPlaceholders(player, tagPrefix);
+			tagSuffix = PlaceholderAPI.setPlaceholders(player, tagSuffix);
+			tabPrefix = PlaceholderAPI.setPlaceholders(player, tabPrefix);
+			tabSuffix = PlaceholderAPI.setPlaceholders(player, tabSuffix);
 		}
 		
 		changeCloudNET(tagPrefix, tagSuffix);
 		
-		if(fileUtils.getConfig().getBoolean("Settings.ChangeOptions.PlayerListName"))
-			setPlayerListName(tabPrefix + p.getName() + tabSuffix);
+		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
+			Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
+				String tmpTabPrefix = finalTabPrefix;
+				String tmpTabSuffix = finalTabSuffix;
+				
+				if(utils.placeholderAPIStatus()) {
+					tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
+					tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
+				}
+				
+				setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
+			}, 20);
+		}
 		
-		if(fileUtils.getConfig().getBoolean("Settings.ChangeOptions.DisplayName"))
-			p.setDisplayName(chatPrefix + p.getName() + chatSuffix);
+		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.DisplayName"))
+			player.setDisplayName(chatPrefix + nickName + chatSuffix);
 		
 		String finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
 		
 		Bukkit.getScheduler().runTask(eazyNick, () -> {
 			if(utils.nameTagEditStatus()) {
-				utils.getNametagEditPrefixes().remove(p.getUniqueId());
-				utils.getNametagEditSuffixes().remove(p.getUniqueId());
+				utils.getNametagEditPrefixes().remove(player.getUniqueId());
+				utils.getNametagEditSuffixes().remove(player.getUniqueId());
 				
 				INametagApi nametagEditAPI = NametagEdit.getApi();
-				Nametag nametag = nametagEditAPI.getNametag(p);
+				Nametag nametag = nametagEditAPI.getNametag(player);
 				
-				utils.getNametagEditPrefixes().put(p.getUniqueId(), nametag.getPrefix());
-				utils.getNametagEditSuffixes().put(p.getUniqueId(), nametag.getSuffix());
+				utils.getNametagEditPrefixes().put(player.getUniqueId(), nametag.getPrefix());
+				utils.getNametagEditSuffixes().put(player.getUniqueId(), nametag.getSuffix());
 
-				nametagEditAPI.setPrefix(p, finalTagPrefix);
-				nametagEditAPI.setSuffix(p, finalTagSuffix);
-				nametagEditAPI.reloadNametag(p);
+				nametagEditAPI.setPrefix(player, finalTagPrefix);
+				nametagEditAPI.setSuffix(player, finalTagSuffix);
+				nametagEditAPI.reloadNametag(player);
 			}
 		});
 		
 		if(utils.ultraPermissionsStatus()) {
-			if(utils.getUltraPermissionsPrefixes().containsKey(p.getUniqueId()) && utils.getUltraPermissionsSuffixes().containsKey(p.getUniqueId())) {
-				utils.getUltraPermissionsPrefixes().remove(p.getUniqueId());
-				utils.getUltraPermissionsSuffixes().remove(p.getUniqueId());
-			}
-			
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
-			me.TechsCode.UltraPermissions.storage.objects.User user = api.getUsers().uuid(p.getUniqueId());
+			Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
 			
-			utils.getUltraPermissionsPrefixes().put(p.getUniqueId(), user.getPrefix());
-			utils.getUltraPermissionsSuffixes().put(p.getUniqueId(), user.getSuffix());
-			
-			user.setPrefix(tabPrefix);
-			user.setSuffix(tabSuffix);
-			
-			if(fileUtils.getConfig().getBoolean("SwitchUltraPermissionsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
-				if(!(utils.getOldUltraPermissionsGroups().containsKey(p.getUniqueId())))
-					utils.getOldUltraPermissionsGroups().put(p.getUniqueId(), new HashMap<>());
+			if(userOptional.isPresent()) {
+				me.TechsCode.UltraPermissions.storage.objects.User user = userOptional.get();
+				Optional<String> prefix = user.getPrefix(), suffix = user.getSuffix();
 				
-				for (Group group : user.getGroupsMap().keySet()) {
-					utils.getOldUltraPermissionsGroups().get(p.getUniqueId()).put(group.getName(), user.getGroupsMap().get(group));
+				utils.getUltraPermissionsPrefixes().put(player.getUniqueId(), prefix.isPresent() ? (prefix.get().trim().isEmpty() ? null : prefix.get()) : null);
+				utils.getUltraPermissionsSuffixes().put(player.getUniqueId(), suffix.isPresent() ? (suffix.get().trim().isEmpty() ? null : suffix.get()) : null);
+				
+				user.setPrefix(tabPrefix);
+				user.setSuffix(tabSuffix);
+				
+				if(setupYamlFile.getConfiguration().getBoolean("SwitchUltraPermissionsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
+					if(!(utils.getOldUltraPermissionsGroups().containsKey(player.getUniqueId())))
+						utils.getOldUltraPermissionsGroups().put(player.getUniqueId(), new HashMap<>());
 					
-					user.removeGroup(group);
+					for (me.TechsCode.UltraPermissions.base.storage.Stored<me.TechsCode.UltraPermissions.storage.objects.Group> groupStored : user.getGroups()) {
+						if(groupStored.isPresent()) {
+							Optional<me.TechsCode.UltraPermissions.storage.objects.Group> groupOptional = groupStored.get();
+							
+							if(groupOptional.isPresent()) {
+								me.TechsCode.UltraPermissions.storage.objects.Group group = groupOptional.get();
+								utils.getOldUltraPermissionsGroups().get(player.getUniqueId()).put(group.getName(), user.getGroupExpiry(groupStored));
+								
+								user.removeGroup(group);
+							}
+						}
+					}
+					
+					Optional<me.TechsCode.UltraPermissions.storage.objects.Group> group = api.getGroups().name(groupName);
+					
+					if(group.isPresent())
+						user.addGroup(group.get());
 				}
-				
-				Group group = api.getGroups().name(groupName);
-				
-				if(group != null)
-					user.addGroup(group);
 			}
 		}
 		
 		if(utils.permissionsExStatus()) {
-			PermissionUser user = PermissionsEx.getUser(p);
+			PermissionUser user = PermissionsEx.getUser(player);
 		
-			if(fileUtils.getConfig().getBoolean("SwitchPermissionsExGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
+			if(setupYamlFile.getConfiguration().getBoolean("SwitchPermissionsExGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {
 				String groupNames = "";
 
 				for (PermissionGroup group : user.getGroups())
 					groupNames += (" " + group.getName());
 				
-				if(!(utils.getOldPermissionsExGroups().containsKey(p.getUniqueId())))
-					utils.getOldPermissionsExGroups().put(p.getUniqueId(), groupNames.trim().split(" "));
+				if(!(utils.getOldPermissionsExGroups().containsKey(player.getUniqueId())))
+					utils.getOldPermissionsExGroups().put(player.getUniqueId(), groupNames.trim().split(" "));
 				
 				user.setGroups(new String[] { groupName });
 			} else {
-				utils.getOldPermissionsExPrefixes().put(p.getUniqueId(), user.getPrefix());
-				utils.getOldPermissionsExSuffixes().put(p.getUniqueId(), user.getSuffix());
+				utils.getOldPermissionsExPrefixes().put(player.getUniqueId(), user.getPrefix());
+				utils.getOldPermissionsExSuffixes().put(player.getUniqueId(), user.getSuffix());
 				
-				user.setPrefix(tabPrefix, p.getWorld().getName());
-				user.setSuffix(tabSuffix, p.getWorld().getName());
+				user.setPrefix(tabPrefix, player.getWorld().getName());
+				user.setSuffix(tabSuffix, player.getWorld().getName());
 			}
 		}
 	}
 	
 	public void changeCloudNET(String prefix, String suffix) {
-		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		
 		if(utils.cloudNetStatus()) {
-			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
+			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
 			
-			if(fileUtils.getConfig().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+			if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
 				PermissionEntity entity = cloudPlayer.getPermissionEntity();
 				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
 				
-				if(utils.getOldCloudNETPrefixes().containsKey(p.getUniqueId()))
-					utils.getOldCloudNETPrefixes().remove(p.getUniqueId());
+				if(utils.getOldCloudNETPrefixes().containsKey(player.getUniqueId()))
+					utils.getOldCloudNETPrefixes().remove(player.getUniqueId());
 				
-				if(utils.getOldCloudNETSuffixes().containsKey(p.getUniqueId()))
-					utils.getOldCloudNETSuffixes().remove(p.getUniqueId());
+				if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId()))
+					utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
 				
-				if(utils.getOldCloudNETTagIDS().containsKey(p.getUniqueId()))
-					utils.getOldCloudNETTagIDS().remove(p.getUniqueId());
+				if(utils.getOldCloudNETTagIDS().containsKey(player.getUniqueId()))
+					utils.getOldCloudNETTagIDS().remove(player.getUniqueId());
 				
-				utils.getOldCloudNETPrefixes().put(p.getUniqueId(), entity.getPrefix());
-				utils.getOldCloudNETSuffixes().put(p.getUniqueId(), entity.getSuffix());
-				utils.getOldCloudNETTagIDS().put(p.getUniqueId(), highestPermissionGroup.getTagId());
+				utils.getOldCloudNETPrefixes().put(player.getUniqueId(), entity.getPrefix());
+				utils.getOldCloudNETSuffixes().put(player.getUniqueId(), entity.getSuffix());
+				utils.getOldCloudNETTagIDS().put(player.getUniqueId(), highestPermissionGroup.getTagId());
 				
 				entity.setPrefix(prefix);
 				entity.setSuffix(suffix);
@@ -796,31 +812,28 @@ public class NickManager {
 	}
 	
 	public void resetCloudNET() {
-		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		
 		if(utils.cloudNetStatus()) {
-			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(p.getUniqueId());
+			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
 			
-			if(fileUtils.getConfig().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+			if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
 				PermissionEntity entity = cloudPlayer.getPermissionEntity();
 				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
 				
-				if(utils.getOldCloudNETPrefixes().containsKey(p.getUniqueId())) {
-					entity.setPrefix(utils.getOldCloudNETPrefixes().get(p.getUniqueId()));
-					highestPermissionGroup.setPrefix(utils.getOldCloudNETPrefixes().get(p.getUniqueId()));
-					utils.getOldCloudNETPrefixes().remove(p.getUniqueId());
+				if(utils.getOldCloudNETPrefixes().containsKey(player.getUniqueId())) {
+					entity.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
+					highestPermissionGroup.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
+					utils.getOldCloudNETPrefixes().remove(player.getUniqueId());
 				}
 				
-				if(utils.getOldCloudNETSuffixes().containsKey(p.getUniqueId())) {
-					entity.setSuffix(utils.getOldCloudNETSuffixes().get(p.getUniqueId()));
-					highestPermissionGroup.setSuffix(utils.getOldCloudNETSuffixes().get(p.getUniqueId()));
-					utils.getOldCloudNETSuffixes().remove(p.getUniqueId());
+				if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId())) {
+					entity.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
+					highestPermissionGroup.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
+					utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
 				}
 				
-				if(utils.getOldCloudNETTagIDS().containsKey(p.getUniqueId())) {
-					highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDS().get(p.getUniqueId()));
-					utils.getOldCloudNETTagIDS().remove(p.getUniqueId());
+				if(utils.getOldCloudNETTagIDS().containsKey(player.getUniqueId())) {
+					highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDS().get(player.getUniqueId()));
+					utils.getOldCloudNETTagIDS().remove(player.getUniqueId());
 				}
 			}
 		}

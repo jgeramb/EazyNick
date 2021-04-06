@@ -5,8 +5,8 @@ import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 
 public class NameCommand implements CommandExecutor {
 
@@ -14,20 +14,22 @@ public class NameCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+		
+		String prefix = utils.getPrefix();
 		
 		if(sender instanceof Player) {
-			Player p = (Player) sender;
+			Player player = (Player) sender;
 			
-			if(p.hasPermission("nick.use")) {
-				NickManager api = new NickManager(p);
+			if(player.hasPermission("nick.use")) {
+				NickManager api = new NickManager(player);
 				
 				if(api.isNicked()) {
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.Name").replace("%name%", api.getNickName()));
+					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Name").replace("%name%", api.getNickName()).replace("%prefix%", prefix));
 				} else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NotNicked"));
+					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NotNicked").replace("%prefix%", prefix));
 			} else
-				p.sendMessage(utils.getNoPerm());
+				languageYamlFile.sendMessage(player, utils.getNoPerm());
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		

@@ -5,19 +5,19 @@ import org.bukkit.event.*;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
 
 public class InventoryCloseListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onInventoryClose(InventoryCloseEvent e) {
+	public void onInventoryClose(InventoryCloseEvent event) {
 		Utils utils = EazyNick.getInstance().getUtils();
 		
-		if (e.getPlayer() instanceof Player) {
-			Player p = (Player) e.getPlayer();
+		if (event.getPlayer() instanceof Player) {
+			Player player = (Player) event.getPlayer();
 			
-			if(utils.getNickNameListPages().containsKey(p.getUniqueId()))
-				utils.getNickNameListPages().remove(p.getUniqueId());
+			if(utils.getNickNameListPages().containsKey(player.getUniqueId()))
+				utils.getNickNameListPages().remove(player.getUniqueId());
 		}
 	}
 

@@ -6,8 +6,11 @@ import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.PlayerUnnickEvent;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.sql.MySQLNickManager;
+import net.dev.eazynick.sql.MySQLPlayerDataManager;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class UnnickCommand implements CommandExecutor {
 
@@ -15,18 +18,28 @@ public class UnnickCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
+		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
+		
+		String prefix = utils.getPrefix();
 		
 		if(sender instanceof Player) {
-			Player p = (Player) sender;
+			Player player = (Player) sender;
 			
-			if(p.hasPermission("nick.use")) {
-				if(utils.getNickedPlayers().contains(p.getUniqueId()))
-					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
-				else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NotNicked"));
+			if(player.hasPermission("nick.reset")) {
+				if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
+				 else if((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
+					mysqlNickManager.removePlayer(player.getUniqueId());
+					mysqlPlayerDataManager.removeData(player.getUniqueId());
+					
+					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", prefix));
+				} else
+					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NotNicked").replace("%prefix%", prefix));
 			} else
-				p.sendMessage(utils.getNoPerm());
+				languageYamlFile.sendMessage(player, utils.getNoPerm());
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		

@@ -4,7 +4,7 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
 
 public class ToggleBungeeNickCommand implements CommandExecutor {
 
@@ -14,13 +14,13 @@ public class ToggleBungeeNickCommand implements CommandExecutor {
 		Utils utils = eazyNick.getUtils();
 		
 		if(sender instanceof Player) {
-			Player p = (Player) sender;
+			Player player = (Player) sender;
 			
-			if(p.hasPermission("nick.use") && p.hasPermission("nick.item")) {
-				if (eazyNick.getFileUtils().getConfig().getBoolean("BungeeCord"))
-					utils.toggleBungeeNick(p);
+			if(player.hasPermission("nick.use") && player.hasPermission("nick.item")) {
+				if (eazyNick.getSetupYamlFile().getConfiguration().getBoolean("BungeeCord"))
+					utils.toggleBungeeNick(player);
 			} else
-				p.sendMessage(utils.getNoPerm());
+				eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		

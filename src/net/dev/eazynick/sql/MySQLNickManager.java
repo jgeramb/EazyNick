@@ -27,8 +27,8 @@ public class MySQLNickManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -51,8 +51,8 @@ public class MySQLNickManager {
 					}
 					
 					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}

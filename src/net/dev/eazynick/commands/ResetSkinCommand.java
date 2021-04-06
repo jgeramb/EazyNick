@@ -5,7 +5,8 @@ import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 
 public class ResetSkinCommand implements CommandExecutor {
 
@@ -13,19 +14,19 @@ public class ResetSkinCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		
 		if(sender instanceof Player) {
-			Player p = (Player) sender;
+			Player player = (Player) sender;
 			
-			if(p.hasPermission("nick.skin")) {
-				NickManager api = new NickManager(p);
+			if(player.hasPermission("nick.skin")) {
+				NickManager api = new NickManager(player);
 				
 				api.changeSkin(api.getRealName());
-				api.updatePlayer();
 				
-				p.sendMessage(utils.getPrefix() + eazyNick.getLanguageFileUtils().getConfigString(p, "Messages.ResetSkin"));
+				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.ResetSkin").replace("%prefix%", utils.getPrefix()));
 			} else
-				p.sendMessage(utils.getNoPerm());
+				languageYamlFile.sendMessage(player, utils.getNoPerm());
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		

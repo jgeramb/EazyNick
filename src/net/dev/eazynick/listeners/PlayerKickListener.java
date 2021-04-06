@@ -6,42 +6,50 @@ import org.bukkit.event.player.PlayerKickEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
+import net.dev.eazynick.api.NickedPlayerData;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class PlayerKickListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerKick(PlayerKickEvent e) {
+	public void onPlayerKick(PlayerKickEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
-		Player p = e.getPlayer();
-		NickManager api = new NickManager(p);
+		Player player = event.getPlayer();
+		NickManager api = new NickManager(player);
 
-		if(utils.getNameCache().containsKey(p.getUniqueId()))
-			utils.getNameCache().remove(p.getUniqueId());
+		if(utils.getNameCache().containsKey(player.getUniqueId()))
+			utils.getNameCache().remove(player.getUniqueId());
 		
 		if (api.isNicked()) {
-			if (eazyNick.getFileUtils().getConfig().getBoolean("DisconnectUnnick"))
+			NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
+			
+			if (setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
+				api.unnickPlayerWithoutRemovingMySQL(false);
+			else
 				api.unnickPlayerWithoutRemovingMySQL(true);
 			
-			if(fileUtils.getConfig().getBoolean("OverwriteJoinQuitMessages")) {
-				String message = fileUtils.getConfigString(p, "OverwrittenMessages.Quit");
+			if(setupYamlFile.getConfiguration().getBoolean("OverwriteJoinQuitMessages")) {
+				String message = setupYamlFile.getConfigString(player, "OverwrittenMessages.Quit");
 				
-				if(fileUtils.getConfig().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(p.getUniqueId()))
-					message = message.replace("%name%", mysqlNickManager.getNickName(p.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(p.getUniqueId()) + mysqlNickManager.getNickName(p.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(p.getUniqueId()));
-				else if(utils.getPlayerNicknames().containsKey(p.getUniqueId()))
-					message = message.replace("%name%", utils.getPlayerNicknames().get(p.getUniqueId()).replace("%displayName%", utils.getChatPrefixes().get(p.getUniqueId()) + utils.getPlayerNicknames().get(p.getUniqueId()) + utils.getChatSuffixes().get(p.getUniqueId())));
+				if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(player.getUniqueId()))
+					message = message.replace("%name%", mysqlNickManager.getNickName(player.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()) + mysqlNickManager.getNickName(player.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(player.getUniqueId())).replace("%displayname%", mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()) + mysqlNickManager.getNickName(player.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()));
 				else
-					message = message.replace("%name%", p.getName()).replace("%displayName%", p.getDisplayName());
+					message = message.replace("%name%", nickedPlayerData.getNickName()).replace("%displayName%", nickedPlayerData.getChatPrefix() + nickedPlayerData.getNickName() + nickedPlayerData.getChatSuffix()).replace("%displayname%", nickedPlayerData.getChatPrefix() + nickedPlayerData.getNickName() + nickedPlayerData.getChatSuffix());
 				
-				e.setLeaveMessage(message);
+				event.setLeaveMessage(message);
+			} else if ((event.getLeaveMessage() != null) && (event.getLeaveMessage() != "")) {
+				if (event.getLeaveMessage().contains("formerly known as"))
+					event.setLeaveMessage("§e" + player.getName() + " left the game.");
+
+				event.setLeaveMessage(event.getLeaveMessage().replace(player.getName(), nickedPlayerData.getNickName()));
 			}
 		}
 	}

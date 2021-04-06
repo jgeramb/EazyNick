@@ -1,35 +1,36 @@
 package net.dev.eazynick.hooks;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class LuckPermsHook {
 
 	private EazyNick eazyNick;
 	private Utils utils;
-	private FileUtils fileUtils;
+	private SetupYamlFile setupYamlFile;
 	
-	private Player p;
+	private Player player;
 	
-	public LuckPermsHook(Player p) {
+	public LuckPermsHook(Player player) {
 		this.eazyNick = EazyNick.getInstance();
 		this.utils = eazyNick.getUtils();
-		this.fileUtils = eazyNick.getFileUtils();
+		this.setupYamlFile = eazyNick.getSetupYamlFile();
 		
-		this.p = p;
+		this.player = player;
 	}
 	
 	public void updateNodes(String prefix, String suffix, String groupName) {
 		net.luckperms.api.LuckPerms api = net.luckperms.api.LuckPermsProvider.get();
-		net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
+		net.luckperms.api.model.user.User user = api.getUserManager().getUser(player.getUniqueId());
 		
-		if(fileUtils.getConfig().getBoolean("ChangeLuckPermsPrefixAndSufix")) {
+		if(setupYamlFile.getConfiguration().getBoolean("ChangeLuckPermsPrefixAndSufix")) {
 			net.luckperms.api.node.NodeBuilderRegistry nodeFactory = api.getNodeBuilderRegistry();
 			net.luckperms.api.node.Node prefixNode = nodeFactory.forPrefix().priority(99).prefix(prefix).expiry(24 * 30, TimeUnit.HOURS).build();
 			net.luckperms.api.node.Node suffixNode = nodeFactory.forSuffix().priority(99).suffix(suffix).expiry(24 * 30, TimeUnit.HOURS).build();
@@ -37,12 +38,12 @@ public class LuckPermsHook {
 			user.transientData().add(prefixNode);
 			user.transientData().add(suffixNode);
 			
-			utils.getLuckPermsPrefixes().put(p.getUniqueId(), prefixNode);
-			utils.getLuckPermsSuffixes().put(p.getUniqueId(), suffixNode);
+			utils.getLuckPermsPrefixes().put(player.getUniqueId(), prefixNode);
+			utils.getLuckPermsSuffixes().put(player.getUniqueId(), suffixNode);
 		}
 		
-		if(fileUtils.getConfig().getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE")) && (user.getPrimaryGroup() != null) && !(user.getPrimaryGroup().isEmpty())) {
-			utils.getOldLuckPermsGroups().put(p.getUniqueId(), user.getPrimaryGroup());
+		if(setupYamlFile.getConfiguration().getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE")) && (user.getPrimaryGroup() != null) && !(user.getPrimaryGroup().isEmpty())) {
+			utils.getOldLuckPermsGroups().put(player.getUniqueId(), user.getNodes(net.luckperms.api.node.NodeType.INHERITANCE));
 			
 			removeAllGroups(user);
 			
@@ -54,25 +55,25 @@ public class LuckPermsHook {
 
 	public void resetNodes() {
 		net.luckperms.api.LuckPerms api = net.luckperms.api.LuckPermsProvider.get();
-		net.luckperms.api.model.user.User user = api.getUserManager().getUser(p.getUniqueId());
+		net.luckperms.api.model.user.User user = api.getUserManager().getUser(player.getUniqueId());
 		
-		if(fileUtils.getConfig().getBoolean("ChangeLuckPermsPrefixAndSufix")) {
-			if(utils.getLuckPermsPrefixes().containsKey(p.getUniqueId()) && utils.getLuckPermsSuffixes().containsKey(p.getUniqueId())) {
-				user.transientData().remove((net.luckperms.api.node.Node) utils.getLuckPermsPrefixes().get(p.getUniqueId()));
-				user.transientData().remove((net.luckperms.api.node.Node) utils.getLuckPermsSuffixes().get(p.getUniqueId()));
+		if(setupYamlFile.getConfiguration().getBoolean("ChangeLuckPermsPrefixAndSufix")) {
+			if(utils.getLuckPermsPrefixes().containsKey(player.getUniqueId()) && utils.getLuckPermsSuffixes().containsKey(player.getUniqueId())) {
+				user.transientData().remove((net.luckperms.api.node.Node) utils.getLuckPermsPrefixes().get(player.getUniqueId()));
+				user.transientData().remove((net.luckperms.api.node.Node) utils.getLuckPermsSuffixes().get(player.getUniqueId()));
 				
-				utils.getLuckPermsPrefixes().remove(p.getUniqueId());
-				utils.getLuckPermsSuffixes().remove(p.getUniqueId());
+				utils.getLuckPermsPrefixes().remove(player.getUniqueId());
+				utils.getLuckPermsSuffixes().remove(player.getUniqueId());
 			}
 		}
 		
-		if(fileUtils.getConfig().getBoolean("SwitchLuckPermsGroupByNicking")) {
-			if(utils.getOldLuckPermsGroups().containsKey(p.getUniqueId())) {
+		if(setupYamlFile.getConfiguration().getBoolean("SwitchLuckPermsGroupByNicking")) {
+			if(utils.getOldLuckPermsGroups().containsKey(player.getUniqueId())) {
 				removeAllGroups(user);
 				
-				user.data().add(net.luckperms.api.node.types.InheritanceNode.builder(utils.getOldLuckPermsGroups().get(p.getUniqueId())).build());
+				((Collection<net.luckperms.api.node.types.InheritanceNode>) utils.getOldLuckPermsGroups().get(player.getUniqueId())).forEach(node -> user.data().add(node));
 				
-				utils.getOldLuckPermsGroups().remove(p.getUniqueId());
+				utils.getOldLuckPermsGroups().remove(player.getUniqueId());
 			}
 		}
 		

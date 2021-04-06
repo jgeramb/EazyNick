@@ -2,7 +2,6 @@ package net.dev.eazynick;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,19 +9,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.mojang.authlib.GameProfile;
-
 import net.dev.eazynick.commands.*;
 import net.dev.eazynick.hooks.DeluxeChatListener;
 import net.dev.eazynick.hooks.PlaceHolderExpansion;
 import net.dev.eazynick.listeners.*;
+import net.dev.eazynick.nms.ReflectionHelper;
+import net.dev.eazynick.nms.fakegui.book.NMSBookBuilder;
+import net.dev.eazynick.nms.fakegui.book.NMSBookUtils;
+import net.dev.eazynick.nms.fakegui.sign.SignGUI;
+import net.dev.eazynick.nms.netty.PacketInjector;
+import net.dev.eazynick.nms.netty.PacketInjector_1_7;
 import net.dev.eazynick.sql.*;
 import net.dev.eazynick.updater.SpigotUpdater;
-import net.dev.eazynick.utils.*;
-import net.dev.eazynick.utils.bookutils.NMSBookBuilder;
-import net.dev.eazynick.utils.bookutils.NMSBookUtils;
-import net.dev.eazynick.utils.nickutils.*;
-import net.dev.eazynick.utils.signutils.SignGUI;
+import net.dev.eazynick.utilities.*;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
+import net.dev.eazynick.utilities.configuration.yaml.*;
+import net.dev.eazynick.utilities.mojang.*;
 
 public class EazyNick extends JavaPlugin {
 
@@ -42,18 +44,18 @@ public class EazyNick extends JavaPlugin {
 	
 	private SpigotUpdater spigotUpdater;
 	private Utils utils;
+	private GUIManager guiManager;
 	private ActionBarUtils actionBarUtils;
-	private FileUtils fileUtils;
-	private NickNameFileUtils nickNameFileUtils;
-	private GUIFileUtils guiFileUtils;
-	private LanguageFileUtils languageFileUtils;
-	private ReflectUtils reflectUtils;
+	private SetupYamlFile setupYamlFile;
+	private NickNameYamlFile nickNameYamlFile;
+	private GUIYamlFile guiYamlFile;
+	private LanguageYamlFile languageYamlFile;
+	private ReflectionHelper reflectionHelper;
 	private NMSBookBuilder nmsBookBuilder;
 	private NMSBookUtils nmsBookUtils;
 	private GameProfileBuilder_1_7 gameProfileBuilder_1_7;
 	private GameProfileBuilder_1_8_R1 gameProfileBuilder_1_8_R1;
 	private GameProfileBuilder gameProfileBuilder;
-	private NMSNickManager nmsNickManager;
 	private UUIDFetcher_1_7 uuidFetcher_1_7;
 	private UUIDFetcher_1_8_R1 uuidFetcher_1_8_R1;
 	private UUIDFetcher uuidFetcher;
@@ -64,22 +66,22 @@ public class EazyNick extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		
-		reflectUtils = new ReflectUtils();
+		reflectionHelper = new ReflectionHelper();
 		
-		version = reflectUtils.getVersion().substring(1);
+		version = reflectionHelper.getVersion().substring(1);
 		pluginFile = getFile();
 		
 		utils = new Utils();
+		guiManager = new GUIManager();
 		actionBarUtils = new ActionBarUtils();
-		fileUtils = new FileUtils();
-		nickNameFileUtils = new NickNameFileUtils();
-		guiFileUtils = new GUIFileUtils();
+		setupYamlFile = new SetupYamlFileFactory().createConfigurationFile(this);
+		nickNameYamlFile = new NickNameYamlFileFactory().createConfigurationFile(this);
+		guiYamlFile = new GUIYamlFileFactory().createConfigurationFile(this);
 		spigotUpdater = new SpigotUpdater();
 		signGUI = new SignGUI();
 		nmsBookBuilder = new NMSBookBuilder();
 		nmsBookUtils = new NMSBookUtils();
 		mineSkinAPI = new MineSkinAPI();
-		nmsNickManager = new NMSNickManager();
 		
 		if(utils.essentialsStatus())
 			Bukkit.getScheduler().runTaskLater(this, () -> initiatePlugin(), 20);
@@ -89,9 +91,9 @@ public class EazyNick extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		new ArrayList<>(utils.getNickedPlayers()).forEach(uuid -> Bukkit.getPlayer(uuid).kickPlayer("§cYou will need to reconnect in order to be able to play properly"));
+		utils.getNickedPlayers().keySet().forEach(uuid -> Bukkit.getPlayer(uuid).kickPlayer("§cYou will need to reconnect in order to be able to play properly"));
 		
-		if (fileUtils.getConfig().getBoolean("BungeeCord"))
+		if (setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 			mysql.disconnect();
 		
 		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
@@ -103,7 +105,9 @@ public class EazyNick extends JavaPlugin {
 	}
 	
 	private void initiatePlugin() {
-		PluginManager pm = Bukkit.getPluginManager();
+		PluginManager pluginManager = Bukkit.getPluginManager();
+
+		languageYamlFile = new LanguageYamlFileFactory(setupYamlFile.getConfiguration().getString("Language")).createConfigurationFile(this);
 		
 		utils.reloadConfigs();
 		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
@@ -120,15 +124,9 @@ public class EazyNick extends JavaPlugin {
 			isCancelled = true;
 		} else {
 			if (version.equals("1_7_R4")) {
-				utils.setNameField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "name"));
-				utils.setUUIDField(reflectUtils.getField(net.minecraft.util.com.mojang.authlib.GameProfile.class, "id"));
-				
 				gameProfileBuilder_1_7 = new GameProfileBuilder_1_7();
 				uuidFetcher_1_7 = new UUIDFetcher_1_7();
 			} else {
-				utils.setNameField(reflectUtils.getField(GameProfile.class, "name"));
-				utils.setUUIDField(reflectUtils.getField(GameProfile.class, "id"));
-				
 				if(version.equals("1_8_R1")) {
 					gameProfileBuilder_1_8_R1 = new GameProfileBuilder_1_8_R1();
 					uuidFetcher_1_8_R1 = new UUIDFetcher_1_8_R1();
@@ -138,14 +136,12 @@ public class EazyNick extends JavaPlugin {
 				}
 			}
 
-			if(fileUtils.getConfig().getBoolean("OverwriteMessagePackets")) {
-				if(version.equals("1_7_R4"))
-					new PacketInjector_1_7().init();
-				else
-					new PacketInjector().init();
-			}
+			if(version.equals("1_7_R4"))
+				new PacketInjector_1_7().init();
+			else
+				new PacketInjector().init();
 			
-			if (!(fileUtils.getConfig().getBoolean("APIMode"))) {
+			if (!(setupYamlFile.getConfiguration().getBoolean("APIMode"))) {
 				getCommand("eazynick").setExecutor(new HelpCommand());
 				getCommand("nickother").setExecutor(new NickOtherCommand());
 				getCommand("changeskin").setExecutor(new ChangeSkinCommand());
@@ -162,43 +158,45 @@ public class EazyNick extends JavaPlugin {
 				getCommand("nickupdatecheck").setExecutor(new NickUpdateCheckCommand());
 				getCommand("togglebungeenick").setExecutor(new ToggleBungeeNickCommand());
 				getCommand("realname").setExecutor(new RealNameCommand());
-				getCommand("nickgui").setExecutor(fileUtils.getConfig().getBoolean("OpenRankedNickGUIOnNickGUICommand") ? new RankedNickGUICommand() : new NickGUICommand());
+				getCommand("nickgui").setExecutor(setupYamlFile.getConfiguration().getBoolean("OpenRankedNickGUIOnNickGUICommand") ? new RankedNickGUICommand() : new NickGUICommand());
 				getCommand("guinick").setExecutor(new GuiNickCommand());
 				getCommand("bookgui").setExecutor(version.startsWith("1_7") ? new RankedNickGUICommand() : new BookGUICommand());
 				
-				pm.registerEvents(new PlayerNickListener(), instance);
-				pm.registerEvents(new PlayerUnnickListener(), instance);
+				pluginManager.registerEvents(new PlayerNickListener(), this);
+				pluginManager.registerEvents(new PlayerUnnickListener(), this);
 				
-				pm.registerEvents(new AsyncPlayerChatListener(), instance);
-				pm.registerEvents(new PlayerCommandPreprocessListener(), instance);
-				pm.registerEvents(new PlayerDropItemListener(), instance);
-				pm.registerEvents(new InventoryClickListener(), instance);
-				pm.registerEvents(new InventoryCloseListener(), instance);
-				pm.registerEvents(new PlayerInteractListener(), instance);
-				pm.registerEvents(new PlayerChangedWorldListener(), instance);
-				pm.registerEvents(new PlayerDeathListener(), instance);
-				pm.registerEvents(new PlayerRespawnListener(), instance);
-				pm.registerEvents(new PlayerJoinListener(), instance);
-				pm.registerEvents(new PlayerKickListener(), instance);
-				pm.registerEvents(new PlayerQuitListener(), instance);
+				pluginManager.registerEvents(new AsyncPlayerChatListener(), this);
+				pluginManager.registerEvents(new PlayerCommandPreprocessListener(), this);
+				pluginManager.registerEvents(new PlayerDropItemListener(), this);
+				pluginManager.registerEvents(new InventoryClickListener(), this);
+				pluginManager.registerEvents(new InventoryCloseListener(), this);
+				pluginManager.registerEvents(new PlayerInteractListener(), this);
+				pluginManager.registerEvents(new PlayerChangedWorldListener(), this);
+				pluginManager.registerEvents(new PlayerDeathListener(), this);
+				pluginManager.registerEvents(new PlayerRespawnListener(), this);
+				pluginManager.registerEvents(new PlayerJoinListener(), this);
+				pluginManager.registerEvents(new PlayerKickListener(), this);
+				pluginManager.registerEvents(new PlayerQuitListener(), this);
+				pluginManager.registerEvents(new WorldInitListener(), this);
+				pluginManager.registerEvents(new ServerListPingListener(), this);
 
-				for (Player all : Bukkit.getOnlinePlayers()) {
-					if ((all != null) && (all.getUniqueId() != null)) {
-						if (!(utils.getCanUseNick().containsKey(all.getUniqueId())))
-							utils.getCanUseNick().put(all.getUniqueId(), true);
+				for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+					if ((currentPlayer != null) && (currentPlayer.getUniqueId() != null)) {
+						if (!(utils.getCanUseNick().containsKey(currentPlayer.getUniqueId())))
+							utils.getCanUseNick().put(currentPlayer.getUniqueId(), true);
 					}
 				}
 			}
 			
 			utils.sendConsole("§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
-			if (fileUtils.getConfig().getBoolean("BungeeCord")) {
-				mysql = new MySQL(fileUtils.getConfig().getString("BungeeMySQL.hostname"), fileUtils.getConfig().getString("BungeeMySQL.port"), fileUtils.getConfig().getString("BungeeMySQL.database"), fileUtils.getConfig().getString("BungeeMySQL.username"), fileUtils.getConfig().getString("BungeeMySQL.password"));
+			if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+				mysql = new MySQL(setupYamlFile.getConfiguration().getString("BungeeMySQL.hostname"), setupYamlFile.getConfiguration().getString("BungeeMySQL.port"), setupYamlFile.getConfiguration().getString("BungeeMySQL.database"), setupYamlFile.getConfiguration().getString("BungeeMySQL.username"), setupYamlFile.getConfiguration().getString("BungeeMySQL.password"));
 				mysql.connect();
 
 				mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NickName varchar(64), SkinName varchar(64))");
-				mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), OldRank varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
-			
+				mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), GroupName varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
+
 				mysqlNickManager = new MySQLNickManager(mysql);
 				mysqlPlayerDataManager = new MySQLPlayerDataManager(mysql);
 				
@@ -208,15 +206,33 @@ public class EazyNick extends JavaPlugin {
 					if(!(file.exists()))
 						file.createNewFile();
 					
-					YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-					cfg.set("settings.bungeecord", true);
-					cfg.save(file);
+					YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
+					configuration.set("settings.bungeecord", true);
+					configuration.save(file);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
 			
 				Bukkit.spigot().getConfig().set("settings.bungeecord", true);
 			}
+			
+			if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked")) {
+				new AsyncTask(new AsyncRunnable() {
+					
+					@Override
+					public void run() {
+						Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> (mysqlNickManager.isPlayerNicked(currentPlayer.getUniqueId()) && !(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())))).forEach(currentNickedPlayer -> {
+							String nickName = mysqlNickManager.getNickName(currentNickedPlayer.getUniqueId()), prefix = mysqlPlayerDataManager.getChatPrefix(currentNickedPlayer.getUniqueId()), suffix = mysqlPlayerDataManager.getChatSuffix(currentNickedPlayer.getUniqueId());
+							
+							if(!(utils.getWorldsWithDisabledActionBar().contains(currentNickedPlayer.getWorld().getName().toUpperCase())))
+								actionBarUtils.sendActionBar(currentNickedPlayer, languageYamlFile.getConfigString(currentNickedPlayer, currentNickedPlayer.hasPermission("nick.otheractionbarmessage") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", prefix).replace("%nickprefix%", prefix).replace("%nickSuffix%", suffix).replace("%nicksuffix%", suffix).replace("%prefix%", utils.getPrefix()));
+						});
+					}
+				}, 0, 1000).run();
+			}
+			
+			if(utils.tabStatus())
+				me.neznamy.tab.shared.config.Configs.unlimited_nametag_mode_not_enabled = "false";
 			
 			utils.sendConsole("");
 			utils.sendConsole("§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
@@ -230,18 +246,18 @@ public class EazyNick extends JavaPlugin {
 			isCancelled = true;
 
 		if (isCancelled) {
-			pm.disablePlugin(instance);
+			pluginManager.disablePlugin(this);
 			return;
 		}
 		
 		if(utils.placeholderAPIStatus()) {
-			new PlaceHolderExpansion(instance).register();
+			new PlaceHolderExpansion(this).register();
 			
 			utils.sendConsole("§7Placeholders loaded successfully!");
 		}
 		
 		if(utils.deluxeChatStatus()) {
-			pm.registerEvents(new DeluxeChatListener(), instance);
+			pluginManager.registerEvents(new DeluxeChatListener(), this);
 			
 			utils.sendConsole("§7DeluxeChat hooked successfully!");
 		}
@@ -275,28 +291,32 @@ public class EazyNick extends JavaPlugin {
 		return utils;
 	}
 	
+	public GUIManager getGUIManager() {
+		return guiManager;
+	}
+	
 	public ActionBarUtils getActionBarUtils() {
 		return actionBarUtils;
 	}
 	
-	public FileUtils getFileUtils() {
-		return fileUtils;
+	public SetupYamlFile getSetupYamlFile() {
+		return setupYamlFile;
 	}
 	
-	public NickNameFileUtils getNickNameFileUtils() {
-		return nickNameFileUtils;
+	public NickNameYamlFile getNickNameYamlFile() {
+		return nickNameYamlFile;
 	}
 	
-	public GUIFileUtils getGUIFileUtils() {
-		return guiFileUtils;
+	public GUIYamlFile getGUIYamlFile() {
+		return guiYamlFile;
 	}
 	
-	public LanguageFileUtils getLanguageFileUtils() {
-		return languageFileUtils;
+	public LanguageYamlFile getLanguageYamlFile() {
+		return languageYamlFile;
 	}
 	
-	public ReflectUtils getReflectUtils() {
-		return reflectUtils;
+	public ReflectionHelper getReflectUtils() {
+		return reflectionHelper;
 	}
 	
 	public NMSBookBuilder getNMSBookBuilder() {
@@ -319,10 +339,6 @@ public class EazyNick extends JavaPlugin {
 		return gameProfileBuilder;
 	}
 	
-	public NMSNickManager getNMSNickManager() {
-		return nmsNickManager;
-	}
-	
 	public UUIDFetcher_1_7 getUUIDFetcher_1_7() {
 		return uuidFetcher_1_7;
 	}
@@ -341,10 +357,6 @@ public class EazyNick extends JavaPlugin {
 	
 	public MineSkinAPI getMineSkinAPI() {
 		return mineSkinAPI;
-	}
-	
-	public void setLanguageFileUtils(LanguageFileUtils languageFileUtils) {
-		this.languageFileUtils = languageFileUtils;
 	}
 
 }

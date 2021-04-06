@@ -7,14 +7,14 @@ public class PlayerUnnickEvent extends Event implements Cancellable {
 
 	private static HandlerList handlers = new HandlerList();
 	private boolean cancelled = false;
-	private Player p;
+	private Player player;
 	
-	public PlayerUnnickEvent(Player p) {
-		this.p = p;
+	public PlayerUnnickEvent(Player player) {
+		this.player = player;
 	}
 	
 	public Player getPlayer() {
-		return p;
+		return player;
 	}
 	
 	public static HandlerList getHandlerList() {

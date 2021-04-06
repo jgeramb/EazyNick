@@ -6,8 +6,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.api.PlayerUnnickEvent;
-import net.dev.eazynick.utils.*;
+import net.dev.eazynick.api.*;
+import net.dev.eazynick.sql.MySQLNickManager;
+import net.dev.eazynick.sql.MySQLPlayerDataManager;
+import net.dev.eazynick.utilities.*;
+import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class NickCommand implements CommandExecutor {
 
@@ -15,98 +19,109 @@ public class NickCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		GUIManager guiManager = eazyNick.getGUIManager();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
+		
+		String prefix = utils.getPrefix();
 		
 		if(sender instanceof Player) {
-			Player p = (Player) sender;
+			Player player = (Player) sender;
 			
-			if(p.hasPermission("nick.use")) {
-				if(utils.getCanUseNick().get(p.getUniqueId())) {
-					if(utils.getNickedPlayers().contains(p.getUniqueId()))
-						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
-					else {
-						if(fileUtils.getConfig().getBoolean("OpenBookGUIOnNickCommand") && !(eazyNick.getVersion().startsWith("1_7"))) {
-							if(!(p.hasPermission("nick.gui"))) {
-								PermissionAttachment pa = p.addAttachment(eazyNick);
-								pa.setPermission("nick.gui", true);
-								p.recalculatePermissions();
-								
-								p.chat("/bookgui");
-								
-								p.removeAttachment(pa);
-								p.recalculatePermissions();
-							} else
-								p.chat("/bookgui");
-						} else if(fileUtils.getConfig().getBoolean("OpenNickListGUIOnNickCommand"))
-							utils.openNickList(p, 0);
-						else if(fileUtils.getConfig().getBoolean("OpenRankedNickGUIOnNickCommand"))
-							utils.openRankedNickGUI(p, "");
-						else if(args.length == 0) {
-							if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
-								utils.performNick(p, "RANDOM");
-							else
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
-						} else if(p.hasPermission("nick.customnickname")) {
-							String name = args[0].replace("\"", ""), nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
-							boolean isCancelled = false;
+			if(new NickManager(player).isNicked()) {
+				if(player.hasPermission("nick.reset"))
+					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
+			} else if((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
+				if(player.hasPermission("nick.reset")) {
+					mysqlNickManager.removePlayer(player.getUniqueId());
+					mysqlPlayerDataManager.removeData(player.getUniqueId());
+					
+					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", prefix));
+				}
+			} else if(player.hasPermission("nick.use")) {
+				if(utils.getCanUseNick().get(player.getUniqueId())) {
+					if(setupYamlFile.getConfiguration().getBoolean("OpenBookGUIOnNickCommand") && !(eazyNick.getVersion().startsWith("1_7"))) {
+						if(!(player.hasPermission("nick.gui"))) {
+							PermissionAttachment pa = player.addAttachment(eazyNick);
+							pa.setPermission("nick.gui", true);
+							player.recalculatePermissions();
 							
-							if(nameWithoutColors.length() <= 16) {
-								if(!(fileUtils.getConfig().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
-									if(!(utils.containsSpecialChars(nameWithoutColors)) || fileUtils.getConfig().getBoolean("AllowSpecialCharactersInCustomName")) {
-										if(!(utils.getBlackList().contains(args[0].toUpperCase()))) {
-											boolean nickNameIsInUse = false;
+							player.chat("/bookgui");
+							
+							player.removeAttachment(pa);
+							player.recalculatePermissions();
+						} else
+							player.chat("/bookgui");
+					} else if(setupYamlFile.getConfiguration().getBoolean("OpenNickListGUIOnNickCommand"))
+						guiManager.openNickList(player, 0);
+					else if(setupYamlFile.getConfiguration().getBoolean("OpenRankedNickGUIOnNickCommand"))
+						guiManager.openRankedNickGUI(player, "");
+					else if(args.length == 0) {
+						if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
+							utils.performNick(player, "RANDOM");
+						else
+							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", prefix));
+					} else if(player.hasPermission("nick.customnickname")) {
+						String name = args[0].replace("\"", ""), nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
+						boolean isCancelled = false;
+						
+						if(nameWithoutColors.length() <= 16) {
+							if(!(setupYamlFile.getConfiguration().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
+								if(!(utils.containsSpecialChars(nameWithoutColors)) || setupYamlFile.getConfiguration().getBoolean("AllowSpecialCharactersInCustomName")) {
+									if(!(utils.getBlackList().contains(args[0].toUpperCase()))) {
+										boolean nickNameIsInUse = false;
+										
+										for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
+											if(nickedPlayerData.getNickName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+												nickNameIsInUse = true;
+										}
+	
+										if(!(nickNameIsInUse) || setupYamlFile.getConfiguration().getBoolean("AllowPlayersToUseSameNickName")) {
+											boolean playerWithNameIsKnown = false;
 											
-											for (String nickName : utils.getPlayerNicknames().values()) {
-												if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-													nickNameIsInUse = true;
+											for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+												if(currentPlayer.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+													playerWithNameIsKnown = true;
 											}
-		
-											if(!(nickNameIsInUse) || fileUtils.getConfig().getBoolean("AllowPlayersToUseSameNickName")) {
-												boolean playerWithNameIsKnown = false;
 												
-												for (Player all : Bukkit.getOnlinePlayers()) {
-													if(all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+											if(Bukkit.getOfflinePlayers() != null) {
+												for (OfflinePlayer currentOfflinePlayer : Bukkit.getOfflinePlayers()) {
+													if((currentOfflinePlayer != null) && (currentOfflinePlayer.getName() != null) && currentOfflinePlayer.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 														playerWithNameIsKnown = true;
 												}
-													
-												if(Bukkit.getOfflinePlayers() != null) {
-													for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
-														if((all != null) && (all.getName() != null) && all.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
-															playerWithNameIsKnown = true;
-													}
-												}
-												
-												if(!(fileUtils.getConfig().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
-													isCancelled = true;
-												
-												if(!(isCancelled)) {
-													if(!(name.equalsIgnoreCase(p.getName()))) {
-														if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
-															utils.performNick(p, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name)))));
-														else
-															p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
-													} else
-														p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.CanNotNickAsSelf"));
+											}
+											
+											if(!(setupYamlFile.getConfiguration().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)
+												isCancelled = true;
+											
+											if(!(isCancelled)) {
+												if(!(name.equalsIgnoreCase(player.getName()))) {
+													if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
+														utils.performNick(player, ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4") ? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name)) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)) : eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name)))));
+													else
+														languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", prefix));
 												} else
-													p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerWithThisNameIsKnown"));
+													languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.CanNotNickAsSelf").replace("%prefix%", prefix));
 											} else
-												p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickNameAlreadyInUse"));
+												languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerWithThisNameIsKnown").replace("%prefix%", prefix));
 										} else
-											p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NameNotAllowed"));
+											languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickNameAlreadyInUse").replace("%prefix%", prefix));
 									} else
-										p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickContainsSpecialCharacters"));
+										languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NameNotAllowed").replace("%prefix%", prefix));
 								} else
-									p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickTooShort"));
+									languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickContainsSpecialCharacters").replace("%prefix%", prefix));
 							} else
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickTooLong"));
+								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickTooShort").replace("%prefix%", prefix));
 						} else
-							p.sendMessage(utils.getNoPerm());
-					}
+							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickTooLong").replace("%prefix%", prefix));
+					} else
+						languageYamlFile.sendMessage(player, utils.getNoPerm());
 				} else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickDelay"));
+					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickDelay").replace("%prefix%", prefix));
 			} else
-				p.sendMessage(utils.getNoPerm());
+				languageYamlFile.sendMessage(player, utils.getNoPerm());
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		

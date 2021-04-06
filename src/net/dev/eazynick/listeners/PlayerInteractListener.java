@@ -9,63 +9,67 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.PlayerUnnickEvent;
-import net.dev.eazynick.utils.*;
+import net.dev.eazynick.utilities.ItemBuilder;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class PlayerInteractListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerInteract(PlayerInteractEvent e) {
+	public void onPlayerInteract(PlayerInteractEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		
-		Player p = e.getPlayer();
+		String prefix = utils.getPrefix();
+		Player player = event.getPlayer();
 
-		if ((e.getItem() != null) && (e.getItem().getType() != Material.AIR && (e.getItem().getItemMeta() != null) && (e.getItem().getItemMeta().getDisplayName() != null))) {
-			String displayName = e.getItem().getItemMeta().getDisplayName();
+		if ((event.getItem() != null) && (event.getItem().getType() != Material.AIR && (event.getItem().getItemMeta() != null) && (event.getItem().getItemMeta().getDisplayName() != null))) {
+			String displayName = event.getItem().getItemMeta().getDisplayName();
 			
-			if (fileUtils.getConfig().getBoolean("NickItem.getOnJoin")) {
-				if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-					if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Disabled"))) {
-						e.setCancelled(true);
-						utils.performNick(p, "RANDOM");
+			if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
+				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+					if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled"))) {
+						event.setCancelled(true);
+						utils.performNick(player, "RANDOM");
 
-						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
-					} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Enabled"))) {
-						e.setCancelled(true);
-						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
+						player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Enabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled")).build());
+					} else if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Enabled"))) {
+						event.setCancelled(true);
+						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
 
-						p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
+						player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
 					} else {
-						if (fileUtils.getConfig().getBoolean("NickOnWorldChange")) {
-							if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Disabled"))) {
-								e.setCancelled(true);
+						if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange")) {
+							if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled"))) {
+								event.setCancelled(true);
 
-								utils.getNickOnWorldChangePlayers().add(p.getUniqueId());
-								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Enabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Enabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Enabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Enabled")).build());
+								utils.getNickOnWorldChangePlayers().add(player.getUniqueId());
+								player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Enabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled")).build());
 
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.WorldChangeAutoNickEnabled"));
-							} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Enabled"))) {
-								e.setCancelled(true);
+								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.WorldChangeAutoNickEnabled").replace("%prefix%", prefix));
+							} else if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Enabled"))) {
+								event.setCancelled(true);
 
-								utils.getNickOnWorldChangePlayers().remove(p.getUniqueId());
-								p.getInventory().setItem(p.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(fileUtils.getConfig().getString("NickItem.ItemType.Disabled")), fileUtils.getConfig().getInt("NickItem.ItemAmount.Disabled"), fileUtils.getConfig().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Disabled")).setLore(languageFileUtils.getConfigString(p, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(fileUtils.getConfig().getBoolean("NickItem.Enchanted.Disabled")).build());
+								utils.getNickOnWorldChangePlayers().remove(player.getUniqueId());
+								player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
 
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.WorldChangeAutoNickDisabled"));
+								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.WorldChangeAutoNickDisabled").replace("%prefix%", prefix));
 							}
 						}
 
-						if (fileUtils.getConfig().getBoolean("BungeeCord")) {
-							if (!(utils.getNickedPlayers().contains(p.getUniqueId()))) {
-								if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.BungeeCord.DisplayName.Disabled"))) {
-									e.setCancelled(true);
+						if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+							if (!(utils.getNickedPlayers().containsKey(player.getUniqueId()))) {
+								if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled"))) {
+									event.setCancelled(true);
 
-									utils.toggleBungeeNick(p);
-								} else if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.BungeeCord.DisplayName.Enabled"))) {
-									e.setCancelled(true);
+									utils.toggleBungeeNick(player);
+								} else if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled"))) {
+									event.setCancelled(true);
 
-									utils.toggleBungeeNick(p);
+									utils.toggleBungeeNick(player);
 								}
 							}
 						}

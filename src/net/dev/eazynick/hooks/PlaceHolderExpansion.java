@@ -6,7 +6,8 @@ import org.bukkit.plugin.Plugin;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.sql.MySQLNickManager;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.sql.MySQLPlayerDataManager;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
@@ -19,47 +20,54 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 	}
 	
 	@Override
-	public String onPlaceholderRequest(Player p, String identifier) {
+	public String onPlaceholderRequest(Player player, String identifier) {
 		EazyNick eazyNick = EazyNick.getInstance();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
-		Utils utils = eazyNick.getUtils();
+		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
-		if(p != null) {
-			NickManager api = new NickManager(p);
-			String displayName = utils.getPlayerNicknames().containsKey(p.getUniqueId()) ? utils.getPlayerNicknames().get(p.getUniqueId()) : p.getName();
+		if(player != null) {
+			NickManager api = new NickManager(player);
+			boolean isMySQLNicked = (mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && !(api.isNicked()), isLobbyMode = setupYamlFile.getConfiguration().getBoolean("LobbyMode");
 			
 			if(identifier.equals("is_nicked") || identifier.equals("is_disguised"))
 				return String.valueOf(api.isNicked());
 			
 			if(identifier.equals("display_name"))
-				return displayName;
+				return api.getNickName();
 			
 			if(identifier.equals("global_name"))
-				return ((mysqlNickManager != null) ? ((mysqlNickManager.isPlayerNicked(p.getUniqueId()) && !(api.isNicked())) ? mysqlNickManager.getNickName(p.getUniqueId()) : displayName) : displayName);
+				return isMySQLNicked ? mysqlNickManager.getNickName(player.getUniqueId()) : api.getNickName();
 			
 			if(identifier.equals("chat_prefix"))
-				return api.getChatPrefix();
+				return (isMySQLNicked && !(isLobbyMode)) ? mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()) : api.getChatPrefix();
 			
 			if(identifier.equals("chat_suffix"))
-				return api.getChatSuffix();
+				return (isMySQLNicked && !(isLobbyMode)) ? mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()) : api.getChatSuffix();
 			
 			if(identifier.equals("tab_prefix"))
-				return api.getTabPrefix();
+				return (isMySQLNicked && !(isLobbyMode)) ? mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()) : api.getTabPrefix();
 			
 			if(identifier.equals("tab_suffix"))
-				return api.getTabSuffix();
+				return (isMySQLNicked && !(isLobbyMode)) ? mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()) : api.getTabSuffix();
 			
 			if(identifier.equals("tag_prefix"))
-				return api.getTagPrefix();
+				return (isMySQLNicked && !(isLobbyMode)) ? mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()) : api.getTagPrefix();
 			
 			if(identifier.equals("tag_suffix"))
-				return api.getTagSuffix();
+				return (isMySQLNicked && !(isLobbyMode)) ? mysqlPlayerDataManager.getTagSuffix(player.getUniqueId()) : api.getTagSuffix();
 			
 			if(identifier.equals("real_name"))
 				return api.getRealName();
 			
 			if(identifier.equals("rank"))
-				return api.getGroupName();
+				return (isMySQLNicked && !(isLobbyMode)) ? mysqlPlayerDataManager.getGroupName(player.getUniqueId()) : api.getGroupName();
+			
+			if(identifier.equals("custom"))
+				return setupYamlFile.getConfigString(player, api.isNicked() ? "CustomPlaceholders.Local.Nicked" : "CustomPlaceholders.Local.Default");
+			
+			if(identifier.equals("global_custom"))
+				return setupYamlFile.getConfigString(player, ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId())) ? "CustomPlaceholders.Global.Nicked" : "CustomPlaceholders.Global.Default");
 		}
 		
 		return null;

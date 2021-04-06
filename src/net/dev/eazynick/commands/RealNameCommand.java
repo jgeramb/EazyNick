@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 
 public class RealNameCommand implements CommandExecutor {
 
@@ -15,27 +15,29 @@ public class RealNameCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+		
+		String prefix = utils.getPrefix();
 		
 		if(sender instanceof Player) {
-			Player p = (Player) sender;
+			Player player = (Player) sender;
 			
-			if(p.hasPermission("nick.realname")) {
+			if(player.hasPermission("nick.realname")) {
 				if(args.length >= 1) {
-					Player t = Bukkit.getPlayer(args[0]);
+					Player targetPlayer = Bukkit.getPlayer(args[0]);
 					
-					if(t != null) {
-						if(utils.getNickedPlayers().contains(t.getUniqueId())) {
-							String realName = new NickManager(t).getRealName();
+					if(targetPlayer != null) {
+						if(utils.getNickedPlayers().containsKey(targetPlayer.getUniqueId())) {
+							String realName = new NickManager(targetPlayer).getRealName();
 							
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.RealName").replace("%realName%", realName).replace("%realname%", realName));
+							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.RealName").replace("%realName%", realName).replace("%realname%", realName).replace("%prefix%", prefix));
 						} else
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerNotNicked"));
+							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerNotNicked").replace("%prefix%", prefix));
 					} else
-						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.PlayerNotFound"));
+						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerNotFound").replace("%prefix%", prefix));
 				}
 			} else
-				p.sendMessage(utils.getNoPerm());
+				languageYamlFile.sendMessage(player, utils.getNoPerm());
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		

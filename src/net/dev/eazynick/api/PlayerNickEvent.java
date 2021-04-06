@@ -7,13 +7,13 @@ public class PlayerNickEvent extends Event implements Cancellable {
 
 	private static HandlerList handlers = new HandlerList();
 	private boolean cancelled = false;
-	private Player p;
+	private Player player;
 	private String nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName;
 	private boolean isBungeeOrJoinNick, isRenick;
 	private int sortID;
 	
-	public PlayerNickEvent(Player p, String nickName, String skinName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, boolean isBungeeOrJoinNick, boolean isRenick, int sortID, String groupName) {
-		this.p = p;
+	public PlayerNickEvent(Player player, String nickName, String skinName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, boolean isBungeeOrJoinNick, boolean isRenick, int sortID, String groupName) {
+		this.player = player;
 		
 		this.nickName = nickName;
 		this.skinName = skinName;
@@ -34,7 +34,7 @@ public class PlayerNickEvent extends Event implements Cancellable {
 	}
 	
 	public Player getPlayer() {
-		return p;
+		return player;
 	}
 	
 	public String getNickName() {

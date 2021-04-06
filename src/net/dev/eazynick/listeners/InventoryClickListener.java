@@ -9,109 +9,115 @@ import org.bukkit.event.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.api.NickedPlayerData;
 import net.dev.eazynick.api.PlayerUnnickEvent;
-import net.dev.eazynick.utils.*;
+import net.dev.eazynick.utilities.GUIManager;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.*;
 
 public class InventoryClickListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onInventoryClick(InventoryClickEvent e) {
+	public void onInventoryClick(InventoryClickEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
-		GUIFileUtils guiFileUtils = eazyNick.getGUIFileUtils();
+		GUIManager guiManager = eazyNick.getGUIManager();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+		GUIYamlFile guiYamlFile = eazyNick.getGUIYamlFile();
 		
-		if (e.getWhoClicked() instanceof Player) {
-			Player p = (Player) e.getWhoClicked();
-			String title = e.getView().getTitle();
+		String prefix = utils.getPrefix();
+		
+		if (event.getWhoClicked() instanceof Player) {
+			Player player = (Player) event.getWhoClicked();
+			String title = event.getView().getTitle();
 			
-			if ((e.getCurrentItem() != null) && (e.getCurrentItem().getType() != Material.AIR) && (e.getCurrentItem().getItemMeta() != null) && (e.getCurrentItem().getItemMeta().getDisplayName() != null)) {
-				String displayName = e.getCurrentItem().getItemMeta().getDisplayName();
+			if ((event.getCurrentItem() != null) && (event.getCurrentItem().getType() != Material.AIR) && (event.getCurrentItem().getItemMeta() != null) && (event.getCurrentItem().getItemMeta().getDisplayName() != null)) {
+				String displayName = event.getCurrentItem().getItemMeta().getDisplayName();
 				
-				if (displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Enabled")) || displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.DisplayName.Disabled")) || displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Enabled")) || displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.WorldChange.DisplayName.Disabled")) || displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.BungeeCord.DisplayName.Enabled")) || displayName.equalsIgnoreCase(languageFileUtils.getConfigString(p, "NickItem.BungeeCord.DisplayName.Disabled"))) {
-					if (!(fileUtils.getConfig().getBoolean("NickItem.InventorySettings.PlayersCanMoveItem")))
-						e.setCancelled(true);
+				if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Enabled")) || displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled")) || displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Enabled")) || displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled")) || displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")) || displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled"))) {
+					if (!(setupYamlFile.getConfiguration().getBoolean("NickItem.InventorySettings.PlayersCanMoveItem")))
+						event.setCancelled(true);
 				}
 				
-				if (title.equalsIgnoreCase(guiFileUtils.getConfigString(p, "NickGUI.InventoryTitle"))) {
-					e.setCancelled(true);
+				if (title.equalsIgnoreCase(guiYamlFile.getConfigString(player, "NickGUI.InventoryTitle"))) {
+					event.setCancelled(true);
 
-					if (displayName.equalsIgnoreCase(guiFileUtils.getConfigString(p, "NickGUI.Nick.DisplayName"))) {
-						p.closeInventory();
+					if (displayName.equalsIgnoreCase(guiYamlFile.getConfigString(player, "NickGUI.Nick.DisplayName"))) {
+						player.closeInventory();
 						
-						if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
-							utils.performNick(p, "RANDOM");
+						if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
+							utils.performNick(player, "RANDOM");
 						else
-							p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
-					} else if (displayName.equalsIgnoreCase(guiFileUtils.getConfigString(p, "NickGUI.Unnick.DisplayName"))) {
-						p.closeInventory();
+							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", prefix));
+					} else if (displayName.equalsIgnoreCase(guiYamlFile.getConfigString(player, "NickGUI.Unnick.DisplayName"))) {
+						player.closeInventory();
 						
-						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(p));
+						Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
 					}
-				} else if (utils.getNickNameListPages().containsKey(p.getUniqueId())) {
-					String currentPage = String.valueOf(utils.getNickNameListPages().get(p.getUniqueId()) + 1);
+				} else if (utils.getNickNameListPages().containsKey(player.getUniqueId())) {
+					String currentPage = String.valueOf(utils.getNickNameListPages().get(player.getUniqueId()) + 1);
 					
-					if (title.equalsIgnoreCase(guiFileUtils.getConfigString(p, "NickNameGUI.InventoryTitle").replace("%currentPage%", currentPage).replace("%currentpage%", currentPage))) {
-						e.setCancelled(true);
+					if (title.equalsIgnoreCase(guiYamlFile.getConfigString(player, "NickNameGUI.InventoryTitle").replace("%currentPage%", currentPage).replace("%currentpage%", currentPage))) {
+						event.setCancelled(true);
 
-						if (displayName.equalsIgnoreCase(guiFileUtils.getConfigString(p, "NickNameGUI.Previous.DisplayName")))
-							utils.openNickList(p, utils.getNickNameListPages().get(p.getUniqueId()) - 1);
-						else if (displayName.equalsIgnoreCase(guiFileUtils.getConfigString(p, "NickNameGUI.Next.DisplayName")))
-							utils.openNickList(p, utils.getNickNameListPages().get(p.getUniqueId()) + 1);
+						if (displayName.equalsIgnoreCase(guiYamlFile.getConfigString(player, "NickNameGUI.Previous.DisplayName")))
+							guiManager.openNickList(player, utils.getNickNameListPages().get(player.getUniqueId()) - 1);
+						else if (displayName.equalsIgnoreCase(guiYamlFile.getConfigString(player, "NickNameGUI.Next.DisplayName")))
+							guiManager.openNickList(player, utils.getNickNameListPages().get(player.getUniqueId()) + 1);
 						else if(!(displayName.equals("§r"))) {
-							p.closeInventory();
+							player.closeInventory();
 							
-							if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
-								utils.performNick(p, displayName.replace(guiFileUtils.getConfigString(p, "NickNameGUI.NickName.DisplayName").replace("%nickName%", "").replace("%nickname%", ""), ""));
+							if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
+								utils.performNick(player, displayName.replace(guiYamlFile.getConfigString(player, "NickNameGUI.NickName.DisplayName").replace("%nickName%", "").replace("%nickname%", ""), ""));
 							else
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
+								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", prefix));
 						}
 					}
 				} else {
-					String[] step4Parts = guiFileUtils.getConfigString(p, "RankedNickGUI.Step4.InventoryTitle").split("%nickName%");
+					String[] step4Parts = guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.InventoryTitle").split("%nickName%");
 					
 					if(step4Parts.length < 2)
-						step4Parts = guiFileUtils.getConfigString(p, "RankedNickGUI.Step4.InventoryTitle").split("%nickname%");
+						step4Parts = guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.InventoryTitle").split("%nickname%");
 
-					if (title.equalsIgnoreCase(guiFileUtils.getConfigString(p, "RankedNickGUI.Step1.InventoryTitle"))) {
-						e.setCancelled(true);
+					if (title.equalsIgnoreCase(guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.InventoryTitle"))) {
+						event.setCancelled(true);
 						
 						if(!(displayName.equals("§r"))) {
 							for (int i = 1; i <= 18; i++) {
-								if(displayName.equals(guiFileUtils.getConfigString(p, "RankGUI.Rank" + i + ".Rank"))) {
-									utils.openRankedNickGUI(p, guiFileUtils.getConfigString(p, "RankGUI.Rank" + i + ".RankName"));
+								if(displayName.equals(guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".Rank"))) {
+									guiManager.openRankedNickGUI(player, guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".RankName"));
 									return;
 								}
 							}
 						}
-					} else if (title.equalsIgnoreCase(guiFileUtils.getConfigString(p, "RankedNickGUI.Step2.InventoryTitle"))) {
-						e.setCancelled(true);
+					} else if (title.equalsIgnoreCase(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.InventoryTitle"))) {
+						event.setCancelled(true);
 						
 						if(!(displayName.equals("§r")))
-							utils.openRankedNickGUI(p, utils.getLastGUITexts().get(p.getUniqueId()) + (displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step2.Default.DisplayName")) ? " DEFAULT" : (displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step2.Normal.DisplayName")) ? " NORMAL" : " RANDOM")));
-					} else if (title.equalsIgnoreCase(guiFileUtils.getConfigString(p, "RankedNickGUI.Step3.InventoryTitle"))) {
-						e.setCancelled(true);
+							guiManager.openRankedNickGUI(player, utils.getLastGUITexts().get(player.getUniqueId()) + (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Default.DisplayName")) ? " DEFAULT" : (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName")) ? " NORMAL" : " RANDOM")));
+					} else if (title.equalsIgnoreCase(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.InventoryTitle"))) {
+						event.setCancelled(true);
 						
-						String lastText = utils.getLastGUITexts().get(p.getUniqueId());
+						String lastText = utils.getLastGUITexts().get(player.getUniqueId());
 						
-						if(displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step3.Custom.DisplayName"))) {
+						if(displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Custom.DisplayName"))) {
 							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1")) {
-								utils.getPlayersTypingNameInChat().put(p.getUniqueId(), lastText);
+								utils.getPlayersTypingNameInChat().put(player.getUniqueId(), lastText);
 								
-								p.closeInventory();
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.TypeNameInChat"));
+								player.closeInventory();
+								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.TypeNameInChat").replace("%prefix%", prefix));
 							} else {
 								String[] args = lastText.split(" ");
 								
-								utils.openCustomGUI(p, args[0], args[1]);
+								guiManager.openCustomGUI(player, args[0], args[1]);
 							}
-						} else if(displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step3.Random.DisplayName"))) {
+						} else if(displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Random.DisplayName"))) {
 							String name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 							boolean nickNameIsInUse = false;
 							
-							for (String nickName : utils.getPlayerNicknames().values()) {
-								if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+							for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
+								if(nickedPlayerData.getNickName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 									nickNameIsInUse = true;
 							}
 							
@@ -119,35 +125,35 @@ public class InventoryClickListener implements Listener {
 								nickNameIsInUse = false;
 								name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 								
-								for (String nickName : utils.getPlayerNicknames().values()) {
-									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+								for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
+									if(nickedPlayerData.getNickName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 										nickNameIsInUse = true;
 								}
 							}
 							
-							utils.openRankedNickGUI(p, lastText + " " + name);
+							guiManager.openRankedNickGUI(player, lastText + " " + name);
 						}
 					} else if (title.startsWith(step4Parts[0]) && ((step4Parts.length == 1) || title.endsWith(step4Parts[1]))) {
-						e.setCancelled(true);
+						event.setCancelled(true);
 						
-						String lastText = utils.getLastGUITexts().get(p.getUniqueId());
+						String lastText = utils.getLastGUITexts().get(player.getUniqueId());
 						String[] args = lastText.split(" ");
 						
-						utils.getLastGUITexts().put(p.getUniqueId(), (lastText = args[0] + " " + args[1]));
+						utils.getLastGUITexts().put(player.getUniqueId(), (lastText = args[0] + " " + args[1]));
 						
-						if(displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step4.Use.DisplayName"))) {
-							p.closeInventory();
+						if(displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Use.DisplayName"))) {
+							player.closeInventory();
 							
-							if(!(fileUtils.getConfig().getStringList("DisabledNickWorlds").contains(p.getWorld().getName())))
-								utils.performRankedNick(p, args[0], args[1], title.replace(step4Parts[0], "").replace(step4Parts[1], ""));
+							if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
+								utils.performRankedNick(player, args[0], args[1], title.replace(step4Parts[0], "").replace(step4Parts[1], ""));
 							else
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.DisabledWorld"));
-						} else if(displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step4.Retry.DisplayName"))) {
+								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", prefix));
+						} else if(displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Retry.DisplayName"))) {
 							String name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 							boolean nickNameIsInUse = false;
 							
-							for (String nickName : utils.getPlayerNicknames().values()) {
-								if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+							for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
+								if(nickedPlayerData.getNickName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 									nickNameIsInUse = true;
 							}
 							
@@ -155,21 +161,21 @@ public class InventoryClickListener implements Listener {
 								nickNameIsInUse = false;
 								name = utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 								
-								for (String nickName : utils.getPlayerNicknames().values()) {
-									if(nickName.toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+								for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
+									if(nickedPlayerData.getNickName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 										nickNameIsInUse = true;
 								}
 							}
 							
-							utils.openRankedNickGUI(p, lastText + " " + name);
-						} else if(displayName.equals(guiFileUtils.getConfigString(p, "RankedNickGUI.Step4.Custom.DisplayName"))) {
-							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1") || !(fileUtils.getConfig().getBoolean("UseSignGUIForCustomName") || fileUtils.getConfig().getBoolean("UseAnvilGUIForCustomName"))) {
-								utils.getPlayersTypingNameInChat().put(p.getUniqueId(), lastText);
+							guiManager.openRankedNickGUI(player, lastText + " " + name);
+						} else if(displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Custom.DisplayName"))) {
+							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1") || !(setupYamlFile.getConfiguration().getBoolean("UseSignGUIForCustomName") || setupYamlFile.getConfiguration().getBoolean("UseAnvilGUIForCustomName"))) {
+								utils.getPlayersTypingNameInChat().put(player.getUniqueId(), lastText);
 								
-								p.closeInventory();
-								p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.TypeNameInChat"));
+								player.closeInventory();
+								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.TypeNameInChat").replace("%prefix%", prefix));
 							} else
-								utils.openCustomGUI(p, args[0], args[1]);
+								guiManager.openCustomGUI(player, args[0], args[1]);
 						}
 					}
 				}

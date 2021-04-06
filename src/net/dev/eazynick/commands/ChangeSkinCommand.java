@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.utils.LanguageFileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 
 public class ChangeSkinCommand implements CommandExecutor {
 
@@ -16,34 +16,34 @@ public class ChangeSkinCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		LanguageFileUtils languageFileUtils = eazyNick.getLanguageFileUtils();
+		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+		
+		String prefix = utils.getPrefix();
 		
 		if(sender instanceof Player) {
-			Player p = (Player) sender;
+			Player player = (Player) sender;
 			
-			if(p.hasPermission("nick.skin")) {
-				if(utils.getCanUseNick().get(p.getUniqueId())) {
-					NickManager api = new NickManager(p);
+			if(player.hasPermission("nick.skin")) {
+				if(utils.getCanUseNick().get(player.getUniqueId())) {
+					NickManager api = new NickManager(player);
 					
 					if(args.length >= 1) {
 						String name = args[0];
 						
 						api.changeSkin(name);
-						api.updatePlayer();
 						
-						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.SkinChanged").replace("%skinName%", name).replace("%skinname%", name));
+						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.SkinChanged").replace("%skinName%", name).replace("%skinname%", name).replace("%prefix%", prefix));
 					} else {
-						String name = eazyNick.getFileUtils().getConfig().getBoolean("UseMineSkinAPI") ? "MineSkin" : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+						String name = eazyNick.getSetupYamlFile().getConfiguration().getBoolean("UseMineSkinAPI") ? "MineSkin" : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 						
 						api.changeSkin(name);
-						api.updatePlayer();
 						
-						p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.SkinChanged").replace("%skinName%", name).replace("%skinname%", name));
+						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.SkinChanged").replace("%skinName%", name).replace("%skinname%", name).replace("%prefix%", prefix));
 					}
 				} else
-					p.sendMessage(utils.getPrefix() + languageFileUtils.getConfigString(p, "Messages.NickDelay"));
+					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickDelay").replace("%prefix%", prefix));
 			} else
-				p.sendMessage(utils.getNoPerm());
+				languageYamlFile.sendMessage(player, utils.getNoPerm());
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		

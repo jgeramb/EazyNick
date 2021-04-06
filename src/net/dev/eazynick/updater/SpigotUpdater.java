@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
 
 public class SpigotUpdater {
 
@@ -31,22 +31,22 @@ public class SpigotUpdater {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(versionURL.openStream()));
 			newVersion = Double.valueOf(reader.readLine()).doubleValue();
 			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
 
 		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
 			System.out.println("[Updater] Found a new version (" + newVersion + ")");
 
-			if (eazyNick.getFileUtils().getConfig().getBoolean("AutoUpdater")) {
+			if (eazyNick.getSetupYamlFile().getConfiguration().getBoolean("AutoUpdater")) {
 				System.out.println("[Updater] Starting download...");
 
 				try {
 					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/download_file?id=1&version=v" + newVersion).openConnection();
 					downloadURL.setRequestProperty("User-Agent", "JustixDevelopment/Updater");
 					channel = Channels.newChannel(downloadURL.getInputStream());
-				} catch (IOException e) {
-					throw new RuntimeException("Download failed", e);
+				} catch (IOException ex) {
+					throw new RuntimeException("Download failed", ex);
 				}
 
 				try {
@@ -54,8 +54,8 @@ public class SpigotUpdater {
 					output.getChannel().transferFrom(channel, 0L, Long.MAX_VALUE);
 					output.flush();
 					output.close();
-				} catch (IOException e) {
-					throw new RuntimeException("File could not be saved", e);
+				} catch (IOException ex) {
+					throw new RuntimeException("File could not be saved", ex);
 				}
 
 				System.out.println("[Updater] Successfully updated plugin to version " + newVersion + ". Please reload/restart your server now.");
@@ -69,13 +69,15 @@ public class SpigotUpdater {
 		return false;
 	}
 	
-	public void checkForUpdates(Player p) {
+	public void checkForUpdates(Player player) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		
+		String prefix = utils.getPrefix();
+		
 		PluginDescriptionFile desc = eazyNick.getDescription();
 		
-		p.sendMessage(utils.getPrefix() + "§3Updater §8» §fChecking for updates...");
+		player.sendMessage(prefix + "§3Updater §8» §fChecking for updates...");
 		
 		ReadableByteChannel channel = null;
 		double newVersion = 0.0;
@@ -87,22 +89,22 @@ public class SpigotUpdater {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(versionURL.openStream()));
 			newVersion = Double.valueOf(reader.readLine()).doubleValue();
 			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
 
 		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
-			p.sendMessage(utils.getPrefix() + "§3Updater §8» §fFound a new version (" + newVersion + ")");
+			player.sendMessage(prefix + "§3Updater §8» §fFound a new version (" + newVersion + ")");
 
-			if (eazyNick.getFileUtils().getConfig().getBoolean("AutoUpdater")) {
-				p.sendMessage(utils.getPrefix() + "§3Updater §8» §fStarting download...");
+			if (eazyNick.getSetupYamlFile().getConfiguration().getBoolean("AutoUpdater")) {
+				player.sendMessage(prefix + "§3Updater §8» §fStarting download...");
 
 				try {
 					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/download_file?id=1&version=v" + newVersion).openConnection();
 					downloadURL.setRequestProperty("User-Agent", "JustixDevelopment/Updater");
 					channel = Channels.newChannel(downloadURL.getInputStream());
-				} catch (IOException e) {
-					throw new RuntimeException("Download failed", e);
+				} catch (IOException ex) {
+					throw new RuntimeException("Download failed", ex);
 				}
 
 				try {
@@ -110,15 +112,15 @@ public class SpigotUpdater {
 					output.getChannel().transferFrom(channel, 0L, Long.MAX_VALUE);
 					output.flush();
 					output.close();
-				} catch (IOException e) {
-					throw new RuntimeException("File could not be saved", e);
+				} catch (IOException ex) {
+					throw new RuntimeException("File could not be saved", ex);
 				}
 
-				p.sendMessage(utils.getPrefix() + "§3Updater §8» §fSuccessfully updated plugin to version " + newVersion + ". Please restart/reload your server");
+				player.sendMessage(prefix + "§3Updater §8» §fSuccessfully updated plugin to version " + newVersion + ". Please restart/reload your server");
 			} else
-				p.sendMessage(utils.getPrefix() + "§3Updater §8» §fDownload the update here: " + desc.getWebsite());
+				player.sendMessage(prefix + "§3Updater §8» §fDownload the update here: " + desc.getWebsite());
 		} else
-			p.sendMessage(utils.getPrefix() + "§3Updater §8» §fNo new version available");
+			player.sendMessage(prefix + "§3Updater §8» §fNo new version available");
 	}
 
 }

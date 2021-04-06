@@ -23,8 +23,8 @@ public class MySQL {
 				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false&characterEncoding=utf8&useUnicode=true&interactiveClient=true", username, password);
 				
 				System.out.println(PREFIX + "Connected to database successfully!");
-			} catch (SQLException e) {
-				System.out.println(PREFIX + "Connection to database failed (" + e.getMessage() + ")!");
+			} catch (SQLException ex) {
+				System.out.println(PREFIX + "Connection to database failed (" + ex.getMessage() + ")!");
 				System.out.println();
 				System.out.println(PREFIX + "Connection Properties:");
 				System.out.println(PREFIX + " Address: " + host + ":" + port);
@@ -47,7 +47,7 @@ public class MySQL {
 				con.close();
 				
 				System.out.println(PREFIX + "Connection to database closed successfully!");
-			} catch (SQLException e) {
+			} catch (SQLException ex) {
 			}
 		}
 	}
@@ -55,7 +55,7 @@ public class MySQL {
 	public boolean isConnected() {
 		try {
 			return ((con != null) && !(con.isClosed()));
-		} catch (SQLException e) {
+		} catch (SQLException ex) {
 		}
 		
 		return false;
@@ -65,24 +65,20 @@ public class MySQL {
 		checkConnection();
 		
 		if(isConnected()) {
-			new FutureTask<>(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						Statement s = con.createStatement();
-						s.executeUpdate(sql);
-						s.close();
-					} catch (SQLException ex) {
-						String msg = ex.getMessage();
+			new FutureTask<>(() -> {
+				try {
+					Statement s = con.createStatement();
+					s.executeUpdate(sql);
+					s.close();
+				} catch (SQLException ex) {
+					String msg = ex.getMessage();
+					
+					System.out.println(PREFIX + "An error occured while executing mysql update (" + msg + ")!");
+					
+					if(msg.contains("The driver has not received any packets from the server.")) {
+						con = null;
 						
-						System.out.println(PREFIX + "An error occured while executing mysql update (" + msg + ")!");
-						
-						if(msg.contains("The driver has not received any packets from the server.")) {
-							con = null;
-							
-							connect();
-						}
+						connect();
 					}
 				}
 			}, 1).run();

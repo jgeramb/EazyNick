@@ -13,19 +13,19 @@ import me.clip.deluxechat.objects.DeluxeFormat;
 public class DeluxeChatListener implements Listener {
 
 	@EventHandler
-	public void onDeluxeChat(DeluxeChatEvent e) {
-		if(EazyNick.getInstance().getFileUtils().getConfig().getBoolean("ChangeNameAndPrefixAndSuffixInDeluxeChatFormat")) {
-			Player p = e.getPlayer();
-			NickManager api = new NickManager(p);
+	public void onDeluxeChat(DeluxeChatEvent event) {
+		if(EazyNick.getInstance().getSetupYamlFile().getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInDeluxeChatFormat")) {
+			Player player = event.getPlayer();
+			NickManager api = new NickManager(player);
 			
 			if(api.isNicked()) {
-				DeluxeFormat format = e.getDeluxeFormat();
+				DeluxeFormat format = event.getDeluxeFormat();
 				format.setPrefix(api.getChatPrefix());
 				format.setSuffix(api.getChatSuffix());
 				format.setName(api.getNickName());
 				format.setNameColor("");
 				format.setChatColor("");
-				e.setDeluxeFormat(format);
+				event.setDeluxeFormat(format);
 			}
 		}
 	}

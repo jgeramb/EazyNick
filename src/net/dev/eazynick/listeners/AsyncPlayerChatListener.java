@@ -7,61 +7,61 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.utils.FileUtils;
-import net.dev.eazynick.utils.Utils;
+import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class AsyncPlayerChatListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onFirstAsyncPlayerChat(AsyncPlayerChatEvent e) {
+	public void onFirstAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		
-		Player p = e.getPlayer();
+		Player player = event.getPlayer();
 		
-		if(utils.getPlayersTypingNameInChat().containsKey(p.getUniqueId())) {
-			String[] args = (utils.getPlayersTypingNameInChat().get(p.getUniqueId()) + " " + e.getMessage().trim()).split(" ");
+		if(utils.getPlayersTypingNameInChat().containsKey(player.getUniqueId())) {
+			String[] args = (utils.getPlayersTypingNameInChat().get(player.getUniqueId()) + " " + event.getMessage().trim()).split(" ");
 			
-			utils.getPlayersTypingNameInChat().remove(p.getUniqueId());
-			utils.performRankedNick(p, args[0], args[1], args[2]);
+			utils.getPlayersTypingNameInChat().remove(player.getUniqueId());
+			utils.performRankedNick(player, args[0], args[1], args[2]);
 			
-			e.setCancelled(true);
+			event.setCancelled(true);
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled=true)
-	public void onAsyncPlayerChat(AsyncPlayerChatEvent e) {
+	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		FileUtils fileUtils = eazyNick.getFileUtils();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
-		Player p = e.getPlayer();
+		Player player = event.getPlayer();
 
-		utils.setLastChatMessage(e.getMessage());
+		utils.setLastChatMessage(event.getMessage());
 		
-		if (fileUtils.getConfig().getBoolean("ReplaceNickedChatFormat")) {
-			if (!(e.isCancelled())) {
-				NickManager api = new NickManager(p);
+		if (setupYamlFile.getConfiguration().getBoolean("ReplaceNickedChatFormat")) {
+			if (!(event.isCancelled())) {
+				NickManager api = new NickManager(player);
 	
 				if (api.isNicked()) {
-					e.setCancelled(true);
+					event.setCancelled(true);
 					
-					String format = fileUtils.getConfigString(p, "Settings.ChatFormat").replace("%displayName%", p.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", p.getName()).replace("%displayname%", p.getDisplayName()).replace("%nickname%", api.getNickName()).replace("%playername%", p.getName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", e.getMessage()).replaceAll("%", "%%");
+					String format = setupYamlFile.getConfigString(player, "Settings.ChatFormat").replace("%displayName%", player.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", api.getNickName()).replace("%displayname%", player.getDisplayName()).replace("%nickname%", api.getNickName()).replace("%playername%", api.getNickName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", event.getMessage()).replaceAll("%", "%%");
 					
-					e.setFormat(format);
+					event.setFormat(format);
 					
 					Bukkit.getConsoleSender().sendMessage(format);
 	
-					for (Player all : Bukkit.getOnlinePlayers()) {
-						if (all.getName().equalsIgnoreCase(p.getName())) {
-							if (fileUtils.getConfig().getBoolean("SeeNickSelf"))
-								all.sendMessage(format);
+					for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+						if (currentPlayer.getName().equalsIgnoreCase(player.getName())) {
+							if (setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))
+								currentPlayer.sendMessage(format);
 							else
-								all.sendMessage(format.replace(p.getDisplayName(), api.getOldDisplayName()));
-						} else if (all.hasPermission("nick.bypass") && fileUtils.getConfig().getBoolean("EnableBypassPermission"))
-							all.sendMessage(format.replace(p.getDisplayName(), api.getOldDisplayName()));
+								currentPlayer.sendMessage(format.replace(player.getDisplayName(), api.getOldDisplayName()));
+						} else if (currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
+							currentPlayer.sendMessage(format.replace(player.getDisplayName(), api.getOldDisplayName()));
 						else
-							all.sendMessage(format);
+							currentPlayer.sendMessage(format);
 					}
 				}
 			}
