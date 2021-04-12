@@ -26,10 +26,10 @@ public class PlayerChangedWorldListener implements Listener {
 			if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(player.getUniqueId()) && !(api.isNicked()) && player.hasPermission("nick.use"))
 				utils.performReNick(player);
 			else if(utils.getNickedPlayers().containsKey(player.getUniqueId())) {
+				NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
+				
 				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 					if(player.isOnline()) {
-						NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
-						
 						api.unnickPlayerWithoutRemovingMySQL(false);
 						
 						Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
@@ -43,10 +43,10 @@ public class PlayerChangedWorldListener implements Listener {
 					NickManager apiCurrentPlayer = new NickManager(currentPlayer);
 					
 					if (apiCurrentPlayer.isNicked() && currentPlayer.getWorld().getName().equals(player.getWorld().getName())) {
+						NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).clone();
+						
 						Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 							if(player.isOnline()) {
-								NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).clone();
-								
 								apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false);
 								
 								Bukkit.getScheduler().runTaskLater(eazyNick, () -> {

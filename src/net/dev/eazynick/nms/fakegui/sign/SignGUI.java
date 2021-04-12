@@ -25,7 +25,8 @@ public class SignGUI implements Listener {
 		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
 		Utils utils = eazyNick.getUtils();
 		
-		Block block = player.getWorld().getBlockAt(player.getLocation().clone().add(0, 5, 0));
+		Block block = player.getWorld().getBlockAt(player.getLocation().clone().add(0, 250 - player.getLocation().getBlockY(), 0));
+		Material oldType = block.getType();
 		block.setType(Material.getMaterial((utils.isNewVersion() && !(eazyNick.getVersion().startsWith("1_13"))) ? "OAK_SIGN" : (eazyNick.getVersion().startsWith("1_13") ? "SIGN" : "SIGN_POST")));
 		
 		Sign sign = (Sign) block.getState();
@@ -59,8 +60,6 @@ public class SignGUI implements Listener {
 					handler.set(tileSign, entityPlayer);
 					
 					playerConnection.getClass().getDeclaredMethod("sendPacket", reflectionHelper.getNMSClass("Packet")).invoke(playerConnection, reflectionHelper.getNMSClass("PacketPlayOutOpenSignEditor").getConstructor(reflectionHelper.getNMSClass("BlockPosition")).newInstance(reflectionHelper.getNMSClass("BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
-					
-					Bukkit.getScheduler().runTaskLater(eazyNick, () -> block.setType(Material.AIR), 3);
 					
 					Object networkManager = playerConnection.getClass().getDeclaredField("networkManager").get(playerConnection);
 					Channel channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
@@ -115,6 +114,8 @@ public class SignGUI implements Listener {
 													channel.pipeline().remove("PacketInjector");
 												
 												listener.onEditComplete(new EditCompleteEvent(lines));
+												
+												block.setType(oldType);
 											} catch (Exception ex) {
 												ex.printStackTrace();
 											}

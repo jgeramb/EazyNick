@@ -38,9 +38,11 @@ public class PacketInjector_1_7 {
 				Channel channel = (Channel) field.get(manager);
 				
 				if((channel.pipeline().context("packet_handler") != null)) {
-					if(channel.pipeline().context("nick_handler") != null)
+					try {
 						channel.pipeline().remove("nick_handler");
-				
+					} catch (NoSuchElementException ignored) {
+					}
+					
 					channel.pipeline().addBefore("packet_handler", "nick_handler", new ChannelDuplexHandler() {
 						
 						@Override
@@ -89,26 +91,35 @@ public class PacketInjector_1_7 {
 										String[] suggestions = (String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg);
 										
 										if(suggestions.length > 1) {
-											String text = suggestions[0], text2 = suggestions[1];
-											int range = 0;
+											boolean replaceSuggestions = false;
 											
-											for (int i = 0; i < text.length(); i++) {
-												if(text.charAt(i) != text2.charAt(i))
-													break;
-												else
-													range++;
+											for (String suggestion : suggestions) {
+												if(tabCompletions.contains(suggestion))
+													replaceSuggestions = true;
 											}
 											
-											String similarText = text.substring(0, range);
+											if(replaceSuggestions) {
+												String text = suggestions[0], text2 = suggestions[1];
+												int range = 0;
+												
+												for (int i = 0; i < text.length(); i++) {
+													if(text.charAt(i) != text2.charAt(i))
+														break;
+													else
+														range++;
+												}
+												
+												String similarText = text.substring(0, range);
+												
+												tabCompletions.removeIf(tabCompletion -> !(StringUtil.copyPartialMatches(similarText, tabCompletions, new ArrayList<String>()).contains(tabCompletion)));
+												Collections.sort(tabCompletions);
 											
-											tabCompletions.removeIf(tabCompletion -> !(StringUtil.copyPartialMatches(similarText, tabCompletions, new ArrayList<String>()).contains(tabCompletion)));
-											Collections.sort(tabCompletions);
-										
-											reflectionHelper.setField(msg, "a", tabCompletions.toArray(new String[0]));
-										} else if(suggestions.length > 0) {
+												reflectionHelper.setField(msg, "a", tabCompletions.toArray(new String[0]));
+											}
+										} else if(suggestions.length == 1) {
 											for(NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
 												if(suggestions[0].equals(nickedPlayerData.getRealName()))
-													reflectionHelper.setField(msg, "a", new String[] { nickedPlayerData.getNickName() });
+													reflectionHelper.setField(msg, "a", new String[0]);
 											}
 										}
 										

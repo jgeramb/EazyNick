@@ -65,7 +65,10 @@ public class GUIManager {
 				
 				@Override
 				public void onEditComplete(SignGUI.EditCompleteEvent event) {
-					utils.performRankedNick(player, rankName, skinType, event.getLines()[0]);
+					String name = event.getLines()[0];
+					
+					if(!(name.isEmpty()) && (name.length() <= 16) && (!(setupYamlFile.getConfiguration().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (name.length() > 2)))
+						utils.performRankedNick(player, rankName, skinType, name);
 				}
 			});
 		} else {

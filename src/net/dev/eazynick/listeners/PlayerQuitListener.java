@@ -1,5 +1,6 @@
 package net.dev.eazynick.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -7,10 +8,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.NickedPlayerData;
+import net.dev.eazynick.hooks.LuckPermsHook;
+import net.dev.eazynick.hooks.TABHook;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
+
+import me.clip.placeholderapi.PlaceholderAPI;
 
 public class PlayerQuitListener implements Listener {
 
@@ -31,10 +36,23 @@ public class PlayerQuitListener implements Listener {
 		if (api.isNicked()) {
 			NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
 			
+			if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnUnnick")) {
+				if(utils.placeholderAPIStatus())
+					setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, PlaceholderAPI.setPlaceholders(player, command)));
+				else
+					setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, command));
+			}
+			
 			if (setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 				api.unnickPlayerWithoutRemovingMySQL(false);
 			else
 				api.unnickPlayerWithoutRemovingMySQL(true);
+			
+			if(utils.luckPermsStatus())
+				new LuckPermsHook(player).resetNodes();
+			
+			if(utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
+				new TABHook(player).reset();
 			
 			if(setupYamlFile.getConfiguration().getBoolean("OverwriteJoinQuitMessages")) {
 				String message = setupYamlFile.getConfigString(player, "OverwrittenMessages.Quit");

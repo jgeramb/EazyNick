@@ -23,7 +23,6 @@ import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import net.milkbowl.vault.chat.Chat;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
-import net.skinsrestorer.shared.exception.SkinRequestException;
 
 import me.TechsCode.UltraPermissions.UltraPermissions;
 import me.TechsCode.UltraPermissions.UltraPermissionsAPI;
@@ -258,11 +257,32 @@ public class NickManager extends ReflectionHelper {
 					}
 					
 					sendPacketNMS(player, packetRespawnPlayer);
+					
+					double oldHealth = player.getHealth(), oldHealthScale = player.isHealthScaled() ? player.getHealthScale() : 0;
+					int oldLevel = player.getLevel();
 
 					Bukkit.getScheduler().runTask(eazyNick, () -> {
 						player.teleport(new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
 						player.updateInventory();
+						
+						if(player.getFoodLevel() != 20)
+							player.setFoodLevel(player.getFoodLevel() + 1);
+						
+						player.setLevel((oldLevel == 10) ? 5 : 10);
+						
+						if(player.isHealthScaled())
+							player.setHealthScale((oldHealthScale == 10) ? 20 : 10);
+						
+						player.setHealth((oldHealth == 10) ? 5 : 10);
 					});
+					
+					Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
+						if(player.isHealthScaled())
+							player.setHealthScale(oldHealthScale);
+									
+						player.setHealth(oldHealth);
+						player.setLevel(oldLevel);
+					}, 2);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -285,7 +305,7 @@ public class NickManager extends ReflectionHelper {
 					
 					try {
 						skinsRestorerAPI.setSkin(player.getName(), skinName);
-					} catch (SkinRequestException ex) {
+					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
 					

@@ -2,7 +2,11 @@ package net.dev.eazynick.utilities.configuration.yaml;
 
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.utilities.Utils;
 
 public class SetupYamlFile extends YamlFile {
 
@@ -138,6 +142,22 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("BlackList", Arrays.asList("ExampleName"));
 		configuration.addDefault("DisabledNickWorlds", Arrays.asList("ExampleName"));
 		configuration.addDefault("MineSkinIds", Arrays.asList("1416741364", "898982494", "186233253"));
+	}
+	
+	@Override
+	public void reload() {
+		boolean bungeecord = configuration.getBoolean("BungeeCord");
+		
+		this.configuration = YamlConfiguration.loadConfiguration(getFile());
+		save();
+		
+		if(!(bungeecord) && configuration.getBoolean("BungeeCord")) {
+			Utils utils = eazyNick.getUtils();
+			utils.sendConsole("§cBungeeCord-Mode enabled§7. §cPlease reload/restart your server now§7.");
+			
+			Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.hasPermission("eazynick.notify")).forEach(currentPlayer -> currentPlayer.sendMessage("§cBungeeCord-Mode enabled§7. §cPlease reload/restart your server now§7."));
+			Bukkit.getPluginManager().disablePlugin(eazyNick);
+		}
 	}
 	
 }

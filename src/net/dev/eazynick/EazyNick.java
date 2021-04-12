@@ -177,8 +177,6 @@ public class EazyNick extends JavaPlugin {
 				pluginManager.registerEvents(new PlayerJoinListener(), this);
 				pluginManager.registerEvents(new PlayerKickListener(), this);
 				pluginManager.registerEvents(new PlayerQuitListener(), this);
-				pluginManager.registerEvents(new WorldInitListener(), this);
-				pluginManager.registerEvents(new ServerListPingListener(), this);
 
 				for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
 					if ((currentPlayer != null) && (currentPlayer.getUniqueId() != null)) {
@@ -186,7 +184,28 @@ public class EazyNick extends JavaPlugin {
 							utils.getCanUseNick().put(currentPlayer.getUniqueId(), true);
 					}
 				}
+				
+				if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked")) {
+					new AsyncTask(new AsyncRunnable() {
+						
+						@Override
+						public void run() {
+							Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> (mysqlNickManager.isPlayerNicked(currentPlayer.getUniqueId()) && !(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())))).forEach(currentNickedPlayer -> {
+								String nickName = mysqlNickManager.getNickName(currentNickedPlayer.getUniqueId()), prefix = mysqlPlayerDataManager.getChatPrefix(currentNickedPlayer.getUniqueId()), suffix = mysqlPlayerDataManager.getChatSuffix(currentNickedPlayer.getUniqueId());
+								
+								if(!(utils.getWorldsWithDisabledActionBar().contains(currentNickedPlayer.getWorld().getName().toUpperCase())))
+									actionBarUtils.sendActionBar(currentNickedPlayer, languageYamlFile.getConfigString(currentNickedPlayer, currentNickedPlayer.hasPermission("nick.otheractionbarmessage") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", prefix).replace("%nickprefix%", prefix).replace("%nickSuffix%", suffix).replace("%nicksuffix%", suffix).replace("%prefix%", utils.getPrefix()));
+							});
+						}
+					}, 0, 1000).run();
+				}
+				
+				if(utils.tabStatus())
+					me.neznamy.tab.shared.config.Configs.unlimited_nametag_mode_not_enabled = "false";
 			}
+			
+			pluginManager.registerEvents(new WorldInitListener(), this);
+			pluginManager.registerEvents(new ServerListPingListener(), this);
 			
 			utils.sendConsole("§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
@@ -215,24 +234,6 @@ public class EazyNick extends JavaPlugin {
 			
 				Bukkit.spigot().getConfig().set("settings.bungeecord", true);
 			}
-			
-			if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked")) {
-				new AsyncTask(new AsyncRunnable() {
-					
-					@Override
-					public void run() {
-						Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> (mysqlNickManager.isPlayerNicked(currentPlayer.getUniqueId()) && !(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())))).forEach(currentNickedPlayer -> {
-							String nickName = mysqlNickManager.getNickName(currentNickedPlayer.getUniqueId()), prefix = mysqlPlayerDataManager.getChatPrefix(currentNickedPlayer.getUniqueId()), suffix = mysqlPlayerDataManager.getChatSuffix(currentNickedPlayer.getUniqueId());
-							
-							if(!(utils.getWorldsWithDisabledActionBar().contains(currentNickedPlayer.getWorld().getName().toUpperCase())))
-								actionBarUtils.sendActionBar(currentNickedPlayer, languageYamlFile.getConfigString(currentNickedPlayer, currentNickedPlayer.hasPermission("nick.otheractionbarmessage") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", prefix).replace("%nickprefix%", prefix).replace("%nickSuffix%", suffix).replace("%nicksuffix%", suffix).replace("%prefix%", utils.getPrefix()));
-						});
-					}
-				}, 0, 1000).run();
-			}
-			
-			if(utils.tabStatus())
-				me.neznamy.tab.shared.config.Configs.unlimited_nametag_mode_not_enabled = "false";
 			
 			utils.sendConsole("");
 			utils.sendConsole("§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
