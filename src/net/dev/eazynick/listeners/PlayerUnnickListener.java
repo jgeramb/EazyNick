@@ -1,7 +1,5 @@
 package net.dev.eazynick.listeners;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -11,6 +9,8 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.PlayerUnnickEvent;
 import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.hooks.TABHook;
+import net.dev.eazynick.utilities.AsyncTask;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
@@ -43,8 +43,15 @@ public class PlayerUnnickListener implements Listener {
 			if(utils.luckPermsStatus())
 				new LuckPermsHook(player).resetNodes();
 			
-			if(utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
-				Bukkit.getScheduler().runTaskLater(eazyNick, () -> new TABHook(player).reset(), 8 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
+			if(utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) {
+				new AsyncTask(new AsyncRunnable() {
+
+					@Override
+					public void run() {
+						new TABHook(player).reset();
+					}
+				}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
+			}
 			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
 				utils.sendConsole("§6" + name + " §7(" + player.getUniqueId().toString() + ") §4reset his nickname to §a" + player.getName());

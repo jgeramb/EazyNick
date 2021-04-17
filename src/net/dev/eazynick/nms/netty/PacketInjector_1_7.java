@@ -8,7 +8,6 @@ import java.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickedPlayerData;
@@ -83,43 +82,20 @@ public class PacketInjector_1_7 {
 										
 										super.write(ctx, msg, promise);
 									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
-										List<String> tabCompletions = new ArrayList<>();
+										String[] completions = (String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg);
 										
-										for(Player currentPlayer : Bukkit.getOnlinePlayers())
-											tabCompletions.add(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId()) ? utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName() : currentPlayer.getName());
-										
-										String[] suggestions = (String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg);
-										
-										if(suggestions.length > 1) {
-											boolean replaceSuggestions = false;
-											
-											for (String suggestion : suggestions) {
-												if(tabCompletions.contains(suggestion))
-													replaceSuggestions = true;
-											}
-											
-											if(replaceSuggestions) {
-												String text = suggestions[0], text2 = suggestions[1];
-												int range = 0;
-												
-												for (int i = 0; i < text.length(); i++) {
-													if(text.charAt(i) != text2.charAt(i))
-														break;
-													else
-														range++;
-												}
-												
-												String similarText = text.substring(0, range);
-												
-												tabCompletions.removeIf(tabCompletion -> !(StringUtil.copyPartialMatches(similarText, tabCompletions, new ArrayList<String>()).contains(tabCompletion)));
-												Collections.sort(tabCompletions);
-											
-												reflectionHelper.setField(msg, "a", tabCompletions.toArray(new String[0]));
-											}
-										} else if(suggestions.length == 1) {
-											for(NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
-												if(suggestions[0].equals(nickedPlayerData.getRealName()))
+										for (String completion : completions) {
+											if(Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(completion)).count() != 0) {
+												if(completions.length == Bukkit.getOnlinePlayers().size()) {
+													ArrayList<String> playerCompletions = new ArrayList<>();
+													
+													Bukkit.getOnlinePlayers().forEach(currentPlayer -> playerCompletions.add(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId()) ? utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName() : currentPlayer.getName()));
+													
+													reflectionHelper.setField(msg, "a", playerCompletions.toArray(new String[0]));
+												} else
 													reflectionHelper.setField(msg, "a", new String[0]);
+												
+												break;
 											}
 										}
 										

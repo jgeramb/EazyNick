@@ -42,7 +42,7 @@ public class SpigotUpdater {
 				System.out.println("[Updater] Starting download...");
 
 				try {
-					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/download_file?id=1&version=v" + newVersion).openConnection();
+					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/dl?id=1&ver=v" + newVersion).openConnection();
 					downloadURL.setRequestProperty("User-Agent", "JustixDevelopment/Updater");
 					channel = Channels.newChannel(downloadURL.getInputStream());
 				} catch (IOException ex) {
@@ -100,7 +100,7 @@ public class SpigotUpdater {
 				player.sendMessage(prefix + "§3Updater §8» §fStarting download...");
 
 				try {
-					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/download_file?id=1&version=v" + newVersion).openConnection();
+					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/dl?id=1&ver=v" + newVersion).openConnection();
 					downloadURL.setRequestProperty("User-Agent", "JustixDevelopment/Updater");
 					channel = Channels.newChannel(downloadURL.getInputStream());
 				} catch (IOException ex) {

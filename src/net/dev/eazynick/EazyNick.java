@@ -166,6 +166,13 @@ public class EazyNick extends JavaPlugin {
 				pluginManager.registerEvents(new PlayerUnnickListener(), this);
 				
 				pluginManager.registerEvents(new AsyncPlayerChatListener(), this);
+				
+				if(!(version.startsWith("1_13") || version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16")))
+					pluginManager.registerEvents(new PlayerChatTabCompleteListener(), this);
+				
+				if(!(version.startsWith("1_7") || version.startsWith("1_8") || version.startsWith("1_9")))
+					pluginManager.registerEvents(new TabCompleteListener(), this);
+					
 				pluginManager.registerEvents(new PlayerCommandPreprocessListener(), this);
 				pluginManager.registerEvents(new PlayerDropItemListener(), this);
 				pluginManager.registerEvents(new InventoryClickListener(), this);

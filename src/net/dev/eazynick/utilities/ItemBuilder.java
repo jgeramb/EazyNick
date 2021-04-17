@@ -48,6 +48,12 @@ public class ItemBuilder {
 		return this;
 	}
 	
+	public ItemBuilder setDurability(int durability) {
+		itemStack.setDurability((short) durability);
+		
+		return this;
+	}
+	
 	public ItemBuilder setDisplayName(String displayName) {
 		itemMeta.setDisplayName(displayName);
 		

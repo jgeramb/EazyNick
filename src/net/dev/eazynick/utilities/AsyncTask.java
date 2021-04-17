@@ -51,7 +51,7 @@ public class AsyncTask {
 		return this;
 	}
 	
-	public static class AsyncRunnable {
+	public static abstract class AsyncRunnable {
 		
 		private AsyncTask asyncTask;
 		
@@ -59,7 +59,7 @@ public class AsyncTask {
 			this.asyncTask = asyncTask;
 		}
 		
-		public void run() {}
+		public abstract void run();
 		
 		public void cancel() {
 			if(asyncTask != null)

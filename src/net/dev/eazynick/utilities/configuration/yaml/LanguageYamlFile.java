@@ -100,7 +100,7 @@ public class LanguageYamlFile extends YamlFile {
 			configuration.addDefault("Messages.RealName", "%prefix%&7The specified player is&8: &a%realName%");
 			configuration.addDefault("Messages.Other.RandomNick", "%prefix%&7You have nicked the player &a%playerName%");
 			configuration.addDefault("Messages.Other.SelectedNick", "%prefix%&7You have set the name of the player &a%playerName% &7to &d%nickName%");
-			configuration.addDefault("Messages.Other.Unnick", "%prefix%&7Du have unnicked the player &a%playerName%");
+			configuration.addDefault("Messages.Other.Unnick", "%prefix%&7You have unnicked the player &a%playerName%");
 			configuration.addDefault("Messages.Other.DisabledWorld", "%prefix%&cThe player &a%playerName% &ccannot be nicked in this world");
 			configuration.addDefault("Messages.ReloadConfig", "%prefix%&7The configuration file was reloaded");
 			configuration.addDefault("Messages.FixSkin", "%prefix%&7Your skin was fixed");

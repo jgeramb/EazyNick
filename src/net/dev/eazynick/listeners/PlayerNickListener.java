@@ -1,7 +1,5 @@
 package net.dev.eazynick.listeners;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -10,7 +8,9 @@ import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.*;
 import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.hooks.TABHook;
+import net.dev.eazynick.utilities.AsyncTask;
 import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
@@ -55,9 +55,16 @@ public class PlayerNickListener implements Listener {
 			
 			final String finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix, finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
 			
-			if(changePrefixAndSuffix && utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
-				Bukkit.getScheduler().runTaskLater(eazyNick, () -> new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID), 8 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
+			if(changePrefixAndSuffix && utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) {
+				new AsyncTask(new AsyncRunnable() {
 
+					@Override
+					public void run() {
+						new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID);
+					}
+				}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
+			}
+			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
 				eazyNick.getUtils().sendConsole("§a" + player.getName() + " §7(" + player.getUniqueId().toString() + ") §4set his nickname to §6" + nickName);
 
