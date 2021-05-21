@@ -30,7 +30,7 @@ public class PlayerChangedWorldListener implements Listener {
 				
 				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 					if(player.isOnline()) {
-						api.unnickPlayerWithoutRemovingMySQL(false);
+						api.unnickPlayerWithoutRemovingMySQL(false, true);
 						
 						Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 							if(player.isOnline())
@@ -47,7 +47,7 @@ public class PlayerChangedWorldListener implements Listener {
 						
 						Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 							if(player.isOnline()) {
-								apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false);
+								apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false, true);
 								
 								Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 									if(currentPlayer.isOnline())

@@ -103,7 +103,12 @@ public class NickedPlayerData {
 			else
 				skinProfile = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
 		} catch (Exception ex) {
-			utils.sendConsole("§cAn error occured while preparing skin profile§7, §cthis is NOT a plugin error§7!");
+			if(utils.isSupportMode()) {
+				utils.sendConsole("§cAn error occured while preparing skin profile§7:");
+				
+				ex.printStackTrace();
+			} else
+				utils.sendConsole("§cAn error occured while preparing skin profile§7, §cthis is NOT a plugin error§7!");
 		}
 		
 		if(skinProfile == null)

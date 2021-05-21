@@ -54,7 +54,7 @@ public class PlayerUnnickListener implements Listener {
 			}
 			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
-				utils.sendConsole("§6" + name + " §7(" + player.getUniqueId().toString() + ") §4reset his nickname to §a" + player.getName());
+				utils.sendConsole("§a" + nickName + " §8(" + player.getUniqueId().toString() + ") §7reset his nickname to §d" + name);
 			
 			languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", utils.getPrefix()));
 			

@@ -68,6 +68,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("ReNickAllOnNewPlayerJoinServer", true);
 		configuration.addDefault("ReNickAllOnNewPlayerJoinWorld", true);
 		configuration.addDefault("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled", true);
+		configuration.addDefault("NameTagPrefixSuffixUpdateDelay", 100);
 
 		configuration.addDefault("NickActionBarMessage", false);
 		configuration.addDefault("ShowNickActionBarWhenMySQLNicked", true);

@@ -78,7 +78,7 @@ public class PlayerJoinListener implements Listener {
 					if (apiCurrentPlayer.isNicked()) {
 						NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).clone();
 						
-						apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false);
+						apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false, false);
 						
 						Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 							if(currentPlayer.isOnline())
@@ -128,7 +128,7 @@ public class PlayerJoinListener implements Listener {
 					Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
 				}
 			}
-		}, 6);
+		}, 7);
 	}
 
 }

@@ -91,7 +91,14 @@ public class EazyNick extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		utils.getNickedPlayers().keySet().forEach(uuid -> Bukkit.getPlayer(uuid).kickPlayer("§cYou will need to reconnect in order to be able to play properly"));
+		utils.getNickedPlayers().keySet().forEach(uuid -> {
+			Player player = Bukkit.getPlayer(uuid);
+			
+			if(utils.getScoreboardTeamManagers().containsKey(uuid))
+				utils.getScoreboardTeamManagers().get(uuid).destroyTeam();
+			
+			player.kickPlayer("§cYou will need to reconnect in order to be able to play properly");
+		});
 		
 		if (setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 			mysql.disconnect();
@@ -142,7 +149,7 @@ public class EazyNick extends JavaPlugin {
 				new PacketInjector().init();
 			
 			if (!(setupYamlFile.getConfiguration().getBoolean("APIMode"))) {
-				getCommand("eazynick").setExecutor(new HelpCommand());
+				getCommand("eazynick").setExecutor(new PluginCommand());
 				getCommand("nickother").setExecutor(new NickOtherCommand());
 				getCommand("changeskin").setExecutor(new ChangeSkinCommand());
 				getCommand("nicklist").setExecutor(new NickListCommand());

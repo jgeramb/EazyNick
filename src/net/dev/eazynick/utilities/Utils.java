@@ -26,7 +26,8 @@ public class Utils {
 	private String noPerm;
 	private String notPlayer;
 	private String lastChatMessage = "NONE";
-
+	private boolean supportMode = false;
+	
 	private List<String> nickNames = new ArrayList<>();
 	private List<String> blackList = new ArrayList<>();
 	private List<String> worldsWithDisabledLobbyMode = new ArrayList<>();
@@ -316,7 +317,7 @@ public class Utils {
 									if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
 										ArrayList<TextComponent> textComponents = new ArrayList<>();
 										
-										for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.BungeeCord").replace("%name%", chatPrefix + name + chatSuffix).split("\n"))
+										for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.BungeeCord").replace("%name%", chatPrefix + name + chatSuffix).split("%nl%"))
 											textComponents.add(new TextComponent(s + "\n"));
 										
 										nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
@@ -327,7 +328,7 @@ public class Utils {
 									if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
 										ArrayList<TextComponent> textComponents = new ArrayList<>();
 										
-										for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer").replace("%name%", chatPrefix + name + chatSuffix).split("\n"))
+										for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer").replace("%name%", chatPrefix + name + chatSuffix).split("%nl%"))
 											textComponents.add(new TextComponent(s + "\n"));
 										
 										nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
@@ -573,6 +574,10 @@ public class Utils {
 		return lastChatMessage;
 	}
 	
+	public boolean isSupportMode() {
+		return supportMode;
+	}
+	
 	public ArrayList<UUID> getNickOnWorldChangePlayers() {
 		return nickOnWorldChangePlayers;
 	}
@@ -711,6 +716,10 @@ public class Utils {
 
 	public void setLastChatMessage(String lastChatMessage) {
 		this.lastChatMessage = lastChatMessage;
+	}
+
+	public void setSupportMode(boolean supportMode) {
+		this.supportMode = supportMode;
 	}
 
 }

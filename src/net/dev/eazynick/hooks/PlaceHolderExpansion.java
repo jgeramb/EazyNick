@@ -2,6 +2,7 @@ package net.dev.eazynick.hooks;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffectType;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
@@ -27,6 +28,7 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
 		if(player != null) {
+			String version = eazyNick.getVersion();
 			NickManager api = new NickManager(player);
 			boolean isMySQLNicked = (mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && !(api.isNicked()), isLobbyMode = setupYamlFile.getConfiguration().getBoolean("LobbyMode");
 			
@@ -68,6 +70,9 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 			
 			if(identifier.equals("global_custom"))
 				return setupYamlFile.getConfigString(player, ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId())) ? "CustomPlaceholders.Global.Nicked" : "CustomPlaceholders.Global.Default");
+		
+			if(identifier.equals("health"))
+				return String.valueOf(Math.round(player.getHealth() + ((version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16")) ? player.getAbsorptionAmount() : (player.hasPotionEffect(PotionEffectType.ABSORPTION) ? ((player.getActivePotionEffects().stream().filter(currentPotionEffect -> currentPotionEffect.getType().equals(PotionEffectType.ABSORPTION)).findFirst().get().getAmplifier() + 1) * 2) : 0))));
 		}
 		
 		return null;

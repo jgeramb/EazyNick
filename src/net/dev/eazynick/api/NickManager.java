@@ -162,7 +162,7 @@ public class NickManager extends ReflectionHelper {
 		}
 	}
 	
-	public void updatePlayer() {
+	public void updatePlayer(boolean spawnPlayer) {
 		try {
 			String version = eazyNick.getVersion();
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
@@ -215,24 +215,26 @@ public class NickManager extends ReflectionHelper {
 							sendPacket(player, currentPlayer, packetPlayOutPlayerInfoAdd);
 						}
 						
-						sendPacketExceptSelf(player, getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer));
-						
-						//Head rotation (Yaw + Pitch)
-						Object packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
-						setField(packetHeadRotation, "a", player.getEntityId());
-						setField(packetHeadRotation, "b", (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)));
-						
-						Class<?> packetPlayOutEntityLook = (version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : null;
-						
-						if(packetPlayOutEntityLook == null) {
-							for (Class<?> clazz : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()) {
-								if(clazz.getSimpleName().equals("PacketPlayOutEntityLook"))
-									packetPlayOutEntityLook = clazz;
+						if(spawnPlayer) {
+							sendPacketExceptSelf(player, getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman")).newInstance(entityPlayer));
+							
+							//Head rotation (Yaw + Pitch)
+							Object packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
+							setField(packetHeadRotation, "a", player.getEntityId());
+							setField(packetHeadRotation, "b", (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)));
+							
+							Class<?> packetPlayOutEntityLook = (version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : null;
+							
+							if(packetPlayOutEntityLook == null) {
+								for (Class<?> clazz : getNMSClass("PacketPlayOutEntity").getDeclaredClasses()) {
+									if(clazz.getSimpleName().equals("PacketPlayOutEntityLook"))
+										packetPlayOutEntityLook = clazz;
+								}
 							}
+							
+							sendPacketExceptSelf(player, packetPlayOutEntityLook.getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(player.getEntityId(), (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (player.getLocation().getPitch() * 256.0F / 360.0F)), true));
+							sendPacketExceptSelf(player, packetHeadRotation);
 						}
-						
-						sendPacketExceptSelf(player, packetPlayOutEntityLook.getConstructor(int.class, byte.class, byte.class, boolean.class).newInstance(player.getEntityId(), (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)), (byte) ((int) (player.getLocation().getPitch() * 256.0F / 360.0F)), true));
-						sendPacketExceptSelf(player, packetHeadRotation);
 						
 						//Self update
 						Object packetRespawnPlayer;
@@ -321,7 +323,7 @@ public class NickManager extends ReflectionHelper {
 								player.setHealth(oldHealth);
 								player.setLevel(oldLevel);
 							}
-						}, 150).run();
+						}, 250).run();
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -336,8 +338,10 @@ public class NickManager extends ReflectionHelper {
 		if(skinName != null) {
 			if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
 				utils.getNickedPlayers().get(player.getUniqueId()).setSkinName(skinName);
+			else
+				utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), player.getName(), skinName, "", "", "", "", "", "", "default", 9999));
 			
-			updatePlayer();
+			updatePlayer(true);
 			
 			if(utils.skinsRestorerStatus()) {
 				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
@@ -349,7 +353,7 @@ public class NickManager extends ReflectionHelper {
 						ex.printStackTrace();
 					}
 					
-					skinsRestorerAPI.applySkin(new PlayerWrapper(player));
+					skinsRestorerAPI.applySkin(new PlayerWrapper(player), skinName);
 				}, 6 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
 			}
 		}
@@ -358,8 +362,10 @@ public class NickManager extends ReflectionHelper {
 	public void setName(String nickName) {
 		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
 			utils.getNickedPlayers().get(player.getUniqueId()).setNickName(nickName);
+		else
+			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), nickName, player.getName(), "", "", "", "", "", "", "default", 9999));
 		
-		updatePlayer();
+		updatePlayer(true);
 	}
 
 	public void nickPlayer(String nickName) {
@@ -416,10 +422,10 @@ public class NickManager extends ReflectionHelper {
 			eazyNick.getMySQLPlayerDataManager().removeData(player.getUniqueId());
 		}
 		
-		unnickPlayerWithoutRemovingMySQL(false);
+		unnickPlayerWithoutRemovingMySQL(false, true);
 	}
 	
-	public void unnickPlayerWithoutRemovingMySQL(boolean keepNick) {
+	public void unnickPlayerWithoutRemovingMySQL(boolean keepNick, boolean spawnPlayer) {
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		
 		NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId());
@@ -435,7 +441,7 @@ public class NickManager extends ReflectionHelper {
 		
 		Bukkit.getScheduler().runTaskLater(eazyNick, () -> utils.getNickedPlayers().remove(player.getUniqueId()), 3);
 		
-		updatePlayer();
+		updatePlayer(spawnPlayer);
 		resetCloudNET();
 		
 		if(utils.ultraPermissionsStatus()) {
@@ -509,10 +515,7 @@ public class NickManager extends ReflectionHelper {
 			}
 		});
 		
-		if(!(eazyNick.isEnabled()))
-			return;
-		
-		Bukkit.getScheduler().runTaskLater(eazyNick, new Runnable() {
+		new AsyncTask(new AsyncRunnable() {
 			
 			@Override
 			public void run() {
@@ -521,7 +524,7 @@ public class NickManager extends ReflectionHelper {
 					setPlayerListName(nickedPlayerData.getOldPlayerListName());
 				}
 			}
-		}, 20 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 40 : 0));
+		}, 1000 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
 		
 		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
@@ -640,7 +643,7 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public String getTagPrefix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagPrefix() : "";
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagPrefix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
 	}
 
 	public void setTagPrefix(String tagPrefix) {
@@ -652,7 +655,7 @@ public class NickManager extends ReflectionHelper {
 	}
 
 	public String getTagSuffix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagSuffix() : "";
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagSuffix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
 	}
 
 	public void setTagSuffix(String tagSuffix) {
@@ -668,7 +671,7 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public String getRandomStringFromList(ArrayList<String> list) {
-		return list.size() != 0 ? list.get((new Random()).nextInt(list.size())) : player.getName();
+		return (list.isEmpty() ? player.getName() : list.get((new Random()).nextInt(list.size())));
 	}
 	
 	public String getRandomName() {
@@ -734,7 +737,7 @@ public class NickManager extends ReflectionHelper {
 					} else
 						cancel();
 				}
-			}, 1000, 1000).run();
+			}, 100L, setupYamlFile.getConfiguration().getInt("NameTagPrefixSuffixUpdateDelay") * 50L).run();
 		}
 		
 		if(utils.placeholderAPIStatus()) {

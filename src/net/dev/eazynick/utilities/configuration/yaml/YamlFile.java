@@ -92,8 +92,17 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 	}
 	
 	public String getConfigString(Player player, String path) {
+		String string = getConfigString(path);
+		
+		if(EazyNick.getInstance().getUtils().placeholderAPIStatus() && (player != null))
+			string = PlaceholderAPI.setPlaceholders(player, string);
+		
+		return string;
+	}
+	
+	public String getConfigString(String path) {
 		if(configuration.contains(path)) {
-			String string = ChatColor.translateAlternateColorCodes('&', configuration.getString(path));
+			String string = ChatColor.translateAlternateColorCodes('&', configuration.getString(path).replace("%nl%", "%nl%&0"));
 			
 			if(eazyNick.getVersion().startsWith("1_16")) {
 				try {
@@ -108,9 +117,6 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 					ex.printStackTrace();
 				}
 			}
-			
-			if(EazyNick.getInstance().getUtils().placeholderAPIStatus() && (player != null))
-				string = PlaceholderAPI.setPlaceholders(player, string);
 			
 			return string;
 		} else

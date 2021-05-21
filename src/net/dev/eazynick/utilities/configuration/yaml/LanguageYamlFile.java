@@ -1,6 +1,6 @@
 package net.dev.eazynick.utilities.configuration.yaml;
 
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 import net.dev.eazynick.EazyNick;
 
@@ -119,9 +119,9 @@ public class LanguageYamlFile extends YamlFile {
 		}
 	}
 	
-	public void sendMessage(Player player, String message) {
+	public void sendMessage(CommandSender sender, String message) {
 		if((message != null) && !(message.trim().isEmpty()))
-			player.sendMessage(message);
+			sender.sendMessage(message);
 	}
 	
 	public void setLanguage(String language) {

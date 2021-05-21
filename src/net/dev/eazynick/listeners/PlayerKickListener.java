@@ -44,9 +44,9 @@ public class PlayerKickListener implements Listener {
 			}
 			
 			if (setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
-				api.unnickPlayerWithoutRemovingMySQL(false);
+				api.unnickPlayerWithoutRemovingMySQL(false, false);
 			else
-				api.unnickPlayerWithoutRemovingMySQL(true);
+				api.unnickPlayerWithoutRemovingMySQL(true, false);
 			
 			if(utils.luckPermsStatus())
 				new LuckPermsHook(player).resetNodes();

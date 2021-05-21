@@ -73,13 +73,17 @@ public class MySQL {
 				} catch (SQLException ex) {
 					String msg = ex.getMessage();
 					
-					System.out.println(PREFIX + "An error occured while executing mysql update (" + msg + ")!");
-					
 					if(msg.contains("The driver has not received any packets from the server.")) {
+						try {
+							con.close();
+						} catch (SQLException ex1) {
+						}
+						
 						con = null;
 						
 						connect();
-					}
+					} else
+						System.out.println(PREFIX + "An error occured while executing mysql update (" + msg + ")!");
 				}
 			}, 1).run();
 		}
@@ -103,13 +107,17 @@ public class MySQL {
 						} catch (SQLException ex) {
 							String msg = ex.getMessage();
 							
-							System.out.println(PREFIX + "An error occured while executing mysql query (" + msg + ")!");
-							
 							if(msg.contains("The driver has not received any packets from the server.")) {
+								try {
+									con.close();
+								} catch (SQLException ex1) {
+								}
+								
 								con = null;
 								
 								connect();
-							}
+							} else
+								System.out.println(PREFIX + "An error occured while executing mysql update (" + msg + ")!");
 						}
 						
 						return null;

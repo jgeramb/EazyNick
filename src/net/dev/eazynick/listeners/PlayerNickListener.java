@@ -66,7 +66,7 @@ public class PlayerNickListener implements Listener {
 			}
 			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
-				eazyNick.getUtils().sendConsole("§a" + player.getName() + " §7(" + player.getUniqueId().toString() + ") §4set his nickname to §6" + nickName);
+				eazyNick.getUtils().sendConsole("§a" + realName + " §8(" + player.getUniqueId().toString() + ") §7set his nickname to §d" + nickName);
 
 			if(changePrefixAndSuffix)
 				api.updatePrefixSuffix(nickName, realName, event.getTagPrefix(), event.getTagSuffix(), event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), sortID, groupName);

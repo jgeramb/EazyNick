@@ -68,6 +68,12 @@ public class UUIDFetcher_1_7 {
 
 				utils.sendConsole("§cThere is no account with username §6" + name + " §cin the mojang database");
 			}
+			
+			if(utils.isSupportMode()) {
+				utils.sendConsole("§cAn error occured while trying to fetch uuid of §6" + name + "§7:");
+				
+				ex.printStackTrace();
+			}
 		}
 
 		return null;
