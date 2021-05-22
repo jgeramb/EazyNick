@@ -15,6 +15,7 @@ import com.nametagedit.plugin.api.INametagApi;
 import com.nametagedit.plugin.api.data.Nametag;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.hooks.TABHook;
 import net.dev.eazynick.nms.ReflectionHelper;
 import net.dev.eazynick.nms.ScoreboardTeamHandler;
 import net.dev.eazynick.utilities.*;
@@ -442,7 +443,32 @@ public class NickManager extends ReflectionHelper {
 		Bukkit.getScheduler().runTaskLater(eazyNick, () -> utils.getNickedPlayers().remove(player.getUniqueId()), 3);
 		
 		updatePlayer(spawnPlayer);
-		resetCloudNET();
+		
+		if(utils.cloudNetStatus()) {
+			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
+			
+			if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+				PermissionEntity entity = cloudPlayer.getPermissionEntity();
+				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
+				
+				if(utils.getOldCloudNETPrefixes().containsKey(player.getUniqueId())) {
+					entity.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
+					highestPermissionGroup.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
+					utils.getOldCloudNETPrefixes().remove(player.getUniqueId());
+				}
+				
+				if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId())) {
+					entity.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
+					highestPermissionGroup.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
+					utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
+				}
+				
+				if(utils.getOldCloudNETTagIDS().containsKey(player.getUniqueId())) {
+					highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDS().get(player.getUniqueId()));
+					utils.getOldCloudNETTagIDS().remove(player.getUniqueId());
+				}
+			}
+		}
 		
 		if(utils.ultraPermissionsStatus()) {
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
@@ -704,86 +730,111 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public void updatePrefixSuffix(String nickName, String realName, String tagPrefix, String tagSuffix, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, int sortID, String groupName) {
-		String finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix;
+		String finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix, finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
 		
 		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
 			if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId()))
 				utils.getScoreboardTeamManagers().remove(player.getUniqueId());
 				
 			utils.getScoreboardTeamManagers().put(player.getUniqueId(), new ScoreboardTeamHandler(player, nickName, realName, tagPrefix, tagSuffix, sortID, groupName));
+		}
+		
+		new AsyncTask(new AsyncRunnable() {
 			
-			ScoreboardTeamHandler scoreboardTeamHandler = utils.getScoreboardTeamManagers().get(player.getUniqueId());
-			
-			new AsyncTask(new AsyncRunnable() {
+			@Override
+			public void run() {
+				UUID uuid = player.getUniqueId();
 				
-				@Override
-				public void run() {
-					UUID uuid = player.getUniqueId();
-					
-					if(eazyNick.isEnabled() && utils.getScoreboardTeamManagers().containsKey(uuid) && player.isOnline()) {
+				if(eazyNick.isEnabled() && player.isOnline() && isNicked()) {
+					if(utils.getScoreboardTeamManagers().containsKey(uuid)) {
+						ScoreboardTeamHandler scoreboardTeamHandler = utils.getScoreboardTeamManagers().get(player.getUniqueId());
 						scoreboardTeamHandler.destroyTeam();
 						scoreboardTeamHandler.createTeam();
+					}
+					
+					if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
+						String tmpTabPrefix = finalTabPrefix, tmpTabSuffix = finalTabSuffix, tmpTagPrefix = finalTagPrefix, tmpTagSuffix = finalTagSuffix;
 						
-						if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
-							String tmpTabPrefix = finalTabPrefix, tmpTabSuffix = finalTabSuffix;
-							
-							if(utils.placeholderAPIStatus()) {
-								tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
-								tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
-							}
-							
-							setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
+						if(utils.placeholderAPIStatus()) {
+							tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
+							tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
+							tmpTagPrefix = PlaceholderAPI.setPlaceholders(player, tmpTagPrefix);
+							tmpTagSuffix = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix);
 						}
-					} else
-						cancel();
-				}
-			}, 100L, setupYamlFile.getConfiguration().getInt("NameTagPrefixSuffixUpdateDelay") * 50L).run();
-		}
-		
+						
+						setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
+						
+						if(utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
+							new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID);
+						
+						if(utils.nameTagEditStatus()) {
+							Bukkit.getScheduler().runTask(eazyNick, () -> {
+								utils.getNametagEditPrefixes().remove(player.getUniqueId());
+								utils.getNametagEditSuffixes().remove(player.getUniqueId());
+								
+								INametagApi nametagEditAPI = NametagEdit.getApi();
+								Nametag nametag = nametagEditAPI.getNametag(player);
+								
+								utils.getNametagEditPrefixes().put(player.getUniqueId(), nametag.getPrefix());
+								utils.getNametagEditSuffixes().put(player.getUniqueId(), nametag.getSuffix());
+
+								String tmpTagPrefix2 = finalTagPrefix, tmpTagSuffix2 = finalTagSuffix;
+								
+								if(utils.placeholderAPIStatus()) {
+									tmpTagPrefix2 = PlaceholderAPI.setPlaceholders(player, tmpTagPrefix2);
+									tmpTagSuffix2 = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix2);
+								}
+								
+								nametagEditAPI.setPrefix(player, tmpTagPrefix2);
+								nametagEditAPI.setSuffix(player, tmpTagSuffix2);
+								nametagEditAPI.reloadNametag(player);
+							});
+						}
+						
+						if(utils.cloudNetStatus()) {
+							CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
+							
+							if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+								PermissionEntity entity = cloudPlayer.getPermissionEntity();
+								de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
+								
+								if(utils.getOldCloudNETPrefixes().containsKey(player.getUniqueId()))
+									utils.getOldCloudNETPrefixes().remove(player.getUniqueId());
+								
+								if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId()))
+									utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
+								
+								if(utils.getOldCloudNETTagIDS().containsKey(player.getUniqueId()))
+									utils.getOldCloudNETTagIDS().remove(player.getUniqueId());
+								
+								utils.getOldCloudNETPrefixes().put(player.getUniqueId(), entity.getPrefix());
+								utils.getOldCloudNETSuffixes().put(player.getUniqueId(), entity.getSuffix());
+								utils.getOldCloudNETTagIDS().put(player.getUniqueId(), highestPermissionGroup.getTagId());
+								
+								entity.setPrefix(tmpTagPrefix);
+								entity.setSuffix(tmpTagSuffix);
+								highestPermissionGroup.setPrefix(tmpTagPrefix);
+								highestPermissionGroup.setSuffix(tmpTagSuffix);
+								highestPermissionGroup.setTagId(Integer.MAX_VALUE);
+							}
+						}
+					}
+				} else
+					cancel();
+			}
+		}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0), setupYamlFile.getConfiguration().getInt("PrefixSuffixUpdateDelay") * 50L).run();
+
 		if(utils.placeholderAPIStatus()) {
-			tagPrefix = PlaceholderAPI.setPlaceholders(player, tagPrefix);
-			tagSuffix = PlaceholderAPI.setPlaceholders(player, tagSuffix);
+			chatPrefix = PlaceholderAPI.setPlaceholders(player, chatPrefix);
+			chatSuffix = PlaceholderAPI.setPlaceholders(player, chatSuffix);
 			tabPrefix = PlaceholderAPI.setPlaceholders(player, tabPrefix);
 			tabSuffix = PlaceholderAPI.setPlaceholders(player, tabSuffix);
-		}
-		
-		changeCloudNET(tagPrefix, tagSuffix);
-		
-		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
-			Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-				String tmpTabPrefix = finalTabPrefix;
-				String tmpTabSuffix = finalTabSuffix;
-				
-				if(utils.placeholderAPIStatus()) {
-					tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
-					tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
-				}
-				
-				setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
-			}, 20);
+			tagPrefix = PlaceholderAPI.setPlaceholders(player, tagPrefix);
+			tagSuffix = PlaceholderAPI.setPlaceholders(player, tagSuffix);
 		}
 		
 		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.DisplayName"))
 			player.setDisplayName(chatPrefix + nickName + chatSuffix);
-		
-		String finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
-		
-		if(utils.nameTagEditStatus()) {
-			Bukkit.getScheduler().runTask(eazyNick, () -> {
-				utils.getNametagEditPrefixes().remove(player.getUniqueId());
-				utils.getNametagEditSuffixes().remove(player.getUniqueId());
-				
-				INametagApi nametagEditAPI = NametagEdit.getApi();
-				Nametag nametag = nametagEditAPI.getNametag(player);
-				
-				utils.getNametagEditPrefixes().put(player.getUniqueId(), nametag.getPrefix());
-				utils.getNametagEditSuffixes().put(player.getUniqueId(), nametag.getSuffix());
-
-				nametagEditAPI.setPrefix(player, finalTagPrefix);
-				nametagEditAPI.setSuffix(player, finalTagSuffix);
-				nametagEditAPI.reloadNametag(player);
-			});
-		}
 		
 		if(utils.ultraPermissionsStatus()) {
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
@@ -843,64 +894,6 @@ public class NickManager extends ReflectionHelper {
 				
 				user.setPrefix(tabPrefix, player.getWorld().getName());
 				user.setSuffix(tabSuffix, player.getWorld().getName());
-			}
-		}
-	}
-	
-	public void changeCloudNET(String prefix, String suffix) {
-		if(utils.cloudNetStatus()) {
-			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
-			
-			if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
-				PermissionEntity entity = cloudPlayer.getPermissionEntity();
-				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
-				
-				if(utils.getOldCloudNETPrefixes().containsKey(player.getUniqueId()))
-					utils.getOldCloudNETPrefixes().remove(player.getUniqueId());
-				
-				if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId()))
-					utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
-				
-				if(utils.getOldCloudNETTagIDS().containsKey(player.getUniqueId()))
-					utils.getOldCloudNETTagIDS().remove(player.getUniqueId());
-				
-				utils.getOldCloudNETPrefixes().put(player.getUniqueId(), entity.getPrefix());
-				utils.getOldCloudNETSuffixes().put(player.getUniqueId(), entity.getSuffix());
-				utils.getOldCloudNETTagIDS().put(player.getUniqueId(), highestPermissionGroup.getTagId());
-				
-				entity.setPrefix(prefix);
-				entity.setSuffix(suffix);
-				highestPermissionGroup.setPrefix(prefix);
-				highestPermissionGroup.setSuffix(suffix);
-				highestPermissionGroup.setTagId(Integer.MAX_VALUE);
-			}
-		}
-	}
-	
-	public void resetCloudNET() {
-		if(utils.cloudNetStatus()) {
-			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
-			
-			if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
-				PermissionEntity entity = cloudPlayer.getPermissionEntity();
-				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
-				
-				if(utils.getOldCloudNETPrefixes().containsKey(player.getUniqueId())) {
-					entity.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
-					highestPermissionGroup.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
-					utils.getOldCloudNETPrefixes().remove(player.getUniqueId());
-				}
-				
-				if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId())) {
-					entity.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
-					highestPermissionGroup.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
-					utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
-				}
-				
-				if(utils.getOldCloudNETTagIDS().containsKey(player.getUniqueId())) {
-					highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDS().get(player.getUniqueId()));
-					utils.getOldCloudNETTagIDS().remove(player.getUniqueId());
-				}
 			}
 		}
 	}

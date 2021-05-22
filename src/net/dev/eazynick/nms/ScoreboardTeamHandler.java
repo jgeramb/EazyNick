@@ -28,7 +28,7 @@ public class ScoreboardTeamHandler {
 		this.prefix = prefix;
 		this.suffix = suffix;
 		this.teamName = sortID + rank + player.getUniqueId().toString().substring(0, 14);
-		this.receivedPacket = new ArrayList<>();
+		this.receivedPacket = new ArrayList<>(Bukkit.getOnlinePlayers());
 		
 		if(this.teamName.length() > 16)
 			this.teamName = this.teamName.substring(0, 16);
@@ -38,15 +38,13 @@ public class ScoreboardTeamHandler {
 		
 		if(this.suffix == null)
 			this.suffix = "";
-		
-		if(this.prefix.length() > 16)
-			this.prefix = this.prefix.substring(0, 16);
-		
-		if(this.suffix.length() > 16)
-			this.suffix = this.suffix.substring(0, 16);
 	}
 	
 	public void destroyTeam() {
+		destroyTeam(false);
+	}
+	
+	private void destroyTeam(boolean skipFilter) {
 		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
 		
 		try {
@@ -87,7 +85,10 @@ public class ScoreboardTeamHandler {
 				}
 			}
 			
-			Bukkit.getOnlinePlayers().stream().filter(receivedPacket::contains).forEach(currentPlayer -> sendPacket(currentPlayer, packet));
+			if(skipFilter)
+				Bukkit.getOnlinePlayers().stream().forEach(currentPlayer -> sendPacket(currentPlayer, packet));
+			else
+				Bukkit.getOnlinePlayers().stream().filter(receivedPacket::contains).forEach(currentPlayer -> sendPacket(currentPlayer, packet));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -109,11 +110,17 @@ public class ScoreboardTeamHandler {
 					prefixForPlayer = setupYamlFile.getConfigString(player, "BypassFormat.NameTagPrefix");
 					suffixForPlayer = setupYamlFile.getConfigString(player, "BypassFormat.NameTagSuffix");
 				}
-				
+
 				if(eazyNick.getUtils().placeholderAPIStatus()) {
 					prefixForPlayer = PlaceholderAPI.setPlaceholders(player, prefixForPlayer);
 					suffixForPlayer = PlaceholderAPI.setPlaceholders(player, suffixForPlayer);
 				}
+				
+				if(prefixForPlayer.length() > 16)
+					prefixForPlayer = prefixForPlayer.substring(0, 16);
+				
+				if(suffixForPlayer.length() > 16)
+					suffixForPlayer = suffixForPlayer.substring(0, 16);
 				
 				if(!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))) {
 					if(eazyNick.getUtils().isNewVersion()) {
@@ -239,7 +246,8 @@ public class ScoreboardTeamHandler {
 			
 				sendPacket(currentPlayer, packet);
 				
-				receivedPacket.add(currentPlayer);
+				if(!(receivedPacket.contains(currentPlayer)))
+					receivedPacket.add(currentPlayer);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

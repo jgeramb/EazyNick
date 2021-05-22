@@ -180,12 +180,12 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public void insertData(UUID uuid, String GroupName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
+	public void insertData(UUID uuid, String groupName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
 		if(mysql.isConnected()) {
 			if(isRegistered(uuid))
 				removeData(uuid);
 			
-			mysql.update("INSERT INTO NickedPlayerDatas (UUID, GroupName, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + GroupName + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
+			mysql.update("INSERT INTO NickedPlayerDatas (UUID, GroupName, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + groupName + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
 		}
 	}
 	

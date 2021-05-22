@@ -68,7 +68,8 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("ReNickAllOnNewPlayerJoinServer", true);
 		configuration.addDefault("ReNickAllOnNewPlayerJoinWorld", true);
 		configuration.addDefault("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled", true);
-		configuration.addDefault("NameTagPrefixSuffixUpdateDelay", 100);
+		configuration.addDefault("PrefixSuffixUpdateDelay", 100);
+		configuration.addDefault("UseLocalRankPrefixes", true);
 
 		configuration.addDefault("NickActionBarMessage", false);
 		configuration.addDefault("ShowNickActionBarWhenMySQLNicked", true);
@@ -126,7 +127,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("Settings.NickFormat.NameTag.Prefix", "&7");
 		configuration.addDefault("Settings.NickFormat.NameTag.Suffix", "&r");
 		configuration.addDefault("Settings.NickFormat.SortID", 9999);
-		configuration.addDefault("Settings.NickFormat.GroupName", "Default");
+		configuration.addDefault("Settings.NickFormat.GroupName", "DefaultGroup");
 		configuration.addDefault("Settings.NickFormat.ServerFullRank.Chat.Prefix", "&a[VIP] ");
 		configuration.addDefault("Settings.NickFormat.ServerFullRank.Chat.Suffix", "&r");
 		configuration.addDefault("Settings.NickFormat.ServerFullRank.PlayerList.Prefix", "&a[VIP] ");
@@ -134,7 +135,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Prefix", "&a[VIP] ");
 		configuration.addDefault("Settings.NickFormat.ServerFullRank.NameTag.Suffix", "&r");
 		configuration.addDefault("Settings.NickFormat.ServerFullRank.SortID", 9998);
-		configuration.addDefault("Settings.NickFormat.ServerFullRank.GroupName", "VIP");
+		configuration.addDefault("Settings.NickFormat.ServerFullRank.GroupName", "VIPGroup");
 		configuration.addDefault("WorldsWithDisabledLobbyMode", Arrays.asList("example_world"));
 		configuration.addDefault("WorldsWithDisabledPrefixAndSuffix", Arrays.asList("example_world"));
 		configuration.addDefault("WorldsWithDisabledActionBar", Arrays.asList("example_world"));

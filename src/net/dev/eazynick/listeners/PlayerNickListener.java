@@ -7,10 +7,7 @@ import org.bukkit.event.*;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.*;
 import net.dev.eazynick.hooks.LuckPermsHook;
-import net.dev.eazynick.hooks.TABHook;
-import net.dev.eazynick.utilities.AsyncTask;
 import net.dev.eazynick.utilities.Utils;
-import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
@@ -42,28 +39,12 @@ public class PlayerNickListener implements Listener {
 			}
 			
 			if(utils.placeholderAPIStatus()) {
-				tagPrefix = PlaceholderAPI.setPlaceholders(player, tagPrefix);
-				tagSuffix = PlaceholderAPI.setPlaceholders(player, tagSuffix);
 				chatPrefix = PlaceholderAPI.setPlaceholders(player, chatPrefix);
 				chatSuffix = PlaceholderAPI.setPlaceholders(player, chatSuffix);
-				tabPrefix = PlaceholderAPI.setPlaceholders(player, tabPrefix);
-				tabSuffix = PlaceholderAPI.setPlaceholders(player, tabSuffix);
 			}
 			
 			if(changePrefixAndSuffix && utils.luckPermsStatus())
 				new LuckPermsHook(player).updateNodes(chatPrefix, chatSuffix, groupName);
-			
-			final String finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix, finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
-			
-			if(changePrefixAndSuffix && utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) {
-				new AsyncTask(new AsyncRunnable() {
-
-					@Override
-					public void run() {
-						new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID);
-					}
-				}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
-			}
 			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
 				eazyNick.getUtils().sendConsole("§a" + realName + " §8(" + player.getUniqueId().toString() + ") §7set his nickname to §d" + nickName);
@@ -73,7 +54,7 @@ public class PlayerNickListener implements Listener {
 			
 			api.nickPlayer(nickName, skinName);
 
-			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(nickName) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(nickName) : eazyNick.getUUIDFetcher().getUUID(nickName)), oldDisplayName, oldPlayerListName, realName, nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName, sortID));
+			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(nickName) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(nickName) : eazyNick.getUUIDFetcher().getUUID(nickName)), oldDisplayName, oldPlayerListName, realName, nickName, skinName, event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), event.getTagPrefix(), event.getTagSuffix(), groupName, sortID));
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnNnick")) {
 				for(Player currentPlayer : Bukkit.getOnlinePlayers())

@@ -17,8 +17,8 @@ public class PlayerDeathListener implements Listener {
 		NickManager api = new NickManager(player);
 		String deathMessage = ((event.getDeathMessage() == null) || event.getDeathMessage().isEmpty()) ? null : event.getDeathMessage();
 
-		if (deathMessage != null) {
-			if (api.isNicked()) {
+		if (api.isNicked()) {
+			if (deathMessage != null) {
 				if (!(EazyNick.getInstance().getSetupYamlFile().getConfiguration().getBoolean("SeeNickSelf"))) {
 					event.setDeathMessage(null);
 

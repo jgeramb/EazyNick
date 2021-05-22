@@ -17,6 +17,7 @@ import net.dev.eazynick.nms.ScoreboardTeamHandler;
 import net.dev.eazynick.nms.fakegui.book.*;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.*;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -256,15 +257,15 @@ public class Utils {
 								String groupName = "";
 								
 								for (int i = 1; i <= 18; i++) {
-									String permission = guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".Permission");
+									String permission = guiYamlFile.getConfigString("RankGUI.Rank" + i + ".Permission");
 									
 									if(rankName.equalsIgnoreCase(guiYamlFile.getConfiguration().getString("RankGUI.Rank" + i + ".RankName")) && guiYamlFile.getConfiguration().getBoolean("RankGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || player.hasPermission(permission))) {
-										chatPrefix = guiYamlFile.getConfigString(player, "Settings.NickFormat.Rank" + i + ".ChatPrefix");
-										chatSuffix = guiYamlFile.getConfigString(player, "Settings.NickFormat.Rank" + i + ".ChatSuffix");
-										tabPrefix = guiYamlFile.getConfigString(player, "Settings.NickFormat.Rank" + i + ".TabPrefix");
-										tabSuffix = guiYamlFile.getConfigString(player, "Settings.NickFormat.Rank" + i + ".TabSuffix");
-										tagPrefix = guiYamlFile.getConfigString(player, "Settings.NickFormat.Rank" + i + ".TagPrefix");
-										tagSuffix = guiYamlFile.getConfigString(player, "Settings.NickFormat.Rank" + i + ".TagSuffix");
+										chatPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
+										chatSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
+										tabPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
+										tabSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
+										tagPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
+										tagSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
 										groupName = guiYamlFile.getConfiguration().getString("Settings.NickFormat.Rank" + i + ".GroupName");
 									}
 								}
@@ -324,15 +325,25 @@ public class Utils {
 									}
 								} else {
 									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, sortID, groupName));
-								
-									if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
-										ArrayList<TextComponent> textComponents = new ArrayList<>();
+									
+									String finalChatPrefix = chatPrefix, finalChatSuffix = chatSuffix;
+									
+									new AsyncTask(new AsyncRunnable() {
 										
-										for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer").replace("%name%", chatPrefix + name + chatSuffix).split("%nl%"))
-											textComponents.add(new TextComponent(s + "\n"));
-										
-										nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
-									}
+										@Override
+										public void run() {
+											Bukkit.getScheduler().runTask(eazyNick, () -> {
+												if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
+													ArrayList<TextComponent> textComponents = new ArrayList<>();
+													
+													for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer").replace("%name%", finalChatPrefix + name + finalChatSuffix).split("%nl%"))
+														textComponents.add(new TextComponent(s + "\n"));
+													
+													nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
+												}
+											});
+										}
+									}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
 								}
 							} else
 								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerWithThisNameIsKnown").replace("%prefix%", prefix));
@@ -400,12 +411,12 @@ public class Utils {
 			tagPrefix = chatPrefix;
 			tagSuffix = chatSuffix;
 		} else {
-			chatPrefix = (serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Prefix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Prefix"));
-			chatSuffix = (serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Suffix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Suffix"));
-			tabPrefix = (serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Prefix"));
-			tabSuffix = (serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Suffix"));
-			tagPrefix = (serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.NameTag.Prefix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.NameTag.Prefix"));
-			tagSuffix = (serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.NameTag.Suffix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.NameTag.Suffix"));
+			chatPrefix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : setupYamlFile.getConfigString("Settings.NickFormat.Chat.Prefix"));
+			chatSuffix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : setupYamlFile.getConfigString("Settings.NickFormat.Chat.Suffix"));
+			tabPrefix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : setupYamlFile.getConfigString("Settings.NickFormat.PlayerList.Prefix"));
+			tabSuffix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : setupYamlFile.getConfigString("Settings.NickFormat.PlayerList.Suffix"));
+			tagPrefix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : setupYamlFile.getConfigString("Settings.NickFormat.NameTag.Prefix"));
+			tagSuffix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : setupYamlFile.getConfigString("Settings.NickFormat.NameTag.Suffix"));
 		}
 
 		new NickManager(player).setGroupName(serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName"));
@@ -421,6 +432,7 @@ public class Utils {
 		if(!(new NickManager(player).isNicked())) {
 			EazyNick eazyNick = EazyNick.getInstance();
 			SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
+			GUIYamlFile guiYamlFile = eazyNick.getGUIYamlFile();
 			LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 			MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 			MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
@@ -466,7 +478,48 @@ public class Utils {
 						if((mysqlPlayerDataManager != null) && mysqlPlayerDataManager.isRegistered(player.getUniqueId())) {
 							new NickManager(player).setGroupName("Default");
 							
-							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()), mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTagSuffix(player.getUniqueId()), true, false, 9999, "NONE"));
+							if(setupYamlFile.getConfiguration().contains("UseLocalRankPrefixes")) {
+								String groupName = mysqlPlayerDataManager.getGroupName(player.getUniqueId()), chatPrefix = mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()), chatSuffix = mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()), tabPrefix = mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()), tabSuffix = mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()), tagPrefix = mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()), tagSuffix = mysqlPlayerDataManager.getTagSuffix(player.getUniqueId());
+								int sortID = 9999;
+								
+								if(groupName.equalsIgnoreCase(setupYamlFile.getConfigString("Settings.NickFormat.GroupName")) || groupName.equalsIgnoreCase(setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.GroupName"))) {
+									String serverFullRank = (getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? ".ServerFullRank" : "";
+									
+									chatPrefix = setupYamlFile.getConfigString("Settings.NickFormat" + serverFullRank + ".Chat.Prefix");
+									chatSuffix = setupYamlFile.getConfigString("Settings.NickFormat" + serverFullRank + ".Chat.Suffix");
+									tabPrefix = setupYamlFile.getConfigString("Settings.NickFormat" + serverFullRank + ".PlayerList.Prefix");
+									tabSuffix = setupYamlFile.getConfigString("Settings.NickFormat" + serverFullRank + ".PlayerList.Suffix");
+									tagPrefix = setupYamlFile.getConfigString("Settings.NickFormat" + serverFullRank + ".NameTag.Prefix");
+									tagSuffix = setupYamlFile.getConfigString("Settings.NickFormat" + serverFullRank + ".NameTag.Suffix");
+									sortID = setupYamlFile.getConfiguration().getInt("Settings.NickFormat" + serverFullRank + ".SortID");
+								} else {
+									for (int i = 1; i <= 18; i++) {
+										if(groupName.equalsIgnoreCase(guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".GroupName"))) {
+											chatPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
+											chatSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
+											tabPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
+											tabSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
+											tagPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
+											tagSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+											sortID = guiYamlFile.getConfiguration().getInt("Settings.NickFormat.Rank" + i + ".SortID");
+											
+											String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
+											
+											chatPrefix = chatPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
+											chatSuffix = chatSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
+											tabPrefix = tabPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
+											tabSuffix = tabSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
+											tagPrefix = tagPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
+											tagSuffix = tagSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
+											
+											break;
+										}
+									}
+								}
+								
+								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, true, false, sortID, mysqlPlayerDataManager.getGroupName(player.getUniqueId())));
+							} else
+								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()), mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTagSuffix(player.getUniqueId()), true, false, 9999, mysqlPlayerDataManager.getGroupName(player.getUniqueId())));
 						} else {
 							boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
 							String prefix = serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.NameTag.Prefix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.NameTag.Prefix");
