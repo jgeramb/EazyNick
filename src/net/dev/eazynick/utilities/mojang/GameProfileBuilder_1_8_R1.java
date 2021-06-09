@@ -32,13 +32,16 @@ public class GameProfileBuilder_1_8_R1 {
 	}
    
 	public GameProfile fetch(UUID uuid, boolean forceNew) throws IOException {
-		if(!forceNew && cache.containsKey(uuid) && cache.get(uuid).isValid())
+		//Check for cached profile
+		if(!(forceNew) && cache.containsKey(uuid) && cache.get(uuid).isValid())
 			return cache.get(uuid).profile;
 		else {
+			//Open http connection
 			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(SERVICE_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
 			connection.setReadTimeout(5000);
          
 			if(connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				//Parse response
 				String json = "", line = "";
 				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				
@@ -46,15 +49,15 @@ public class GameProfileBuilder_1_8_R1 {
 					json += line;
             
 				GameProfile result = gson.fromJson(json, GameProfile.class);
+				
+				//Cache profile
 				cache.put(uuid, new CachedProfile(result));
 				
 				return result;
-			} else {
-				if(!forceNew && cache.containsKey(uuid))
-					return cache.get(uuid).profile;
 			}
             
 			JsonObject error = (JsonObject) new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine());
+			
             throw new IOException(error.get("error").getAsString() + ": " + error.get("errorMessage").getAsString());
 		}
 	}
@@ -64,6 +67,7 @@ public class GameProfileBuilder_1_8_R1 {
 	}
    
 	public GameProfile getProfile(UUID uuid, String name, String skinUrl, String capeUrl) {
+		//Create profile from properties
 		GameProfile profile = new GameProfile(uuid, name);
 		boolean cape = capeUrl != null && !capeUrl.isEmpty();
 		

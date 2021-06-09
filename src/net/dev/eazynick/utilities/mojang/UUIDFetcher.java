@@ -35,20 +35,25 @@ public class UUIDFetcher {
 		
 		name = name.toLowerCase();
 
+		//Check for cached unique id
 		if (uuidCache.containsKey(name))
 			return uuidCache.get(name);
 
 		try {
+			//Open connection
 			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, timestamp / 1000)).openConnection();
 			connection.setReadTimeout(5000);
 
+			//Parse response
 			UUIDFetcher data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher.class);
 
+			//Cache data
 			uuidCache.put(name, data.id);
 			nameCache.put(data.id, data.name);
 
 			return data.id;
 		} catch (Exception ex) {
+			//Remove nickname from nickNames.yml
 			NickNameYamlFile nickNameYamlFile = eazyNick.getNickNameYamlFile();
 
 			List<String> list = nickNameYamlFile.getConfiguration().getStringList("NickNames");
@@ -80,20 +85,25 @@ public class UUIDFetcher {
 	}
 
 	public String getName(String name, UUID uuid) {
+		//Check for cached name
 		if (nameCache.containsKey(uuid))
 			return nameCache.get(uuid);
 
 		try {
+			//Open connection
 			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
 			connection.setReadTimeout(5000);
 
+			//Parse response
 			UUIDFetcher[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher[].class);
 			UUIDFetcher currentNameData = nameHistory[nameHistory.length - 1];
+			
+			//Cache data
 			uuidCache.put(currentNameData.name.toLowerCase(), uuid);
 			nameCache.put(uuid, currentNameData.name);
 
 			return currentNameData.name;
-		} catch (Exception ex) {
+		} catch (Exception ignore) {
 		}
 
 		return name;

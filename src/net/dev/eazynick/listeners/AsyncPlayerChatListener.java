@@ -10,6 +10,8 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+
 public class AsyncPlayerChatListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -46,7 +48,12 @@ public class AsyncPlayerChatListener implements Listener {
 				if (api.isNicked()) {
 					event.setCancelled(true);
 					
-					String format = setupYamlFile.getConfigString(player, "Settings.ChatFormat").replace("%displayName%", player.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", api.getNickName()).replace("%displayname%", player.getDisplayName()).replace("%nickname%", api.getNickName()).replace("%playername%", api.getNickName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix()).replace("%message%", event.getMessage()).replaceAll("%", "%%");
+					String format = setupYamlFile.getConfigString(player, "Settings.ChatFormat").replace("%displayName%", player.getDisplayName()).replace("%nickName%", api.getNickName()).replace("%playerName%", api.getNickName()).replace("%displayname%", player.getDisplayName()).replace("%nickname%", api.getNickName()).replace("%playername%", api.getNickName()).replace("%prefix%", api.getChatPrefix()).replace("%suffix%", api.getChatSuffix());
+					
+					if(utils.isPluginInstalled("PlaceholderAPI"))
+						format = PlaceholderAPI.setPlaceholders(player, format);
+					
+					format = format.replace("%message%", event.getMessage()).replaceAll("%", "%%");
 					
 					event.setFormat(format);
 					

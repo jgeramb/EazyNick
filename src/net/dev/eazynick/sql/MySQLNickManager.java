@@ -13,7 +13,9 @@ public class MySQLNickManager {
 	}
 
 	public String getNickName(UUID uuid) {
+		//Check if player is in table
 		if(isPlayerNicked(uuid)) {
+			//Check if connection is open
 			if(mysql.isConnected()) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");
@@ -37,7 +39,9 @@ public class MySQLNickManager {
 	}
 	
 	public String getSkinName(UUID uuid) {
+		//Check if player is in table
 		if(isPlayerNicked(uuid)) {
+			//Check if connection is open
 			if(mysql.isConnected()) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");
@@ -61,20 +65,25 @@ public class MySQLNickManager {
 	}
 	
 	public void addPlayer(UUID uuid, String nickName, String skinName) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is not in table
 			if(!(isPlayerNicked(uuid)))
 				mysql.update("INSERT INTO NickedPlayers (UUID, NickName, SkinName) VALUES ('" + uuid.toString() + "', '" + nickName + "', '" + skinName + "')");
 		}
 	}
 	
 	public void removePlayer(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isPlayerNicked(uuid))
 				mysql.update("DELETE FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");
 		}
 	}
 
 	public boolean isPlayerNicked(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
 			try {
 				ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uuid.toString() + "'");

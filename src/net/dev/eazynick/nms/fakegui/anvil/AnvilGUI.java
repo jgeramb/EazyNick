@@ -28,7 +28,7 @@ public class AnvilGUI {
 
 	public AnvilGUI(final Player player, final AnvilClickEventHandler handler) {
 		eazyNick = EazyNick.getInstance();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
+		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
 		blockPositionClass = reflectionHelper.getNMSClass("BlockPosition");
 		containerAnvil = reflectionHelper.getNMSClass("ContainerAnvil");
@@ -109,7 +109,7 @@ public class AnvilGUI {
 	}
 
 	public void open() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
+		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
 		player.setLevel(player.getLevel() + 1);
 		player.closeInventory();

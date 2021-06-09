@@ -18,11 +18,13 @@ public class MineSkinAPI {
 		ArrayList<Property> props = new ArrayList<>();
 		
 		try {
+			//Open http connection
 			HttpURLConnection textureConnection = (HttpURLConnection) new URL(String.format(URL_FORMAT, id)).openConnection();
 			textureConnection.setRequestProperty("User-Agent", "JustixDevelopment/APIClient");
 			textureConnection.setRequestMethod("GET");
 			textureConnection.setReadTimeout(5000);
 			
+			//Parse response
 			JsonObject jsonObject = new JsonParser().parse(new BufferedReader(new InputStreamReader(textureConnection.getInputStream()))).getAsJsonObject();
 			JsonObject texture = jsonObject.get("data").getAsJsonObject().get("texture").getAsJsonObject();
 			
@@ -38,11 +40,13 @@ public class MineSkinAPI {
 		Collection<net.minecraft.util.com.mojang.authlib.properties.Property> props = new ArrayList<>();
 		
 		try {
+			//Open htp connection
 			HttpURLConnection textureConnection = (HttpURLConnection) new URL(String.format(URL_FORMAT, id)).openConnection();
 			textureConnection.setRequestProperty("User-Agent", "JustixDevelopment/APIClient");
 			textureConnection.setRequestMethod("GET");
 			textureConnection.setReadTimeout(5000);
 			
+			//Parse response
 			net.minecraft.util.com.google.gson.JsonObject jsonObject = new net.minecraft.util.com.google.gson.JsonParser().parse(new BufferedReader(new InputStreamReader(textureConnection.getInputStream()))).getAsJsonObject();
 			net.minecraft.util.com.google.gson.JsonObject texture = jsonObject.get("data").getAsJsonObject().get("texture").getAsJsonObject();
 			

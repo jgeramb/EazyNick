@@ -22,7 +22,7 @@ public class BookPage {
 	
 	public Object getAsIChatBaseComponent() {
 		EazyNick eazyNick = EazyNick.getInstance();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
+		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
 		Class<?> chatSerializer = (eazyNick.getVersion().startsWith("1_7") || eazyNick.getVersion().equals("1_8_R1")) ? reflectionHelper.getNMSClass("ChatSerializer") : reflectionHelper.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
 		

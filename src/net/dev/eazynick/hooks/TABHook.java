@@ -64,7 +64,7 @@ public class TABHook {
 				tabPlayer.setTeamName(utils.getTABTeams().get(player.getUniqueId()));
 				tabPlayer.forceRefresh();
 			}
-		} catch (NullPointerException ex) {
+		} catch (NullPointerException ignore) {
 		}
 		
 		utils.getTABTeams().remove(player.getUniqueId());

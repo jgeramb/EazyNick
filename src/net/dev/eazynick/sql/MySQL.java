@@ -2,6 +2,9 @@ package net.dev.eazynick.sql;
 
 import java.sql.*;
 import java.util.concurrent.*;
+import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
 
 public class MySQL {
 
@@ -18,36 +21,49 @@ public class MySQL {
 	}
 
 	public void connect() {
-		if(!isConnected()) {
+		//Make sure no connection is open
+		if(!(isConnected())) {
 			try {
+				//Open connection
 				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false&characterEncoding=utf8&useUnicode=true&interactiveClient=true", username, password);
 				
-				System.out.println(PREFIX + "Connected to database successfully!");
+				Bukkit.getLogger().info(PREFIX + "Connected to database successfully!");
 			} catch (SQLException ex) {
-				System.out.println(PREFIX + "Connection to database failed (" + ex.getMessage() + ")!");
-				System.out.println();
-				System.out.println(PREFIX + "Connection Properties:");
-				System.out.println(PREFIX + " Address: " + host + ":" + port);
-				System.out.println(PREFIX + " Database: " + database);
-				System.out.println(PREFIX + " Username: " + username);
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + "Connection to database failed!");
+				Bukkit.getLogger().log(Level.WARNING, PREFIX);
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + "Connection Properties:");
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + " Address: " + host + ":" + port);
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + " Database: " + database);
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + " Username: " + username);
 				
 				String censoredPassword = "";
 				
 				for (int i = 0; i < password.length(); i++)
 					censoredPassword += "*";
 				
-				System.out.println(PREFIX + " Password: " + censoredPassword);
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + " Password: " + censoredPassword);
+				Bukkit.getLogger().log(Level.WARNING, PREFIX);
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + "---------- Stack trace START ----------");
+				Bukkit.getLogger().log(Level.WARNING, "");
+				
+				ex.printStackTrace();
+				
+				Bukkit.getLogger().log(Level.WARNING, "");
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + "---------- Stack trace  END  ----------");
 			}
 		}
 	}
 
 	public void disconnect() {
+		//Check if connection is open
 		if(isConnected()) {
 			try {
+				//Close connection
 				con.close();
 				
-				System.out.println(PREFIX + "Connection to database closed successfully!");
+				Bukkit.getLogger().log(Level.INFO, PREFIX + "Connection to database closed successfully!");
 			} catch (SQLException ex) {
+				Bukkit.getLogger().log(Level.WARNING, PREFIX + "Could not close Connection to database!");
 			}
 		}
 	}
@@ -55,18 +71,18 @@ public class MySQL {
 	public boolean isConnected() {
 		try {
 			return ((con != null) && !(con.isClosed()));
-		} catch (SQLException ex) {
+		} catch (SQLException ignore) {
 		}
 		
 		return false;
 	}
 
 	public void update(String sql) {
-		checkConnection();
-		
+		//Check if connection is open
 		if(isConnected()) {
 			new FutureTask<>(() -> {
 				try {
+					//Execute update
 					Statement s = con.createStatement();
 					s.executeUpdate(sql);
 					s.close();
@@ -83,15 +99,14 @@ public class MySQL {
 						
 						connect();
 					} else
-						System.out.println(PREFIX + "An error occured while executing mysql update (" + msg + ")!");
+						Bukkit.getLogger().log(Level.WARNING, PREFIX + "An error occured while executing mysql update (" + msg + ")!");
 				}
 			}, 1).run();
 		}
 	}
 
 	public ResultSet getResult(String qry) {
-		checkConnection();
-		
+		//Check if connection is open
 		if(isConnected()) {
 			try {
 				final FutureTask<ResultSet> task = new FutureTask<ResultSet>(new Callable<ResultSet>() {
@@ -100,6 +115,7 @@ public class MySQL {
 					public ResultSet call() {
 						
 						try {
+							//Execute query
 							Statement s = con.createStatement();
 							ResultSet rs = s.executeQuery(qry);
 							
@@ -117,7 +133,7 @@ public class MySQL {
 								
 								connect();
 							} else
-								System.out.println(PREFIX + "An error occured while executing mysql update (" + msg + ")!");
+								Bukkit.getLogger().log(Level.WARNING, PREFIX + "An error occured while executing mysql update (" + msg + ")!");
 						}
 						
 						return null;
@@ -132,11 +148,6 @@ public class MySQL {
 		}
 		
 		return null;
-	}
-	
-	private void checkConnection() {
-		if(!(isConnected()))
-			connect();
 	}
 
 	public Connection getConnection() {

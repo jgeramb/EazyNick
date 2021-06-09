@@ -23,20 +23,23 @@ public class AsyncTask {
 		asyncRunnable.prepare(this);
 		
 		new Thread(() -> {
+			//Wait 'delay' milliseconds
 			try {
 				Thread.sleep(delay);
 			} catch (InterruptedException ex) {
 			}
 			
 			do {
+				asyncRunnable.run();
+				
+				//Check if task should be executed again
 				if(period >= 0) {
+					//Wait 'period' milliseconds
 					try {
 						Thread.sleep(period);
 					} catch (InterruptedException ex) {
 					}
 				}
-				
-				asyncRunnable.run();
 			} while(running.get());
 			
 			Thread.currentThread().interrupt();

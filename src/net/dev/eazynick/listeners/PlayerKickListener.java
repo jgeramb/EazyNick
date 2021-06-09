@@ -1,5 +1,7 @@
 package net.dev.eazynick.listeners;
 
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -28,16 +30,14 @@ public class PlayerKickListener implements Listener {
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
 		Player player = event.getPlayer();
+		UUID uniqueId = player.getUniqueId();
 		NickManager api = new NickManager(player);
 
-		if(utils.getNameCache().containsKey(player.getUniqueId()))
-			utils.getNameCache().remove(player.getUniqueId());
-		
 		if (api.isNicked()) {
-			NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
+			NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uniqueId).clone();
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnUnnick")) {
-				if(utils.placeholderAPIStatus())
+				if(utils.isPluginInstalled("PlaceholderAPI"))
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, PlaceholderAPI.setPlaceholders(player, command)));
 				else
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, command));
@@ -48,17 +48,28 @@ public class PlayerKickListener implements Listener {
 			else
 				api.unnickPlayerWithoutRemovingMySQL(true, false);
 			
-			if(utils.luckPermsStatus())
+			if(utils.isPluginInstalled("LuckPerms"))
 				new LuckPermsHook(player).resetNodes();
 			
-			if(utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
+			if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
 				new TABHook(player).reset();
+			
+			if(utils.getIncomingPacketInjectors().containsKey(uniqueId)) {
+				Object incomingPacketInjector = utils.getIncomingPacketInjectors().get(uniqueId);
+				
+				try {
+					incomingPacketInjector.getClass().getMethod("unregister").invoke(incomingPacketInjector);
+				} catch (Exception ignore) {
+				}
+				
+				utils.getIncomingPacketInjectors().remove(uniqueId);
+			}
 			
 			if(setupYamlFile.getConfiguration().getBoolean("OverwriteJoinQuitMessages")) {
 				String message = setupYamlFile.getConfigString(player, "OverwrittenMessages.Quit");
 				
-				if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(player.getUniqueId()))
-					message = message.replace("%name%", mysqlNickManager.getNickName(player.getUniqueId())).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()) + mysqlNickManager.getNickName(player.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(player.getUniqueId())).replace("%displayname%", mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()) + mysqlNickManager.getNickName(player.getUniqueId()) + mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()));
+				if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(uniqueId))
+					message = message.replace("%name%", mysqlNickManager.getNickName(uniqueId)).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(uniqueId) + mysqlNickManager.getNickName(uniqueId) + mysqlPlayerDataManager.getChatSuffix(uniqueId)).replace("%displayname%", mysqlPlayerDataManager.getChatPrefix(uniqueId) + mysqlNickManager.getNickName(uniqueId) + mysqlPlayerDataManager.getChatSuffix(uniqueId));
 				else
 					message = message.replace("%name%", nickedPlayerData.getNickName()).replace("%displayName%", nickedPlayerData.getChatPrefix() + nickedPlayerData.getNickName() + nickedPlayerData.getChatSuffix()).replace("%displayname%", nickedPlayerData.getChatPrefix() + nickedPlayerData.getNickName() + nickedPlayerData.getChatSuffix());
 				

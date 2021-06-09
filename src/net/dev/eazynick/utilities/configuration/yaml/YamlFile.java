@@ -28,7 +28,8 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 		this.eazyNick = eazyNick;
 		this.directory = new File("plugins/" + eazyNick.getDescription().getName() + "/" + subdirectoryName);
 		this.file = new File(directory, fileName);
-				
+		
+		//Create directory and file
 		if (!(directory.exists()))
 			directory.mkdir();
 
@@ -40,11 +41,13 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 			}
 		}
 		
+		//Load configuration from file
 		this.configuration = YamlConfiguration.loadConfiguration(file);
 	}
 	
 	@Override
 	public void initConfiguration() {
+		//Set configuration header & defaults
 		PluginDescriptionFile pluginDescriptionFile = eazyNick.getDescription();
 		
 		configuration.options().header("-------------------------------------------------------------------\n"
@@ -70,6 +73,8 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 	
 		configuration.options().copyDefaults(true);
 		configuration.options().copyHeader(true);
+		
+		//Save configuration
 		save();
 	}
 	
@@ -79,6 +84,7 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 	@Override
 	public void save() {
 		try {
+			//Save configuration to file
 			configuration.save(file);
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -87,23 +93,27 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 	
 	@Override
 	public void reload() {
+		//Load configuration from file and save it to the file
 		this.configuration = YamlConfiguration.loadConfiguration(file);
 		save();
 	}
 	
+	//Get a string from the configuration and apply 'setPlaceholders' from PlaceholderAPI if it is installed
 	public String getConfigString(Player player, String path) {
 		String string = getConfigString(path);
 		
-		if(EazyNick.getInstance().getUtils().placeholderAPIStatus() && (player != null))
+		if(EazyNick.getInstance().getUtils().isPluginInstalled("PlaceholderAPI") && (player != null))
 			string = PlaceholderAPI.setPlaceholders(player, string);
 		
 		return string;
 	}
 	
+	//Get a string from the configuration and convert the color codes and new lines
 	public String getConfigString(String path) {
 		if(configuration.contains(path)) {
 			String string = ChatColor.translateAlternateColorCodes('&', configuration.getString(path).replace("%nl%", "%nl%&0"));
 			
+			//HEX-Color-Support
 			if(eazyNick.getVersion().startsWith("1_16")) {
 				try {
 					Matcher match = HEX_COLOR_PATTERN.matcher(string);

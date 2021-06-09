@@ -1,4 +1,4 @@
-package net.dev.eazynick.nms.netty;
+package net.dev.eazynick.nms.netty.server;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -8,19 +8,22 @@ import java.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.NickedPlayerData;
 import net.dev.eazynick.nms.ReflectionHelper;
+import net.dev.eazynick.utilities.NickReason;
 import net.dev.eazynick.utilities.Utils;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.io.netty.channel.*;
 
-public class PacketInjector_1_7 {
+public class OutgoingPacketInjector_1_7 {
 
 	public void init() {
 		EazyNick eazyNick = EazyNick.getInstance();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
+		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		Utils utils = eazyNick.getUtils();
 		
 		Field field = reflectionHelper.getFirstFieldByType(reflectionHelper.getNMSClass("NetworkManager"), Channel.class);
@@ -61,16 +64,21 @@ public class PacketInjector_1_7 {
 								try {
 									if (msg.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
 										UUID uuid = ((GameProfile) reflectionHelper.getField(msg.getClass(), "b").get(msg)).getId();
-										
-										if(utils.getNickedPlayers().containsKey(uuid))
-											reflectionHelper.setField(msg, "b", utils.getNickedPlayers().get(uuid).getFakeGameProfile(false));
-										
-										super.write(ctx, msg, promise);
+											
+										if(!(utils.getSoonNickedPlayers().containsKey(uuid))) {
+											if(utils.getNickedPlayers().containsKey(uuid))
+												reflectionHelper.setField(msg, "b", utils.getNickedPlayers().get(uuid).getFakeGameProfile(false));
+											
+											super.write(ctx, msg, promise);
+										}
 									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
 										Object playerObject = reflectionHelper.getField(msg.getClass(), "player").get(msg);
 										
 										if(playerObject != null) {
 											UUID uuid = ((GameProfile) playerObject).getId();
+											
+											if(utils.getSoonNickedPlayers().containsKey(uuid) && utils.getSoonNickedPlayers().get(uuid).equals(NickReason.JOIN) && (reflectionHelper.getField(msg.getClass(), "action").getInt(msg) == 0))
+												return;
 											
 											if(utils.getNickedPlayers().containsKey(uuid)) {
 												NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uuid);
@@ -82,22 +90,26 @@ public class PacketInjector_1_7 {
 										
 										super.write(ctx, msg, promise);
 									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
-										String[] completions = (String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg);
+										String textToComplete = utils.getTextsToComplete().get(player);
+										String[] splitTextToComplete = textToComplete.trim().split(" ");
+										ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
 										
-										for (String completion : completions) {
-											if(Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(completion)).count() != 0) {
-												if(completions.length == Bukkit.getOnlinePlayers().size()) {
-													ArrayList<String> playerCompletions = new ArrayList<>();
-													
-													Bukkit.getOnlinePlayers().forEach(currentPlayer -> playerCompletions.add(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId()) ? utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName() : currentPlayer.getName()));
-													
-													reflectionHelper.setField(msg, "a", playerCompletions.toArray(new String[0]));
-												} else
-													reflectionHelper.setField(msg, "a", new String[0]);
-												
-												break;
-											}
-										}
+										if(splitTextToComplete.length < 2)
+											textToComplete = "";
+										else
+											textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
+										
+										Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+										
+										utils.getNickedPlayers().values().forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
+
+										newCompletions.addAll(Arrays.asList((String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg)));
+										newCompletions.removeIf(currentCompletion -> (Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion)).count() != 0));
+										newCompletions.addAll(StringUtil.copyPartialMatches(textToComplete, playerNames, new ArrayList<>()));
+										
+										Collections.sort(newCompletions);
+										
+										reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
 										
 										super.write(ctx, msg, promise);
 									} else if (msg.getClass().getSimpleName().equals("PacketPlayOutChat") && eazyNick.getSetupYamlFile().getConfiguration().getBoolean("OverwriteMessagePackets"))
@@ -171,7 +183,7 @@ public class PacketInjector_1_7 {
 	public Object constructChatPacket(Object packet) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
+		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
 		String lastChatMessage = ChatColor.stripColor(utils.getLastChatMessage());
 		String prefix = ChatColor.stripColor(utils.getPrefix());

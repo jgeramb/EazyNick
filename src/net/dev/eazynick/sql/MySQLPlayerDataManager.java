@@ -13,7 +13,9 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public String getGroupName(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
@@ -37,7 +39,9 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public String getChatPrefix(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
@@ -61,7 +65,9 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public String getChatSuffix(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
@@ -85,7 +91,9 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public String getTabPrefix(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
@@ -109,7 +117,9 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public String getTabSuffix(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
@@ -133,7 +143,9 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public String getTagPrefix(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
@@ -157,7 +169,9 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public String getTagSuffix(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isRegistered(uuid)) {
 				try {
 					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
@@ -181,7 +195,9 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public void insertData(UUID uuid, String groupName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Remove player from table
 			if(isRegistered(uuid))
 				removeData(uuid);
 			
@@ -190,13 +206,16 @@ public class MySQLPlayerDataManager {
 	}
 	
 	public void removeData(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
+			//Check if player is in table
 			if(isRegistered(uuid))
 				mysql.update("DELETE FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
 		}
 	}
 
 	public boolean isRegistered(UUID uuid) {
+		//Check if connection is open
 		if(mysql.isConnected()) {
 			try {
 				ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");

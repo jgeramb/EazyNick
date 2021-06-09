@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,8 +16,10 @@ import net.dev.eazynick.nms.ReflectionHelper;
 import net.dev.eazynick.nms.fakegui.book.NMSBookBuilder;
 import net.dev.eazynick.nms.fakegui.book.NMSBookUtils;
 import net.dev.eazynick.nms.fakegui.sign.SignGUI;
-import net.dev.eazynick.nms.netty.PacketInjector;
-import net.dev.eazynick.nms.netty.PacketInjector_1_7;
+import net.dev.eazynick.nms.netty.client.IncomingPacketInjector;
+import net.dev.eazynick.nms.netty.client.IncomingPacketInjector_1_7;
+import net.dev.eazynick.nms.netty.server.OutgoingPacketInjector;
+import net.dev.eazynick.nms.netty.server.OutgoingPacketInjector_1_7;
 import net.dev.eazynick.sql.*;
 import net.dev.eazynick.updater.SpigotUpdater;
 import net.dev.eazynick.utilities.*;
@@ -70,7 +71,8 @@ public class EazyNick extends JavaPlugin {
 		
 		version = reflectionHelper.getVersion().substring(1);
 		pluginFile = getFile();
-		
+
+		//Initialize class instances
 		utils = new Utils();
 		guiManager = new GUIManager();
 		actionBarUtils = new ActionBarUtils();
@@ -83,7 +85,8 @@ public class EazyNick extends JavaPlugin {
 		nmsBookUtils = new NMSBookUtils();
 		mineSkinAPI = new MineSkinAPI();
 		
-		if(utils.essentialsStatus())
+		//Fix essentials 'nick' command bug
+		if(utils.isPluginInstalled("Essentials"))
 			Bukkit.getScheduler().runTaskLater(this, () -> initiatePlugin(), 20);
 		else
 			initiatePlugin();
@@ -91,15 +94,26 @@ public class EazyNick extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		//Fix bugs
 		utils.getNickedPlayers().keySet().forEach(uuid -> {
 			Player player = Bukkit.getPlayer(uuid);
 			
 			if(utils.getScoreboardTeamManagers().containsKey(uuid))
 				utils.getScoreboardTeamManagers().get(uuid).destroyTeam();
 			
+			if(utils.getIncomingPacketInjectors().containsKey(uuid)) {
+				Object incomingPacketInjector = utils.getIncomingPacketInjectors().get(uuid);
+				
+				try {
+					incomingPacketInjector.getClass().getMethod("unregister").invoke(incomingPacketInjector);
+				} catch (Exception ignore) {
+				}
+			}
+			
 			player.kickPlayer("§cYou will need to reconnect in order to be able to play properly");
 		});
 		
+		//Disconnect mysql
 		if (setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 			mysql.disconnect();
 		
@@ -120,6 +134,7 @@ public class EazyNick extends JavaPlugin {
 		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
 		utils.sendConsole("");
 
+		//Check if version is compatible
 		if (!(version.equals("1_7_R4") || version.equals("1_8_R1") || version.equals("1_8_R2")
 				|| version.equals("1_8_R3") || version.equals("1_9_R1") || version.equals("1_9_R2")
 				|| version.equals("1_10_R1") || version.equals("1_11_R1") || version.equals("1_12_R1")
@@ -143,11 +158,13 @@ public class EazyNick extends JavaPlugin {
 				}
 			}
 
+			//Initialize OutgoingPacketInjecot(_1_7)
 			if(version.equals("1_7_R4"))
-				new PacketInjector_1_7().init();
+				new OutgoingPacketInjector_1_7().init();
 			else
-				new PacketInjector().init();
+				new OutgoingPacketInjector().init();
 			
+			//Check if plugin features should be enabled -> APIMode: false
 			if (!(setupYamlFile.getConfiguration().getBoolean("APIMode"))) {
 				getCommand("eazynick").setExecutor(new PluginCommand());
 				getCommand("nickother").setExecutor(new NickOtherCommand());
@@ -169,9 +186,11 @@ public class EazyNick extends JavaPlugin {
 				getCommand("guinick").setExecutor(new GuiNickCommand());
 				getCommand("bookgui").setExecutor(version.startsWith("1_7") ? new RankedNickGUICommand() : new BookGUICommand());
 				
+				//Register listeners for plugin events
 				pluginManager.registerEvents(new PlayerNickListener(), this);
 				pluginManager.registerEvents(new PlayerUnnickListener(), this);
 				
+				//Register other event listeners
 				pluginManager.registerEvents(new AsyncPlayerChatListener(), this);
 				
 				if(!(version.startsWith("1_13") || version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16")))
@@ -188,22 +207,24 @@ public class EazyNick extends JavaPlugin {
 				pluginManager.registerEvents(new PlayerChangedWorldListener(), this);
 				pluginManager.registerEvents(new PlayerDeathListener(), this);
 				pluginManager.registerEvents(new PlayerRespawnListener(), this);
+				pluginManager.registerEvents(new PlayerLoginListener(), this);
 				pluginManager.registerEvents(new PlayerJoinListener(), this);
 				pluginManager.registerEvents(new PlayerKickListener(), this);
 				pluginManager.registerEvents(new PlayerQuitListener(), this);
 
-				for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-					if ((currentPlayer != null) && (currentPlayer.getUniqueId() != null)) {
-						if (!(utils.getCanUseNick().containsKey(currentPlayer.getUniqueId())))
-							utils.getCanUseNick().put(currentPlayer.getUniqueId(), true);
-					}
-				}
+				//Allow every player to use nick + initialize IncomingPacketInjector
+				Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
+					utils.getCanUseNick().put(currentPlayer.getUniqueId(), true);
+					utils.getIncomingPacketInjectors().put(currentPlayer.getUniqueId(), version.startsWith("1_7") ? new IncomingPacketInjector_1_7(currentPlayer) : new IncomingPacketInjector(currentPlayer));
+				});
 				
+				//Start action bar scheduler
 				if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked")) {
 					new AsyncTask(new AsyncRunnable() {
 						
 						@Override
 						public void run() {
+							//Display action bar to players that are nicked in mysql
 							Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> (mysqlNickManager.isPlayerNicked(currentPlayer.getUniqueId()) && !(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())))).forEach(currentNickedPlayer -> {
 								String nickName = mysqlNickManager.getNickName(currentNickedPlayer.getUniqueId()), prefix = mysqlPlayerDataManager.getChatPrefix(currentNickedPlayer.getUniqueId()), suffix = mysqlPlayerDataManager.getChatSuffix(currentNickedPlayer.getUniqueId());
 								
@@ -213,40 +234,36 @@ public class EazyNick extends JavaPlugin {
 						}
 					}, 0, 1000).run();
 				}
-				
-				if(utils.tabStatus())
-					me.neznamy.tab.shared.config.Configs.unlimited_nametag_mode_not_enabled = "false";
 			}
 			
+			//Register important event listeners
 			pluginManager.registerEvents(new WorldInitListener(), this);
 			pluginManager.registerEvents(new ServerListPingListener(), this);
 			
 			utils.sendConsole("§7Version §e" + version + " §7was loaded §asuccessfully§7!");
 
+			//Prepare bungeecord mode
 			if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+				//Open mysql connection
 				mysql = new MySQL(setupYamlFile.getConfiguration().getString("BungeeMySQL.hostname"), setupYamlFile.getConfiguration().getString("BungeeMySQL.port"), setupYamlFile.getConfiguration().getString("BungeeMySQL.database"), setupYamlFile.getConfiguration().getString("BungeeMySQL.username"), setupYamlFile.getConfiguration().getString("BungeeMySQL.password"));
 				mysql.connect();
 
+				//Create default tables
 				mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NickName varchar(64), SkinName varchar(64))");
 				mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerDatas (UUID varchar(64), GroupName varchar(64), ChatPrefix varchar(64), ChatSuffix varchar(64), TabPrefix varchar(64), TabSuffix varchar(64), TagPrefix varchar(64), TagSuffix varchar(64))");
 
+				//Initialize mysql managers
 				mysqlNickManager = new MySQLNickManager(mysql);
 				mysqlPlayerDataManager = new MySQLPlayerDataManager(mysql);
 				
+				//Enable bungeecord in the spigot.yml (for skin loading)
+				Bukkit.spigot().getConfig().set("settings.bungeecord", true);
+				
 				try {
-					File file = new File("spigot.yml");
-					
-					if(!(file.exists()))
-						file.createNewFile();
-					
-					YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
-					configuration.set("settings.bungeecord", true);
-					configuration.save(file);
+					Bukkit.spigot().getConfig().save(new File("spigot.yml"));
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
-			
-				Bukkit.spigot().getConfig().set("settings.bungeecord", true);
 			}
 			
 			utils.sendConsole("");
@@ -265,13 +282,15 @@ public class EazyNick extends JavaPlugin {
 			return;
 		}
 		
-		if(utils.placeholderAPIStatus()) {
+		//Prepare PlaceholderAPI placeholders
+		if(utils.isPluginInstalled("PlaceholderAPI")) {
 			new PlaceHolderExpansion(this).register();
 			
 			utils.sendConsole("§7Placeholders loaded successfully!");
 		}
 		
-		if(utils.deluxeChatStatus()) {
+		//Prepare DeluxeChat hook
+		if(utils.isPluginInstalled("DeluxeChat")) {
 			pluginManager.registerEvents(new DeluxeChatListener(), this);
 			
 			utils.sendConsole("§7DeluxeChat hooked successfully!");
@@ -330,7 +349,7 @@ public class EazyNick extends JavaPlugin {
 		return languageYamlFile;
 	}
 	
-	public ReflectionHelper getReflectUtils() {
+	public ReflectionHelper getReflectionHelper() {
 		return reflectionHelper;
 	}
 	

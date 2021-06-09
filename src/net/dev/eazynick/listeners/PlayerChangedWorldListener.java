@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.*;
+import net.dev.eazynick.utilities.NickReason;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
@@ -27,6 +28,8 @@ public class PlayerChangedWorldListener implements Listener {
 				utils.performReNick(player);
 			else if(utils.getNickedPlayers().containsKey(player.getUniqueId())) {
 				NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
+				
+				utils.getSoonNickedPlayers().put(player.getUniqueId(), NickReason.WORLDCHANGE);
 				
 				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 					if(player.isOnline()) {

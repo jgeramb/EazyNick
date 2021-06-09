@@ -32,7 +32,7 @@ public class PlayerUnnickListener implements Listener {
 			String nickName = api.getNickName(), name = api.getRealName();
 	
 			if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnUnnick")) {
-				if(utils.placeholderAPIStatus())
+				if(utils.isPluginInstalled("PlaceholderAPI"))
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, PlaceholderAPI.setPlaceholders(player, command)));
 				else
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, command));
@@ -40,10 +40,10 @@ public class PlayerUnnickListener implements Listener {
 			
 			api.unnickPlayer();
 			
-			if(utils.luckPermsStatus())
+			if(utils.isPluginInstalled("LuckPerms"))
 				new LuckPermsHook(player).resetNodes();
 			
-			if(utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) {
+			if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) {
 				new AsyncTask(new AsyncRunnable() {
 
 					@Override

@@ -15,6 +15,7 @@ public class LanguageYamlFileFactory implements BaseFileFactory<YamlConfiguratio
 	
 	@Override
 	public LanguageYamlFile createConfigurationFile(EazyNick eazyNick) {
+		//Initialize language file
 		LanguageYamlFile languageYamlFile = new LanguageYamlFile(eazyNick, "lang/", language + ".yml");
 		languageYamlFile.setLanguage(language);
 		languageYamlFile.initConfiguration();

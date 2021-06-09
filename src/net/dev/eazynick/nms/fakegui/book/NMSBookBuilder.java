@@ -18,7 +18,7 @@ public class NMSBookBuilder {
 	
 	public NMSBookBuilder() {
 		this.eazyNick = EazyNick.getInstance();
-		this.reflectionHelper = eazyNick.getReflectUtils();
+		this.reflectionHelper = eazyNick.getReflectionHelper();
 	}
 	
 	public ItemStack create(String title, BookPage... bookPages) {

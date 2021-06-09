@@ -9,6 +9,7 @@ public class SetupYamlFileFactory implements BaseFileFactory<YamlConfiguration> 
 
 	@Override
 	public SetupYamlFile createConfigurationFile(EazyNick eazyNick) {
+		//Initialize 'setup.yml' file
 		SetupYamlFile setupYamlFile = new SetupYamlFile(eazyNick);
 		setupYamlFile.initConfiguration();
 		

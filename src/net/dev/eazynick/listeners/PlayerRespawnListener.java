@@ -23,7 +23,7 @@ public class PlayerRespawnListener implements Listener {
 		
 		if(utils.getNickedPlayers().containsKey(player.getUniqueId())) {
 			NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
-			
+
 			Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 				api.unnickPlayerWithoutRemovingMySQL(false, true);
 				

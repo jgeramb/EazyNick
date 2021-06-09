@@ -89,7 +89,7 @@ public class NickedPlayerData {
 		return (version.startsWith("1_7") ? new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName) : new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName));
 	}
 	
-	private void prepareSkinProfile() {
+	private boolean prepareSkinProfile() {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		
@@ -113,6 +113,10 @@ public class NickedPlayerData {
 		
 		if(skinProfile == null)
 			skinProfile = version.startsWith("1_7") ? utils.getDefaultGameProfile_1_7() : utils.getDefaultGameProfile();
+		else
+			return true;
+		
+		return false;
 	}
 
 	public UUID getUniqueId() {
@@ -191,10 +195,10 @@ public class NickedPlayerData {
 		this.nickName = nickName;
 	}
 	
-	public void setSkinName(String skinName) {
+	public boolean setSkinName(String skinName) {
 		this.skinName = skinName;
 		
-		prepareSkinProfile();
+		return prepareSkinProfile();
 	}
 
 	public void setChatPrefix(String chatPrefix) {

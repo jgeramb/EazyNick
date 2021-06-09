@@ -1,6 +1,7 @@
 package net.dev.eazynick.listeners;
 
-import java.util.*;
+import java.util.List;
+import java.util.ListIterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;

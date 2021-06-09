@@ -45,7 +45,7 @@ public class ScoreboardTeamHandler {
 	}
 	
 	private void destroyTeam(boolean skipFilter) {
-		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
+		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
 		try {
 			packet = reflectionHelper.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor().newInstance();
@@ -96,7 +96,7 @@ public class ScoreboardTeamHandler {
 
 	public void createTeam() {
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
+		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
 		Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
 			try {
@@ -111,7 +111,7 @@ public class ScoreboardTeamHandler {
 					suffixForPlayer = setupYamlFile.getConfigString(player, "BypassFormat.NameTagSuffix");
 				}
 
-				if(eazyNick.getUtils().placeholderAPIStatus()) {
+				if(eazyNick.getUtils().isPluginInstalled("PlaceholderAPI")) {
 					prefixForPlayer = PlaceholderAPI.setPlaceholders(player, prefixForPlayer);
 					suffixForPlayer = PlaceholderAPI.setPlaceholders(player, suffixForPlayer);
 				}
@@ -255,7 +255,7 @@ public class ScoreboardTeamHandler {
 	}
 	
 	private Object getAsIChatBaseComponent(String txt) {
-		ReflectionHelper reflectionHelper = eazyNick.getReflectUtils();
+		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
 		try {
 			return reflectionHelper.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(reflectionHelper.getNMSClass("IChatBaseComponent"), "{\"text\":\"" + txt + "\"}");
@@ -270,7 +270,7 @@ public class ScoreboardTeamHandler {
 		try {
 			Object playerHandle = player.getClass().getMethod("getHandle", new Class[0]).invoke(player, new Object[0]);
 			Object playerConnection = playerHandle.getClass().getField("playerConnection").get(playerHandle);
-			playerConnection.getClass().getMethod("sendPacket", new Class[] { eazyNick.getReflectUtils().getNMSClass("Packet") }).invoke(playerConnection, new Object[] { packet });
+			playerConnection.getClass().getMethod("sendPacket", new Class[] { eazyNick.getReflectionHelper().getNMSClass("Packet") }).invoke(playerConnection, new Object[] { packet });
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

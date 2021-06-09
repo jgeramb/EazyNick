@@ -9,6 +9,7 @@ public class GUIYamlFileFactory implements BaseFileFactory<YamlConfiguration> {
 
 	@Override
 	public GUIYamlFile createConfigurationFile(EazyNick eazyNick) {
+		//Initialize 'guis.yml' file
 		GUIYamlFile guiYamlFile = new GUIYamlFile(eazyNick, "guis.yml");
 		guiYamlFile.initConfiguration();
 		

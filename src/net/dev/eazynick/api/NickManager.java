@@ -174,21 +174,24 @@ public class NickManager extends ReflectionHelper {
 			
 			//Despawn and remove from tablist
 			for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
-				sendPacket(player, currentPlayer, getNMSClass("PacketPlayOutEntityDestroy").getConstructor(int[].class).newInstance(new int[] { player.getEntityId() }));
+				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId())))
+					sendPacket(player, currentPlayer, getNMSClass("PacketPlayOutEntityDestroy").getConstructor(int[].class).newInstance(new int[] { player.getEntityId() }));
 				
-				Object packetPlayOutPlayerInfoRemove;
-				
-				if(version.equals("1_7_R4")) {
-					Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId()))) {
+					Object packetPlayOutPlayerInfoRemove;
 					
-					packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
-				} else {
-					Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+					if(version.equals("1_7_R4")) {
+						Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+						
+						packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+					} else {
+						Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+						
+						packetPlayOutPlayerInfoRemove = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+					}
 					
-					packetPlayOutPlayerInfoRemove = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+					sendPacket(player, currentPlayer, packetPlayOutPlayerInfoRemove);
 				}
-				
-				sendPacket(player, currentPlayer, packetPlayOutPlayerInfoRemove);
 			}
 			
 			new BukkitRunnable() {
@@ -199,21 +202,26 @@ public class NickManager extends ReflectionHelper {
 						return;
 					
 					try {
+						if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+							utils.getSoonNickedPlayers().remove(player.getUniqueId());
+						
 						//Add to tablist and spawn
-						for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
-							Object packetPlayOutPlayerInfoAdd;
-							
-							if(version.equals("1_7_R4")) {
-								Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+						if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId())) || utils.getSoonNickedPlayers().get(player.getUniqueId()).equals(NickReason.JOIN)) {
+							for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
+								Object packetPlayOutPlayerInfoAdd;
 								
-								packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
-							} else {
-								Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+								if(version.equals("1_7_R4")) {
+									Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+									
+									packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+								} else {
+									Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+									
+									packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+								}
 								
-								packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+								sendPacket(player, currentPlayer, packetPlayOutPlayerInfoAdd);
 							}
-							
-							sendPacket(player, currentPlayer, packetPlayOutPlayerInfoAdd);
 						}
 						
 						if(spawnPlayer) {
@@ -337,26 +345,26 @@ public class NickManager extends ReflectionHelper {
 	
 	public void changeSkin(String skinName) {
 		if(skinName != null) {
-			if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
-				utils.getNickedPlayers().get(player.getUniqueId()).setSkinName(skinName);
-			else
+			if(utils.getNickedPlayers().containsKey(player.getUniqueId())) {
+				if(utils.getNickedPlayers().get(player.getUniqueId()).setSkinName(skinName) && utils.isPluginInstalled("SkinsRestorer")) {
+					Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
+						SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
+						
+						try {
+							skinsRestorerAPI.setSkin(player.getName(), skinName);
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+						
+						skinsRestorerAPI.applySkin(new PlayerWrapper(player), skinName);
+					}, 6 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+					
+					return;
+				}
+			} else
 				utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), player.getName(), skinName, "", "", "", "", "", "", "default", 9999));
 			
 			updatePlayer(true);
-			
-			if(utils.skinsRestorerStatus()) {
-				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-					SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
-					
-					try {
-						skinsRestorerAPI.setSkin(player.getName(), skinName);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-					
-					skinsRestorerAPI.applySkin(new PlayerWrapper(player), skinName);
-				}, 6 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
-			}
 		}
 	}
 	
@@ -444,7 +452,7 @@ public class NickManager extends ReflectionHelper {
 		
 		updatePlayer(spawnPlayer);
 		
-		if(utils.cloudNetStatus()) {
+		if(utils.isPluginInstalled("CloudNetAPI")) {
 			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
 			
 			if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
@@ -463,14 +471,14 @@ public class NickManager extends ReflectionHelper {
 					utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
 				}
 				
-				if(utils.getOldCloudNETTagIDS().containsKey(player.getUniqueId())) {
-					highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDS().get(player.getUniqueId()));
-					utils.getOldCloudNETTagIDS().remove(player.getUniqueId());
+				if(utils.getOldCloudNETTagIDs().containsKey(player.getUniqueId())) {
+					highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDs().get(player.getUniqueId()));
+					utils.getOldCloudNETTagIDs().remove(player.getUniqueId());
 				}
 			}
 		}
 		
-		if(utils.ultraPermissionsStatus()) {
+		if(utils.isPluginInstalled("UltraPermissions")) {
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
 			Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
 		
@@ -499,7 +507,7 @@ public class NickManager extends ReflectionHelper {
 			}
 		}
 		
-		if(utils.permissionsExStatus()) {
+		if(utils.isPluginInstalled("PermissionsEx")) {
 			PermissionUser user = PermissionsEx.getUser(player);
 		
 			if(setupYamlFile.getConfiguration().getBoolean("SwitchPermissionsExGroupByNicking")) {
@@ -522,7 +530,7 @@ public class NickManager extends ReflectionHelper {
 		}
 		
 		Bukkit.getScheduler().runTask(eazyNick, () -> {
-			if(utils.nameTagEditStatus()) {
+			if(utils.isPluginInstalled("NametagEdit")) {
 				if(utils.getNametagEditPrefixes().containsKey(player.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(player.getUniqueId())) {
 					String prefix = utils.getNametagEditPrefixes().get(player.getUniqueId()), suffix = utils.getNametagEditSuffixes().get(player.getUniqueId());
 					INametagApi nametagEditAPI = NametagEdit.getApi();
@@ -569,7 +577,7 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public String getChatPrefix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getChatPrefix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getChatPrefix() : ((utils.isPluginInstalled("Vault") && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
 	}
 
 	public void setChatPrefix(String chatPrefix) {
@@ -594,7 +602,7 @@ public class NickManager extends ReflectionHelper {
 	}
 
 	public String getChatSuffix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getChatSuffix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getChatSuffix() : ((utils.isPluginInstalled("Vault") && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
 	}
 
 	public void setChatSuffix(String chatSuffix) {
@@ -619,7 +627,7 @@ public class NickManager extends ReflectionHelper {
 	}
 
 	public String getTabPrefix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTabPrefix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTabPrefix() : ((utils.isPluginInstalled("Vault") && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
 	}
 
 	public void setTabPrefix(String tabPrefix) {
@@ -644,7 +652,7 @@ public class NickManager extends ReflectionHelper {
 	}
 
 	public String getTabSuffix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTabSuffix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTabSuffix() : ((utils.isPluginInstalled("Vault") && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
 	}
 
 	public void setTabSuffix(String tabSuffix) {
@@ -669,7 +677,7 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public String getTagPrefix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagPrefix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagPrefix() : ((utils.isPluginInstalled("Vault") && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerPrefix(player) : "");
 	}
 
 	public void setTagPrefix(String tagPrefix) {
@@ -681,7 +689,7 @@ public class NickManager extends ReflectionHelper {
 	}
 
 	public String getTagSuffix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagSuffix() : ((utils.vaultStatus() && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
+		return utils.getNickedPlayers().containsKey(player.getUniqueId()) ? utils.getNickedPlayers().get(player.getUniqueId()).getTagSuffix() : ((utils.isPluginInstalled("Vault") && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes")) ? ((Chat) Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider()).getPlayerSuffix(player) : "");
 	}
 
 	public void setTagSuffix(String tagSuffix) {
@@ -755,7 +763,7 @@ public class NickManager extends ReflectionHelper {
 					if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
 						String tmpTabPrefix = finalTabPrefix, tmpTabSuffix = finalTabSuffix, tmpTagPrefix = finalTagPrefix, tmpTagSuffix = finalTagSuffix;
 						
-						if(utils.placeholderAPIStatus()) {
+						if(utils.isPluginInstalled("PlaceholderAPI")) {
 							tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
 							tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
 							tmpTagPrefix = PlaceholderAPI.setPlaceholders(player, tmpTagPrefix);
@@ -764,10 +772,10 @@ public class NickManager extends ReflectionHelper {
 						
 						setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
 						
-						if(utils.tabStatus() && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
+						if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
 							new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID);
 						
-						if(utils.nameTagEditStatus()) {
+						if(utils.isPluginInstalled("NametagEdit")) {
 							Bukkit.getScheduler().runTask(eazyNick, () -> {
 								utils.getNametagEditPrefixes().remove(player.getUniqueId());
 								utils.getNametagEditSuffixes().remove(player.getUniqueId());
@@ -780,7 +788,7 @@ public class NickManager extends ReflectionHelper {
 
 								String tmpTagPrefix2 = finalTagPrefix, tmpTagSuffix2 = finalTagSuffix;
 								
-								if(utils.placeholderAPIStatus()) {
+								if(utils.isPluginInstalled("PlaceholderAPI")) {
 									tmpTagPrefix2 = PlaceholderAPI.setPlaceholders(player, tmpTagPrefix2);
 									tmpTagSuffix2 = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix2);
 								}
@@ -791,7 +799,7 @@ public class NickManager extends ReflectionHelper {
 							});
 						}
 						
-						if(utils.cloudNetStatus()) {
+						if(utils.isPluginInstalled("CloudNetAPI")) {
 							CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
 							
 							if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
@@ -804,12 +812,12 @@ public class NickManager extends ReflectionHelper {
 								if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId()))
 									utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
 								
-								if(utils.getOldCloudNETTagIDS().containsKey(player.getUniqueId()))
-									utils.getOldCloudNETTagIDS().remove(player.getUniqueId());
+								if(utils.getOldCloudNETTagIDs().containsKey(player.getUniqueId()))
+									utils.getOldCloudNETTagIDs().remove(player.getUniqueId());
 								
 								utils.getOldCloudNETPrefixes().put(player.getUniqueId(), entity.getPrefix());
 								utils.getOldCloudNETSuffixes().put(player.getUniqueId(), entity.getSuffix());
-								utils.getOldCloudNETTagIDS().put(player.getUniqueId(), highestPermissionGroup.getTagId());
+								utils.getOldCloudNETTagIDs().put(player.getUniqueId(), highestPermissionGroup.getTagId());
 								
 								entity.setPrefix(tmpTagPrefix);
 								entity.setSuffix(tmpTagSuffix);
@@ -824,7 +832,7 @@ public class NickManager extends ReflectionHelper {
 			}
 		}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0), setupYamlFile.getConfiguration().getInt("PrefixSuffixUpdateDelay") * 50L).run();
 
-		if(utils.placeholderAPIStatus()) {
+		if(utils.isPluginInstalled("PlaceholderAPI")) {
 			chatPrefix = PlaceholderAPI.setPlaceholders(player, chatPrefix);
 			chatSuffix = PlaceholderAPI.setPlaceholders(player, chatSuffix);
 			tabPrefix = PlaceholderAPI.setPlaceholders(player, tabPrefix);
@@ -836,7 +844,7 @@ public class NickManager extends ReflectionHelper {
 		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.DisplayName"))
 			player.setDisplayName(chatPrefix + nickName + chatSuffix);
 		
-		if(utils.ultraPermissionsStatus()) {
+		if(utils.isPluginInstalled("UltraPermissions")) {
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
 			Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
 			
@@ -875,7 +883,7 @@ public class NickManager extends ReflectionHelper {
 			}
 		}
 		
-		if(utils.permissionsExStatus()) {
+		if(utils.isPluginInstalled("PermissionsEx")) {
 			PermissionUser user = PermissionsEx.getUser(player);
 		
 			if(setupYamlFile.getConfiguration().getBoolean("SwitchPermissionsExGroupByNicking") && !(groupName.equalsIgnoreCase("NONE"))) {

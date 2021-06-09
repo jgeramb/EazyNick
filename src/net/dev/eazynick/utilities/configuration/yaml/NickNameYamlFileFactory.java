@@ -9,6 +9,7 @@ public class NickNameYamlFileFactory implements BaseFileFactory<YamlConfiguratio
 
 	@Override
 	public NickNameYamlFile createConfigurationFile(EazyNick eazyNick) {
+		//Initialize 'nickNames.yml' file
 		NickNameYamlFile nickNameYamlFile = new NickNameYamlFile(eazyNick);
 		nickNameYamlFile.initConfiguration();
 		

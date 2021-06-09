@@ -38,12 +38,12 @@ public class PlayerNickListener implements Listener {
 					eazyNick.getMySQLPlayerDataManager().insertData(player.getUniqueId(), groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 			}
 			
-			if(utils.placeholderAPIStatus()) {
+			if(utils.isPluginInstalled("PlaceholderAPI")) {
 				chatPrefix = PlaceholderAPI.setPlaceholders(player, chatPrefix);
 				chatSuffix = PlaceholderAPI.setPlaceholders(player, chatSuffix);
 			}
 			
-			if(changePrefixAndSuffix && utils.luckPermsStatus())
+			if(changePrefixAndSuffix && utils.isPluginInstalled("LuckPerms"))
 				new LuckPermsHook(player).updateNodes(chatPrefix, chatSuffix, groupName);
 			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
@@ -68,7 +68,7 @@ public class PlayerNickListener implements Listener {
 				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages." + (event.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName).replace("%prefix%", utils.getPrefix()));
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnNick")) {
-				if(utils.placeholderAPIStatus())
+				if(utils.isPluginInstalled("PlaceholderAPI"))
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, PlaceholderAPI.setPlaceholders(player, cmd)));
 				else
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, cmd));
