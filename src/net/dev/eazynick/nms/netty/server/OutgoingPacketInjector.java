@@ -24,13 +24,17 @@ import io.netty.channel.*;
 
 public class OutgoingPacketInjector {
 
+	private Channel channel;
+	private String handlerName;
+	
 	public void init() {
 		EazyNick eazyNick = EazyNick.getInstance();
 		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		Utils utils = eazyNick.getUtils();
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
-		String version = eazyNick.getVersion();
+		handlerName = eazyNick.getDescription().getName().toLowerCase() + "_handler";
+		
 		Field field = reflectionHelper.getFirstFieldByType(reflectionHelper.getNMSClass("NetworkManager"), Channel.class);
 		field.setAccessible(true);
 		
@@ -42,122 +46,127 @@ public class OutgoingPacketInjector {
 			Object minecraftServer = dedicatedServer.get(craftServer);
 			
 			for(Object manager : Collections.synchronizedList((List<?>) getNetworkManagerList(minecraftServer.getClass().getMethod("getServerConnection").invoke(minecraftServer))).toArray()) {
-				Channel channel = (Channel) field.get(manager);
+				channel = (Channel) field.get(manager);
 				
 				if((channel.pipeline().context("packet_handler") != null)) {
-					try {
-						channel.pipeline().remove("nick_handler");
-					} catch (NoSuchElementException ignored) {
-					}
+					if (channel.pipeline().get(handlerName) != null)
+						channel.pipeline().remove(handlerName);
 					
-					channel.pipeline().addBefore("packet_handler", "nick_handler", new ChannelDuplexHandler() {
-						
-						@Override
-						public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
-							InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-							String ip = inetSocketAddress.getAddress().getHostAddress();
-							Player player = null;
+					try {
+						channel.pipeline().addBefore("packet_handler", handlerName, new ChannelDuplexHandler() {
 							
-							for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-								InetSocketAddress currentInetSocketAddress = currentPlayer.getAddress();
-
-								if(ip.equals("127.0.0.1") ? (currentInetSocketAddress.getPort() == inetSocketAddress.getPort()) : (currentInetSocketAddress.getAddress().getHostAddress().equals(ip) || (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())))
-									player = currentPlayer;
-							}
-							
-							if(player != null) {
-								try {
-									if (msg.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
-										UUID uuid = (UUID) reflectionHelper.getField(msg.getClass(), "b").get(msg);
+							@Override
+							public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
+								InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+								String ip = inetSocketAddress.getAddress().getHostAddress();
+								Player player = null;
+								
+								for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+									InetSocketAddress currentInetSocketAddress = currentPlayer.getAddress();
+	
+									if(ip.equals("127.0.0.1") ? (currentInetSocketAddress.getPort() == inetSocketAddress.getPort()) : (currentInetSocketAddress.getAddress().getHostAddress().equals(ip) || (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())))
+										player = currentPlayer;
+								}
+								
+								if(player != null) {
+									try {
+										if (msg.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
+											UUID uuid = (UUID) reflectionHelper.getField(msg.getClass(), "b").get(msg);
+												
+											if(!(utils.getSoonNickedPlayers().containsKey(uuid))) {
+												if(utils.getNickedPlayers().containsKey(uuid))
+													reflectionHelper.setField(msg, "b", setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID") ? utils.getNickedPlayers().get(uuid).getSpoofedUniqueId() : uuid);
+												
+												super.write(ctx, msg, promise);
+											}
+										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
+											Object b = reflectionHelper.getField(msg.getClass(), "b").get(msg);
 											
-										if(!(utils.getSoonNickedPlayers().containsKey(uuid))) {
-											if(utils.getNickedPlayers().containsKey(uuid))
-												reflectionHelper.setField(msg, "b", setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID") ? utils.getNickedPlayers().get(uuid).getSpoofedUniqueId() : uuid);
+											if(b != null) {
+												for (Object playerInfoData : ((ArrayList<Object>) b)) {
+													UUID uuid = ((GameProfile) reflectionHelper.getField(playerInfoData.getClass(), "d").get(playerInfoData)).getId();
+	
+													if(utils.getSoonNickedPlayers().containsKey(uuid) && utils.getSoonNickedPlayers().get(uuid).equals(NickReason.JOIN) && reflectionHelper.getField(msg.getClass(), "a").get(msg).toString().endsWith("ADD_PLAYER"))
+														return;
+													
+													if(utils.getNickedPlayers().containsKey(uuid))
+														reflectionHelper.setField(playerInfoData, "d", utils.getNickedPlayers().get(uuid).getFakeGameProfile(uuid.equals(player.getUniqueId()) ? false : setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")));
+												}
+											}
 											
 											super.write(ctx, msg, promise);
-										}
-									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
-										Object b = reflectionHelper.getField(msg.getClass(), "b").get(msg);
+										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
+											if(!(player.hasPermission("nick.bypass") && eazyNick.getSetupYamlFile().getConfiguration().getBoolean("EnableBypassPermission")) && !(utils.isNewVersion())) {
+												String textToComplete = utils.getTextsToComplete().get(player);
+												String[] splitTextToComplete = textToComplete.trim().split(" ");
+												ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
+												
+												if(splitTextToComplete.length < 2)
+													textToComplete = "";
+												else
+													textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
+												
+												Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+												
+												utils.getNickedPlayers().values().forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
+		
+												newCompletions.addAll(Arrays.asList((String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg)));
+												newCompletions.removeIf(currentCompletion -> (Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion)).count() != 0));
+												newCompletions.addAll(StringUtil.copyPartialMatches(textToComplete, playerNames, new ArrayList<>()));
+											
+												Collections.sort(newCompletions);
+											
+												reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
+											}
+											
+											super.write(ctx, msg, promise);
+										} else if (msg.getClass().getSimpleName().equals("PacketPlayOutChat") && setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets"))
+											super.write(ctx, constructChatPacket(msg), promise);
+										else
+											super.write(ctx, msg, promise);
+									} catch (Exception ex) {
+										ex.printStackTrace();
 										
-										if(b != null) {
-											for (Object playerInfoData : ((ArrayList<Object>) b)) {
-												UUID uuid = ((GameProfile) reflectionHelper.getField(playerInfoData.getClass(), "d").get(playerInfoData)).getId();
-
-												if(utils.getSoonNickedPlayers().containsKey(uuid) && utils.getSoonNickedPlayers().get(uuid).equals(NickReason.JOIN) && reflectionHelper.getField(msg.getClass(), "a").get(msg).toString().endsWith("ADD_PLAYER"))
-													return;
+										try {
+											super.write(ctx, msg, promise);
+										} catch (Exception ex2) {
+											utils.sendConsole("§4Could not write packet to network connection§8: §e" + ex2.getMessage());
+										}
+									}
+								} else {
+									try {
+										if (msg.getClass().getSimpleName().equals("PacketStatusOutServerInfo")) {
+											Object serverPing = reflectionHelper.getField(msg.getClass(), "b").get(msg);
+											Object serverPingPlayerSample = reflectionHelper.getField(serverPing.getClass(), "b").get(serverPing);
+											GameProfile[] gameProfileArray = (GameProfile[]) reflectionHelper.getField(serverPingPlayerSample.getClass(), "c").get(serverPingPlayerSample);
+											
+											for (int i = 0; i < gameProfileArray.length; i++) {
+												UUID uuid = gameProfileArray[i].getId();
 												
 												if(utils.getNickedPlayers().containsKey(uuid))
-													reflectionHelper.setField(playerInfoData, "d", utils.getNickedPlayers().get(uuid).getFakeGameProfile(uuid.equals(player.getUniqueId()) ? false : setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")));
+													gameProfileArray[i] = (GameProfile) utils.getNickedPlayers().get(uuid).getFakeGameProfile(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID"));
 											}
-										}
-										
-										super.write(ctx, msg, promise);
-									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete") && (version.startsWith("1_8") || version.startsWith("1_9"))) {
-										String textToComplete = utils.getTextsToComplete().get(player);
-										String[] splitTextToComplete = textToComplete.trim().split(" ");
-										ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
-										
-										if(splitTextToComplete.length < 2)
-											textToComplete = "";
-										else
-											textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
-										
-										Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
-										
-										utils.getNickedPlayers().values().forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
-
-										newCompletions.addAll(Arrays.asList((String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg)));
-										newCompletions.removeIf(currentCompletion -> (Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion)).count() != 0));
-										newCompletions.addAll(StringUtil.copyPartialMatches(textToComplete, playerNames, new ArrayList<>()));
-										
-										Collections.sort(newCompletions);
-										
-										reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
-										
-										super.write(ctx, msg, promise);
-									} else if (msg.getClass().getSimpleName().equals("PacketPlayOutChat") && setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets"))
-										super.write(ctx, constructChatPacket(msg), promise);
-									else
-										super.write(ctx, msg, promise);
-								} catch (Exception ex) {
-									ex.printStackTrace();
-									
-									try {
-										super.write(ctx, msg, promise);
-									} catch (Exception ex2) {
-										utils.sendConsole("§4Could not write packet to network connection§8: §e" + ex2.getMessage());
+											
+											reflectionHelper.setField(serverPingPlayerSample, "c", gameProfileArray);
+											
+											super.write(ctx, msg, promise);
+										} else
+											super.write(ctx, msg, promise);
+									} catch (Exception ex) {
+										utils.sendConsole("§4Could not write packet to network connection (while logging in or pinging server)§8: §e" + ex.getMessage());
 									}
 								}
-							} else {
-								try {
-									if (msg.getClass().getSimpleName().equals("PacketStatusOutServerInfo")) {
-										Object serverPing = reflectionHelper.getField(msg.getClass(), "b").get(msg);
-										Object serverPingPlayerSample = reflectionHelper.getField(serverPing.getClass(), "b").get(serverPing);
-										GameProfile[] gameProfileArray = (GameProfile[]) reflectionHelper.getField(serverPingPlayerSample.getClass(), "c").get(serverPingPlayerSample);
-										
-										for (int i = 0; i < gameProfileArray.length; i++) {
-											UUID uuid = gameProfileArray[i].getId();
-											
-											if(utils.getNickedPlayers().containsKey(uuid))
-												gameProfileArray[i] = (GameProfile) utils.getNickedPlayers().get(uuid).getFakeGameProfile(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID"));
-										}
-										
-										reflectionHelper.setField(serverPingPlayerSample, "c", gameProfileArray);
-										
-										super.write(ctx, msg, promise);
-									} else
-										super.write(ctx, msg, promise);
-								} catch (Exception ex) {
-									utils.sendConsole("§4Could not write packet to network connection (while logging in or pinging server)§8: §e" + ex.getMessage());
-								}
 							}
-						}
-						
-						@Override
-					    public void close(ChannelHandlerContext ctx, ChannelPromise future) throws Exception {
-					    }
-						
-					});
+							
+							@Override
+						    public void close(ChannelHandlerContext ctx, ChannelPromise future) throws Exception {
+						    }
+							
+						});
+					} catch (Exception ex) {
+						if(!(ex.getMessage().contains("Duplicate handler")))
+							ex.printStackTrace();
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -243,6 +252,11 @@ public class OutgoingPacketInjector {
 		}
 		
 		return packet;
+	}
+	
+	public void unregister() {
+		if((channel != null) && channel.pipeline().get(handlerName) != null)
+			channel.pipeline().remove(handlerName);
 	}
 	
 }

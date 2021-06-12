@@ -62,6 +62,7 @@ public class EazyNick extends JavaPlugin {
 	private UUIDFetcher uuidFetcher;
 	private SignGUI signGUI;
 	private MineSkinAPI mineSkinAPI;
+	private Object outgoingPacketInjector;
 	
 	@Override
 	public void onEnable() {
@@ -113,6 +114,13 @@ public class EazyNick extends JavaPlugin {
 			player.kickPlayer("§cYou will need to reconnect in order to be able to play properly");
 		});
 		
+		//Unregister OutgoingPacketInjecot(_1_7)
+		try {
+			outgoingPacketInjector.getClass().getMethod("unregister").invoke(outgoingPacketInjector);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
 		//Disconnect mysql
 		if (setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 			mysql.disconnect();
@@ -157,13 +165,19 @@ public class EazyNick extends JavaPlugin {
 					uuidFetcher = new UUIDFetcher();
 				}
 			}
-
+			
 			//Initialize OutgoingPacketInjecot(_1_7)
 			if(version.equals("1_7_R4"))
-				new OutgoingPacketInjector_1_7().init();
+				outgoingPacketInjector = new OutgoingPacketInjector_1_7();
 			else
-				new OutgoingPacketInjector().init();
+				outgoingPacketInjector = new OutgoingPacketInjector();
 			
+			try {
+				outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
 			//Check if plugin features should be enabled -> APIMode: false
 			if (!(setupYamlFile.getConfiguration().getBoolean("APIMode"))) {
 				getCommand("eazynick").setExecutor(new PluginCommand());
@@ -192,13 +206,6 @@ public class EazyNick extends JavaPlugin {
 				
 				//Register other event listeners
 				pluginManager.registerEvents(new AsyncPlayerChatListener(), this);
-				
-				if(!(version.startsWith("1_13") || version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16")))
-					pluginManager.registerEvents(new PlayerChatTabCompleteListener(), this);
-				
-				if(!(version.startsWith("1_7") || version.startsWith("1_8") || version.startsWith("1_9")))
-					pluginManager.registerEvents(new TabCompleteListener(), this);
-					
 				pluginManager.registerEvents(new PlayerCommandPreprocessListener(), this);
 				pluginManager.registerEvents(new PlayerDropItemListener(), this);
 				pluginManager.registerEvents(new InventoryClickListener(), this);

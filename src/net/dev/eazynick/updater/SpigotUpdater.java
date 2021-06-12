@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -19,7 +20,7 @@ public class SpigotUpdater {
 		
 		PluginDescriptionFile desc = eazyNick.getDescription();
 		
-		System.out.println("[Updater] Checking for updates...");
+		Bukkit.getLogger().info("[Updater] Checking for updates...");
 		
 		ReadableByteChannel channel = null;
 		double newVersion = 0.0;
@@ -35,10 +36,10 @@ public class SpigotUpdater {
 
 		//Check if version is outdated
 		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
-			System.out.println("[Updater] Found a new version (" + newVersion + ")");
+			Bukkit.getLogger().info("[Updater] Found a new version (" + newVersion + ")");
 
 			if (eazyNick.getSetupYamlFile().getConfiguration().getBoolean("AutoUpdater")) {
-				System.out.println("[Updater] Starting download...");
+				Bukkit.getLogger().info("[Updater] Starting download...");
 
 				try {
 					//Open connection
@@ -59,13 +60,13 @@ public class SpigotUpdater {
 					throw new RuntimeException("File could not be saved", ex);
 				}
 
-				System.out.println("[Updater] Successfully updated plugin to version " + newVersion + ". Please reload/restart your server now.");
+				Bukkit.getLogger().info("[Updater] Successfully updated plugin to version " + newVersion + ". Please reload/restart your server now.");
 				
 				return true;
 			} else
-				System.out.println("[Updater] Download the update here: " + desc.getWebsite());
+				Bukkit.getLogger().info("[Updater] Download the update here: " + desc.getWebsite());
 		} else
-			System.out.println("[Updater] No new version available");
+			Bukkit.getLogger().info("[Updater] No new version available");
 		
 		return false;
 	}
