@@ -24,7 +24,7 @@ import io.netty.channel.*;
 
 public class OutgoingPacketInjector {
 
-	private Channel channel;
+	private ArrayList<Channel> channels;
 	private String handlerName;
 	
 	public void init() {
@@ -33,6 +33,7 @@ public class OutgoingPacketInjector {
 		Utils utils = eazyNick.getUtils();
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
+		channels = new ArrayList<>();
 		handlerName = eazyNick.getDescription().getName().toLowerCase() + "_handler";
 		
 		Field field = reflectionHelper.getFirstFieldByType(reflectionHelper.getNMSClass("NetworkManager"), Channel.class);
@@ -46,9 +47,11 @@ public class OutgoingPacketInjector {
 			Object minecraftServer = dedicatedServer.get(craftServer);
 			
 			for(Object manager : Collections.synchronizedList((List<?>) getNetworkManagerList(minecraftServer.getClass().getMethod("getServerConnection").invoke(minecraftServer))).toArray()) {
-				channel = (Channel) field.get(manager);
+				Channel channel = (Channel) field.get(manager);
 				
 				if((channel.pipeline().context("packet_handler") != null)) {
+					channels.add(channel);
+					
 					if (channel.pipeline().get(handlerName) != null)
 						channel.pipeline().remove(handlerName);
 					
@@ -255,8 +258,7 @@ public class OutgoingPacketInjector {
 	}
 	
 	public void unregister() {
-		if((channel != null) && channel.pipeline().get(handlerName) != null)
-			channel.pipeline().remove(handlerName);
+		channels.stream().filter(currentChannel -> ((currentChannel != null) && (currentChannel.pipeline().get(handlerName) != null))).forEach(currentChannel -> currentChannel.pipeline().remove(handlerName));
 	}
 	
 }

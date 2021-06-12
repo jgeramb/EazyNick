@@ -273,6 +273,10 @@ public class EazyNick extends JavaPlugin {
 				}
 			}
 			
+			//Initialize bStats
+			BStatsMetrics bStatsMetrics = new BStatsMetrics(this, 11663);
+			bStatsMetrics.addCustomChart(new BStatsMetrics.SimplePie("mysql", () -> (setupYamlFile.getConfiguration().getBoolean("BungeeCord") ? "yes" : "no")));
+			
 			utils.sendConsole("");
 			utils.sendConsole("§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
 			utils.sendConsole("§7Version§8: §3" + getDescription().getVersion());
@@ -398,6 +402,14 @@ public class EazyNick extends JavaPlugin {
 	
 	public MineSkinAPI getMineSkinAPI() {
 		return mineSkinAPI;
+	}
+	
+	public Object getOutgoingPacketInjector() {
+		return outgoingPacketInjector;
+	}
+	
+	public void setOutgoingPacketInjector(Object outgoingPacketInjector) {
+		this.outgoingPacketInjector = outgoingPacketInjector;
 	}
 
 }

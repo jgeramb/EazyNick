@@ -12,10 +12,23 @@ public class ServerListPingListener implements Listener {
 
 	@EventHandler
 	public void onServerListPing(ServerListPingEvent event) {
-		if(EazyNick.getInstance().getVersion().equals("1_7_R4"))
-			new OutgoingPacketInjector_1_7().init();
-		else
-			new OutgoingPacketInjector().init();
+		EazyNick eazyNick = EazyNick.getInstance();
+		
+		if(eazyNick.getVersion().equals("1_7_R4")) {
+			((OutgoingPacketInjector_1_7) eazyNick.getOutgoingPacketInjector()).unregister();
+			
+			OutgoingPacketInjector_1_7 outgoingPacketInjector = new OutgoingPacketInjector_1_7();
+			outgoingPacketInjector.init();
+			
+			eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
+		} else {
+			((OutgoingPacketInjector) eazyNick.getOutgoingPacketInjector()).unregister();
+			
+			OutgoingPacketInjector outgoingPacketInjector = new OutgoingPacketInjector();
+			outgoingPacketInjector.init();
+			
+			eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
+		}
 	}
 	
 }

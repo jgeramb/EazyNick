@@ -31,6 +31,15 @@ public class ReflectionHelper {
 		return null;
 	}
 	
+	public Class<?> getSubClass(Class<?> clazz, String className) {
+		for(Class<?> subClazz : clazz.getDeclaredClasses()) {
+			if(subClazz.getSimpleName().equals(className))
+				return subClazz;
+		}
+		
+		return null;
+	}
+	
 	public Field getField(Class<?> clazz, String fieldName) {
 		try {
 			Field f = clazz.getDeclaredField(fieldName);

@@ -70,6 +70,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled", true);
 		configuration.addDefault("PrefixSuffixUpdateDelay", 100);
 		configuration.addDefault("UseLocalRankPrefixes", true);
+		configuration.addDefault("ShowProfileErrorMessages", true);
 
 		configuration.addDefault("NickActionBarMessage", false);
 		configuration.addDefault("ShowNickActionBarWhenMySQLNicked", true);

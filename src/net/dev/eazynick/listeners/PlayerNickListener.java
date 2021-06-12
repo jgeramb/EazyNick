@@ -49,11 +49,11 @@ public class PlayerNickListener implements Listener {
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
 				eazyNick.getUtils().sendConsole("§a" + realName + " §8(" + player.getUniqueId().toString() + ") §7set his nickname to §d" + nickName);
 
+			api.nickPlayer(nickName, skinName);
+			
 			if(changePrefixAndSuffix)
 				api.updatePrefixSuffix(nickName, realName, event.getTagPrefix(), event.getTagSuffix(), event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), sortID, groupName);
 			
-			api.nickPlayer(nickName, skinName);
-
 			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(nickName) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(nickName) : eazyNick.getUUIDFetcher().getUUID(nickName)), oldDisplayName, oldPlayerListName, realName, nickName, skinName, event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), event.getTagPrefix(), event.getTagSuffix(), groupName, sortID));
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnNnick")) {

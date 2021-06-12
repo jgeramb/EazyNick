@@ -69,11 +69,21 @@ public class PlayerJoinListener implements Listener {
 		
 		Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 			if(eazyNick.getVersion().equals("1_7_R4")) {
-				new OutgoingPacketInjector_1_7().init();
+				((OutgoingPacketInjector_1_7) eazyNick.getOutgoingPacketInjector()).unregister();
+				
+				OutgoingPacketInjector_1_7 outgoingPacketInjector = new OutgoingPacketInjector_1_7();
+				outgoingPacketInjector.init();
+				
+				eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
 				
 				utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector_1_7(player));
 			} else {
-				new OutgoingPacketInjector().init();
+				((OutgoingPacketInjector) eazyNick.getOutgoingPacketInjector()).unregister();
+
+				OutgoingPacketInjector outgoingPacketInjector = new OutgoingPacketInjector();
+				outgoingPacketInjector.init();
+				
+				eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
 				
 				utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector(player));
 			}

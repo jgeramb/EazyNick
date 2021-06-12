@@ -135,7 +135,7 @@ public class NickManager extends ReflectionHelper {
 				}
 			} else {
 				try {
-					Class<?> enumPlayerInfoAction = eazyNick.getVersion().equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(eazyNick.getVersion().equals("1_11_R1") || eazyNick.getVersion().equals("1_12_R1") || utils.isNewVersion()) ? 1 : 2];
+					Class<?> enumPlayerInfoAction = eazyNick.getVersion().equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass("PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction");
 					Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 					Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 					
@@ -185,7 +185,7 @@ public class NickManager extends ReflectionHelper {
 						
 						packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 					} else {
-						Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+						Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass("PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction"));
 						
 						packetPlayOutPlayerInfoRemove = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 					}
@@ -215,7 +215,7 @@ public class NickManager extends ReflectionHelper {
 									
 									packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 								} else {
-									Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getNMSClass("PacketPlayOutPlayerInfo").getDeclaredClasses()[(version.startsWith("1_1") && !(version.equals("1_10_R1"))) ? 1 : 2]);
+									Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass("PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction"));
 									
 									packetPlayOutPlayerInfoAdd = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField("ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 								}
@@ -443,122 +443,124 @@ public class NickManager extends ReflectionHelper {
 		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
 			player.setCustomName(nickName);
 		
-		if(keepNick)
-			utils.getLastNickDatas().put(player.getUniqueId(), nickedPlayerData.clone());
-		else
-			utils.getLastNickDatas().remove(player.getUniqueId());
+		updatePlayer(spawnPlayer);
 		
 		Bukkit.getScheduler().runTaskLater(eazyNick, () -> utils.getNickedPlayers().remove(player.getUniqueId()), 3);
 		
-		updatePlayer(spawnPlayer);
-		
-		if(utils.isPluginInstalled("CloudNetAPI")) {
-			CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
+		if(nickedPlayerData != null) {
+			if(keepNick)
+				utils.getLastNickDatas().put(player.getUniqueId(), nickedPlayerData.clone());
+			else
+				utils.getLastNickDatas().remove(player.getUniqueId());
 			
-			if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
-				PermissionEntity entity = cloudPlayer.getPermissionEntity();
-				de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
+			if(utils.isPluginInstalled("CloudNetAPI")) {
+				CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
 				
-				if(utils.getOldCloudNETPrefixes().containsKey(player.getUniqueId())) {
-					entity.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
-					highestPermissionGroup.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
-					utils.getOldCloudNETPrefixes().remove(player.getUniqueId());
-				}
-				
-				if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId())) {
-					entity.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
-					highestPermissionGroup.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
-					utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
-				}
-				
-				if(utils.getOldCloudNETTagIDs().containsKey(player.getUniqueId())) {
-					highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDs().get(player.getUniqueId()));
-					utils.getOldCloudNETTagIDs().remove(player.getUniqueId());
+				if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+					PermissionEntity entity = cloudPlayer.getPermissionEntity();
+					de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup = entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
+					
+					if(utils.getOldCloudNETPrefixes().containsKey(player.getUniqueId())) {
+						entity.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
+						highestPermissionGroup.setPrefix(utils.getOldCloudNETPrefixes().get(player.getUniqueId()));
+						utils.getOldCloudNETPrefixes().remove(player.getUniqueId());
+					}
+					
+					if(utils.getOldCloudNETSuffixes().containsKey(player.getUniqueId())) {
+						entity.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
+						highestPermissionGroup.setSuffix(utils.getOldCloudNETSuffixes().get(player.getUniqueId()));
+						utils.getOldCloudNETSuffixes().remove(player.getUniqueId());
+					}
+					
+					if(utils.getOldCloudNETTagIDs().containsKey(player.getUniqueId())) {
+						highestPermissionGroup.setTagId(utils.getOldCloudNETTagIDs().get(player.getUniqueId()));
+						utils.getOldCloudNETTagIDs().remove(player.getUniqueId());
+					}
 				}
 			}
-		}
-		
-		if(utils.isPluginInstalled("UltraPermissions")) {
-			UltraPermissionsAPI api = UltraPermissions.getAPI();
-			Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
-		
-			if(userOptional.isPresent()) {
-				me.TechsCode.UltraPermissions.storage.objects.User user = userOptional.get();
-				
-				if(utils.getOldUltraPermissionsGroups().containsKey(player.getUniqueId())) {
-					HashMap<String, Long> data = utils.getOldUltraPermissionsGroups().get(player.getUniqueId());
-					
-					data.keySet().forEach(group -> user.addGroup(api.getGroups().name(group).get(), data.get(group)));
-					
-					utils.getOldUltraPermissionsGroups().remove(player.getUniqueId());
-				}
 			
-				if(utils.getUltraPermissionsPrefixes().containsKey(player.getUniqueId())) {
-					user.setPrefix(utils.getUltraPermissionsPrefixes().get(player.getUniqueId()));
-					
-					utils.getUltraPermissionsPrefixes().remove(player.getUniqueId());
-				}
-				
-				if(utils.getUltraPermissionsSuffixes().containsKey(player.getUniqueId())) {
-					user.setSuffix(utils.getUltraPermissionsSuffixes().get(player.getUniqueId()));
-					
-					utils.getUltraPermissionsSuffixes().remove(player.getUniqueId());
-				}
-			}
-		}
-		
-		if(utils.isPluginInstalled("PermissionsEx")) {
-			PermissionUser user = PermissionsEx.getUser(player);
-		
-			if(setupYamlFile.getConfiguration().getBoolean("SwitchPermissionsExGroupByNicking")) {
-				if(utils.getOldPermissionsExGroups().containsKey(player.getUniqueId())) {
-					user.setGroups(utils.getOldPermissionsExGroups().get(player.getUniqueId()));
-					
-					utils.getOldPermissionsExGroups().remove(player.getUniqueId());
-				}
-			} else if(utils.getOldPermissionsExPrefixes().containsKey(player.getUniqueId()) && utils.getOldPermissionsExSuffixes().containsKey(player.getUniqueId())) {
-				user.setPrefix(utils.getOldPermissionsExPrefixes().get(player.getUniqueId()), player.getWorld().getName());
-				user.setSuffix(utils.getOldPermissionsExSuffixes().get(player.getUniqueId()), player.getWorld().getName());
-			}
-		}
-		
-		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
-			if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId())) {
-				utils.getScoreboardTeamManagers().get(player.getUniqueId()).destroyTeam();
-				utils.getScoreboardTeamManagers().remove(player.getUniqueId());
-			}
-		}
-		
-		Bukkit.getScheduler().runTask(eazyNick, () -> {
-			if(utils.isPluginInstalled("NametagEdit")) {
-				if(utils.getNametagEditPrefixes().containsKey(player.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(player.getUniqueId())) {
-					String prefix = utils.getNametagEditPrefixes().get(player.getUniqueId()), suffix = utils.getNametagEditSuffixes().get(player.getUniqueId());
-					INametagApi nametagEditAPI = NametagEdit.getApi();
-					
-					if((prefix != null) && !(prefix.isEmpty()))
-						nametagEditAPI.setPrefix(player, prefix);
-					
-					if((suffix != null) && !(suffix.isEmpty()))
-						nametagEditAPI.setSuffix(player, suffix);
-					
-					nametagEditAPI.reloadNametag(player);
-					
-					utils.getNametagEditPrefixes().remove(player.getUniqueId());
-					utils.getNametagEditSuffixes().remove(player.getUniqueId());
-				}
-			}
-		});
-		
-		new AsyncTask(new AsyncRunnable() {
+			if(utils.isPluginInstalled("UltraPermissions")) {
+				UltraPermissionsAPI api = UltraPermissions.getAPI();
+				Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
 			
-			@Override
-			public void run() {
-				if(player.isOnline()) {
-					player.setDisplayName(nickedPlayerData.getOldDisplayName());
-					setPlayerListName(nickedPlayerData.getOldPlayerListName());
+				if(userOptional.isPresent()) {
+					me.TechsCode.UltraPermissions.storage.objects.User user = userOptional.get();
+					
+					if(utils.getOldUltraPermissionsGroups().containsKey(player.getUniqueId())) {
+						HashMap<String, Long> data = utils.getOldUltraPermissionsGroups().get(player.getUniqueId());
+						
+						data.keySet().forEach(group -> user.addGroup(api.getGroups().name(group).get(), data.get(group)));
+						
+						utils.getOldUltraPermissionsGroups().remove(player.getUniqueId());
+					}
+				
+					if(utils.getUltraPermissionsPrefixes().containsKey(player.getUniqueId())) {
+						user.setPrefix(utils.getUltraPermissionsPrefixes().get(player.getUniqueId()));
+						
+						utils.getUltraPermissionsPrefixes().remove(player.getUniqueId());
+					}
+					
+					if(utils.getUltraPermissionsSuffixes().containsKey(player.getUniqueId())) {
+						user.setSuffix(utils.getUltraPermissionsSuffixes().get(player.getUniqueId()));
+						
+						utils.getUltraPermissionsSuffixes().remove(player.getUniqueId());
+					}
 				}
 			}
-		}, 1000 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
+			
+			if(utils.isPluginInstalled("PermissionsEx")) {
+				PermissionUser user = PermissionsEx.getUser(player);
+			
+				if(setupYamlFile.getConfiguration().getBoolean("SwitchPermissionsExGroupByNicking")) {
+					if(utils.getOldPermissionsExGroups().containsKey(player.getUniqueId())) {
+						user.setGroups(utils.getOldPermissionsExGroups().get(player.getUniqueId()));
+						
+						utils.getOldPermissionsExGroups().remove(player.getUniqueId());
+					}
+				} else if(utils.getOldPermissionsExPrefixes().containsKey(player.getUniqueId()) && utils.getOldPermissionsExSuffixes().containsKey(player.getUniqueId())) {
+					user.setPrefix(utils.getOldPermissionsExPrefixes().get(player.getUniqueId()), player.getWorld().getName());
+					user.setSuffix(utils.getOldPermissionsExSuffixes().get(player.getUniqueId()), player.getWorld().getName());
+				}
+			}
+			
+			if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
+				if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId())) {
+					utils.getScoreboardTeamManagers().get(player.getUniqueId()).destroyTeam();
+					utils.getScoreboardTeamManagers().remove(player.getUniqueId());
+				}
+			}
+			
+			Bukkit.getScheduler().runTask(eazyNick, () -> {
+				if(utils.isPluginInstalled("NametagEdit")) {
+					if(utils.getNametagEditPrefixes().containsKey(player.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(player.getUniqueId())) {
+						String prefix = utils.getNametagEditPrefixes().get(player.getUniqueId()), suffix = utils.getNametagEditSuffixes().get(player.getUniqueId());
+						INametagApi nametagEditAPI = NametagEdit.getApi();
+						
+						if((prefix != null) && !(prefix.isEmpty()))
+							nametagEditAPI.setPrefix(player, prefix);
+						
+						if((suffix != null) && !(suffix.isEmpty()))
+							nametagEditAPI.setSuffix(player, suffix);
+						
+						nametagEditAPI.reloadNametag(player);
+						
+						utils.getNametagEditPrefixes().remove(player.getUniqueId());
+						utils.getNametagEditSuffixes().remove(player.getUniqueId());
+					}
+				}
+			});
+			
+			new AsyncTask(new AsyncRunnable() {
+				
+				@Override
+				public void run() {
+					if(player.isOnline()) {
+						player.setDisplayName(nickedPlayerData.getOldDisplayName());
+						setPlayerListName(nickedPlayerData.getOldPlayerListName());
+					}
+				}
+			}, 1000 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
+		}
 		
 		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
@@ -741,8 +743,10 @@ public class NickManager extends ReflectionHelper {
 		String finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix, finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
 		
 		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
-			if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId()))
+			if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId())) {
+				utils.getScoreboardTeamManagers().get(player.getUniqueId()).destroyTeam();
 				utils.getScoreboardTeamManagers().remove(player.getUniqueId());
+			}
 				
 			utils.getScoreboardTeamManagers().put(player.getUniqueId(), new ScoreboardTeamHandler(player, nickName, realName, tagPrefix, tagSuffix, sortID, groupName));
 		}
@@ -760,6 +764,11 @@ public class NickManager extends ReflectionHelper {
 						scoreboardTeamHandler.createTeam();
 					}
 					
+					boolean tabNamePrefixSuffixChange = utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB");
+					
+					if(tabNamePrefixSuffixChange)
+						new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID);
+					
 					if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
 						String tmpTabPrefix = finalTabPrefix, tmpTabSuffix = finalTabSuffix, tmpTagPrefix = finalTagPrefix, tmpTagSuffix = finalTagSuffix;
 						
@@ -770,10 +779,8 @@ public class NickManager extends ReflectionHelper {
 							tmpTagSuffix = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix);
 						}
 						
-						setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
-						
-						if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
-							new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID);
+						if(!(tabNamePrefixSuffixChange))
+							setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
 						
 						if(utils.isPluginInstalled("NametagEdit")) {
 							Bukkit.getScheduler().runTask(eazyNick, () -> {

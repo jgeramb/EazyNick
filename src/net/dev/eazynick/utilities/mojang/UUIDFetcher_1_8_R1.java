@@ -58,27 +58,24 @@ public class UUIDFetcher_1_8_R1 {
 			NickNameYamlFile nickNameYamlFile = eazyNick.getNickNameYamlFile();
 
 			List<String> list = nickNameYamlFile.getConfiguration().getStringList("NickNames");
-			ArrayList<String> toRemove = new ArrayList<>();
 			final String finalName = name;
 
-			list.stream().filter(s -> s.equalsIgnoreCase(finalName)).forEach(s -> toRemove.add(s));
+			new ArrayList<>(list).stream().filter(currentNickName -> currentNickName.equalsIgnoreCase(finalName)).forEach(currentNickName -> {
+				list.remove(currentNickName);
+				utils.getNickNames().remove(currentNickName);
+			});
 
-			if (toRemove.size() >= 1) {
-				toRemove.forEach(s -> {
-					list.remove(s);
-					utils.getNickNames().remove(s);
-				});
-
-				nickNameYamlFile.getConfiguration().set("NickNames", list);
-				nickNameYamlFile.save();
-				
-				utils.sendConsole("§cThere is no account with username §6" + name + " §cin the mojang database");
-			}
+			nickNameYamlFile.getConfiguration().set("NickNames", list);
+			nickNameYamlFile.save();
 			
-			if(utils.isSupportMode()) {
-				utils.sendConsole("§cAn error occured while trying to fetch uuid of §6" + name + "§7:");
-				
-				ex.printStackTrace();
+			//Show error message
+			if(eazyNick.getSetupYamlFile().getConfiguration().getBoolean("ShowProfileErrorMessages")) {
+				if(utils.isSupportMode()) {
+					utils.sendConsole("§cAn error occured while trying to fetch uuid of §6" + name + "§7:");
+					
+					ex.printStackTrace();
+				} else
+					utils.sendConsole("§cThere is no account with username §6" + name + " §cin the mojang database");
 			}
 		}
 
