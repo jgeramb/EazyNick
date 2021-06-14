@@ -1,6 +1,8 @@
 package net.dev.eazynick.nms;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 
@@ -46,8 +48,8 @@ public class ReflectionHelper {
 			f.setAccessible(true);
 			
 			return f;
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException ex) {
-			ex.printStackTrace();
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException e) {
+			e.printStackTrace();
 			
 			return null;
 		}
@@ -55,9 +57,9 @@ public class ReflectionHelper {
 
 	public Class<?> getNMSClass(String className) {
 		try {
-			return Class.forName("net.minecraft.server." + getVersion() + "." + className);
-		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace();
+			return Class.forName(getVersion().startsWith("v1_17") ? ("net.minecraft." + className) : ("net.minecraft.server." + getVersion() + "." + className));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 		
 		return null;
@@ -66,8 +68,8 @@ public class ReflectionHelper {
 	public Class<?> getCraftClass(String className) {
 		try {
 			return Class.forName("org.bukkit.craftbukkit." + getVersion() + "." + className);
-		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 		
 		return null;
@@ -76,20 +78,51 @@ public class ReflectionHelper {
 	public String getVersion() {
 		return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 	}
-
-	public void debugClass(Object msg) {
-		Class<?> clazz = msg.getClass();
+	
+	public boolean isNewVersion() {
+		return (Integer.parseInt(getVersion().substring(1).split("_")[1]) > 12);
+	}
+	
+	public void debugObject(Object obj) {
+		Class<?> clazz = obj.getClass();
 		
 		System.out.println();
 		System.out.println("Class info of \"" + clazz.getSimpleName() + "\":");
+		System.out.println("» Constructors:");
 		
-		for (Field f : clazz.getDeclaredFields()) {
-			f.setAccessible(true);
-			
+		for (Constructor<?> currentConstructor : clazz.getDeclaredConstructors())
+			System.out.println("--> " + Arrays.toString(currentConstructor.getParameterTypes()));
+		
+		System.out.println("» Fields:");
+		
+		for (Field currentField : clazz.getDeclaredFields()) {
 			try {
-				System.out.println("--> " + f.getType().getSimpleName() + " " + f.getName() + ": " + f.get(msg));
-			} catch (IllegalArgumentException | IllegalAccessException ex) {
-				System.out.println("--> " + f.getType().getSimpleName() + " " + f.getName() + ": ERROR (" + ex.getMessage() + ")");
+				currentField.setAccessible(true);
+				
+				System.out.println("--> " + currentField.getType().getSimpleName() + " " + currentField.getName() + ": " + currentField.get(obj));
+			} catch (Exception ex) {
+				System.out.println("--> " + currentField.getType().getSimpleName() + " " + currentField.getName() + ": ERROR (" + ex.getMessage() + ")");
+			}
+		}
+	}
+	
+	public void debugClass(Class<?> clazz) {
+		System.out.println();
+		System.out.println("Class info of \"" + clazz.getSimpleName() + "\":");
+		System.out.println("» Constructors:");
+		
+		for (Constructor<?> currentConstructor : clazz.getDeclaredConstructors())
+			System.out.println("--> " + Arrays.toString(currentConstructor.getParameterTypes()));
+		
+		System.out.println("» Fields:");
+		
+		for (Field currentField : clazz.getDeclaredFields()) {
+			try {
+				currentField.setAccessible(true);
+				
+				System.out.println("--> " + currentField.getType().getSimpleName() + " " + currentField.getName());
+			} catch (Exception ex) {
+				System.out.println("--> " + currentField.getType().getSimpleName() + " " + currentField.getName() + ": ERROR (" + ex.getMessage() + ")");
 			}
 		}
 	}

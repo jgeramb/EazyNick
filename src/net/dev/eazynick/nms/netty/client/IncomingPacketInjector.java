@@ -24,11 +24,12 @@ public class IncomingPacketInjector {
 		SignGUI signGUI = eazyNick.getSignGUI();
 		
 		try {
+			String version = eazyNick.getVersion();
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-			Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
-			Object networkManager = playerConnection.getClass().getDeclaredField("networkManager").get(playerConnection);
+			Object playerConnection = entityPlayer.getClass().getField(version.startsWith("1_17") ? "b" : "playerConnection").get(entityPlayer);
+			Object networkManager = playerConnection.getClass().getDeclaredField(version.startsWith("1_17") ? "a" : "networkManager").get(playerConnection);
 			
-			this.channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
+			this.channel = (Channel) networkManager.getClass().getDeclaredField(version.startsWith("1_17") ? "k" : "channel").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
 			if (channel.pipeline().get(handlerName) != null)
@@ -40,7 +41,7 @@ public class IncomingPacketInjector {
 				public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
 					if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
 						if(signGUI.getEditCompleteListeners().containsKey(player)) {
-							Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), "b").get(packet);
+							Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), version.startsWith("1_17") ? "c" : "b").get(packet);
 							
 							Bukkit.getScheduler().runTask(eazyNick, new Runnable() {
 								
@@ -49,7 +50,7 @@ public class IncomingPacketInjector {
 									try {
 										String[] lines = new String[4];
 
-										if(eazyNick.getVersion().startsWith("1_8")) {
+										if(version.startsWith("1_8")) {
 											int i = 0;
 											
 											for (Object obj : rawLines) {
@@ -73,7 +74,7 @@ public class IncomingPacketInjector {
 						}
 					} else if(packet.getClass().getName().endsWith("PacketPlayInTabComplete")) {
 						try {
-							eazyNick.getUtils().getTextsToComplete().put(player, (String) reflectionHelper.getField(packet.getClass(), eazyNick.getUtils().isNewVersion() ? "b" : "a").get(packet));
+							eazyNick.getUtils().getTextsToComplete().put(player, (String) reflectionHelper.getField(packet.getClass(), eazyNick.getUtils().isVersion13OrLater() ? "b" : "a").get(packet));
 						} catch (IllegalArgumentException | IllegalAccessException ex) {
 							ex.printStackTrace();
 						}

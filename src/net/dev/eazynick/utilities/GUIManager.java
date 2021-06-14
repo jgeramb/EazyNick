@@ -104,7 +104,7 @@ public class GUIManager {
 		
 		utils.getLastGUITexts().put(player.getUniqueId(), text);
 		
-		boolean newVersion = utils.isNewVersion();
+		boolean newVersion = utils.isVersion13OrLater();
 		String[] args = text.isEmpty() ? new String[0] : text.split(" ");
 		
 		if(args.length == 0) {

@@ -21,7 +21,7 @@ public class ItemBuilder {
 	private ItemMeta itemMeta;
 	
 	public ItemBuilder(int amount) {
-		this(Material.getMaterial(EazyNick.getInstance().getUtils().isNewVersion() ? "PLAYER_HEAD" : "SKULL_ITEM"), amount, EazyNick.getInstance().getUtils().isNewVersion() ? 0 : 3);
+		this(Material.getMaterial(EazyNick.getInstance().getUtils().isVersion13OrLater() ? "PLAYER_HEAD" : "SKULL_ITEM"), amount, EazyNick.getInstance().getUtils().isVersion13OrLater() ? 0 : 3);
 	}
 	
 	public ItemBuilder(Material mat) {

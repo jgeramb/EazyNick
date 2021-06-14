@@ -36,7 +36,8 @@ public class OutgoingPacketInjector {
 		channels = new ArrayList<>();
 		handlerName = eazyNick.getDescription().getName().toLowerCase() + "_handler";
 		
-		Field field = reflectionHelper.getFirstFieldByType(reflectionHelper.getNMSClass("NetworkManager"), Channel.class);
+		String version = eazyNick.getVersion();
+		Field field = reflectionHelper.getFirstFieldByType(version.startsWith("1_17") ? reflectionHelper.getNMSClass("network.NetworkManager") : reflectionHelper.getNMSClass("NetworkManager"), Channel.class);
 		field.setAccessible(true);
 		
 		try {
@@ -87,19 +88,19 @@ public class OutgoingPacketInjector {
 											
 											if(b != null) {
 												for (Object playerInfoData : ((ArrayList<Object>) b)) {
-													UUID uuid = ((GameProfile) reflectionHelper.getField(playerInfoData.getClass(), "d").get(playerInfoData)).getId();
+													UUID uuid = ((GameProfile) reflectionHelper.getField(playerInfoData.getClass(), version.startsWith("1_17") ? "c" : "d").get(playerInfoData)).getId();
 	
 													if(utils.getSoonNickedPlayers().containsKey(uuid) && utils.getSoonNickedPlayers().get(uuid).equals(NickReason.JOIN) && reflectionHelper.getField(msg.getClass(), "a").get(msg).toString().endsWith("ADD_PLAYER"))
 														return;
 													
 													if(utils.getNickedPlayers().containsKey(uuid))
-														reflectionHelper.setField(playerInfoData, "d", utils.getNickedPlayers().get(uuid).getFakeGameProfile(uuid.equals(player.getUniqueId()) ? false : setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")));
+														reflectionHelper.setField(playerInfoData, version.startsWith("1_17") ? "c" : "d", utils.getNickedPlayers().get(uuid).getFakeGameProfile(uuid.equals(player.getUniqueId()) ? false : setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")));
 												}
 											}
 											
 											super.write(ctx, msg, promise);
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
-											if(!(player.hasPermission("nick.bypass") && eazyNick.getSetupYamlFile().getConfiguration().getBoolean("EnableBypassPermission")) && !(utils.isNewVersion())) {
+											if(!(player.hasPermission("nick.bypass") && eazyNick.getSetupYamlFile().getConfiguration().getBoolean("EnableBypassPermission")) && !(utils.isVersion13OrLater())) {
 												String textToComplete = utils.getTextsToComplete().get(player);
 												String[] splitTextToComplete = textToComplete.trim().split(" ");
 												ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
@@ -140,7 +141,7 @@ public class OutgoingPacketInjector {
 									try {
 										if (msg.getClass().getSimpleName().equals("PacketStatusOutServerInfo")) {
 											Object serverPing = reflectionHelper.getField(msg.getClass(), "b").get(msg);
-											Object serverPingPlayerSample = reflectionHelper.getField(serverPing.getClass(), "b").get(serverPing);
+											Object serverPingPlayerSample = reflectionHelper.getField(serverPing.getClass(), version.startsWith("1_17") ? "d" : "b").get(serverPing);
 											GameProfile[] gameProfileArray = (GameProfile[]) reflectionHelper.getField(serverPingPlayerSample.getClass(), "c").get(serverPingPlayerSample);
 											
 											for (int i = 0; i < gameProfileArray.length; i++) {
@@ -203,6 +204,7 @@ public class OutgoingPacketInjector {
 		String version = eazyNick.getVersion();
 		String lastChatMessage = ChatColor.stripColor(utils.getLastChatMessage());
 		String prefix = ChatColor.stripColor(utils.getPrefix());
+		boolean is17 = version.startsWith("1_17");
 		
 		try {
 			Field field = packet.getClass().getDeclaredField("a");
@@ -212,11 +214,11 @@ public class OutgoingPacketInjector {
 			Object editedComponent = null;
 			
 			if(iChatBaseComponent != null) {
-				Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass("IChatBaseComponent");
+				Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass(is17 ? "network.chat.IChatBaseComponent" : "IChatBaseComponent");
 				Class<?> chatSerializer = version.equals("1_8_R1") ? reflectionHelper.getNMSClass("ChatSerializer") : iChatBaseComponentClass.getDeclaredClasses()[0];
 				
 				String fullText = "";
-				Method method = iChatBaseComponentClass.getDeclaredMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16")) ? "getSiblings" : "a");
+				Method method = iChatBaseComponentClass.getDeclaredMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17")) ? "getSiblings" : "a");
 				method.setAccessible(true);
 				
 				for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {

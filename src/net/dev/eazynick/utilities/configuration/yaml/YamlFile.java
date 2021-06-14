@@ -111,10 +111,11 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 	//Get a string from the configuration and convert the color codes and new lines
 	public String getConfigString(String path) {
 		if(configuration.contains(path)) {
-			String string = ChatColor.translateAlternateColorCodes('&', configuration.getString(path).replace("%nl%", "%nl%&0"));
+			String version = eazyNick.getVersion(), string = ChatColor.translateAlternateColorCodes('&', configuration.getString(path).replace("%nl%", "%nl%&0"));
 			
+			//TODO: Upgrade to 1.17
 			//HEX-Color-Support
-			if(eazyNick.getVersion().startsWith("1_16")) {
+			if(version.startsWith("1_16") || version.startsWith("1_17")) {
 				try {
 					Matcher match = HEX_COLOR_PATTERN.matcher(string);
 					

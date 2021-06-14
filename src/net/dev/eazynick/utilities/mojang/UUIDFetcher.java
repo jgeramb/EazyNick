@@ -6,8 +6,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.mojang.util.UUIDTypeAdapter;
 
 import net.dev.eazynick.EazyNick;
@@ -16,14 +17,10 @@ import net.dev.eazynick.utilities.configuration.yaml.NickNameYamlFile;
 
 public class UUIDFetcher {
 
-	private Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
 	private final String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s?at=%d";
 	private final String NAME_URL = "https://api.mojang.com/user/profiles/%s/names";
 	private Map<String, UUID> uuidCache = new HashMap<String, UUID>();
 	private Map<UUID, String> nameCache = new HashMap<UUID, String>();
-
-	private String name;
-	private UUID id;
 
 	public UUID getUUID(String name) {
 		return getUUIDAt(name, System.currentTimeMillis());
@@ -45,13 +42,22 @@ public class UUIDFetcher {
 			connection.setReadTimeout(5000);
 
 			//Parse response
-			UUIDFetcher data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher.class);
+			try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+				StringBuilder response = new StringBuilder();
+				String line;
+				
+				while((line = bufferedReader.readLine()) != null)
+					response.append(line);
+				
+				JSONObject data = new JSONObject(response.toString());
+				UUID uniqueId = UUID.fromString(data.getString("id").replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
+				
+				//Cache data
+				uuidCache.put(name, uniqueId);
+				nameCache.put(uniqueId, data.getString("name"));
 
-			//Cache data
-			uuidCache.put(name, data.id);
-			nameCache.put(data.id, data.name);
-
-			return data.id;
+				return uniqueId;
+			}
 		} catch (Exception ex) {
 			//Remove nickname from nickNames.yml
 			NickNameYamlFile nickNameYamlFile = eazyNick.getNickNameYamlFile();
@@ -92,14 +98,22 @@ public class UUIDFetcher {
 			connection.setReadTimeout(5000);
 
 			//Parse response
-			UUIDFetcher[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher[].class);
-			UUIDFetcher currentNameData = nameHistory[nameHistory.length - 1];
-			
-			//Cache data
-			uuidCache.put(currentNameData.name.toLowerCase(), uuid);
-			nameCache.put(uuid, currentNameData.name);
-
-			return currentNameData.name;
+			try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+				StringBuilder response = new StringBuilder();
+				String line;
+				
+				while((line = bufferedReader.readLine()) != null)
+					response.append(line);
+				
+				JSONArray data = new JSONArray(response.toString());
+				JSONObject currentNameData = (JSONObject) data.get(data.length() - 1);
+				
+				//Cache data
+				uuidCache.put(currentNameData.getString("name").toLowerCase(), uuid);
+				nameCache.put(uuid, currentNameData.getString("name"));
+	
+				return currentNameData.getString("name");
+			}
 		} catch (Exception ignore) {
 		}
 

@@ -26,7 +26,7 @@ public class NickGUICommand implements CommandExecutor {
 				Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "NickGUI.InventoryTitle"));
 				
 				for (int i = 0; i < inv.getSize(); i++)
-					inv.setItem(i, new ItemBuilder(Material.getMaterial(utils.isNewVersion() ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, utils.isNewVersion() ? 0 : 15).setDisplayName("§r").build());
+					inv.setItem(i, new ItemBuilder(Material.getMaterial(utils.isVersion13OrLater() ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, utils.isVersion13OrLater() ? 0 : 15).setDisplayName("§r").build());
 				
 				inv.setItem(11, new ItemBuilder(Material.NAME_TAG).setDisplayName(guiYamlFile.getConfigString(player, "NickGUI.Nick.DisplayName")).build());
 				inv.setItem(15, new ItemBuilder(Material.GLASS, 1, 14).setDisplayName(guiYamlFile.getConfigString(player, "NickGUI.Unnick.DisplayName")).build());

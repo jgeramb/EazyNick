@@ -123,7 +123,7 @@ public class Utils {
 	}
 
 	//Version is newer than 1.12.2
-	public boolean isNewVersion() {
+	public boolean isVersion13OrLater() {
 		return (Integer.parseInt(EazyNick.getInstance().getVersion().split("_")[1]) > 12);
 	}
 	
@@ -448,7 +448,7 @@ public class Utils {
 		//Nick player
 		new NickManager(player).setGroupName(serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName"));
 		
-		Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nameWhithoutColors, setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? "MineSkin" : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID") : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.SortID"), serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")));
+		Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nameWhithoutColors, setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + getRandomStringFromList(setupYamlFile.getConfiguration().getStringList("MineSkinIds"))) : nameWhithoutColors, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID") : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.SortID"), serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")));
 	}
 	
 	public void performReNick(Player player) {
@@ -602,6 +602,11 @@ public class Utils {
 
 			languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickEnabled").replace("%prefix%", prefix));
 		}
+	}
+	
+	//Get a random string from a list
+	public String getRandomStringFromList(List<String> list) {
+		return (list.isEmpty() ? "" : list.get((new Random()).nextInt(list.size())));
 	}
 	
 	//String contains characters that are not allowed in minecraft usernames (allowed: a-z, A-Z, 0-9, _)

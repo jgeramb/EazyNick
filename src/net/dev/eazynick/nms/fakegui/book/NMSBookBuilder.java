@@ -28,6 +28,7 @@ public class NMSBookBuilder {
 		bookMeta.setAuthor(eazyNick.getDescription().getName());
 		
 		try {
+			String version = eazyNick.getVersion();
 			Class<?> craftChatMessage = reflectionHelper.getCraftClass("util.CraftChatMessage");
 			Field f = reflectionHelper.getField(reflectionHelper.getCraftClass("inventory.CraftMetaBook"), "pages");
 			List<Object> list = (List<Object>) f.get(bookMeta);
@@ -40,7 +41,8 @@ public class NMSBookBuilder {
 			
 			for (BookPage bookPage : bookPages) {
 				if(!((bookPage == null) || bookPage.isEmpty()))
-					list.add(eazyNick.getVersion().equals("1_16_R3") ? craftChatMessage.getMethod("toJSON", reflectionHelper.getNMSClass("IChatBaseComponent")).invoke(null, craftChatMessage.getMethod("fromJSON", String.class).invoke(null, bookPage.getAsString())) : bookPage.getAsIChatBaseComponent());
+					//TODO: Upgrade to 1.17
+					list.add((version.startsWith("1_17") || version.equals("1_16_R3")) ? craftChatMessage.getMethod("toJSON", reflectionHelper.getNMSClass(eazyNick.getVersion().startsWith("1_17") ? "network.chat.IChatBaseComponent" : "IChatBaseComponent")).invoke(null, craftChatMessage.getMethod("fromJSON", String.class).invoke(null, bookPage.getAsString())) : bookPage.getAsIChatBaseComponent());
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

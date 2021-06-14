@@ -24,7 +24,8 @@ public class BookPage {
 		EazyNick eazyNick = EazyNick.getInstance();
 		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
-		Class<?> chatSerializer = (eazyNick.getVersion().startsWith("1_7") || eazyNick.getVersion().equals("1_8_R1")) ? reflectionHelper.getNMSClass("ChatSerializer") : reflectionHelper.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0];
+		String version = eazyNick.getVersion();
+		Class<?> chatSerializer = (version.startsWith("1_7") || version.equals("1_8_R1")) ? reflectionHelper.getNMSClass("ChatSerializer") : reflectionHelper.getNMSClass(version.startsWith("1_17") ? "network.chat.IChatBaseComponent" : "IChatBaseComponent").getDeclaredClasses()[0];
 		
 		try {
 			return chatSerializer.getMethod("a", String.class).invoke(chatSerializer, getAsString());

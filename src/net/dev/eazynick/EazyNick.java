@@ -99,19 +99,21 @@ public class EazyNick extends JavaPlugin {
 		utils.getNickedPlayers().keySet().forEach(uuid -> {
 			Player player = Bukkit.getPlayer(uuid);
 			
-			if(utils.getScoreboardTeamManagers().containsKey(uuid))
-				utils.getScoreboardTeamManagers().get(uuid).destroyTeam();
-			
-			if(utils.getIncomingPacketInjectors().containsKey(uuid)) {
-				Object incomingPacketInjector = utils.getIncomingPacketInjectors().get(uuid);
+			if(player != null) {
+				if(utils.getScoreboardTeamManagers().containsKey(uuid))
+					utils.getScoreboardTeamManagers().get(uuid).destroyTeam();
 				
-				try {
-					incomingPacketInjector.getClass().getMethod("unregister").invoke(incomingPacketInjector);
-				} catch (Exception ignore) {
+				if(utils.getIncomingPacketInjectors().containsKey(uuid)) {
+					Object incomingPacketInjector = utils.getIncomingPacketInjectors().get(uuid);
+					
+					try {
+						incomingPacketInjector.getClass().getMethod("unregister").invoke(incomingPacketInjector);
+					} catch (Exception ignore) {
+					}
 				}
+				
+				player.kickPlayer("§cYou will need to reconnect in order to be able to play properly");
 			}
-			
-			player.kickPlayer("§cYou will need to reconnect in order to be able to play properly");
 		});
 		
 		//Unregister OutgoingPacketInjecot(_1_7)
@@ -148,7 +150,7 @@ public class EazyNick extends JavaPlugin {
 				|| version.equals("1_10_R1") || version.equals("1_11_R1") || version.equals("1_12_R1")
 				|| version.equals("1_13_R1") || version.equals("1_13_R2") || version.equals("1_14_R1")
 				|| version.equals("1_15_R1") || version.equals("1_16_R1") || version.equals("1_16_R2")
-				|| version.equals("1_16_R3"))) {
+				|| version.equals("1_16_R3") || version.equals("1_17_R1"))) {
 			utils.sendConsole("§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 
 			isCancelled = true;

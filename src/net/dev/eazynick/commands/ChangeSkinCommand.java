@@ -9,6 +9,7 @@ import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class ChangeSkinCommand implements CommandExecutor {
 
@@ -17,6 +18,7 @@ public class ChangeSkinCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		String prefix = utils.getPrefix();
 		
@@ -34,7 +36,7 @@ public class ChangeSkinCommand implements CommandExecutor {
 						
 						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.SkinChanged").replace("%skinName%", name).replace("%skinname%", name).replace("%prefix%", prefix));
 					} else {
-						String name = eazyNick.getSetupYamlFile().getConfiguration().getBoolean("UseMineSkinAPI") ? "MineSkin" : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+						String name = setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + utils.getRandomStringFromList(setupYamlFile.getConfiguration().getStringList("MineSkinIds"))) : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 						
 						api.changeSkin(name);
 						

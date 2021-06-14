@@ -11,7 +11,7 @@ public class GUIYamlFile extends YamlFile {
 	@Override
 	public void setDefaults() {
 		String arrow = "&0\u27A4";
-		boolean newMaterials = eazyNick.getUtils().isNewVersion();
+		boolean newMaterials = eazyNick.getUtils().isVersion13OrLater();
 		
 		//Default NickGUI
 		configuration.addDefault("NickGUI.InventoryTitle", "&5Nick&8:");
