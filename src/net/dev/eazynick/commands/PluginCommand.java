@@ -33,7 +33,7 @@ public class PluginCommand implements CommandExecutor {
 				sender.sendMessage(prefix + "§7/nick §8» §aRandom nick");
 				sender.sendMessage(prefix + "§7/nick [name] §8» §aStated nick");
 				sender.sendMessage(prefix + "§7/unnick §8» §aReset nick");
-				sender.sendMessage(prefix + "§7/realname [sender] §8» §aReal name of sender");
+				sender.sendMessage(prefix + "§7/realname [player] §8» §aReal name of player");
 				sender.sendMessage(prefix);
 				sender.sendMessage(prefix + "§7More help§8: §a/eazynick 2");
 				sender.sendMessage(prefix);
@@ -43,10 +43,10 @@ public class PluginCommand implements CommandExecutor {
 					sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
 					sender.sendMessage(prefix);
 					sender.sendMessage(prefix + "§7/name §8» §aShows current nickname");
-					sender.sendMessage(prefix + "§7/nickother [sender] §8» §aRandom nick for stated sender");
-					sender.sendMessage(prefix + "§7/nickother [sender] [name] §8» §aStated nick for stated sender");
+					sender.sendMessage(prefix + "§7/nickother [player] §8» §aRandom nick for stated player");
+					sender.sendMessage(prefix + "§7/nickother [player] [name] §8» §aStated nick for stated player");
 					sender.sendMessage(prefix + "§7/fixskin §8» §aFixes your skin");
-					sender.sendMessage(prefix + "§7/nickedsenders §8» §aList of current nicked senders");
+					sender.sendMessage(prefix + "§7/nickedplayers §8» §aList of current nicked players");
 					sender.sendMessage(prefix + "§7/nickgui §8» §aGUI for (un)nicking");
 					sender.sendMessage(prefix + "§7/nicklist §8» §aGUI with skulls to nick");
 					sender.sendMessage(prefix);
