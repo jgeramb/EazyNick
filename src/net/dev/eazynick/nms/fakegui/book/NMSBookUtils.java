@@ -31,7 +31,6 @@ public class NMSBookUtils extends ReflectionHelper {
 					Class<?> enumHand = getNMSClass(is17 ? "world.EnumHand" : "EnumHand");
 					Object mainHand = getField(enumHand, is17 ? "a" : "MAIN_HAND").get(enumHand);
 					
-					//TODO: Upgrade to 1.17
 					if(Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17")) {
 						Class<?> itemWrittenBook = getNMSClass(is17 ? "world.item.ItemWrittenBook" : "ItemWrittenBook");
 						

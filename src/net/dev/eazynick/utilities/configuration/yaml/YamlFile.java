@@ -113,7 +113,6 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 		if(configuration.contains(path)) {
 			String version = eazyNick.getVersion(), string = ChatColor.translateAlternateColorCodes('&', configuration.getString(path).replace("%nl%", "%nl%&0"));
 			
-			//TODO: Upgrade to 1.17
 			//HEX-Color-Support
 			if(version.startsWith("1_16") || version.startsWith("1_17")) {
 				try {

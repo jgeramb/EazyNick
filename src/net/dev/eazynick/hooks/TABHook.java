@@ -19,11 +19,13 @@ public class TABHook {
 		TabPlayer tabPlayer = TABAPI.getPlayer(player.getUniqueId());
 		
 		if(tabPlayer != null) {
+			//Set temporarily tablist values
 			tabPlayer.setValueTemporarily(EnumProperty.TABPREFIX, tabPrefix);
 			tabPlayer.setValueTemporarily(EnumProperty.TABSUFFIX, tabSuffix);
 			tabPlayer.setValueTemporarily(EnumProperty.CUSTOMTABNAME, name);
 			
 			if(!(tabPlayer.hasHiddenNametag())) {
+				//Set temporarily nametag values
 				tabPlayer.setValueTemporarily(EnumProperty.TAGPREFIX, tagPrefix);
 				tabPlayer.setValueTemporarily(EnumProperty.TAGSUFFIX, tagSuffix);
 				
@@ -35,12 +37,14 @@ public class TABHook {
 			
 			EazyNick.getInstance().getUtils().getTABTeams().put(player.getUniqueId(), tabPlayer.getTeamName());
 			
+			//Update TAB team
 			String teamName = sortID + name;
 			
 			if(teamName.length() > 16)
 				teamName = teamName.substring(0, 16);
 			
 			tabPlayer.setTeamName(teamName);
+			//Refresh player
 			tabPlayer.forceRefresh();
 		}
 	}
@@ -52,16 +56,23 @@ public class TABHook {
 		
 		try {
 			if(tabPlayer != null) {
+				//Reset temporarily tablist values
 				tabPlayer.removeTemporaryValue(EnumProperty.TABPREFIX);
 				tabPlayer.removeTemporaryValue(EnumProperty.TABSUFFIX);
 				tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTABNAME);
-				tabPlayer.removeTemporaryValue(EnumProperty.TAGPREFIX);
-				tabPlayer.removeTemporaryValue(EnumProperty.TAGSUFFIX);
 				
-				if(tabPlayer.hasTemporaryValue(EnumProperty.CUSTOMTAGNAME))
-					tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTAGNAME);
+				if(!(tabPlayer.hasHiddenNametag())) {
+					//Reset temporarily nametag values
+					tabPlayer.removeTemporaryValue(EnumProperty.TAGPREFIX);
+					tabPlayer.removeTemporaryValue(EnumProperty.TAGSUFFIX);
+					
+					if(tabPlayer.hasTemporaryValue(EnumProperty.CUSTOMTAGNAME))
+						tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTAGNAME);
+				}
 				
+				//Reset TAB team
 				tabPlayer.setTeamName(utils.getTABTeams().get(player.getUniqueId()));
+				//Refresh player
 				tabPlayer.forceRefresh();
 			}
 		} catch (NullPointerException ignore) {

@@ -83,6 +83,8 @@ public class ReflectionHelper {
 		return (Integer.parseInt(getVersion().substring(1).split("_")[1]) > 12);
 	}
 	
+	/* Only for debugging purposes */
+	
 	public void debugObject(Object obj) {
 		Class<?> clazz = obj.getClass();
 		

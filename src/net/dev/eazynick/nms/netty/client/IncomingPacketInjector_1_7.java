@@ -27,18 +27,21 @@ private EazyNick eazyNick;
 			Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
 			Object networkManager = playerConnection.getClass().getDeclaredField("networkManager").get(playerConnection);
 			
+			//Get netty channel
 			this.channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
 			if (channel.pipeline().get(handlerName) != null)
 				channel.pipeline().remove(handlerName);
 			
+			//Add packet handler to netty channel
 			channel.pipeline().addBefore("packet_handler", handlerName, new ChannelDuplexHandler() {
 				
 				@Override
 				public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
 					if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
 						if(signGUI.getEditCompleteListeners().containsKey(player)) {
+							//Process SignGUI success
 							Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), "b").get(packet);
 							
 							Bukkit.getScheduler().runTask(eazyNick, new Runnable() {
@@ -71,6 +74,7 @@ private EazyNick eazyNick;
 							});
 						} else if(packet.getClass().getName().endsWith("PacketPlayInTabComplete")) {
 							try {
+								//Cache input text
 								eazyNick.getUtils().getTextsToComplete().put(player, (String) reflectionHelper.getField(packet.getClass(), "a").get(packet));
 							} catch (IllegalArgumentException | IllegalAccessException ex) {
 								ex.printStackTrace();

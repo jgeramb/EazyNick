@@ -33,6 +33,7 @@ public class NickedPlayerData {
 		this.groupName = groupName;
 		this.sortID = sortID;
 		
+		//Load skin
 		prepareSkinProfile();
 	}
 	
@@ -46,6 +47,7 @@ public class NickedPlayerData {
 		boolean changeNameTag = eazyNick.getSetupYamlFile().getConfiguration().getBoolean("Settings.ChangeOptions.NameTag");
 		
 		try {
+			//Create and return new game profile
 			if(version.startsWith("1_7")) {
 				net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, changeNameTag ? nickName : realName);
 				gameProfile.getProperties().removeAll("textures");
@@ -63,6 +65,7 @@ public class NickedPlayerData {
 			ex.printStackTrace();
 		} 
 		
+		//Return default game profile
 		return (version.startsWith("1_7") ? new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName) : new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName));
 	}
 	
@@ -77,6 +80,7 @@ public class NickedPlayerData {
 		
 		try {
 			if(skinName.startsWith("MINESKIN:")) {
+				//Load skin from mineskin.org
 				if(version.startsWith("1_7")) {
 					((GameProfile) skinProfile).getProperties().removeAll("textures");
 					((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size())) : skinName.split(":")[1]));
@@ -85,6 +89,7 @@ public class NickedPlayerData {
 					((GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size())) : skinName.split(":")[1]));
 				}
 			} else {
+				//Load skin from mojang api
 				if(version.startsWith("1_7"))
 					skinProfile = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
 				else if(version.equals("1_8_R1"))
@@ -187,6 +192,7 @@ public class NickedPlayerData {
 	public boolean setSkinName(String skinName) {
 		this.skinName = skinName;
 		
+		//Reload skin
 		return prepareSkinProfile();
 	}
 

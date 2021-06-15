@@ -12,6 +12,7 @@ import com.mojang.authlib.properties.Property;
 
 public class MineSkinAPI {
 
+	//Declare mineskin.org api url
 	private final String URL_FORMAT = "https://api.mineskin.org/get/id/%s";
 	
 	public Collection<Property> getTextureProperties(String id) {

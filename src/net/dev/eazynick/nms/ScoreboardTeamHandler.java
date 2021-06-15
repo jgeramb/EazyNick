@@ -51,11 +51,13 @@ public class ScoreboardTeamHandler {
 		try {
 			boolean is17 = eazyNick.getVersion().startsWith("1_17");
 			
+			//Create packet instance
 			Constructor<?> constructor = reflectionHelper.getNMSClass(is17 ? "network.protocol.game.PacketPlayOutScoreboardTeam" : "PacketPlayOutScoreboardTeam").getDeclaredConstructor(is17 ? new Class[] { String.class, int.class, Optional.class, Collection.class } : new Class[0]);
 			constructor.setAccessible(true);
 			
 			packet = constructor.newInstance(is17 ? new Object[] { null, 0, null, new ArrayList<>() } : new Object[0]);
 			
+			//Set packet fields
 			if(!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))) {
 				if(eazyNick.getUtils().isVersion13OrLater()) {
 					try {
@@ -101,6 +103,7 @@ public class ScoreboardTeamHandler {
 				}
 			}
 			
+			//Send packet to destroy team
 			if(skipFilter)
 				Bukkit.getOnlinePlayers().stream().forEach(currentPlayer -> sendPacket(currentPlayer, packet));
 			else
@@ -117,11 +120,13 @@ public class ScoreboardTeamHandler {
 			try {
 				boolean is17 = eazyNick.getVersion().startsWith("1_17");
 				
+				//Create packet instance
 				Constructor<?> constructor = reflectionHelper.getNMSClass(is17 ? "network.protocol.game.PacketPlayOutScoreboardTeam" : "PacketPlayOutScoreboardTeam").getDeclaredConstructor(is17 ? new Class[] { String.class, int.class, Optional.class, Collection.class } : new Class[0]);
 				constructor.setAccessible(true);
 				
 				packet = constructor.newInstance(is17 ? new Object[] { null, 0, null, new ArrayList<>() } : new Object[0]);
 				
+				//Determine which prefix should be shown
 				String prefixForPlayer = prefix;
 				String suffixForPlayer = suffix;
 				List<String> contents = Arrays.asList(nickName, realName);
@@ -131,17 +136,20 @@ public class ScoreboardTeamHandler {
 					suffixForPlayer = setupYamlFile.getConfigString(player, "BypassFormat.NameTagSuffix");
 				}
 
+				//Replace placeholders
 				if(eazyNick.getUtils().isPluginInstalled("PlaceholderAPI")) {
 					prefixForPlayer = PlaceholderAPI.setPlaceholders(player, prefixForPlayer);
 					suffixForPlayer = PlaceholderAPI.setPlaceholders(player, suffixForPlayer);
 				}
 				
+				//Make sure the prefix and suffix are not longer than 16 characters
 				if(prefixForPlayer.length() > 16)
 					prefixForPlayer = prefixForPlayer.substring(0, 16);
 				
 				if(suffixForPlayer.length() > 16)
 					suffixForPlayer = suffixForPlayer.substring(0, 16);
 				
+				//Set packet fields
 				if(!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))) {
 					if(eazyNick.getUtils().isVersion13OrLater()) {
 						try {
@@ -279,6 +287,7 @@ public class ScoreboardTeamHandler {
 					reflectionHelper.setField(packet, "g", 0);
 				}
 			
+				//Send packet to create team
 				sendPacket(currentPlayer, packet);
 				
 				if(!(receivedPacket.contains(currentPlayer)))
@@ -291,6 +300,7 @@ public class ScoreboardTeamHandler {
 	
 	private Object getAsIChatBaseComponent(String text) {
 		try {
+			//Create IChatBaseComponent from String using ChatSerializer
 			return reflectionHelper.getNMSClass(eazyNick.getVersion().startsWith("1_17") ? "network.chat.IChatBaseComponent" : "IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + text + "\"}");
 		} catch (Exception e) {
 			return null;
@@ -301,6 +311,7 @@ public class ScoreboardTeamHandler {
 		boolean is17 = eazyNick.getVersion().startsWith("1_17");
 		
 		try {
+			//Send packet to player connection
 			Object playerHandle = p.getClass().getMethod("getHandle", new Class[0]).invoke(p, new Object[0]);
 			Object playerConnection = playerHandle.getClass().getField(is17 ? "b" : "playerConnection").get(playerHandle);
 			playerConnection.getClass().getMethod("sendPacket", new Class[] { reflectionHelper.getNMSClass(is17 ? "network.protocol.Packet" : "Packet") }).invoke(playerConnection, new Object[] { packet });

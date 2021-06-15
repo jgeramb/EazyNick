@@ -54,9 +54,11 @@ public class NickManager extends ReflectionHelper {
 	private void sendPacket(Player nickedPlayer, Player player, Object packet) {
 		if((player.canSee(nickedPlayer) && player.getWorld().getName().equals(nickedPlayer.getWorld().getName()))) {
 			if(player.getEntityId() != nickedPlayer.getEntityId()) {
+				//Send packet to player who is not the player being nicked
 				if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
 					sendPacketNMS(player, packet);
 			} else if(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))
+				//Send packet to player being nicked
 				sendPacketNMS(player, packet);
 		}
 	}
@@ -65,6 +67,7 @@ public class NickManager extends ReflectionHelper {
 		for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
 			if(currentPlayer.getWorld().getName().equals(player.getWorld().getName())) {
 				if((eazyNick.getVersion().startsWith("1_7") ? true : (!(player.getGameMode().equals(GameMode.SPECTATOR)) || currentPlayer.getGameMode().equals(GameMode.SPECTATOR))) && (currentPlayer.getEntityId() != player.getEntityId())) {
+					//Send packet to player who is not the player being nicked
 					if(!(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
 						sendPacketNMS(currentPlayer, packet);
 				}
@@ -74,6 +77,7 @@ public class NickManager extends ReflectionHelper {
 	
 	private void sendPacketNMS(Player player, Object packet) {
 		try {
+			//Send packet to player connection
 			boolean is17 = eazyNick.getVersion().startsWith("1_17");
 			Object handle = player.getClass().getMethod("getHandle").invoke(player);
 			Object playerConnection = handle.getClass().getDeclaredField(is17 ? "b" : "playerConnection").get(handle);
@@ -84,84 +88,91 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public void setPlayerListName(String name) {
-		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
-			String serverVersion = eazyNick.getVersion();
-			
-			if(serverVersion.equals("1_7_R4")) {
-				try {
-					Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+		String serverVersion = eazyNick.getVersion();
+		
+		if(serverVersion.equals("1_7_R4")) {
+			try {
+				Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 
-					if (name.length() > 16)
-						name = name.substring(0, 16);
-						
-					Field f = getNMSClass("EntityPlayer").getDeclaredField("listName");
-					f.setAccessible(true);
-					f.set(entityPlayer, name);
-					f.setAccessible(false);
+				//Make sure name is not longer than 16 characters
+				if (name.length() > 16)
+					name = name.substring(0, 16);
+				
+				//Set listName field of EntityPlayer -> getPlayerListName()
+				Field listNameField = getNMSClass("EntityPlayer").getDeclaredField("listName");
+				listNameField.setAccessible(true);
+				listNameField.set(entityPlayer, name);
 
-					Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
-					Object packet = playOutPlayerInfo.getMethod("updateDisplayName", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
-					Object packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
-					Object packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
-					
-					for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
-						if(currentPlayer.canSee(player)) {
-							if(!(currentPlayer.getUniqueId().equals(player.getUniqueId()))) {
-								if(!(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
-									Object playerConenction = getNMSClass("EntityPlayer").getDeclaredField("playerConnection").get(currentPlayer.getClass().getMethod("getHandle").invoke(currentPlayer));
-									Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
-									int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
-									
-									if (version < 28) {
-										sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
-										sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
-									} else
-										sendPacketNMS(currentPlayer, packet);
-								}
-							} else {
-								if(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")) {
-									Object playerConenction = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
-									Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
-									int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
-									
-									if (version < 28) {
-										sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
-										sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
-									} else
-										sendPacketNMS(currentPlayer, packet);
-								}
+				Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
+				Object packet = playOutPlayerInfo.getMethod("updateDisplayName", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+				Object packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+				Object packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
+				
+				for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
+					if(currentPlayer.canSee(player)) {
+						if(!(currentPlayer.getUniqueId().equals(player.getUniqueId()))) {
+							if(!(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+								Object playerConenction = getNMSClass("EntityPlayer").getDeclaredField("playerConnection").get(currentPlayer.getClass().getMethod("getHandle").invoke(currentPlayer));
+								Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
+								int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
+								
+								if (version < 28) {
+									//Send packets to remove player from tablist and add it again
+									sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
+									sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
+								} else
+									//Send packet to update tablist name
+									sendPacketNMS(currentPlayer, packet);
+							}
+						} else {
+							if(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")) {
+								Object playerConenction = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
+								Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
+								int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
+								
+								if (version < 28) {
+									//Send packets to remove player from tablist and add it again
+									sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
+									sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
+								} else
+									//Send packet to update tablist name
+									sendPacketNMS(currentPlayer, packet);
 							}
 						}
 					}
-				} catch (Exception ex) {
-					ex.printStackTrace();
 				}
-			} else {
-				try {
-					Class<?> enumPlayerInfoAction = serverVersion.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass(serverVersion.startsWith("1_17") ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction");
-					Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-					Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
-					
-					Array.set(entityPlayerArray, 0, entityPlayer);
-					
-					final String finalName = name;
-					
-					Bukkit.getScheduler().runTask(eazyNick, () -> {
-						try {
-							Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
-							Field f = getNMSClass(serverVersion.startsWith("1_17") ? "server.level.EntityPlayer" : "EntityPlayer").getDeclaredField("listName");
-							f.setAccessible(true);
-							f.set(entityPlayer, utils.isVersion13OrLater() ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, finalName) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, finalName))[0]);
-							
-							for(Player currentPlayer : Bukkit.getOnlinePlayers())
-								sendPacket(player, currentPlayer, getNMSClass(serverVersion.startsWith("1_17") ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField(serverVersion.startsWith("1_17") ? "d" : "UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray));
-						} catch (Exception ex) {
-							ex.printStackTrace();
-						}
-					});
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		} else {
+			try {
+				Class<?> enumPlayerInfoAction = serverVersion.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass(serverVersion.startsWith("1_17") ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction");
+				Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+				Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
+				
+				//Push player to entity player array
+				Array.set(entityPlayerArray, 0, entityPlayer);
+				
+				final String finalName = name;
+				
+				//Run task synchronized
+				Bukkit.getScheduler().runTask(eazyNick, () -> {
+					try {
+						//Set listName field of EntityPlayer -> getPlayerListName()
+						Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
+						Field f = getNMSClass(serverVersion.startsWith("1_17") ? "server.level.EntityPlayer" : "EntityPlayer").getDeclaredField("listName");
+						f.setAccessible(true);
+						f.set(entityPlayer, utils.isVersion13OrLater() ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, finalName) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, finalName))[0]);
+						
+						for(Player currentPlayer : Bukkit.getOnlinePlayers())
+							//Send packet to update tablist name
+							sendPacket(player, currentPlayer, getNMSClass(serverVersion.startsWith("1_17") ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField(serverVersion.startsWith("1_17") ? "d" : "UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray));
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				});
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
@@ -179,9 +190,11 @@ public class NickManager extends ReflectionHelper {
 			//Despawn and remove from tablist
 			for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
 				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId())))
+					//Destroy entity
 					sendPacket(player, currentPlayer, getNMSClass(is17 ? "network.protocol.game.PacketPlayOutEntityDestroy" : "PacketPlayOutEntityDestroy").getConstructor(is17 ? int.class : int[].class).newInstance(is17 ? player.getEntityId() : new int[] { player.getEntityId() }));
 				
 				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId()))) {
+					//Remove player from tablist
 					Object packetPlayOutPlayerInfoRemove;
 					
 					if(version.equals("1_7_R4")) {
@@ -212,6 +225,7 @@ public class NickManager extends ReflectionHelper {
 						//Add to tablist and spawn
 						if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId())) || utils.getSoonNickedPlayers().get(player.getUniqueId()).equals(NickReason.JOIN)) {
 							for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
+								//Add player to tablist
 								Object packetPlayOutPlayerInfoAdd;
 								
 								if(version.equals("1_7_R4")) {
@@ -229,9 +243,10 @@ public class NickManager extends ReflectionHelper {
 						}
 						
 						if(spawnPlayer) {
+							//Spawn player
 							sendPacketExceptSelf(player, getNMSClass(is17 ? "network.protocol.game.PacketPlayOutNamedEntitySpawn" : "PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass(is17 ? "world.entity.player.EntityHuman" : "EntityHuman")).newInstance(entityPlayer));
 							
-							//Head rotation (Yaw + Pitch)
+							//Fix head and body rotation (Yaw + Pitch)
 							Object packetHeadRotation;
 							
 							if(is17)
@@ -255,7 +270,7 @@ public class NickManager extends ReflectionHelper {
 							sendPacketExceptSelf(player, packetHeadRotation);
 						}
 						
-						//Self update
+						//Self skin update
 						Object packetRespawnPlayer;
 						
 						if(version.startsWith("1_16") || is17) {
@@ -287,11 +302,11 @@ public class NickManager extends ReflectionHelper {
 						
 						sendPacketNMS(player, packetRespawnPlayer);
 						
-						//Position
+						//Fix position
 						Object playerConnection = entityPlayer.getClass().getDeclaredField(is17 ? "b" : "playerConnection").get(entityPlayer);
 						playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
 						
-						//Armor, Inventory, Health, Foodlevel & Level
+						//Fix armor, inventory, health, food level & experience level
 						double oldHealth = player.getHealth(), oldHealthScale = player.isHealthScaled() ? player.getHealthScale() : 0;
 						int oldLevel = player.getLevel();
 						ItemStack oldHelmet = player.getInventory().getHelmet(), oldChestplate = player.getInventory().getChestplate(), oldLeggings = player.getInventory().getLeggings(), oldBoots = player.getInventory().getBoots();
@@ -357,6 +372,7 @@ public class NickManager extends ReflectionHelper {
 		if(skinName != null) {
 			if(utils.getNickedPlayers().containsKey(player.getUniqueId())) {
 				if(utils.getNickedPlayers().get(player.getUniqueId()).setSkinName(skinName) && utils.isPluginInstalled("SkinsRestorer")) {
+					//Update skins restorer data synchronized
 					Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
 						SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
 						
@@ -374,6 +390,7 @@ public class NickManager extends ReflectionHelper {
 			} else
 				utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), player.getName(), skinName, "", "", "", "", "", "", "default", 9999));
 			
+			//Respawn player and update tablist
 			updatePlayer(true);
 		}
 	}
@@ -385,6 +402,7 @@ public class NickManager extends ReflectionHelper {
 			else
 				utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), player.getName(), "MINESKIN:" + mineSkinId, "", "", "", "", "", "", "default", 9999));
 			
+			//Respawn player and update tablist
 			updatePlayer(true);
 		}
 	}
@@ -395,10 +413,12 @@ public class NickManager extends ReflectionHelper {
 		else
 			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), nickName, player.getName(), "", "", "", "", "", "", "default", 9999));
 		
+		//Respawn player and update tablist
 		updatePlayer(true);
 	}
 
 	public void nickPlayer(String nickName) {
+		//Use nickname as skin name
 		nickPlayer(nickName, nickName);
 	}
 	
@@ -411,9 +431,11 @@ public class NickManager extends ReflectionHelper {
 		if(setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 			eazyNick.getMySQLNickManager().addPlayer(player.getUniqueId(), nickName, skinName);
 		
+		//Update name and tablist and respawn player
 		setName(new StringUtils(nickName).removeColorCodes().getString());
 		
 		if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage")) {
+			//Show and update action bar frequently
 			new AsyncTask(new AsyncRunnable() {
 				
 				@Override
@@ -434,6 +456,7 @@ public class NickManager extends ReflectionHelper {
 			}, 0, 1000).run();
 		}
 		
+		//Update nick item
 		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
 				ItemStack item = player.getInventory().getItem(slot);
@@ -447,11 +470,13 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public void unnickPlayer() {
+		//Remove mysql data
 		if(setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
 			eazyNick.getMySQLNickManager().removePlayer(player.getUniqueId());
 			eazyNick.getMySQLPlayerDataManager().removeData(player.getUniqueId());
 		}
 		
+		//Unnick player
 		unnickPlayerWithoutRemovingMySQL(false, true);
 	}
 	
@@ -464,6 +489,7 @@ public class NickManager extends ReflectionHelper {
 		if (!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4")))
 			player.setCustomName(nickName);
 		
+		//Respawn player
 		updatePlayer(spawnPlayer);
 		
 		Bukkit.getScheduler().runTaskLater(eazyNick, () -> utils.getNickedPlayers().remove(player.getUniqueId()), 3);
@@ -474,6 +500,7 @@ public class NickManager extends ReflectionHelper {
 			else
 				utils.getLastNickDatas().remove(player.getUniqueId());
 			
+			//Reset CloudNet prefix and suffix
 			if(utils.isPluginInstalled("CloudNetAPI")) {
 				CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
 				
@@ -500,6 +527,7 @@ public class NickManager extends ReflectionHelper {
 				}
 			}
 			
+			//Reset UltraPermissions prefix, suffix and group
 			if(utils.isPluginInstalled("UltraPermissions")) {
 				UltraPermissionsAPI api = UltraPermissions.getAPI();
 				Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
@@ -529,6 +557,7 @@ public class NickManager extends ReflectionHelper {
 				}
 			}
 			
+			//Reset PermissionsEx prefix, suffix and group
 			if(utils.isPluginInstalled("PermissionsEx")) {
 				PermissionUser user = PermissionsEx.getUser(player);
 			
@@ -544,6 +573,7 @@ public class NickManager extends ReflectionHelper {
 				}
 			}
 			
+			//Reset fake scoreboard team
 			if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
 				if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId())) {
 					utils.getScoreboardTeamManagers().get(player.getUniqueId()).destroyTeam();
@@ -551,6 +581,7 @@ public class NickManager extends ReflectionHelper {
 				}
 			}
 			
+			//Reset NametagEdit prefix and suffix synchronized
 			Bukkit.getScheduler().runTask(eazyNick, () -> {
 				if(utils.isPluginInstalled("NametagEdit")) {
 					if(utils.getNametagEditPrefixes().containsKey(player.getUniqueId()) || utils.getNametagEditSuffixes().containsKey(player.getUniqueId())) {
@@ -571,6 +602,7 @@ public class NickManager extends ReflectionHelper {
 				}
 			});
 			
+			//Reset chat and tablist name
 			new AsyncTask(new AsyncRunnable() {
 				
 				@Override
@@ -583,6 +615,7 @@ public class NickManager extends ReflectionHelper {
 			}, 1000 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
 		}
 		
+		//Update nick item
 		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("nick.item"))) {
 			for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
 				ItemStack item = player.getInventory().getItem(slot);
@@ -760,11 +793,13 @@ public class NickManager extends ReflectionHelper {
 		String finalTabPrefix = tabPrefix, finalTabSuffix = tabSuffix, finalTagPrefix = tagPrefix, finalTagSuffix = tagSuffix;
 		
 		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
+			//Reset fake scoreboard team
 			if(utils.getScoreboardTeamManagers().containsKey(player.getUniqueId())) {
 				utils.getScoreboardTeamManagers().get(player.getUniqueId()).destroyTeam();
 				utils.getScoreboardTeamManagers().remove(player.getUniqueId());
 			}
-				
+			
+			//Create new fake scoreboard team
 			utils.getScoreboardTeamManagers().put(player.getUniqueId(), new ScoreboardTeamHandler(player, nickName, realName, tagPrefix, tagSuffix, sortID, groupName));
 		}
 		
@@ -775,6 +810,7 @@ public class NickManager extends ReflectionHelper {
 				UUID uuid = player.getUniqueId();
 				
 				if(eazyNick.isEnabled() && player.isOnline() && isNicked()) {
+					//Update fake scoreboard team
 					if(utils.getScoreboardTeamManagers().containsKey(uuid)) {
 						ScoreboardTeamHandler scoreboardTeamHandler = utils.getScoreboardTeamManagers().get(player.getUniqueId());
 						scoreboardTeamHandler.destroyTeam();
@@ -783,12 +819,14 @@ public class NickManager extends ReflectionHelper {
 					
 					boolean tabNamePrefixSuffixChange = utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB");
 					
+					//Update TAB tablist prefix and suffix and nametag prefix, suffix and sort id
 					if(tabNamePrefixSuffixChange)
 						new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID);
 					
 					if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
 						String tmpTabPrefix = finalTabPrefix, tmpTabSuffix = finalTabSuffix, tmpTagPrefix = finalTagPrefix, tmpTagSuffix = finalTagSuffix;
 						
+						//Replace placeholders
 						if(utils.isPluginInstalled("PlaceholderAPI")) {
 							tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
 							tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
@@ -796,9 +834,11 @@ public class NickManager extends ReflectionHelper {
 							tmpTagSuffix = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix);
 						}
 						
+						//Update tablist name
 						if(!(tabNamePrefixSuffixChange))
 							setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
 						
+						//Update NametagEdit prefix and suffix synchronized
 						if(utils.isPluginInstalled("NametagEdit")) {
 							Bukkit.getScheduler().runTask(eazyNick, () -> {
 								utils.getNametagEditPrefixes().remove(player.getUniqueId());
@@ -823,6 +863,7 @@ public class NickManager extends ReflectionHelper {
 							});
 						}
 						
+						//Update CloudNet prefix and suffix
 						if(utils.isPluginInstalled("CloudNetAPI")) {
 							CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
 							
@@ -856,6 +897,7 @@ public class NickManager extends ReflectionHelper {
 			}
 		}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0), setupYamlFile.getConfiguration().getInt("PrefixSuffixUpdateDelay") * 50L).run();
 
+		//Replace placeholders
 		if(utils.isPluginInstalled("PlaceholderAPI")) {
 			chatPrefix = PlaceholderAPI.setPlaceholders(player, chatPrefix);
 			chatSuffix = PlaceholderAPI.setPlaceholders(player, chatSuffix);
@@ -865,9 +907,11 @@ public class NickManager extends ReflectionHelper {
 			tagSuffix = PlaceholderAPI.setPlaceholders(player, tagSuffix);
 		}
 		
+		//Set chat name
 		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.DisplayName"))
 			player.setDisplayName(chatPrefix + nickName + chatSuffix);
 		
+		//Update UltraPermissions prefix, suffix and group
 		if(utils.isPluginInstalled("UltraPermissions")) {
 			UltraPermissionsAPI api = UltraPermissions.getAPI();
 			Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
@@ -907,6 +951,7 @@ public class NickManager extends ReflectionHelper {
 			}
 		}
 		
+		//Update PermissionsEx prefix, suffix and group
 		if(utils.isPluginInstalled("PermissionsEx")) {
 			PermissionUser user = PermissionsEx.getUser(player);
 		

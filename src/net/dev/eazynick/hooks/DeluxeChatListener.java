@@ -19,12 +19,14 @@ public class DeluxeChatListener implements Listener {
 			NickManager api = new NickManager(player);
 			
 			if(api.isNicked()) {
+				//Replace chat format
 				DeluxeFormat format = event.getDeluxeFormat();
 				format.setPrefix(api.getChatPrefix());
 				format.setSuffix(api.getChatSuffix());
 				format.setName(api.getNickName());
 				format.setNameColor("");
 				format.setChatColor("");
+				
 				event.setDeluxeFormat(format);
 			}
 		}

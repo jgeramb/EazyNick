@@ -31,6 +31,7 @@ public class LuckPermsHook {
 		net.luckperms.api.model.user.User user = api.getUserManager().getUser(player.getUniqueId());
 		
 		if(setupYamlFile.getConfiguration().getBoolean("ChangeLuckPermsPrefixAndSufix")) {
+			//Create new prefix and suffix nodes
 			net.luckperms.api.node.NodeBuilderRegistry nodeFactory = api.getNodeBuilderRegistry();
 			net.luckperms.api.node.Node prefixNode = nodeFactory.forPrefix().priority(99).prefix(prefix).expiry(24 * 30, TimeUnit.HOURS).build();
 			net.luckperms.api.node.Node suffixNode = nodeFactory.forSuffix().priority(99).suffix(suffix).expiry(24 * 30, TimeUnit.HOURS).build();
@@ -43,6 +44,7 @@ public class LuckPermsHook {
 		}
 		
 		if(setupYamlFile.getConfiguration().getBoolean("SwitchLuckPermsGroupByNicking") && !(groupName.equalsIgnoreCase("NONE")) && (user.getPrimaryGroup() != null) && !(user.getPrimaryGroup().isEmpty())) {
+			//Update group nodes
 			utils.getOldLuckPermsGroups().put(player.getUniqueId(), user.getNodes(net.luckperms.api.node.NodeType.INHERITANCE));
 			
 			removeAllGroups(user);
@@ -59,6 +61,7 @@ public class LuckPermsHook {
 		
 		if(setupYamlFile.getConfiguration().getBoolean("ChangeLuckPermsPrefixAndSufix")) {
 			if(utils.getLuckPermsPrefixes().containsKey(player.getUniqueId()) && utils.getLuckPermsSuffixes().containsKey(player.getUniqueId())) {
+				//Remove prefix and suffix nodes
 				user.transientData().remove((net.luckperms.api.node.Node) utils.getLuckPermsPrefixes().get(player.getUniqueId()));
 				user.transientData().remove((net.luckperms.api.node.Node) utils.getLuckPermsSuffixes().get(player.getUniqueId()));
 				
@@ -69,6 +72,7 @@ public class LuckPermsHook {
 		
 		if(setupYamlFile.getConfiguration().getBoolean("SwitchLuckPermsGroupByNicking")) {
 			if(utils.getOldLuckPermsGroups().containsKey(player.getUniqueId())) {
+				//Reset group nodes
 				removeAllGroups(user);
 				
 				((Collection<net.luckperms.api.node.types.InheritanceNode>) utils.getOldLuckPermsGroups().get(player.getUniqueId())).forEach(node -> user.data().add(node));

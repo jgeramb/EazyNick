@@ -29,18 +29,21 @@ public class IncomingPacketInjector {
 			Object playerConnection = entityPlayer.getClass().getField(version.startsWith("1_17") ? "b" : "playerConnection").get(entityPlayer);
 			Object networkManager = playerConnection.getClass().getDeclaredField(version.startsWith("1_17") ? "a" : "networkManager").get(playerConnection);
 			
+			//Get netty channel
 			this.channel = (Channel) networkManager.getClass().getDeclaredField(version.startsWith("1_17") ? "k" : "channel").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
 			if (channel.pipeline().get(handlerName) != null)
 				channel.pipeline().remove(handlerName);
 			
+			//Add packet handler to netty channel
 			channel.pipeline().addBefore("packet_handler", handlerName, new ChannelDuplexHandler() {
 				
 				@Override
 				public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
 					if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
 						if(signGUI.getEditCompleteListeners().containsKey(player)) {
+							//Process SignGUI success
 							Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), version.startsWith("1_17") ? "c" : "b").get(packet);
 							
 							Bukkit.getScheduler().runTask(eazyNick, new Runnable() {
@@ -74,6 +77,7 @@ public class IncomingPacketInjector {
 						}
 					} else if(packet.getClass().getName().endsWith("PacketPlayInTabComplete")) {
 						try {
+							//Cache input text
 							eazyNick.getUtils().getTextsToComplete().put(player, (String) reflectionHelper.getField(packet.getClass(), eazyNick.getUtils().isVersion13OrLater() ? "b" : "a").get(packet));
 						} catch (IllegalArgumentException | IllegalAccessException ex) {
 							ex.printStackTrace();

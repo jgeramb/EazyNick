@@ -37,16 +37,20 @@ public class OutgoingPacketInjector {
 		handlerName = eazyNick.getDescription().getName().toLowerCase() + "_handler";
 		
 		String version = eazyNick.getVersion();
+		
+		//Get Channel from NetworkManager
 		Field field = reflectionHelper.getFirstFieldByType(version.startsWith("1_17") ? reflectionHelper.getNMSClass("network.NetworkManager") : reflectionHelper.getNMSClass("NetworkManager"), Channel.class);
 		field.setAccessible(true);
 		
 		try {
+			//Get MinecraftServer from CraftServer
 			Object craftServer = Bukkit.getServer();
 			Field dedicatedServer = reflectionHelper.getCraftClass("CraftServer").getDeclaredField("console");
 			dedicatedServer.setAccessible(true);
 			
 			Object minecraftServer = dedicatedServer.get(craftServer);
 			
+			//Add packet handler to every ServerConnection and remove old ones
 			for(Object manager : Collections.synchronizedList((List<?>) getNetworkManagerList(minecraftServer.getClass().getMethod("getServerConnection").invoke(minecraftServer))).toArray()) {
 				Channel channel = (Channel) field.get(manager);
 				
@@ -57,6 +61,7 @@ public class OutgoingPacketInjector {
 						channel.pipeline().remove(handlerName);
 					
 					try {
+						//Add new packet handler
 						channel.pipeline().addBefore("packet_handler", handlerName, new ChannelDuplexHandler() {
 							
 							@Override
@@ -65,6 +70,7 @@ public class OutgoingPacketInjector {
 								String ip = inetSocketAddress.getAddress().getHostAddress();
 								Player player = null;
 								
+								//Determine player from ip
 								for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
 									InetSocketAddress currentInetSocketAddress = currentPlayer.getAddress();
 	
@@ -79,6 +85,7 @@ public class OutgoingPacketInjector {
 												
 											if(!(utils.getSoonNickedPlayers().containsKey(uuid))) {
 												if(utils.getNickedPlayers().containsKey(uuid))
+													//Replace uuid with fake uuid (spoofed uuid)
 													reflectionHelper.setField(msg, "b", setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID") ? utils.getNickedPlayers().get(uuid).getSpoofedUniqueId() : uuid);
 												
 												super.write(ctx, msg, promise);
@@ -94,6 +101,7 @@ public class OutgoingPacketInjector {
 														return;
 													
 													if(utils.getNickedPlayers().containsKey(uuid))
+														//Replace game profile with fake game profile (nicked player profile)
 														reflectionHelper.setField(playerInfoData, version.startsWith("1_17") ? "c" : "d", utils.getNickedPlayers().get(uuid).getFakeGameProfile(uuid.equals(player.getUniqueId()) ? false : setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")));
 												}
 											}
@@ -110,21 +118,26 @@ public class OutgoingPacketInjector {
 												else
 													textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
 												
+												//Collect nicknames
 												Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
 												
 												utils.getNickedPlayers().values().forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
 		
+												//Process completions
 												newCompletions.addAll(Arrays.asList((String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg)));
 												newCompletions.removeIf(currentCompletion -> (Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion)).count() != 0));
 												newCompletions.addAll(StringUtil.copyPartialMatches(textToComplete, playerNames, new ArrayList<>()));
 											
+												//Sort completions alphabetically
 												Collections.sort(newCompletions);
 											
+												//Replace completions
 												reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
 											}
 											
 											super.write(ctx, msg, promise);
 										} else if (msg.getClass().getSimpleName().equals("PacketPlayOutChat") && setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets"))
+											//Replace chat packet
 											super.write(ctx, constructChatPacket(msg), promise);
 										else
 											super.write(ctx, msg, promise);
@@ -148,9 +161,11 @@ public class OutgoingPacketInjector {
 												UUID uuid = gameProfileArray[i].getId();
 												
 												if(utils.getNickedPlayers().containsKey(uuid))
+													//Replace game profile with fake game profile (nicked player profile)
 													gameProfileArray[i] = (GameProfile) utils.getNickedPlayers().get(uuid).getFakeGameProfile(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID"));
 											}
 											
+											//Replace game profiles in ServerPingPlayerSample
 											reflectionHelper.setField(serverPingPlayerSample, "c", gameProfileArray);
 											
 											super.write(ctx, msg, promise);
@@ -180,6 +195,7 @@ public class OutgoingPacketInjector {
 	
 	public Object getNetworkManagerList(Object serverConnection) {
 		try {
+			//Get NetworkManager list from ServerConnection
 			List<Field> fields = Arrays.asList(serverConnection.getClass().getDeclaredFields());
 			Collections.reverse(fields);
 			
@@ -207,6 +223,7 @@ public class OutgoingPacketInjector {
 		boolean is17 = version.startsWith("1_17");
 		
 		try {
+			//Get chat message from packet
 			Field field = packet.getClass().getDeclaredField("a");
 			field.setAccessible(true);
 
@@ -214,6 +231,7 @@ public class OutgoingPacketInjector {
 			Object editedComponent = null;
 			
 			if(iChatBaseComponent != null) {
+				//Collect raw text from message
 				Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass(is17 ? "network.chat.IChatBaseComponent" : "IChatBaseComponent");
 				Class<?> chatSerializer = version.equals("1_8_R1") ? reflectionHelper.getNMSClass("ChatSerializer") : iChatBaseComponentClass.getDeclaredClasses()[0];
 				
@@ -232,6 +250,7 @@ public class OutgoingPacketInjector {
 					}
 				}
 				
+				//Replace real names with nicknames
 				if(!(fullText.contains(lastChatMessage) || fullText.startsWith(prefix))) {
 					String json = (String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, iChatBaseComponent);
 					
@@ -250,6 +269,7 @@ public class OutgoingPacketInjector {
 				}
 			}
 			
+			//Overwrite chat message
 			if(editedComponent != null)
 				reflectionHelper.setField(packet, "a", editedComponent);
 		} catch (Exception ex) {
