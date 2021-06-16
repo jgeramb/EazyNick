@@ -43,7 +43,8 @@ public class TABHook {
 			if(teamName.length() > 16)
 				teamName = teamName.substring(0, 16);
 			
-			tabPlayer.setTeamName(teamName);
+			tabPlayer.forceTeamName(teamName);
+			
 			//Refresh player
 			tabPlayer.forceRefresh();
 		}
@@ -71,7 +72,8 @@ public class TABHook {
 				}
 				
 				//Reset TAB team
-				tabPlayer.setTeamName(utils.getTABTeams().get(player.getUniqueId()));
+				tabPlayer.forceTeamName(utils.getTABTeams().get(player.getUniqueId()));
+				
 				//Refresh player
 				tabPlayer.forceRefresh();
 			}

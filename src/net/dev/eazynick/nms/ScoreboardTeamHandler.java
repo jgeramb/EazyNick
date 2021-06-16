@@ -58,7 +58,7 @@ public class ScoreboardTeamHandler {
 			packet = constructor.newInstance(is17 ? new Object[] { null, 0, null, new ArrayList<>() } : new Object[0]);
 			
 			//Set packet fields
-			if(!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))) {
+			if(!(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1"))) {
 				if(eazyNick.getUtils().isVersion13OrLater()) {
 					try {
 						reflectionHelper.setField(packet, "a", teamName);
@@ -150,7 +150,7 @@ public class ScoreboardTeamHandler {
 					suffixForPlayer = suffixForPlayer.substring(0, 16);
 				
 				//Set packet fields
-				if(!(eazyNick.getVersion().equalsIgnoreCase("1_7_R4"))) {
+				if(!(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1"))) {
 					if(eazyNick.getUtils().isVersion13OrLater()) {
 						try {
 							reflectionHelper.setField(packet, "a", teamName);

@@ -16,18 +16,26 @@ import net.dev.eazynick.api.NickedPlayerData;
 import net.dev.eazynick.nms.ReflectionHelper;
 import net.dev.eazynick.utilities.NickReason;
 import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.io.netty.channel.*;
 
 public class OutgoingPacketInjector_1_7 {
 
+	private EazyNick eazyNick;
+	private ReflectionHelper reflectionHelper;
+	
 	private ArrayList<Channel> channels;
 	private String handlerName;
 	
+	public OutgoingPacketInjector_1_7() {
+		this.eazyNick = EazyNick.getInstance();
+		this.reflectionHelper = eazyNick.getReflectionHelper();
+	}
+	
 	public void init() {
-		EazyNick eazyNick = EazyNick.getInstance();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		Utils utils = eazyNick.getUtils();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		channels = new ArrayList<>();
 		handlerName = eazyNick.getDescription().getName().toLowerCase() + "_handler";
@@ -130,10 +138,65 @@ public class OutgoingPacketInjector_1_7 {
 											reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
 											
 											super.write(ctx, msg, promise);
-										} else if (msg.getClass().getSimpleName().equals("PacketPlayOutChat") && eazyNick.getSetupYamlFile().getConfiguration().getBoolean("OverwriteMessagePackets"))
-											//Replace chat packet
-											super.write(ctx, constructChatPacket(msg), promise);
-										else
+										} else if (msg.getClass().getSimpleName().equals("PacketPlayOutChat") && setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
+											//Get chat message from packet and replace names
+											Object editedComponent = replaceNames(reflectionHelper.getField(msg.getClass(), "a").get(msg), true);
+											
+											//Overwrite chat message
+											if(editedComponent != null)
+												reflectionHelper.setField(msg, "a", editedComponent);
+											
+											super.write(ctx, msg, promise);
+										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardObjective")) {
+											String name = (String) reflectionHelper.getField(msg.getClass(), "b").get(msg);
+											
+											for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
+												if(currentNickedPlayerData.getRealName().equalsIgnoreCase(name)) {
+													name = currentNickedPlayerData.getNickName();
+													break;
+												}
+											}
+											
+											reflectionHelper.setField(msg, "b", name);
+											
+											super.write(ctx, msg, promise);
+										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardScore")) {
+											//Replace name
+											String name = (String) reflectionHelper.getField(msg.getClass(), "a").get(msg);
+											
+											for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
+												if(currentNickedPlayerData.getRealName().equalsIgnoreCase(name)) {
+													name = currentNickedPlayerData.getNickName();
+													break;
+												}
+											}
+											
+											reflectionHelper.setField(msg, "a", name);
+											
+											super.write(ctx, msg, promise);
+										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
+											if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+												//Replace names
+												ArrayList<String> contents = new ArrayList<>((List<String>) reflectionHelper.getField(msg.getClass(), "e").get(msg));
+												
+												for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
+													for (String currentName : new ArrayList<>(contents)) {
+														if(currentNickedPlayerData.getRealName().equalsIgnoreCase(currentName)) {
+															contents.remove(currentName);
+															
+															if(!(contents.contains(currentNickedPlayerData.getNickName())))
+																contents.add(currentNickedPlayerData.getNickName());
+															
+															break;
+														}
+													}
+												}
+												
+												reflectionHelper.setField(msg, "e", contents);
+											}
+											
+											super.write(ctx, msg, promise);
+										} else
 											super.write(ctx, msg, promise);
 									} catch (Exception ex) {
 										ex.printStackTrace();
@@ -209,26 +272,15 @@ public class OutgoingPacketInjector_1_7 {
 		return null;
 	}
 	
-	public Object constructChatPacket(Object packet) {
-		EazyNick eazyNick = EazyNick.getInstance();
+	private Object replaceNames(Object iChatBaseComponent, boolean isChatPacket) {
 		Utils utils = eazyNick.getUtils();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
-		
-		String lastChatMessage = ChatColor.stripColor(utils.getLastChatMessage());
-		String prefix = ChatColor.stripColor(utils.getPrefix());
+
+		Object editedComponent = null;
 		
 		try {
-			//Get chat message from packet
-			Field field = packet.getClass().getDeclaredField("a");
-			field.setAccessible(true);
-
-			Object iChatBaseComponent = field.get(packet);
-			Object editedComponent = null;
-			
 			if(iChatBaseComponent != null) {
 				//Collect raw text from message
 				Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass("IChatBaseComponent");
-				Class<?> chatSerializer = reflectionHelper.getNMSClass("ChatSerializer");
 				
 				String fullText = "";
 				Method method = iChatBaseComponentClass.getDeclaredMethod("a");
@@ -236,7 +288,7 @@ public class OutgoingPacketInjector_1_7 {
 				
 				for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {
 					if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
-						String[] json = ((String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, partlyIChatBaseComponent)).replace("\"", "").replace("{", "").replace("}", "").split(",");
+						String[] json = serialize(partlyIChatBaseComponent).replace("\"", "").replace("{", "").replace("}", "").split(",");
 						
 						for (String s : json) {
 							if(s.startsWith("text:"))
@@ -246,8 +298,8 @@ public class OutgoingPacketInjector_1_7 {
 				}
 				
 				//Replace real names with nicknames
-				if(!(fullText.contains(lastChatMessage) || fullText.startsWith(prefix))) {
-					String json = (String) chatSerializer.getMethod("a", iChatBaseComponentClass).invoke(null, iChatBaseComponent);
+				if((!(fullText.contains(ChatColor.stripColor(utils.getLastChatMessage())) || !(isChatPacket)) || fullText.startsWith(ChatColor.stripColor(utils.getPrefix())))) {
+					String json = serialize(iChatBaseComponent);
 					
 					for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
 						String name = Bukkit.getPlayer(nickedPlayerData.getUniqueId()).getName();
@@ -256,20 +308,32 @@ public class OutgoingPacketInjector_1_7 {
 							json = json.replaceAll(name, nickedPlayerData.getNickName());
 					}
 					
-					editedComponent = chatSerializer.getMethod("a", String.class).invoke(null, json);
+					editedComponent = deserialize(json);
 				}
 			}
-			
-			//Overwrite chat message
-			if(editedComponent != null)
-				reflectionHelper.setField(packet, "a", editedComponent);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		
-		return packet;
+		return editedComponent;
+	}
+
+	private String serialize(Object iChatBaseComponent) {
+		try {
+			return ((String) reflectionHelper.getNMSClass("ChatSerializer").getMethod("a", reflectionHelper.getNMSClass("IChatBaseComponent")).invoke(null, iChatBaseComponent));
+		} catch (Exception ex) {
+			return "";
+		}
 	}
 	
+	public Object deserialize(String json) {
+		try {
+			return reflectionHelper.getNMSClass("ChatSerializer").getMethod("a", String.class).invoke(null, json);
+		} catch (Exception ex) {
+			return "";
+		}
+	}
+
 	public void unregister() {
 		channels.stream().filter(currentChannel -> ((currentChannel != null) && (currentChannel.pipeline().get(handlerName) != null))).forEach(currentChannel -> currentChannel.pipeline().remove(handlerName));
 	}
