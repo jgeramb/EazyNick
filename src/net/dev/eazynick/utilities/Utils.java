@@ -74,9 +74,6 @@ public class Utils {
 	private HashMap<UUID, String> nametagEditPrefixes = new HashMap<>();
 	private HashMap<UUID, String> nametagEditSuffixes = new HashMap<>();
 	
-	//TAB old data
-	private HashMap<UUID, String> tabTeams = new HashMap<>();
-	
 	//Last selected options
 	private HashMap<UUID, String> lastNickNames = new HashMap<>();
 	private HashMap<UUID, String> lastSkinNames = new HashMap<>();
@@ -304,7 +301,7 @@ public class Utils {
 								else if(skinType.equalsIgnoreCase("NORMAL"))
 									skinName = new Random().nextBoolean() ? "Steve" : "Alex";
 								else if(skinType.equalsIgnoreCase("RANDOM"))
-									skinName = nickNames.get(new Random().nextInt(getNickNames().size()));
+									skinName = setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + getRandomStringFromList(setupYamlFile.getConfiguration().getStringList("MineSkinIds"))) : nickNames.get(new Random().nextInt(getNickNames().size()));
 								else if(skinType.equalsIgnoreCase("SKINFROMNAME"))
 									skinName = name;
 								else
@@ -317,7 +314,7 @@ public class Utils {
 								if(lastNickNames.containsKey(player.getUniqueId()))
 									lastNickNames.remove(player.getUniqueId());
 								
-								lastSkinNames.put(player.getUniqueId(), skinName);
+								lastSkinNames.put(player.getUniqueId(), skinName.startsWith("MINESKIN:") ? "RANDOM" : skinName);
 								lastNickNames.put(player.getUniqueId(), name);
 								
 								//Fix book still in inventory bug
@@ -783,10 +780,6 @@ public class Utils {
 	
 	public HashMap<UUID, String> getNametagEditSuffixes() {
 		return nametagEditSuffixes;
-	}
-	
-	public HashMap<UUID, String> getTABTeams() {
-		return tabTeams;
 	}
 	
 	public HashMap<UUID, ScoreboardTeamHandler> getScoreboardTeamManagers() {

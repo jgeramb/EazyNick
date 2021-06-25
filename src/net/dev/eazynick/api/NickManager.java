@@ -189,10 +189,12 @@ public class NickManager extends ReflectionHelper {
 			
 			//Despawn and remove from tablist
 			for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
-				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId())))
+				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId()))) {
 					//Destroy entity
-					sendPacket(player, currentPlayer, getNMSClass(is17 ? "network.protocol.game.PacketPlayOutEntityDestroy" : "PacketPlayOutEntityDestroy").getConstructor(is17 ? int.class : int[].class).newInstance(is17 ? player.getEntityId() : new int[] { player.getEntityId() }));
-				
+					if(!((utils.isPluginInstalled("ViaRewind") || utils.isPluginInstalled("ViaBackwards") || utils.isPluginInstalled("ProtocolSupport")) && currentPlayer.equals(player)))
+						sendPacket(player, currentPlayer, getNMSClass(is17 ? "network.protocol.game.PacketPlayOutEntityDestroy" : "PacketPlayOutEntityDestroy").getConstructor(is17 ? int.class : int[].class).newInstance(is17 ? player.getEntityId() : new int[] { player.getEntityId() }));
+				}
+					
 				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId()))) {
 					//Remove player from tablist
 					Object packetPlayOutPlayerInfoRemove;
@@ -270,94 +272,96 @@ public class NickManager extends ReflectionHelper {
 							sendPacketExceptSelf(player, packetHeadRotation);
 						}
 						
-						//Self skin update
-						Object packetRespawnPlayer;
-						
-						if(version.startsWith("1_16") || is17) {
-							Object craftWorld = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
-							Class<?> enumGameMode = getNMSClass(is17 ? "world.level.EnumGamemode" : "EnumGamemode");
-	
-							packetRespawnPlayer = version.equals("1_16_R1") ? getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true) : getNMSClass(is17 ? "network.protocol.game.PacketPlayOutRespawn" : "PacketPlayOutRespawn").getConstructor(getNMSClass(is17 ? "world.level.dimension.DimensionManager" : "DimensionManager"), getNMSClass(is17 ? "resources.ResourceKey" : "ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getDimensionManager").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass(is17 ? "world.level.biome.BiomeManager" : "BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
-						} else if(version.startsWith("1_15")) {
-							Class<?> dimensionManager = getNMSClass("DimensionManager");
-							Class<?> worldType = getNMSClass("WorldType");
-							Class<?> enumGameMode = getNMSClass("EnumGamemode");
+						if(!(utils.isPluginInstalled("ViaRewind") || utils.isPluginInstalled("ViaBackwards") || utils.isPluginInstalled("ProtocolSupport"))) {
+							//Self skin update
+							Object packetRespawnPlayer;
 							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, long.class, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, player.getWorld().getEnvironment().getId()), Hashing.sha256().hashLong(player.getWorld().getSeed()).asLong(), worldType.getMethod("getType", String.class).invoke(worldType, player.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, player.getGameMode().getValue()));
-						} else if(version.startsWith("1_14")) {
-							Class<?> dimensionManager = getNMSClass("DimensionManager");
-							Class<?> worldType = getNMSClass("WorldType");
-							Class<?> enumGameMode = getNMSClass("EnumGamemode");
-							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, player.getWorld().getEnvironment().getId()), worldType.getMethod("getType", String.class).invoke(worldType, player.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, player.getGameMode().getValue()));
-						} else if(version.equals("1_13_R2")) {
-							Object craftWorld = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
-							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldClient.getClass().getDeclaredField("dimension").get(craftWorld), worldClient.getClass().getMethod("getDifficulty").invoke(worldClient), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
-						} else {
-							Class<?> enumGameMode = (version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1") || version.equals("1_9_R2")) ? getNMSClass("WorldSettings").getDeclaredClasses()[0] : getNMSClass("EnumGamemode");
-							
-							packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(int.class, getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), enumGameMode).newInstance(player.getWorld().getEnvironment().getId(), (version.equals("1_7_R4") ? getNMSClass("World").getDeclaredField("difficulty").get(worldClient) : worldClient.getClass().getMethod("getDifficulty").invoke(worldClient)), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
-						}
-						
-						sendPacketNMS(player, packetRespawnPlayer);
-						
-						//Fix position
-						Object playerConnection = entityPlayer.getClass().getDeclaredField(is17 ? "b" : "playerConnection").get(entityPlayer);
-						playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
-						
-						//Fix armor, inventory, health, food level & experience level
-						double oldHealth = player.getHealth(), oldHealthScale = player.isHealthScaled() ? player.getHealthScale() : 0;
-						int oldLevel = player.getLevel();
-						ItemStack oldHelmet = player.getInventory().getHelmet(), oldChestplate = player.getInventory().getChestplate(), oldLeggings = player.getInventory().getLeggings(), oldBoots = player.getInventory().getBoots();
-						
-						if(oldHelmet != null)
-							player.getInventory().setHelmet(new ItemBuilder(Material.LEATHER_HELMET).setDurability(1).setDisplayName("§r").build());
-						
-						if(oldChestplate != null)
-							player.getInventory().setChestplate(new ItemBuilder(Material.LEATHER_CHESTPLATE).setDurability(1).setDisplayName("§r").build());
-						
-						if(oldLeggings != null)
-							player.getInventory().setLeggings(new ItemBuilder(Material.LEATHER_LEGGINGS).setDurability(1).setDisplayName("§r").build());
-						
-						if(oldBoots != null)
-							player.getInventory().setBoots(new ItemBuilder(Material.LEATHER_BOOTS).setDurability(1).setDisplayName("§r").build());
-						
-						player.updateInventory();
-						
-						if(player.getFoodLevel() != 20)
-							player.setFoodLevel(player.getFoodLevel() + 1);
-						
-						player.setLevel((oldLevel == 10) ? 5 : 10);
-						
-						if(player.isHealthScaled())
-							player.setHealthScale((oldHealthScale == 10) ? 20 : 10);
-						
-						player.setHealth((oldHealth == 10) ? 5 : 10);
-						
-						new AsyncTask(new AsyncRunnable() {
-							
-							@Override
-							public void run() {
-								if(oldHelmet != null)
-									player.getInventory().setHelmet(oldHelmet);
+							if(version.startsWith("1_16") || is17) {
+								Object craftWorld = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
+								Class<?> enumGameMode = getNMSClass(is17 ? "world.level.EnumGamemode" : "EnumGamemode");
+		
+								packetRespawnPlayer = version.equals("1_16_R1") ? getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true) : getNMSClass(is17 ? "network.protocol.game.PacketPlayOutRespawn" : "PacketPlayOutRespawn").getConstructor(getNMSClass(is17 ? "world.level.dimension.DimensionManager" : "DimensionManager"), getNMSClass(is17 ? "resources.ResourceKey" : "ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getDimensionManager").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass(is17 ? "world.level.biome.BiomeManager" : "BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
+							} else if(version.startsWith("1_15")) {
+								Class<?> dimensionManager = getNMSClass("DimensionManager");
+								Class<?> worldType = getNMSClass("WorldType");
+								Class<?> enumGameMode = getNMSClass("EnumGamemode");
 								
-								if(oldChestplate != null)
-									player.getInventory().setChestplate(oldChestplate);
+								packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, long.class, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, player.getWorld().getEnvironment().getId()), Hashing.sha256().hashLong(player.getWorld().getSeed()).asLong(), worldType.getMethod("getType", String.class).invoke(worldType, player.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, player.getGameMode().getValue()));
+							} else if(version.startsWith("1_14")) {
+								Class<?> dimensionManager = getNMSClass("DimensionManager");
+								Class<?> worldType = getNMSClass("WorldType");
+								Class<?> enumGameMode = getNMSClass("EnumGamemode");
 								
-								if(oldLeggings != null)
-									player.getInventory().setLeggings(oldLeggings);
+								packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(dimensionManager, worldType, enumGameMode).newInstance(dimensionManager.getMethod("a", int.class).invoke(dimensionManager, player.getWorld().getEnvironment().getId()), worldType.getMethod("getType", String.class).invoke(worldType, player.getWorld().getWorldType().getName()), enumGameMode.getMethod("getById", int.class).invoke(enumGameMode, player.getGameMode().getValue()));
+							} else if(version.equals("1_13_R2")) {
+								Object craftWorld = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
 								
-								if(oldBoots != null)
-									player.getInventory().setBoots(oldBoots);
+								packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("DimensionManager"), getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), getNMSClass("EnumGamemode")).newInstance(worldClient.getClass().getDeclaredField("dimension").get(craftWorld), worldClient.getClass().getMethod("getDifficulty").invoke(worldClient), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
+							} else {
+								Class<?> enumGameMode = (version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1") || version.equals("1_9_R2")) ? getNMSClass("WorldSettings").getDeclaredClasses()[0] : getNMSClass("EnumGamemode");
 								
-								if(player.isHealthScaled())
-									player.setHealthScale(oldHealthScale);
-											
-								player.setHealth(oldHealth);
-								player.setLevel(oldLevel);
+								packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn").getConstructor(int.class, getNMSClass("EnumDifficulty"), getNMSClass("WorldType"), enumGameMode).newInstance(player.getWorld().getEnvironment().getId(), (version.equals("1_7_R4") ? getNMSClass("World").getDeclaredField("difficulty").get(worldClient) : worldClient.getClass().getMethod("getDifficulty").invoke(worldClient)), worldData.getClass().getMethod("getType").invoke(worldData), interactManager.getClass().getMethod("getGameMode").invoke(interactManager));
 							}
-						}, 250).run();
+							
+							sendPacketNMS(player, packetRespawnPlayer);
+						
+							//Fix position
+							Object playerConnection = entityPlayer.getClass().getDeclaredField(is17 ? "b" : "playerConnection").get(entityPlayer);
+							playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
+							
+							//Fix armor, inventory, health, food level & experience level
+							double oldHealth = player.getHealth(), oldHealthScale = player.isHealthScaled() ? player.getHealthScale() : 0;
+							int oldLevel = player.getLevel();
+							ItemStack oldHelmet = player.getInventory().getHelmet(), oldChestplate = player.getInventory().getChestplate(), oldLeggings = player.getInventory().getLeggings(), oldBoots = player.getInventory().getBoots();
+							
+							if(oldHelmet != null)
+								player.getInventory().setHelmet(new ItemBuilder(Material.LEATHER_HELMET).setDurability(1).setDisplayName("§r").build());
+							
+							if(oldChestplate != null)
+								player.getInventory().setChestplate(new ItemBuilder(Material.LEATHER_CHESTPLATE).setDurability(1).setDisplayName("§r").build());
+							
+							if(oldLeggings != null)
+								player.getInventory().setLeggings(new ItemBuilder(Material.LEATHER_LEGGINGS).setDurability(1).setDisplayName("§r").build());
+							
+							if(oldBoots != null)
+								player.getInventory().setBoots(new ItemBuilder(Material.LEATHER_BOOTS).setDurability(1).setDisplayName("§r").build());
+							
+							player.updateInventory();
+							
+							if(player.getFoodLevel() != 20)
+								player.setFoodLevel(player.getFoodLevel() + 1);
+							
+							player.setLevel((oldLevel == 10) ? 5 : 10);
+							
+							if(player.isHealthScaled())
+								player.setHealthScale((oldHealthScale == 10) ? 20 : 10);
+							
+							player.setHealth((oldHealth == 10) ? 5 : 10);
+							
+							new AsyncTask(new AsyncRunnable() {
+								
+								@Override
+								public void run() {
+									if(oldHelmet != null)
+										player.getInventory().setHelmet(oldHelmet);
+									
+									if(oldChestplate != null)
+										player.getInventory().setChestplate(oldChestplate);
+									
+									if(oldLeggings != null)
+										player.getInventory().setLeggings(oldLeggings);
+									
+									if(oldBoots != null)
+										player.getInventory().setBoots(oldBoots);
+									
+									if(player.isHealthScaled())
+										player.setHealthScale(oldHealthScale);
+												
+									player.setHealth(oldHealth);
+									player.setLevel(oldLevel);
+								}
+							}, 250).run();
+						}
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

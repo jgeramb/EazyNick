@@ -38,6 +38,9 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 			if(identifier.equals("display_name"))
 				return api.getNickName();
 			
+			if(identifier.equals("skin_name"))
+				return (isMySQLNicked && !(isLobbyMode)) ? mysqlNickManager.getSkinName(player.getUniqueId()) : (api.isNicked() ? eazyNick.getUtils().getNickedPlayers().get(player.getUniqueId()).getSkinName() : player.getName());
+			
 			if(identifier.equals("global_name"))
 				return isMySQLNicked ? mysqlNickManager.getNickName(player.getUniqueId()) : api.getNickName();
 			

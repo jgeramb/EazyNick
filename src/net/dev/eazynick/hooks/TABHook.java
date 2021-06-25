@@ -2,9 +2,6 @@ package net.dev.eazynick.hooks;
 
 import org.bukkit.entity.Player;
 
-import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.utilities.Utils;
-
 import me.neznamy.tab.api.*;
 
 public class TABHook {
@@ -31,11 +28,9 @@ public class TABHook {
 				
 				try {
 					tabPlayer.setValueTemporarily(EnumProperty.CUSTOMTAGNAME, name);
-				} catch (IllegalStateException ex) {
+				} catch (IllegalStateException ignore) {
 				}
 			}
-			
-			EazyNick.getInstance().getUtils().getTABTeams().put(player.getUniqueId(), tabPlayer.getTeamName());
 			
 			//Update TAB team
 			String teamName = sortID + name;
@@ -44,43 +39,33 @@ public class TABHook {
 				teamName = teamName.substring(0, 16);
 			
 			tabPlayer.forceTeamName(teamName);
-			
-			//Refresh player
-			tabPlayer.forceRefresh();
 		}
 	}
 	
 	public void reset() {
-		Utils utils = EazyNick.getInstance().getUtils();
-		
 		TabPlayer tabPlayer = TABAPI.getPlayer(player.getUniqueId());
 		
-		try {
-			if(tabPlayer != null) {
-				//Reset temporarily tablist values
-				tabPlayer.removeTemporaryValue(EnumProperty.TABPREFIX);
-				tabPlayer.removeTemporaryValue(EnumProperty.TABSUFFIX);
-				tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTABNAME);
+		if(tabPlayer != null) {
+			//Reset temporarily tablist values
+			tabPlayer.removeTemporaryValue(EnumProperty.TABPREFIX);
+			tabPlayer.removeTemporaryValue(EnumProperty.TABSUFFIX);
+			tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTABNAME);
+			
+			if(!(tabPlayer.hasHiddenNametag())) {
+				//Reset temporarily nametag values
+				tabPlayer.removeTemporaryValue(EnumProperty.TAGPREFIX);
+				tabPlayer.removeTemporaryValue(EnumProperty.TAGSUFFIX);
 				
-				if(!(tabPlayer.hasHiddenNametag())) {
-					//Reset temporarily nametag values
-					tabPlayer.removeTemporaryValue(EnumProperty.TAGPREFIX);
-					tabPlayer.removeTemporaryValue(EnumProperty.TAGSUFFIX);
-					
+				try {
 					if(tabPlayer.hasTemporaryValue(EnumProperty.CUSTOMTAGNAME))
 						tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTAGNAME);
+				} catch (NullPointerException ignore) {
 				}
-				
-				//Reset TAB team
-				tabPlayer.forceTeamName(utils.getTABTeams().get(player.getUniqueId()));
-				
-				//Refresh player
-				tabPlayer.forceRefresh();
 			}
-		} catch (NullPointerException ignore) {
+			
+			//Reset TAB team
+			tabPlayer.forceTeamName(null);
 		}
-		
-		utils.getTABTeams().remove(player.getUniqueId());
 	}
 
 }

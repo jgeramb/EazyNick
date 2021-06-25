@@ -28,7 +28,7 @@ private EazyNick eazyNick;
 			Object networkManager = playerConnection.getClass().getDeclaredField("networkManager").get(playerConnection);
 			
 			//Get netty channel
-			this.channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
+			this.channel = (Channel) networkManager.getClass().getDeclaredField("m").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
 			if (channel.pipeline().get(handlerName) != null)

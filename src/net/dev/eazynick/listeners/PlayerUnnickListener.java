@@ -59,11 +59,10 @@ public class PlayerUnnickListener implements Listener {
 			languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", utils.getPrefix()));
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnUnnick")) {
-				for(Player currentPlayer : Bukkit.getOnlinePlayers())
+				Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
 					languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Unnick.Quit").replace("%displayName%", player.getDisplayName()).replace("%displayname%", player.getDisplayName()).replace("%name%", nickName));
-				
-				for(Player currentPlayer : Bukkit.getOnlinePlayers())
 					languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Unnick.Join").replace("%displayName%", player.getDisplayName()).replace("%displayname%", player.getDisplayName()).replace("%name%", name));
+				});
 			}
 		}
 	}

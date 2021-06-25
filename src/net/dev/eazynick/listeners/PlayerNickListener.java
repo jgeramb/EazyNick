@@ -57,11 +57,10 @@ public class PlayerNickListener implements Listener {
 			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(nickName) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(nickName) : eazyNick.getUUIDFetcher().getUUID(nickName)), oldDisplayName, oldPlayerListName, realName, nickName, skinName, event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), event.getTagPrefix(), event.getTagSuffix(), groupName, sortID));
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnNnick")) {
-				for(Player currentPlayer : Bukkit.getOnlinePlayers())
+				Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
 					languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Nick.Quit").replace("%displayName%", oldDisplayName).replace("%displayname%", oldDisplayName).replace("%name%", api.getRealName()));
-				
-				for(Player currentPlayer : Bukkit.getOnlinePlayers())
 					languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Nick.Join").replace("%displayName%", player.getDisplayName()).replace("%displayname%", player.getDisplayName()).replace("%name%", nickName));
+				});
 			}
 			
 			if(!(event.isRenick()))

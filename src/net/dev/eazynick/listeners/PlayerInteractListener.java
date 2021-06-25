@@ -29,7 +29,7 @@ public class PlayerInteractListener implements Listener {
 		if ((event.getItem() != null) && (event.getItem().getType() != Material.AIR && (event.getItem().getItemMeta() != null) && (event.getItem().getItemMeta().getDisplayName() != null))) {
 			String displayName = event.getItem().getItemMeta().getDisplayName();
 			
-			if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
+			if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin") && player.hasPermission("nick.item")) {
 				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled"))) {
 						event.setCancelled(true);
