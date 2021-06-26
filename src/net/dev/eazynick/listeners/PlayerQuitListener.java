@@ -43,6 +43,12 @@ public class PlayerQuitListener implements Listener {
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, command));
 			}
 			
+			if(utils.getOldExperienceLevels().containsKey(player.getUniqueId())) {
+				player.setLevel(utils.getOldExperienceLevels().get(player.getUniqueId()));
+				
+				utils.getOldExperienceLevels().remove(player.getUniqueId());
+			}
+			
 			if (setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 				api.unnickPlayerWithoutRemovingMySQL(false, false);
 			else

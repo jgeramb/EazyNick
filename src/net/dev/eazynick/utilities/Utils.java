@@ -78,6 +78,9 @@ public class Utils {
 	private HashMap<UUID, String> lastNickNames = new HashMap<>();
 	private HashMap<UUID, String> lastSkinNames = new HashMap<>();
 	
+	//FakeExperienceLevel -> real data
+	private HashMap<UUID, Integer> oldExperienceLevels = new HashMap<>();
+	
 	//NickList
 	private HashMap<UUID, Integer> nickNameListPages = new HashMap<>();
 	
@@ -720,6 +723,10 @@ public class Utils {
 	
 	public HashMap<UUID, Boolean> getCanUseNick() {
 		return canUseNick;
+	}
+	
+	public HashMap<UUID, Integer> getOldExperienceLevels() {
+		return oldExperienceLevels;
 	}
 	
 	public HashMap<UUID, Integer> getNickNameListPages() {

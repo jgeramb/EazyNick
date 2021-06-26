@@ -40,6 +40,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("DisconnectUnnick", true);
 		configuration.addDefault("EnableBypassLobbyModePermission", true);
 		configuration.addDefault("EnableBypassPermission", false);
+		configuration.addDefault("FakeExperienceLevel", -1);
 		configuration.addDefault("GetNewNickOnEveryServerSwitch", false);
 		configuration.addDefault("JoinNick", false);
 		configuration.addDefault("KeepNickOnWorldChange", true);

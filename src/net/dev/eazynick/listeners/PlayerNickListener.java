@@ -47,7 +47,7 @@ public class PlayerNickListener implements Listener {
 				new LuckPermsHook(player).updateNodes(chatPrefix, chatSuffix, groupName);
 			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
-				eazyNick.getUtils().sendConsole("§a" + realName + " §8(" + player.getUniqueId().toString() + ") §7set his nickname to §d" + nickName);
+				utils.sendConsole("§a" + realName + " §8(" + player.getUniqueId().toString() + ") §7set his nickname to §d" + nickName);
 
 			api.nickPlayer(nickName, skinName);
 			

@@ -27,10 +27,10 @@ public class IncomingPacketInjector {
 			String version = eazyNick.getVersion();
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 			Object playerConnection = entityPlayer.getClass().getField(version.startsWith("1_17") ? "b" : "playerConnection").get(entityPlayer);
-			Object networkManager = playerConnection.getClass().getDeclaredField(version.startsWith("1_17") ? "a" : "networkManager").get(playerConnection);
+			Object networkManager = playerConnection.getClass().getField(version.startsWith("1_17") ? "a" : "networkManager").get(playerConnection);
 			
 			//Get netty channel
-			this.channel = (Channel) networkManager.getClass().getDeclaredField(version.startsWith("1_17") ? "k" : "channel").get(networkManager);
+			this.channel = (Channel) networkManager.getClass().getField(version.startsWith("1_17") ? "k" : "channel").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
 			if (channel.pipeline().get(handlerName) != null)
@@ -46,32 +46,28 @@ public class IncomingPacketInjector {
 							//Process SignGUI success
 							Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), version.startsWith("1_17") ? "c" : "b").get(packet);
 							
-							Bukkit.getScheduler().runTask(eazyNick, new Runnable() {
-								
-								@Override
-								public void run() {
-									try {
-										String[] lines = new String[4];
+							Bukkit.getScheduler().runTask(eazyNick, () -> {
+								try {
+									String[] lines = new String[4];
 
-										if(version.startsWith("1_8")) {
-											int i = 0;
+									if(version.startsWith("1_8")) {
+										int i = 0;
+										
+										for (Object obj : rawLines) {
+											lines[i] = (String) obj.getClass().getMethod("getText").invoke(obj);
 											
-											for (Object obj : rawLines) {
-												lines[i] = (String) obj.getClass().getMethod("getText").invoke(obj);
-												
-												i++;
-											}
-										} else
-											lines = (String[]) rawLines;
-										
-										if (channel.pipeline().get("PacketInjector") != null)
-											channel.pipeline().remove("PacketInjector");
-										
-										signGUI.getEditCompleteListeners().get(player).onEditComplete(new EditCompleteEvent(lines));
-										signGUI.getBlocks().get(player).setType(signGUI.getOldTypes().get(player));
-									} catch (Exception ex) {
-										ex.printStackTrace();
-									}
+											i++;
+										}
+									} else
+										lines = (String[]) rawLines;
+									
+									if (channel.pipeline().get("PacketInjector") != null)
+										channel.pipeline().remove("PacketInjector");
+									
+									signGUI.getEditCompleteListeners().get(player).onEditComplete(new EditCompleteEvent(lines));
+									signGUI.getBlocks().get(player).setType(signGUI.getOldTypes().get(player));
+								} catch (Exception ex) {
+									ex.printStackTrace();
 								}
 							});
 						}

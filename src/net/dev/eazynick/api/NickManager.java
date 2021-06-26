@@ -435,6 +435,14 @@ public class NickManager extends ReflectionHelper {
 		if(setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 			eazyNick.getMySQLNickManager().addPlayer(player.getUniqueId(), nickName, skinName);
 		
+		int fakeExperienceLevel = setupYamlFile.getConfiguration().getInt("FakeExperienceLevel");
+		
+		if(fakeExperienceLevel > -1) {
+			utils.getOldExperienceLevels().put(player.getUniqueId(), player.getLevel());
+			
+			player.setLevel(fakeExperienceLevel);
+		}
+		
 		//Update name and tablist and respawn player
 		setName(new StringUtils(nickName).removeColorCodes().getString());
 		
@@ -614,6 +622,12 @@ public class NickManager extends ReflectionHelper {
 					if(player.isOnline()) {
 						player.setDisplayName(nickedPlayerData.getOldDisplayName());
 						setPlayerListName(nickedPlayerData.getOldPlayerListName());
+						
+						if(utils.getOldExperienceLevels().containsKey(player.getUniqueId())) {
+							player.setLevel(utils.getOldExperienceLevels().get(player.getUniqueId()));
+							
+							utils.getOldExperienceLevels().remove(player.getUniqueId());
+						}
 					}
 				}
 			}, 1000 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
