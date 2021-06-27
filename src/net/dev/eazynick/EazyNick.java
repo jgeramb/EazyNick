@@ -228,7 +228,7 @@ public class EazyNick extends JavaPlugin {
 				});
 				
 				//Start action bar scheduler
-				if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked")) {
+				if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked") && setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
 					new AsyncTask(new AsyncRunnable() {
 						
 						@Override
@@ -241,7 +241,7 @@ public class EazyNick extends JavaPlugin {
 									actionBarUtils.sendActionBar(currentNickedPlayer, languageYamlFile.getConfigString(currentNickedPlayer, currentNickedPlayer.hasPermission("nick.otheractionbarmessage") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", prefix).replace("%nickprefix%", prefix).replace("%nickSuffix%", suffix).replace("%nicksuffix%", suffix).replace("%prefix%", utils.getPrefix()));
 							});
 						}
-					}, 0, 1000).run();
+					}, 1000, 1000).run();
 				}
 			}
 			

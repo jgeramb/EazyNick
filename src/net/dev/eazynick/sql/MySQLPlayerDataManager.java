@@ -2,33 +2,35 @@ package net.dev.eazynick.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class MySQLPlayerDataManager {
 
+	private HashMap<UUID, CachedNickedPlayerData> cachedData;
 	private MySQL mysql;
 	
 	public MySQLPlayerDataManager(MySQL mysql) {
+		this.cachedData = new HashMap<>();
 		this.mysql = mysql;
 	}
 	
-	public String getGroupName(UUID uuid) {
+	public String getGroupName(UUID uniqueId) {
+		if(cachedData.containsKey(uniqueId))
+			return cachedData.get(uniqueId).getGroupName();
+		
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Check if player is in table
-			if(isRegistered(uuid)) {
-				try {
-					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-					
-					if(rs.next()) {
-						String s = rs.getString("GroupName");
+			if(isRegistered(uniqueId)) {
+				try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'")) {
+					if(resultSet.next()) {
+						String groupName = resultSet.getString("GroupName");
 						
-						rs.close();
+						cachedData.put(uniqueId, new CachedNickedPlayerData(groupName, resultSet.getString("ChatPrefix"), resultSet.getString("ChatSuffix"), resultSet.getString("TabPrefix"), resultSet.getString("TabSuffix"), resultSet.getString("TagPrefix"), resultSet.getString("TagSuffix")));
 						
-						return s;
+						return groupName;
 					}
-					
-					rs.close();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}
@@ -38,23 +40,22 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public String getChatPrefix(UUID uuid) {
+	public String getChatPrefix(UUID uniqueId) {
+		if(cachedData.containsKey(uniqueId))
+			return cachedData.get(uniqueId).getChatPrefix();
+		
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Check if player is in table
-			if(isRegistered(uuid)) {
-				try {
-					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-					
-					if(rs.next()) {
-						String s = rs.getString("ChatPrefix");
+			if(isRegistered(uniqueId)) {
+				try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'")) {
+					if(resultSet.next()) {
+						String chatPrefix = resultSet.getString("ChatPrefix");
 						
-						rs.close();
-						
-						return s;
+						cachedData.put(uniqueId, new CachedNickedPlayerData(resultSet.getString("GroupName"), chatPrefix, resultSet.getString("ChatSuffix"), resultSet.getString("TabPrefix"), resultSet.getString("TabSuffix"), resultSet.getString("TagPrefix"), resultSet.getString("TagSuffix")));
+
+						return chatPrefix;
 					}
-					
-					rs.close();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}
@@ -64,23 +65,22 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public String getChatSuffix(UUID uuid) {
+	public String getChatSuffix(UUID uniqueId) {
+		if(cachedData.containsKey(uniqueId))
+			return cachedData.get(uniqueId).getChatSuffix();
+		
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Check if player is in table
-			if(isRegistered(uuid)) {
-				try {
-					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-					
-					if(rs.next()) {
-						String s = rs.getString("ChatSuffix");
+			if(isRegistered(uniqueId)) {
+				try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'")) {
+					if(resultSet.next()) {
+						String chatSuffix = resultSet.getString("ChatSuffix");
 						
-						rs.close();
+						cachedData.put(uniqueId, new CachedNickedPlayerData(resultSet.getString("GroupName"), resultSet.getString("ChatPrefix"), chatSuffix, resultSet.getString("TabPrefix"), resultSet.getString("TabSuffix"), resultSet.getString("TagPrefix"), resultSet.getString("TagSuffix")));
 						
-						return s;
+						return chatSuffix;
 					}
-					
-					rs.close();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}
@@ -90,23 +90,22 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public String getTabPrefix(UUID uuid) {
+	public String getTabPrefix(UUID uniqueId) {
+		if(cachedData.containsKey(uniqueId))
+			return cachedData.get(uniqueId).getTabPrefix();
+		
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Check if player is in table
-			if(isRegistered(uuid)) {
-				try {
-					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-					
-					if(rs.next()) {
-						String s = rs.getString("TabPrefix");
+			if(isRegistered(uniqueId)) {
+				try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'")) {
+					if(resultSet.next()) {
+						String tabPrefix = resultSet.getString("TabPrefix");
 						
-						rs.close();
+						cachedData.put(uniqueId, new CachedNickedPlayerData(resultSet.getString("GroupName"), resultSet.getString("ChatPrefix"), resultSet.getString("ChatSuffix"), tabPrefix, resultSet.getString("TabSuffix"), resultSet.getString("TagPrefix"), resultSet.getString("TagSuffix")));
 						
-						return s;
+						return tabPrefix;
 					}
-					
-					rs.close();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}
@@ -116,23 +115,22 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public String getTabSuffix(UUID uuid) {
+	public String getTabSuffix(UUID uniqueId) {
+		if(cachedData.containsKey(uniqueId))
+			return cachedData.get(uniqueId).getTabSuffix();
+		
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Check if player is in table
-			if(isRegistered(uuid)) {
-				try {
-					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-					
-					if(rs.next()) {
-						String s = rs.getString("TabSuffix");
+			if(isRegistered(uniqueId)) {
+				try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'")) {
+					if(resultSet.next()) {
+						String tabSuffix = resultSet.getString("TabSuffix");
 						
-						rs.close();
+						cachedData.put(uniqueId, new CachedNickedPlayerData(resultSet.getString("GroupName"), resultSet.getString("ChatPrefix"), resultSet.getString("ChatSuffix"), resultSet.getString("TabPrefix"), tabSuffix, resultSet.getString("TagPrefix"), resultSet.getString("TagSuffix")));
 						
-						return s;
+						return tabSuffix;
 					}
-					
-					rs.close();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}
@@ -142,23 +140,22 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public String getTagPrefix(UUID uuid) {
+	public String getTagPrefix(UUID uniqueId) {
+		if(cachedData.containsKey(uniqueId))
+			return cachedData.get(uniqueId).getTagPrefix();
+		
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Check if player is in table
-			if(isRegistered(uuid)) {
-				try {
-					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-					
-					if(rs.next()) {
-						String s = rs.getString("TagPrefix");
+			if(isRegistered(uniqueId)) {
+				try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'")) {
+					if(resultSet.next()) {
+						String tagPrefix = resultSet.getString("TagPrefix");
 						
-						rs.close();
+						cachedData.put(uniqueId, new CachedNickedPlayerData(resultSet.getString("GroupName"), resultSet.getString("ChatPrefix"), resultSet.getString("ChatSuffix"), resultSet.getString("TabPrefix"), resultSet.getString("TabSuffix"), tagPrefix, resultSet.getString("TagSuffix")));
 						
-						return s;
+						return tagPrefix;
 					}
-					
-					rs.close();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}
@@ -168,23 +165,22 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public String getTagSuffix(UUID uuid) {
+	public String getTagSuffix(UUID uniqueId) {
+		if(cachedData.containsKey(uniqueId))
+			return cachedData.get(uniqueId).getTagSuffix();
+		
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Check if player is in table
-			if(isRegistered(uuid)) {
-				try {
-					ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-					
-					if(rs.next()) {
-						String s = rs.getString("TagSuffix");
+			if(isRegistered(uniqueId)) {
+				try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'")) {
+					if(resultSet.next()) {
+						String tagSuffix = resultSet.getString("TagSuffix");
 						
-						rs.close();
+						cachedData.put(uniqueId, new CachedNickedPlayerData(resultSet.getString("GroupName"), resultSet.getString("ChatPrefix"), resultSet.getString("ChatSuffix"), resultSet.getString("TabPrefix"), resultSet.getString("TabSuffix"), resultSet.getString("TagPrefix"), tagSuffix));
 						
-						return s;
+						return tagSuffix;
 					}
-					
-					rs.close();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}
@@ -194,45 +190,97 @@ public class MySQLPlayerDataManager {
 		return "";
 	}
 	
-	public void insertData(UUID uuid, String groupName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
+	public void insertData(UUID uniqueId, String groupName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Remove player from table
-			if(isRegistered(uuid))
-				removeData(uuid);
+			if(isRegistered(uniqueId))
+				removeData(uniqueId);
 			
-			mysql.update("INSERT INTO NickedPlayerDatas (UUID, GroupName, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uuid.toString() + "', '" + groupName + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
+			cachedData.put(uniqueId, new CachedNickedPlayerData(groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix));
+			
+			mysql.update("INSERT INTO NickedPlayerDatas (UUID, GroupName, ChatPrefix, ChatSuffix, TabPrefix, TabSuffix, TagPrefix, TagSuffix) VALUES ('" + uniqueId.toString() + "', '" + groupName + "', " + "'" + chatPrefix + "', '" + chatSuffix + "', '" + tabPrefix + "', '" + tabSuffix + "', '" + tagPrefix + "', '" + tagSuffix + "')");
 		}
 	}
 	
-	public void removeData(UUID uuid) {
+	public void removeData(UUID uniqueId) {
 		//Check if connection is open
 		if(mysql.isConnected()) {
 			//Check if player is in table
-			if(isRegistered(uuid))
-				mysql.update("DELETE FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
+			if(isRegistered(uniqueId)) {
+				cachedData.remove(uniqueId);
+				
+				mysql.update("DELETE FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'");
+			}
 		}
 	}
 
-	public boolean isRegistered(UUID uuid) {
+	public boolean isRegistered(UUID uniqueId) {
+		if(cachedData.containsKey(uniqueId))
+			return true;
+		
 		//Check if connection is open
 		if(mysql.isConnected()) {
-			try {
-				ResultSet rs = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uuid.toString() + "'");
-				
-				if(rs.next()) {
-					rs.close();
+			try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayerDatas WHERE UUID = '" + uniqueId.toString() + "'")) {
+				if(resultSet.next()) {
+					cachedData.put(uniqueId, new CachedNickedPlayerData(resultSet.getString("GroupName"), resultSet.getString("ChatPrefix"), resultSet.getString("ChatSuffix"), resultSet.getString("TabPrefix"), resultSet.getString("TabSuffix"), resultSet.getString("TagPrefix"), resultSet.getString("TagSuffix")));
 					
 					return true;
 				}
-				
-				rs.close();
 			} catch (SQLException ex) {
 				ex.printStackTrace();
 			}
 		}
 		
 		return false;
+	}
+	
+	public void clearCachedData(UUID uniqueId) {
+		cachedData.remove(uniqueId);
+	}
+	
+	public class CachedNickedPlayerData {
+		
+		private String groupName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix;
+
+		public CachedNickedPlayerData(String groupName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix) {
+			this.groupName = groupName;
+			this.chatPrefix = chatPrefix;
+			this.chatSuffix = chatSuffix;
+			this.tabPrefix = tabPrefix;
+			this.tabSuffix = tabSuffix;
+			this.tagPrefix = tagPrefix;
+			this.tagSuffix = tagSuffix;
+		}
+
+		public String getGroupName() {
+			return groupName;
+		}
+
+		public String getChatPrefix() {
+			return chatPrefix;
+		}
+
+		public String getChatSuffix() {
+			return chatSuffix;
+		}
+
+		public String getTabPrefix() {
+			return tabPrefix;
+		}
+
+		public String getTabSuffix() {
+			return tabSuffix;
+		}
+
+		public String getTagPrefix() {
+			return tagPrefix;
+		}
+
+		public String getTagSuffix() {
+			return tagSuffix;
+		}
+		
 	}
 
 }

@@ -34,6 +34,7 @@ public class PlayerKickListener implements Listener {
 		NickManager api = new NickManager(player);
 
 		if (api.isNicked()) {
+			boolean isBungeeCord = setupYamlFile.getConfiguration().getBoolean("BungeeCord");
 			NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uniqueId).clone();
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnUnnick")) {
@@ -49,7 +50,7 @@ public class PlayerKickListener implements Listener {
 				utils.getOldExperienceLevels().remove(player.getUniqueId());
 			}
 			
-			if (setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
+			if (setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || isBungeeCord)
 				api.unnickPlayerWithoutRemovingMySQL(false, false);
 			else
 				api.unnickPlayerWithoutRemovingMySQL(true, false);
@@ -74,7 +75,7 @@ public class PlayerKickListener implements Listener {
 			if(setupYamlFile.getConfiguration().getBoolean("OverwriteJoinQuitMessages")) {
 				String message = setupYamlFile.getConfigString(player, "OverwrittenMessages.Quit");
 				
-				if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(uniqueId))
+				if(isBungeeCord && mysqlNickManager.isPlayerNicked(uniqueId))
 					message = message.replace("%name%", mysqlNickManager.getNickName(uniqueId)).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(uniqueId) + mysqlNickManager.getNickName(uniqueId) + mysqlPlayerDataManager.getChatSuffix(uniqueId)).replace("%displayname%", mysqlPlayerDataManager.getChatPrefix(uniqueId) + mysqlNickManager.getNickName(uniqueId) + mysqlPlayerDataManager.getChatSuffix(uniqueId));
 				else
 					message = message.replace("%name%", nickedPlayerData.getNickName()).replace("%displayName%", nickedPlayerData.getChatPrefix() + nickedPlayerData.getNickName() + nickedPlayerData.getChatSuffix()).replace("%displayname%", nickedPlayerData.getChatPrefix() + nickedPlayerData.getNickName() + nickedPlayerData.getChatSuffix());
@@ -85,6 +86,11 @@ public class PlayerKickListener implements Listener {
 					event.setLeaveMessage("§e" + player.getName() + " left the game.");
 
 				event.setLeaveMessage(event.getLeaveMessage().replace(player.getName(), nickedPlayerData.getNickName()));
+			}
+			
+			if(isBungeeCord) {
+				mysqlNickManager.clearCachedData(uniqueId);
+				mysqlPlayerDataManager.clearCachedData(uniqueId);
 			}
 		}
 	}
