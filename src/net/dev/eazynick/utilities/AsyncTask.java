@@ -7,6 +7,7 @@ public class AsyncTask {
 	private AsyncRunnable asyncRunnable;
 	private long delay, period;
 	private AtomicBoolean running;
+	private Thread thread;
 	
 	public AsyncTask(AsyncRunnable asyncRunnable, long delay) {
 		this(asyncRunnable, delay, -1);
@@ -22,10 +23,10 @@ public class AsyncTask {
 	public AsyncTask run() {
 		asyncRunnable.prepare(this);
 		
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			//Wait 'delay' milliseconds
 			try {
-				Thread.sleep(delay);
+				thread.sleep(delay);
 			} catch (InterruptedException ex) {
 			}
 			
@@ -36,14 +37,15 @@ public class AsyncTask {
 				if(period >= 0) {
 					//Wait 'period' milliseconds
 					try {
-						Thread.sleep(period);
+						thread.sleep(period);
 					} catch (InterruptedException ex) {
 					}
 				}
 			} while(running.get());
 			
-			Thread.currentThread().interrupt();
-		}).start();
+			thread.interrupt();
+		});
+		thread.start();
 		
 		return this;
 	}

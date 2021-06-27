@@ -1,7 +1,6 @@
 package net.dev.eazynick.api;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.util.*;
 
 import org.bukkit.*;
@@ -307,7 +306,23 @@ public class NickManager extends ReflectionHelper {
 						
 							//Fix position
 							Object playerConnection = entityPlayer.getClass().getDeclaredField(is17 ? "b" : "playerConnection").get(entityPlayer);
-							playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
+							
+							if(is17) {
+								playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX() - 100, player.getLocation().getY() + 100.5, player.getLocation().getZ() - 100, player.getLocation().getYaw(), player.getLocation().getPitch()));
+								
+								new AsyncTask(new AsyncRunnable() {
+									
+									@Override
+									public void run() {
+										try {
+											playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX() + 100, player.getLocation().getY() - 100, player.getLocation().getZ() + 100, player.getLocation().getYaw(), player.getLocation().getPitch()));
+										} catch (Exception ex) {
+											ex.printStackTrace();
+										}
+									}
+								}, 10).run();
+							} else
+								playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY() + 0.25, player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
 							
 							//Fix armor, inventory, health, food level & experience level
 							double oldHealth = player.getHealth(), oldHealthScale = player.isHealthScaled() ? player.getHealthScale() : 0;

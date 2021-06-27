@@ -28,7 +28,7 @@ public class SpigotUpdater {
 		File file = eazyNick.getPluginFile();
 
 		//Parse latest version from spigotmc.org as double
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("http://api.spigotmc.org/legacy/update.php?resource=51398").openStream()))) {
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://api.spigotmc.org/legacy/update.php?resource=51398").openStream()))) {
 			newVersion = Double.valueOf(reader.readLine()).doubleValue();
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -43,7 +43,7 @@ public class SpigotUpdater {
 
 				try {
 					//Open connection
-					HttpURLConnection downloadURL = (HttpURLConnection) new URL("http://www.justix-dev.de/go/dl?id=1&ver=v" + newVersion).openConnection();
+					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/dl?id=1&ver=v" + newVersion).openConnection();
 					downloadURL.setRequestProperty("User-Agent", "JustixDevelopment/Updater");
 					
 					//Open channel for downloading new file
