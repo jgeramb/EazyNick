@@ -12,9 +12,13 @@ import io.netty.buffer.Unpooled;
 
 public class NMSBookUtils extends ReflectionHelper {
 
+	private EazyNick eazyNick;
+	
+	public NMSBookUtils(EazyNick eazyNick) {
+		this.eazyNick = eazyNick;
+	}
+
 	public void open(Player player, ItemStack book) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		
 		ItemStack hand = player.getItemInHand();
 		
 		player.setItemInHand(book);

@@ -61,7 +61,7 @@ public class MySQL {
 				//Close connection
 				con.close();
 				
-				Bukkit.getLogger().log(Level.INFO, PREFIX + "Connection to database closed successfully!");
+				Bukkit.getLogger().info(PREFIX + "Connection to database closed successfully!");
 			} catch (SQLException ex) {
 				Bukkit.getLogger().log(Level.WARNING, PREFIX + "Could not close Connection to database!");
 			}

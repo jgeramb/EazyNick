@@ -9,10 +9,15 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ActionBarUtils {
 	
+	private EazyNick eazyNick;
+	private ReflectionHelper reflectionHelper;
+	
+	public ActionBarUtils(EazyNick eazyNick) {
+		this.eazyNick = eazyNick;
+		this.reflectionHelper = eazyNick.getReflectionHelper();
+	}
+
 	public void sendActionBar(Player player, String text) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
-		
 		try {
 			//Send action bar message
 			if (eazyNick.getVersion().startsWith("1_7_") || eazyNick.getVersion().startsWith("1_8_")) {
@@ -33,7 +38,7 @@ public class ActionBarUtils {
 			//Send packet via reflections
 			Object handle = player.getClass().getMethod("getHandle").invoke(player);
 			Object playerConnection = handle.getClass().getDeclaredField("playerConnection").get(handle);
-			playerConnection.getClass().getMethod("sendPacket", EazyNick.getInstance().getReflectionHelper().getNMSClass("Packet")).invoke(playerConnection, packet);
+			playerConnection.getClass().getMethod("sendPacket", reflectionHelper.getNMSClass("Packet")).invoke(playerConnection, packet);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

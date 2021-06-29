@@ -16,15 +16,25 @@ import net.dev.eazynick.utilities.Utils;
 
 public class SignGUI implements Listener {
 
-	private HashMap<Player, Block> blocks = new HashMap<>();
-	private HashMap<Player, Material> oldTypes = new HashMap<>();
-	private HashMap<Player, EditCompleteListener> editCompleteListeners = new HashMap<>();
+	private EazyNick eazyNick = EazyNick.getInstance();
+	private ReflectionHelper reflectionHelper;
+	private Utils utils;
+	
+	private HashMap<Player, Block> blocks;
+	private HashMap<Player, Material> oldTypes;
+	private HashMap<Player, EditCompleteListener> editCompleteListeners;
+	
+	public SignGUI(EazyNick eazyNick) {
+		this.eazyNick = eazyNick;
+		this.reflectionHelper = eazyNick.getReflectionHelper();
+		this.utils = eazyNick.getUtils();
+		
+		this.blocks = new HashMap<>();
+		this.oldTypes = new HashMap<>();
+		this.editCompleteListeners = new HashMap<>();
+	}
 	
 	public void open(Player player, String line1, String line2, String line3, String line4, EditCompleteListener editCompleteListener) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
-		Utils utils = eazyNick.getUtils();
-		
 		String version = eazyNick.getVersion();
 		boolean is17 = version.startsWith("1_17");
 		Block block = player.getWorld().getBlockAt(player.getLocation().clone().add(0, 250 - player.getLocation().getBlockY(), 0));

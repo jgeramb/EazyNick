@@ -33,7 +33,7 @@ public class PlayerQuitListener implements Listener {
 		UUID uniqueId = player.getUniqueId();
 		NickManager api = new NickManager(player);
 
-		if (api.isNicked()) {
+		if (api.isNicked() && !(setupYamlFile.getConfiguration().getBoolean("APIMode"))) {
 			boolean isBungeeCord = setupYamlFile.getConfiguration().getBoolean("BungeeCord");
 			NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uniqueId).clone();
 			
@@ -61,17 +61,6 @@ public class PlayerQuitListener implements Listener {
 			if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB"))
 				new TABHook(player).reset();
 			
-			if(utils.getIncomingPacketInjectors().containsKey(uniqueId)) {
-				Object incomingPacketInjector = utils.getIncomingPacketInjectors().get(uniqueId);
-				
-				try {
-					incomingPacketInjector.getClass().getMethod("unregister").invoke(incomingPacketInjector);
-				} catch (Exception ignore) {
-				}
-				
-				utils.getIncomingPacketInjectors().remove(uniqueId);
-			}
-			
 			if(setupYamlFile.getConfiguration().getBoolean("OverwriteJoinQuitMessages")) {
 				String message = setupYamlFile.getConfigString(player, "OverwrittenMessages.Quit");
 				
@@ -92,6 +81,17 @@ public class PlayerQuitListener implements Listener {
 				mysqlNickManager.clearCachedData(uniqueId);
 				mysqlPlayerDataManager.clearCachedData(uniqueId);
 			}
+		}
+		
+		if(utils.getIncomingPacketInjectors().containsKey(uniqueId)) {
+			Object incomingPacketInjector = utils.getIncomingPacketInjectors().get(uniqueId);
+			
+			try {
+				incomingPacketInjector.getClass().getMethod("unregister").invoke(incomingPacketInjector);
+			} catch (Exception ignore) {
+			}
+			
+			utils.getIncomingPacketInjectors().remove(uniqueId);
 		}
 	}
 

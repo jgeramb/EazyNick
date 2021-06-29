@@ -18,15 +18,18 @@ import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 public class GUIManager {
 	
 	private Utils utils;
+	private GUIYamlFile guiYamlFile;
+	private SetupYamlFile setupYamlFile;
+	private SignGUI signGUI;
 	
-	public GUIManager() {
-		this.utils = EazyNick.getInstance().getUtils();
+	public GUIManager(EazyNick eazyNick) {
+		this.utils = eazyNick.getUtils();
+		this.guiYamlFile = eazyNick.getGUIYamlFile();
+		this.setupYamlFile = eazyNick.getSetupYamlFile();
+		this.signGUI = eazyNick.getSignGUI();
 	}
 
 	public void openNickList(Player player, int page) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		GUIYamlFile guiYamlFile = eazyNick.getGUIYamlFile();
-		
 		Inventory inv = Bukkit.createInventory(null, 45, guiYamlFile.getConfigString(player, "NickNameGUI.InventoryTitle").replace("%currentPage%", String.valueOf(page + 1)).replace("%currentpage%", String.valueOf(page + 1)));
 		ArrayList<String> toShow = new ArrayList<>();
 		
@@ -56,12 +59,8 @@ public class GUIManager {
 	}
 	
 	public void openCustomGUI(Player player, String rankName, String skinType) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
-		GUIYamlFile guiYamlFile = eazyNick.getGUIYamlFile();
-		
 		if(setupYamlFile.getConfiguration().getBoolean("UseSignGUIForCustomName")) {
-			eazyNick.getSignGUI().open(player, guiYamlFile.getConfigString(player, "SignGUI.Line1"), guiYamlFile.getConfigString(player, "SignGUI.Line2"), guiYamlFile.getConfigString(player, "SignGUI.Line3"), guiYamlFile.getConfigString(player, "SignGUI.Line4"), new SignGUI.EditCompleteListener() {
+			signGUI.open(player, guiYamlFile.getConfigString(player, "SignGUI.Line1"), guiYamlFile.getConfigString(player, "SignGUI.Line2"), guiYamlFile.getConfigString(player, "SignGUI.Line3"), guiYamlFile.getConfigString(player, "SignGUI.Line4"), new SignGUI.EditCompleteListener() {
 				
 				@Override
 				public void onEditComplete(SignGUI.EditCompleteEvent event) {

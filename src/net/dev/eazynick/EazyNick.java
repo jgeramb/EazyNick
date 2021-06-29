@@ -75,20 +75,23 @@ public class EazyNick extends JavaPlugin {
 
 		//Initialize class instances
 		utils = new Utils();
-		guiManager = new GUIManager();
-		actionBarUtils = new ActionBarUtils();
+		actionBarUtils = new ActionBarUtils(this);
+		
 		setupYamlFile = new SetupYamlFileFactory().createConfigurationFile(this);
 		nickNameYamlFile = new NickNameYamlFileFactory().createConfigurationFile(this);
 		guiYamlFile = new GUIYamlFileFactory().createConfigurationFile(this);
-		spigotUpdater = new SpigotUpdater();
-		signGUI = new SignGUI();
-		nmsBookBuilder = new NMSBookBuilder();
-		nmsBookUtils = new NMSBookUtils();
+		
+		spigotUpdater = new SpigotUpdater(this);
 		mineSkinAPI = new MineSkinAPI();
+		
+		signGUI = new SignGUI(this);
+		nmsBookBuilder = new NMSBookBuilder(this);
+		nmsBookUtils = new NMSBookUtils(this);
+		guiManager = new GUIManager(this);
 		
 		//Fix essentials 'nick' command bug
 		if(utils.isPluginInstalled("Essentials"))
-			Bukkit.getScheduler().runTaskLater(this, () -> initiatePlugin(), 20);
+			Bukkit.getScheduler().runTaskLater(this, this::initiatePlugin, 20);
 		else
 			initiatePlugin();
 	}
@@ -116,11 +119,13 @@ public class EazyNick extends JavaPlugin {
 			}
 		});
 		
-		//Unregister OutgoingPacketInjecot(_1_7)
-		try {
-			outgoingPacketInjector.getClass().getMethod("unregister").invoke(outgoingPacketInjector);
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		if(outgoingPacketInjector != null) {
+			//Unregister OutgoingPacketInjecot(_1_7)
+			try {
+				outgoingPacketInjector.getClass().getMethod("unregister").invoke(outgoingPacketInjector);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 		
 		//Disconnect mysql
@@ -137,7 +142,7 @@ public class EazyNick extends JavaPlugin {
 	
 	private void initiatePlugin() {
 		PluginManager pluginManager = Bukkit.getPluginManager();
-
+		
 		languageYamlFile = new LanguageYamlFileFactory(setupYamlFile.getConfiguration().getString("Language")).createConfigurationFile(this);
 		
 		utils.reloadConfigs();
@@ -168,17 +173,29 @@ public class EazyNick extends JavaPlugin {
 				}
 			}
 			
-			//Initialize OutgoingPacketInjecot(_1_7)
-			if(version.equals("1_7_R4"))
-				outgoingPacketInjector = new OutgoingPacketInjector_1_7();
-			else
-				outgoingPacketInjector = new OutgoingPacketInjector();
-			
-			try {
-				outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			new AsyncTask(new AsyncRunnable() {
+				
+				@Override
+				public void run() {
+					//Initialize OutgoingPacketInjecot(_1_7)
+					if(version.equals("1_7_R4"))
+						outgoingPacketInjector = new OutgoingPacketInjector_1_7();
+					else
+						outgoingPacketInjector = new OutgoingPacketInjector();
+					
+					try {
+						outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+					
+					//Check for updates
+					if (spigotUpdater.checkForUpdates()) {
+						pluginManager.disablePlugin(instance);
+						return;
+					}
+				}
+			}, 100).run();
 
 			//Check if plugin features should be enabled -> APIMode: false
 			if (!(setupYamlFile.getConfiguration().getBoolean("APIMode"))) {
@@ -217,10 +234,7 @@ public class EazyNick extends JavaPlugin {
 				pluginManager.registerEvents(new PlayerDeathListener(), this);
 				pluginManager.registerEvents(new PlayerRespawnListener(), this);
 				pluginManager.registerEvents(new PlayerLoginListener(), this);
-				pluginManager.registerEvents(new PlayerJoinListener(), this);
-				pluginManager.registerEvents(new PlayerKickListener(), this);
-				pluginManager.registerEvents(new PlayerQuitListener(), this);
-
+				
 				//Allow every player to use nick + initialize IncomingPacketInjector
 				Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
 					utils.getCanUseNick().put(currentPlayer.getUniqueId(), true);
@@ -246,6 +260,9 @@ public class EazyNick extends JavaPlugin {
 			}
 			
 			//Register important event listeners
+			pluginManager.registerEvents(new PlayerJoinListener(), this);
+			pluginManager.registerEvents(new PlayerKickListener(), this);
+			pluginManager.registerEvents(new PlayerQuitListener(), this);
 			pluginManager.registerEvents(new WorldInitListener(), this);
 			pluginManager.registerEvents(new ServerListPingListener(), this);
 			
@@ -283,12 +300,9 @@ public class EazyNick extends JavaPlugin {
 			utils.sendConsole("§7Plugin by§8: §3" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
 			utils.sendConsole("§7Version§8: §3" + getDescription().getVersion());
 		}
-
+		
 		utils.sendConsole("");
 		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
-
-		if (spigotUpdater.checkForUpdates())
-			isCancelled = true;
 
 		if (isCancelled) {
 			pluginManager.disablePlugin(this);

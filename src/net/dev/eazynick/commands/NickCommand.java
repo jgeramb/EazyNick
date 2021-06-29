@@ -86,11 +86,12 @@ public class NickCommand implements CommandExecutor {
 													playerWithNameIsKnown = true;
 											}
 												
-											if(Bukkit.getOfflinePlayers() != null) {
+											try {
 												for (OfflinePlayer currentOfflinePlayer : Bukkit.getOfflinePlayers()) {
 													if((currentOfflinePlayer != null) && (currentOfflinePlayer.getName() != null) && currentOfflinePlayer.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
 														playerWithNameIsKnown = true;
 												}
+											} catch (NullPointerException ignore) {
 											}
 											
 											if(!(setupYamlFile.getConfiguration().getBoolean("AllowPlayersToNickAsKnownPlayers")) && playerWithNameIsKnown)

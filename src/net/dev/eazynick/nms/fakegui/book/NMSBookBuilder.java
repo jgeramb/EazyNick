@@ -16,8 +16,8 @@ public class NMSBookBuilder {
 	private EazyNick eazyNick;
 	private ReflectionHelper reflectionHelper;
 	
-	public NMSBookBuilder() {
-		this.eazyNick = EazyNick.getInstance();
+	public NMSBookBuilder(EazyNick eazyNick) {
+		this.eazyNick = eazyNick;
 		this.reflectionHelper = eazyNick.getReflectionHelper();
 	}
 	

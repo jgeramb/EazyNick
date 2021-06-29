@@ -1,6 +1,7 @@
 package net.dev.eazynick.api;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.*;
 
 import org.bukkit.*;
@@ -390,17 +391,17 @@ public class NickManager extends ReflectionHelper {
 			if(utils.getNickedPlayers().containsKey(player.getUniqueId())) {
 				if(utils.getNickedPlayers().get(player.getUniqueId()).setSkinName(skinName) && utils.isPluginInstalled("SkinsRestorer")) {
 					//Update skins restorer data synchronized
-					Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-						SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
-						
+					new Thread(() -> {
 						try {
+							Thread.sleep(300 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (1000 * 2) : 0));
+						
+							SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
 							skinsRestorerAPI.setSkin(player.getName(), skinName);
+							skinsRestorerAPI.applySkin(new PlayerWrapper(player), skinName);
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
-						
-						skinsRestorerAPI.applySkin(new PlayerWrapper(player), skinName);
-					}, 6 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+					}).start();
 					
 					return;
 				}

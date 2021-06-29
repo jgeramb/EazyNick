@@ -12,12 +12,21 @@ import org.bukkit.plugin.PluginDescriptionFile;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class SpigotUpdater {
 
+	private EazyNick eazyNick;
+	private SetupYamlFile setupYamlFile;
+	private Utils utils;
+	
+	public SpigotUpdater(EazyNick eazyNick) {
+		this.eazyNick = eazyNick;
+		this.setupYamlFile = eazyNick.getSetupYamlFile();
+		this.utils = eazyNick.getUtils();
+	}
+
 	public boolean checkForUpdates() {
-		EazyNick eazyNick = EazyNick.getInstance();
-		
 		PluginDescriptionFile desc = eazyNick.getDescription();
 		
 		Bukkit.getLogger().info("[Updater] Checking for updates...");
@@ -38,7 +47,7 @@ public class SpigotUpdater {
 		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
 			Bukkit.getLogger().info("[Updater] Found a new version (" + newVersion + ")");
 
-			if (eazyNick.getSetupYamlFile().getConfiguration().getBoolean("AutoUpdater")) {
+			if (setupYamlFile.getConfiguration().getBoolean("AutoUpdater")) {
 				Bukkit.getLogger().info("[Updater] Starting download...");
 
 				try {
@@ -72,9 +81,6 @@ public class SpigotUpdater {
 	}
 	
 	public void checkForUpdates(Player player) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		Utils utils = eazyNick.getUtils();
-		
 		String prefix = utils.getPrefix();
 		
 		PluginDescriptionFile desc = eazyNick.getDescription();
@@ -97,7 +103,7 @@ public class SpigotUpdater {
 		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
 			player.sendMessage(prefix + "§3Updater §8» §fFound a new version (" + newVersion + ")");
 
-			if (eazyNick.getSetupYamlFile().getConfiguration().getBoolean("AutoUpdater")) {
+			if (setupYamlFile.getConfiguration().getBoolean("AutoUpdater")) {
 				player.sendMessage(prefix + "§3Updater §8» §fStarting download...");
 
 				try {
