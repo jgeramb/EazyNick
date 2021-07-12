@@ -6,7 +6,6 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.plugin.Plugin;
 
 import com.google.common.primitives.Chars;
 import com.mojang.authlib.GameProfile;
@@ -102,16 +101,17 @@ public class Utils {
 	//Soon nicked
 	private HashMap<UUID, NickReason> soonNickedPlayers = new HashMap<>();
 	
+	//Loaded plugins
+	private HashMap<String, List<String>> loadedPlugins = new HashMap<>();
+	
 	//Check plugin status
 	public boolean isPluginInstalled(String name) {
-		return (Bukkit.getPluginManager().getPlugin(name) != null);
+		return loadedPlugins.containsKey(name);
 	}
 	
 	public boolean isPluginInstalled(String name, String author) {
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
-		
-		if(plugin != null)
-			return plugin.getDescription().getAuthors().contains(author);
+		if(loadedPlugins.containsKey(name))
+			return loadedPlugins.get(name).contains(author);
 		
 		return false;
 	}
@@ -345,26 +345,30 @@ public class Utils {
 										nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
 									}
 								} else {
-									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, sortID, groupName));
+									PlayerNickEvent playerNickEvent = new PlayerNickEvent(player, name, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, sortID, groupName);
 									
-									String finalChatPrefix = chatPrefix, finalChatSuffix = chatSuffix;
+									Bukkit.getPluginManager().callEvent(playerNickEvent);
 									
-									new AsyncTask(new AsyncRunnable() {
+									if(!(playerNickEvent.isCancelled())) {
+										String finalChatPrefix = chatPrefix, finalChatSuffix = chatSuffix;
 										
-										@Override
-										public void run() {
-											Bukkit.getScheduler().runTask(eazyNick, () -> {
-												if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
-													ArrayList<TextComponent> textComponents = new ArrayList<>();
-													
-													for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer").replace("%name%", finalChatPrefix + name + finalChatSuffix).split("%nl%"))
-														textComponents.add(new TextComponent(s + "\n"));
-													
-													nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
-												}
-											});
-										}
-									}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
+										new AsyncTask(new AsyncRunnable() {
+											
+											@Override
+											public void run() {
+												Bukkit.getScheduler().runTask(eazyNick, () -> {
+													if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
+														ArrayList<TextComponent> textComponents = new ArrayList<>();
+														
+														for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer").replace("%name%", finalChatPrefix + name + finalChatSuffix).split("%nl%"))
+															textComponents.add(new TextComponent(s + "\n"));
+														
+														nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
+													}
+												});
+											}
+										}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
+									}
 								}
 							} else
 								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerWithThisNameIsKnown").replace("%prefix%", prefix));
@@ -821,6 +825,10 @@ public class Utils {
 	
 	public HashMap<UUID, NickReason> getSoonNickedPlayers() {
 		return soonNickedPlayers;
+	}
+	
+	public HashMap<String, List<String>> getLoadedPlugins() {
+		return loadedPlugins;
 	}
 
 	public void setLastChatMessage(String lastChatMessage) {

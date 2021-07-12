@@ -7,7 +7,6 @@ import java.util.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.hash.Hashing;
 import com.nametagedit.plugin.NametagEdit;
@@ -213,7 +212,7 @@ public class NickManager extends ReflectionHelper {
 				}
 			}
 			
-			new BukkitRunnable() {
+			new AsyncTask(new AsyncRunnable() {
 				
 				@Override
 				public void run() {
@@ -380,7 +379,7 @@ public class NickManager extends ReflectionHelper {
 						ex.printStackTrace();
 					}
 				}
-			}.runTaskLater(eazyNick, 5 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0));
+			}, 50L * (5 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * new Random().nextInt(3)) : 0))).run();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -518,7 +517,13 @@ public class NickManager extends ReflectionHelper {
 		//Respawn player
 		updatePlayer(spawnPlayer);
 		
-		Bukkit.getScheduler().runTaskLater(eazyNick, () -> utils.getNickedPlayers().remove(player.getUniqueId()), 3);
+		new AsyncTask(new AsyncRunnable() {
+			
+			@Override
+			public void run() {
+				utils.getNickedPlayers().remove(player.getUniqueId());
+			}
+		}, 50L * 3);
 		
 		if(nickedPlayerData != null) {
 			if(keepNick)

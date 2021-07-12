@@ -7,6 +7,8 @@ import org.bukkit.event.*;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.*;
 import net.dev.eazynick.hooks.LuckPermsHook;
+import net.dev.eazynick.utilities.AsyncTask;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
@@ -31,7 +33,13 @@ public class PlayerNickListener implements Listener {
 			
 			utils.getCanUseNick().put(player.getUniqueId(), false);
 			
-			Bukkit.getScheduler().runTaskLater(eazyNick, () -> utils.getCanUseNick().put(player.getUniqueId(), true), setupYamlFile.getConfiguration().getLong("Settings.NickDelay") * 20);
+			new AsyncTask(new AsyncRunnable() {
+				
+				@Override
+				public void run() {
+					utils.getCanUseNick().put(player.getUniqueId(), true);
+				}
+			}, setupYamlFile.getConfiguration().getLong("Settings.NickDelay") * 1000L).run();
 			
 			if(setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
 				if(!(groupName.equals("NONE")))
@@ -48,7 +56,7 @@ public class PlayerNickListener implements Listener {
 			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
 				utils.sendConsole("§a" + realName + " §8(" + player.getUniqueId().toString() + ") §7set his nickname to §d" + nickName);
-
+			
 			api.nickPlayer(nickName, skinName);
 			
 			if(changePrefixAndSuffix)

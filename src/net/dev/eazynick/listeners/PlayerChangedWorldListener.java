@@ -8,8 +8,8 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.*;
-import net.dev.eazynick.utilities.NickReason;
-import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.*;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class PlayerChangedWorldListener implements Listener {
@@ -31,16 +31,24 @@ public class PlayerChangedWorldListener implements Listener {
 				
 				utils.getSoonNickedPlayers().put(player.getUniqueId(), NickReason.WORLDCHANGE);
 				
-				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-					if(player.isOnline()) {
-						api.unnickPlayerWithoutRemovingMySQL(false, true);
-						
-						Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-							if(player.isOnline())
-								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
-						}, 21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+				new AsyncTask(new AsyncRunnable() {
+					
+					@Override
+					public void run() {
+						if(player.isOnline()) {
+							api.unnickPlayerWithoutRemovingMySQL(false, true);
+							
+							new AsyncTask(new AsyncRunnable() {
+								
+								@Override
+								public void run() {
+									if(player.isOnline())
+										Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+								}
+							}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0)));
+						}
 					}
-				}, 20);
+				}, 1000L);
 			}
 			
 			if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && setupYamlFile.getConfiguration().getBoolean("ReNickAllOnNewPlayerJoinWorld")) {
@@ -51,16 +59,24 @@ public class PlayerChangedWorldListener implements Listener {
 						if (apiCurrentPlayer.isNicked() && currentPlayer.getWorld().getName().equals(player.getWorld().getName())) {
 							NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).clone();
 							
-							Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-								if(player.isOnline()) {
-									apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false, true);
-									
-									Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-										if(currentPlayer.isOnline())
-											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(currentPlayer, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
-									}, 21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
+							new AsyncTask(new AsyncRunnable() {
+								
+								@Override
+								public void run() {
+									if(player.isOnline()) {
+										apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false, true);
+										
+										new AsyncTask(new AsyncRunnable() {
+											
+											@Override
+											public void run() {
+												if(currentPlayer.isOnline())
+													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(currentPlayer, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+											}
+										}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0)));
+									}
 								}
-							}, 20);
+							}, 1000L);
 						}
 					}
 				}

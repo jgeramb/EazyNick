@@ -12,7 +12,9 @@ import org.bukkit.event.Listener;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.nms.ReflectionHelper;
+import net.dev.eazynick.utilities.AsyncTask;
 import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 
 public class SignGUI implements Listener {
 
@@ -54,29 +56,33 @@ public class SignGUI implements Listener {
 		
 		Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> (currentPlayer != player)).forEach(currentPlayer -> currentPlayer.sendBlockChange(block.getLocation(), Material.AIR, (byte) 0));
 		
-		Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-			try {
-				boolean useCraftBlockEntityState = utils.isVersion13OrLater() || Bukkit.getVersion().contains("1.12.2") || Bukkit.getVersion().contains("1.12.1");
-				Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-				Object playerConnection = entityPlayer.getClass().getField(is17 ? "b" : "playerConnection").get(entityPlayer);
-
-				Field tileField = (useCraftBlockEntityState ? reflectionHelper.getCraftClass("block.CraftBlockEntityState") : sign.getClass()).getDeclaredField(useCraftBlockEntityState ? "tileEntity" : "sign");
-				tileField.setAccessible(true);
-				Object tileSign = tileField.get(sign);
-
-				Field editable = tileSign.getClass().getDeclaredField(is17 ? "f" : "isEditable");
-				editable.setAccessible(true);
-				editable.set(tileSign, true);
-				
-				Field handler = tileSign.getClass().getDeclaredField((version.startsWith("1_15") || version.startsWith("1_16")) ? "c" : (version.startsWith("1_14") ? "j" : (version.startsWith("1_13") ? "g" : (is17 ? "g" : "h"))));
-				handler.setAccessible(true);
-				handler.set(tileSign, is17 ? player.getUniqueId() : entityPlayer);
-				
-				playerConnection.getClass().getDeclaredMethod("sendPacket", reflectionHelper.getNMSClass(is17 ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, reflectionHelper.getNMSClass(is17 ? "network.protocol.game.PacketPlayOutOpenSignEditor" : "PacketPlayOutOpenSignEditor").getConstructor(reflectionHelper.getNMSClass(is17 ? "core.BlockPosition" : "BlockPosition")).newInstance(reflectionHelper.getNMSClass(is17 ? "core.BlockPosition" : "BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
-			} catch (Exception ex) {
-	        	ex.printStackTrace();
-	        }
-		}, 3);
+		new AsyncTask(new AsyncRunnable() {
+			
+			@Override
+			public void run() {
+				try {
+					boolean useCraftBlockEntityState = utils.isVersion13OrLater() || Bukkit.getVersion().contains("1.12.2") || Bukkit.getVersion().contains("1.12.1");
+					Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+					Object playerConnection = entityPlayer.getClass().getField(is17 ? "b" : "playerConnection").get(entityPlayer);
+	
+					Field tileField = (useCraftBlockEntityState ? reflectionHelper.getCraftClass("block.CraftBlockEntityState") : sign.getClass()).getDeclaredField(useCraftBlockEntityState ? "tileEntity" : "sign");
+					tileField.setAccessible(true);
+					Object tileSign = tileField.get(sign);
+	
+					Field editable = tileSign.getClass().getDeclaredField(is17 ? "f" : "isEditable");
+					editable.setAccessible(true);
+					editable.set(tileSign, true);
+					
+					Field handler = tileSign.getClass().getDeclaredField((version.startsWith("1_15") || version.startsWith("1_16")) ? "c" : (version.startsWith("1_14") ? "j" : (version.startsWith("1_13") ? "g" : (is17 ? "g" : "h"))));
+					handler.setAccessible(true);
+					handler.set(tileSign, is17 ? player.getUniqueId() : entityPlayer);
+					
+					playerConnection.getClass().getDeclaredMethod("sendPacket", reflectionHelper.getNMSClass(is17 ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, reflectionHelper.getNMSClass(is17 ? "network.protocol.game.PacketPlayOutOpenSignEditor" : "PacketPlayOutOpenSignEditor").getConstructor(reflectionHelper.getNMSClass(is17 ? "core.BlockPosition" : "BlockPosition")).newInstance(reflectionHelper.getNMSClass(is17 ? "core.BlockPosition" : "BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
+				} catch (Exception ex) {
+		        	ex.printStackTrace();
+		        }
+			}
+		}, 50L * 3);
 	}
 	
 	public HashMap<Player, Block> getBlocks() {

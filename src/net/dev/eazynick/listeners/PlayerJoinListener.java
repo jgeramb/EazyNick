@@ -17,6 +17,7 @@ import net.dev.eazynick.nms.netty.server.OutgoingPacketInjector_1_7;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
 import net.dev.eazynick.utilities.*;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
@@ -70,87 +71,95 @@ public class PlayerJoinListener implements Listener {
 			}
 		}
 		
-		Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-			if(eazyNick.getVersion().equals("1_7_R4")) {
-				((OutgoingPacketInjector_1_7) eazyNick.getOutgoingPacketInjector()).unregister();
-				
-				OutgoingPacketInjector_1_7 outgoingPacketInjector = new OutgoingPacketInjector_1_7();
-				outgoingPacketInjector.init();
-				
-				eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
-				
-				utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector_1_7(player));
-			} else {
-				((OutgoingPacketInjector) eazyNick.getOutgoingPacketInjector()).unregister();
-
-				OutgoingPacketInjector outgoingPacketInjector = new OutgoingPacketInjector();
-				outgoingPacketInjector.init();
-				
-				eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
-				
-				utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector(player));
-			}
+		new AsyncTask(new AsyncRunnable() {
 			
-			if(!(isAPIMode)) {
-				if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && setupYamlFile.getConfiguration().getBoolean("ReNickAllOnNewPlayerJoinServer")) {
-					for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-						NickManager apiCurrentPlayer = new NickManager(currentPlayer);
-						
-						if (apiCurrentPlayer.isNicked()) {
-							NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).clone();
-							
-							apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false, false);
-							
-							Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-								if(currentPlayer.isOnline())
-									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(currentPlayer, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
-							}, 21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
-						}
-					}
-				}
-				
-				if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
-					if (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) {
-						if (mysqlNickManager.isPlayerNicked(uniqueId))
-							utils.performReNick(player);
-					} else if (mysqlNickManager.isPlayerNicked(uniqueId) && setupYamlFile.getConfiguration().getBoolean("GetNewNickOnEveryServerSwitch")) {
-						String name = api.getRandomName();
-						
-						mysqlNickManager.removePlayer(uniqueId);
-						mysqlNickManager.addPlayer(uniqueId, name, name);
-					}
+			@Override
+			public void run() {
+				if(eazyNick.getVersion().equals("1_7_R4")) {
+					((OutgoingPacketInjector_1_7) eazyNick.getOutgoingPacketInjector()).unregister();
+					
+					OutgoingPacketInjector_1_7 outgoingPacketInjector = new OutgoingPacketInjector_1_7();
+					outgoingPacketInjector.init();
+					
+					eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
+					
+					utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector_1_7(player));
+				} else {
+					((OutgoingPacketInjector) eazyNick.getOutgoingPacketInjector()).unregister();
 	
-					if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
-						if (player.hasPermission("nick.item")) {
-							if (!(mysqlNickManager.isPlayerNicked(uniqueId)))
-								player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
-							else
-								player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled")).build());
-						}
-					}
-				} else if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
-					if (player.hasPermission("nick.item")) {
-						if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange"))
-							player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
-						else
-							player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
-					}
+					OutgoingPacketInjector outgoingPacketInjector = new OutgoingPacketInjector();
+					outgoingPacketInjector.init();
+					
+					eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
+					
+					utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector(player));
 				}
 				
-				if (setupYamlFile.getConfiguration().getBoolean("JoinNick")) {
-					if (!(api.isNicked()) && player.hasPermission("nick.use"))
-						utils.performNick(player, "RANDOM");
-				} else if (!(setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick")) && utils.getLastNickDatas().containsKey(uniqueId)) {
-					if((eazyNick.getMySQL() != null) && eazyNick.getMySQL().isConnected())
-						Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, mysqlNickManager.getNickName(uniqueId), mysqlNickManager.getSkinName(uniqueId), mysqlPlayerDataManager.getChatPrefix(uniqueId), mysqlPlayerDataManager.getChatSuffix(uniqueId), mysqlPlayerDataManager.getTabPrefix(uniqueId), mysqlPlayerDataManager.getTabSuffix(uniqueId), mysqlPlayerDataManager.getTagPrefix(uniqueId), mysqlPlayerDataManager.getTagSuffix(uniqueId), false, false, 9999, "NONE"));
-					else if(utils.getLastNickDatas().containsKey(uniqueId)) {
-						NickedPlayerData nickedPlayerData = utils.getLastNickDatas().get(uniqueId);
+				if(!(isAPIMode)) {
+					if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && setupYamlFile.getConfiguration().getBoolean("ReNickAllOnNewPlayerJoinServer")) {
+						for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+							NickManager apiCurrentPlayer = new NickManager(currentPlayer);
+							
+							if (apiCurrentPlayer.isNicked()) {
+								NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).clone();
+								
+								apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false, false);
+								
+								new AsyncTask(new AsyncRunnable() {
+									
+									@Override
+									public void run() {
+										if(currentPlayer.isOnline())
+											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(currentPlayer, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+									}
+								}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0)));
+							}
+						}
+					}
+					
+					if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+						if (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) {
+							if (mysqlNickManager.isPlayerNicked(uniqueId))
+								utils.performReNick(player);
+						} else if (mysqlNickManager.isPlayerNicked(uniqueId) && setupYamlFile.getConfiguration().getBoolean("GetNewNickOnEveryServerSwitch")) {
+							String name = api.getRandomName();
+							
+							mysqlNickManager.removePlayer(uniqueId);
+							mysqlNickManager.addPlayer(uniqueId, name, name);
+						}
+		
+						if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
+							if (player.hasPermission("nick.item")) {
+								if (!(mysqlNickManager.isPlayerNicked(uniqueId)))
+									player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
+								else
+									player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled")).build());
+							}
+						}
+					} else if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
+						if (player.hasPermission("nick.item")) {
+							if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange"))
+								player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
+							else
+								player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
+						}
+					}
 						
-						Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+					if (setupYamlFile.getConfiguration().getBoolean("JoinNick")) {
+						if (!(api.isNicked()) && player.hasPermission("nick.use"))
+							utils.performNick(player, "RANDOM");
+					} else if (!(setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick")) && utils.getLastNickDatas().containsKey(uniqueId)) {
+						if((eazyNick.getMySQL() != null) && eazyNick.getMySQL().isConnected())
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, mysqlNickManager.getNickName(uniqueId), mysqlNickManager.getSkinName(uniqueId), mysqlPlayerDataManager.getChatPrefix(uniqueId), mysqlPlayerDataManager.getChatSuffix(uniqueId), mysqlPlayerDataManager.getTabPrefix(uniqueId), mysqlPlayerDataManager.getTabSuffix(uniqueId), mysqlPlayerDataManager.getTagPrefix(uniqueId), mysqlPlayerDataManager.getTagSuffix(uniqueId), false, false, 9999, "NONE"));
+						else if(utils.getLastNickDatas().containsKey(uniqueId)) {
+							NickedPlayerData nickedPlayerData = utils.getLastNickDatas().get(uniqueId);
+							
+							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+						}
 					}
 				}
 			}
-		}, 7);
+		}, 50L * 7).run();
 	}
 
 }

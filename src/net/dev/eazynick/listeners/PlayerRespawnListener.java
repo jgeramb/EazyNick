@@ -7,7 +7,9 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.*;
+import net.dev.eazynick.utilities.AsyncTask;
 import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class PlayerRespawnListener implements Listener {
@@ -24,14 +26,22 @@ public class PlayerRespawnListener implements Listener {
 		if(utils.getNickedPlayers().containsKey(player.getUniqueId())) {
 			NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
 
-			Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-				api.unnickPlayerWithoutRemovingMySQL(false, true);
+			new AsyncTask(new AsyncRunnable() {
 				
-				Bukkit.getScheduler().runTaskLater(eazyNick, () -> {
-					if(player.isOnline())
-						Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
-				}, 21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0));
-			}, 1);
+				@Override
+				public void run() {
+					api.unnickPlayerWithoutRemovingMySQL(false, true);
+				
+					new AsyncTask(new AsyncRunnable() {
+						
+						@Override
+						public void run() {
+							if(player.isOnline())
+								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+						}
+					}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0)));
+				}
+			}, 50L);
 		}
 	}
 
