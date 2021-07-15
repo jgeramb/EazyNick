@@ -198,6 +198,22 @@ public class EazyNick extends JavaPlugin {
 					//Cache loaded plugins
 					for(Plugin currentPlugin : Bukkit.getPluginManager().getPlugins())
 						utils.getLoadedPlugins().put(currentPlugin.getName(), currentPlugin.getDescription().getAuthors());
+					
+					Bukkit.getScheduler().runTask(instance, () -> {
+						//Prepare PlaceholderAPI placeholders
+						if(utils.isPluginInstalled("PlaceholderAPI")) {
+							new PlaceHolderExpansion(instance).register();
+							
+							utils.sendConsole("§7Placeholders loaded successfully!");
+						}
+						
+						//Prepare DeluxeChat hook
+						if(utils.isPluginInstalled("DeluxeChat")) {
+							pluginManager.registerEvents(new DeluxeChatListener(), instance);
+							
+							utils.sendConsole("§7DeluxeChat hooked successfully!");
+						}
+					});
 				}
 			}, 100).run();
 
@@ -299,24 +315,8 @@ public class EazyNick extends JavaPlugin {
 		utils.sendConsole("");
 		utils.sendConsole("§7========== §8[ §5§lEazyNick §8] §7==========");
 
-		if (isCancelled) {
+		if (isCancelled)
 			pluginManager.disablePlugin(this);
-			return;
-		}
-		
-		//Prepare PlaceholderAPI placeholders
-		if(utils.isPluginInstalled("PlaceholderAPI")) {
-			new PlaceHolderExpansion(this).register();
-			
-			utils.sendConsole("§7Placeholders loaded successfully!");
-		}
-		
-		//Prepare DeluxeChat hook
-		if(utils.isPluginInstalled("DeluxeChat")) {
-			pluginManager.registerEvents(new DeluxeChatListener(), this);
-			
-			utils.sendConsole("§7DeluxeChat hooked successfully!");
-		}
 	}
 	
 	public File getPluginFile() {

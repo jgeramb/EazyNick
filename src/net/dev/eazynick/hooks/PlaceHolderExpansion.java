@@ -1,7 +1,6 @@
 package net.dev.eazynick.hooks;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 
 import net.dev.eazynick.EazyNick;
@@ -14,12 +13,12 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
 public class PlaceHolderExpansion extends PlaceholderExpansion {
 	
-	private Plugin plugin;
+	private EazyNick eazyNick;
 	
-	public PlaceHolderExpansion(Plugin plugin) {
-		this.plugin = plugin;
+	public PlaceHolderExpansion(EazyNick eazyNick) {
+		this.eazyNick = eazyNick;
 	}
-	
+
 	@Override
 	public String onPlaceholderRequest(Player player, String identifier) {
 		EazyNick eazyNick = EazyNick.getInstance();
@@ -78,27 +77,37 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 				return String.valueOf(Math.round(player.getHealth() + ((version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17")) ? player.getAbsorptionAmount() : (player.hasPotionEffect(PotionEffectType.ABSORPTION) ? ((player.getActivePotionEffects().stream().filter(currentPotionEffect -> currentPotionEffect.getType().equals(PotionEffectType.ABSORPTION)).findFirst().get().getAmplifier() + 1) * 2) : 0))));
 		}
 		
-		return null;
+		return "";
+	}
+	
+	@Override
+    public boolean canRegister(){
+        return true;
+    }
+	
+	@Override
+    public boolean persist(){
+        return true;
+    }
+	
+	@Override
+	public String getAuthor() {
+		return eazyNick.getDescription().getAuthors().get(0);
 	}
 	
 	@Override
 	public String getIdentifier() {
-		return plugin.getDescription().getName();
+		return eazyNick.getName().toLowerCase();
 	}
 	
 	@Override
-	public boolean canRegister() {
-		return true;
+	public String getRequiredPlugin() {
+		return null;
 	}
 	
 	@Override
 	public String getVersion() {
-		return plugin.getDescription().getVersion();
-	}
-	
-	@Override
-	public String getAuthor() {
-		return plugin.getDescription().getAuthors().toString().replace("[", "").replace("]", "");
+		return eazyNick.getDescription().getVersion();
 	}
 	
 }

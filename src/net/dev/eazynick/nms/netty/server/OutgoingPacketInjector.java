@@ -352,7 +352,10 @@ public class OutgoingPacketInjector {
 	}
 	
 	public void unregister() {
-		channels.stream().filter(currentChannel -> ((currentChannel != null) && (currentChannel.pipeline().get(handlerName) != null))).forEach(currentChannel -> currentChannel.pipeline().remove(handlerName));
+		try {
+			channels.stream().filter(currentChannel -> ((currentChannel != null) && (currentChannel.pipeline().get(handlerName) != null))).forEach(currentChannel -> currentChannel.pipeline().remove(handlerName));
+		} catch (Exception ignore) {
+		}
 	}
 	
 }

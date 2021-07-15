@@ -92,8 +92,11 @@ private EazyNick eazyNick;
 	}
 	
 	public void unregister() {
-		if(channel.pipeline().get(handlerName) != null)
-			channel.pipeline().remove(handlerName);
+		try {
+			if(channel.pipeline().get(handlerName) != null)
+				channel.pipeline().remove(handlerName);
+		} catch (Exception ignore) {
+		}
 	}
 	
 }

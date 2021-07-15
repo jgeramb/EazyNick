@@ -523,7 +523,7 @@ public class NickManager extends ReflectionHelper {
 			public void run() {
 				utils.getNickedPlayers().remove(player.getUniqueId());
 			}
-		}, 50L * 3);
+		}, 50L * 3).run();
 		
 		if(nickedPlayerData != null) {
 			if(keepNick)

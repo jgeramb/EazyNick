@@ -82,7 +82,7 @@ public class SignGUI implements Listener {
 		        	ex.printStackTrace();
 		        }
 			}
-		}, 50L * 3);
+		}, 50L * 3).run();
 	}
 	
 	public HashMap<Player, Block> getBlocks() {
