@@ -70,8 +70,7 @@ public class MySQLNickManager {
 		if(mysql.isConnected()) {
 			//Check if player is not in table
 			if(!(isPlayerNicked(uniqueId))) {
-				if(cachedData.containsKey(uniqueId))
-					cachedData.put(uniqueId, new CachedNickData(nickName, skinName));
+				cachedData.put(uniqueId, new CachedNickData(nickName, skinName));
 				
 				mysql.update("INSERT INTO NickedPlayers (UUID, NickName, SkinName) VALUES ('" + uniqueId.toString() + "', '" + nickName + "', '" + skinName + "')");
 			}

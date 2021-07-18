@@ -31,8 +31,7 @@ private EazyNick eazyNick;
 			this.channel = (Channel) networkManager.getClass().getDeclaredField("m").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
-			if (channel.pipeline().get(handlerName) != null)
-				channel.pipeline().remove(handlerName);
+			unregister();
 			
 			//Add packet handler to netty channel
 			channel.pipeline().addBefore("packet_handler", handlerName, new ChannelDuplexHandler() {

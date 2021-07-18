@@ -262,7 +262,7 @@ public class EazyNick extends JavaPlugin {
 				});
 				
 				//Start action bar scheduler
-				if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked") && setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+				if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked") && setupYamlFile.getConfiguration().getBoolean("BungeeCord") && setupYamlFile.getConfiguration().getBoolean("LobbyMode")) {
 					new AsyncTask(new AsyncRunnable() {
 						
 						@Override

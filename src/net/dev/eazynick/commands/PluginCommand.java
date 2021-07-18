@@ -9,6 +9,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import net.md_5.bungee.api.chat.*;
 
 public class PluginCommand implements CommandExecutor {
@@ -18,6 +19,7 @@ public class PluginCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		String prefix = utils.getPrefix();
 		
@@ -94,7 +96,8 @@ public class PluginCommand implements CommandExecutor {
 						sender.sendMessage(prefix + "§8┣ §7Java version §8» §a" + System.getProperty("java.version"));
 						sender.sendMessage(prefix + "§8┣ §7Server version §8» §a" + Bukkit.getVersion());
 						sender.sendMessage(prefix + "§8┣ §7Online mode §8» §a" + Bukkit.getOnlineMode());
-						sender.sendMessage(prefix + "§8┣ §7BungeeCord §8» §a" + Bukkit.spigot().getConfig().getBoolean("settings.bungeecord"));
+						sender.sendMessage(prefix + "§8┣ §7BungeeCord §8» §a" + setupYamlFile.getConfiguration().getBoolean("BungeeCord"));
+						sender.sendMessage(prefix + "§8┣ §7LobbyMode §8» §a" + setupYamlFile.getConfiguration().getBoolean("LobbyMode"));
 						sender.sendMessage(prefix + "§8┣ §7Spawn protection §8» §a" + Bukkit.getSpawnRadius());
 						
 						String plugins = "";

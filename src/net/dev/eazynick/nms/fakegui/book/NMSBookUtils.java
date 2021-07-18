@@ -76,14 +76,16 @@ public class NMSBookUtils extends ReflectionHelper {
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					} finally {
-						if(noOffhand) {
-							try {
-								playerInventory.getClass().getMethod("setItemInHand", ItemStack.class).invoke(playerInventory, hand);
-							} catch (Exception ex) {
-								ex.printStackTrace();
-							}
-						} else
-							playerInventory.setItemInMainHand(hand);
+						Bukkit.getScheduler().runTask(eazyNick, () -> {
+							if(noOffhand) {
+								try {
+									playerInventory.getClass().getMethod("setItemInHand", ItemStack.class).invoke(playerInventory, hand);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							} else
+								playerInventory.setItemInMainHand(hand);
+						});
 					}
 				}
 			}, 50L * 2).run();

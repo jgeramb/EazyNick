@@ -33,8 +33,7 @@ public class IncomingPacketInjector {
 			this.channel = (Channel) networkManager.getClass().getField(version.startsWith("1_17") ? "k" : "channel").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
-			if (channel.pipeline().get(handlerName) != null)
-				channel.pipeline().remove(handlerName);
+			unregister();
 			
 			//Add packet handler to netty channel
 			channel.pipeline().addBefore("packet_handler", handlerName, new ChannelDuplexHandler() {
