@@ -11,9 +11,8 @@ import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.hooks.TABHook;
 import net.dev.eazynick.utilities.AsyncTask;
 import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
+import net.dev.eazynick.utilities.configuration.yaml.*;
 import net.dev.eazynick.utilities.Utils;
-import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
-import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 
@@ -24,12 +23,13 @@ public class PlayerUnnickListener implements Listener {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
+		SavedNickDatasYamlFile savedNickDatasYamlFile = eazyNick.getSavedNickDatasYamlFile();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		
 		if(!(event.isCancelled())) {
 			Player player = event.getPlayer();
 			NickManager api = new NickManager(player);
-			String nickName = api.getNickName(), name = api.getRealName();
+			String nickName = api.getNickName(), name = api.getRealName(), uniqueIdString = player.getUniqueId().toString().replace("-", "");
 	
 			if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnUnnick")) {
 				if(utils.isPluginInstalled("PlaceholderAPI"))
@@ -37,6 +37,9 @@ public class PlayerUnnickListener implements Listener {
 				else
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, command));
 			}
+			
+			if(savedNickDatasYamlFile.getConfiguration().contains(uniqueIdString))
+				savedNickDatasYamlFile.getConfiguration().set(uniqueIdString, null);
 			
 			api.unnickPlayer();
 			

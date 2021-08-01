@@ -191,9 +191,9 @@ public class NickManager extends ReflectionHelper {
 				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId()))) {
 					//Destroy entity
 					if(!((utils.isPluginInstalled("ViaRewind") || utils.isPluginInstalled("ViaBackwards") || utils.isPluginInstalled("ProtocolSupport")) && currentPlayer.equals(player)))
-						sendPacket(player, currentPlayer, getNMSClass(is17 ? "network.protocol.game.PacketPlayOutEntityDestroy" : "PacketPlayOutEntityDestroy").getConstructor(is17 ? int.class : int[].class).newInstance(is17 ? player.getEntityId() : new int[] { player.getEntityId() }));
+						sendPacket(player, currentPlayer, getNMSClass(is17 ? "network.protocol.game.PacketPlayOutEntityDestroy" : "PacketPlayOutEntityDestroy").getConstructor((is17 && !(Bukkit.getVersion().contains("1.17.1"))) ? int.class : int[].class).newInstance((is17 && !(Bukkit.getVersion().contains("1.17.1"))) ? player.getEntityId() : new int[] { player.getEntityId() }));
 				}
-					
+				
 				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId()))) {
 					//Remove player from tablist
 					Object packetPlayOutPlayerInfoRemove;
@@ -220,8 +220,7 @@ public class NickManager extends ReflectionHelper {
 						return;
 					
 					try {
-						if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
-							utils.getSoonNickedPlayers().remove(player.getUniqueId());
+						utils.getSoonNickedPlayers().remove(player.getUniqueId());
 						
 						//Add to tablist and spawn
 						if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId())) || utils.getSoonNickedPlayers().get(player.getUniqueId()).equals(NickReason.JOIN)) {

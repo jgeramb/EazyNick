@@ -81,12 +81,12 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 	}
 	
 	@Override
-    public boolean canRegister(){
+    public boolean canRegister() {
         return true;
     }
 	
 	@Override
-    public boolean persist(){
+    public boolean persist() {
         return true;
     }
 	

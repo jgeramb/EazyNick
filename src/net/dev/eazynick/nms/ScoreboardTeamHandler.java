@@ -94,14 +94,14 @@ public class ScoreboardTeamHandler {
 						reflectionHelper.setField(packet, "i", 1);
 					}
 				}
-			} else {
+			}/* else {
 				try {
 					reflectionHelper.setField(packet, "a", teamName);
 					reflectionHelper.setField(packet, "f", 1);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-			}
+			}*/
 			
 			//Send packet to destroy team
 			if(skipFilter)
@@ -277,7 +277,7 @@ public class ScoreboardTeamHandler {
 							reflectionHelper.setField(packet, "i", 0);
 						}
 					}
-				} else {
+				}/* else {
 					reflectionHelper.setField(packet, "a", teamName);
 					reflectionHelper.setField(packet, "b", teamName);
 					reflectionHelper.setField(packet, "c", prefixForPlayer);
@@ -285,7 +285,7 @@ public class ScoreboardTeamHandler {
 					reflectionHelper.setField(packet, "e", contents);
 					reflectionHelper.setField(packet, "f", 0);
 					reflectionHelper.setField(packet, "g", 0);
-				}
+				}*/
 			
 				//Send packet to create team
 				sendPacket(currentPlayer, packet);

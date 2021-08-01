@@ -49,6 +49,7 @@ public class EazyNick extends JavaPlugin {
 	private ActionBarUtils actionBarUtils;
 	private SetupYamlFile setupYamlFile;
 	private NickNameYamlFile nickNameYamlFile;
+	private SavedNickDatasYamlFile savedNickDatasYamlFile;
 	private GUIYamlFile guiYamlFile;
 	private LanguageYamlFile languageYamlFile;
 	private ReflectionHelper reflectionHelper;
@@ -79,6 +80,7 @@ public class EazyNick extends JavaPlugin {
 		
 		setupYamlFile = new SetupYamlFileFactory().createConfigurationFile(this);
 		nickNameYamlFile = new NickNameYamlFileFactory().createConfigurationFile(this);
+		savedNickDatasYamlFile = new SavedNickDatasYamlFileFactory().createConfigurationFile(this);
 		guiYamlFile = new GUIYamlFileFactory().createConfigurationFile(this);
 		
 		spigotUpdater = new SpigotUpdater(this);
@@ -98,6 +100,9 @@ public class EazyNick extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		//Save nick datas
+		savedNickDatasYamlFile.save();
+		
 		//Fix bugs
 		utils.getNickedPlayers().keySet().forEach(uuid -> {
 			Player player = Bukkit.getPlayer(uuid);
@@ -361,6 +366,10 @@ public class EazyNick extends JavaPlugin {
 	
 	public NickNameYamlFile getNickNameYamlFile() {
 		return nickNameYamlFile;
+	}
+	
+	public SavedNickDatasYamlFile getSavedNickDatasYamlFile() {
+		return savedNickDatasYamlFile;
 	}
 	
 	public GUIYamlFile getGUIYamlFile() {

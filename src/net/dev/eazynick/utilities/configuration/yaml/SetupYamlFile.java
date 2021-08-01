@@ -61,6 +61,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("ReNickAllOnNewPlayerJoinWorld", true);
 		configuration.addDefault("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled", true);
 		configuration.addDefault("ReplaceNickedChatFormat", true);
+		configuration.addDefault("SaveLocalNickDatas", false);
 		configuration.addDefault("SeeNickSelf", true);
 		configuration.addDefault("ServerIsUsingCloudNETPrefixesAndSuffixes", false);
 		configuration.addDefault("ServerIsUsingVaultPrefixesAndSuffixes", false);

@@ -22,7 +22,7 @@ public class PlayerLoginListener implements Listener {
 		Player player = event.getPlayer();
 		UUID uniqueId = player.getUniqueId();
 
-		if ((setupYamlFile.getConfiguration().getBoolean("BungeeCord") && (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) && eazyNick.getMySQLNickManager().isPlayerNicked(uniqueId)) || utils.getLastNickDatas().containsKey(uniqueId))
+		if ((setupYamlFile.getConfiguration().getBoolean("BungeeCord") && (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) && eazyNick.getMySQLNickManager().isPlayerNicked(uniqueId)) || utils.getLastNickDatas().containsKey(uniqueId) || setupYamlFile.getConfiguration().getBoolean("JoinNick") || (setupYamlFile.getConfiguration().getBoolean("SaveLocalNickDatas") && eazyNick.getSavedNickDatasYamlFile().getConfiguration().contains(player.getUniqueId().toString().replace("-", ""))))
 			utils.getSoonNickedPlayers().put(uniqueId, NickReason.JOIN);
 	}
 

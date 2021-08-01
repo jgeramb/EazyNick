@@ -43,12 +43,12 @@ public class PlayerChangedWorldListener implements Listener {
 								@Override
 								public void run() {
 									if(player.isOnline())
-										Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+										Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getSpoofedUniqueId(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
 								}
-							}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0)));
+							}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0))).run();
 						}
 					}
-				}, 1000L);
+				}, 1000L).run();
 			}
 			
 			if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && setupYamlFile.getConfiguration().getBoolean("ReNickAllOnNewPlayerJoinWorld")) {
@@ -71,12 +71,12 @@ public class PlayerChangedWorldListener implements Listener {
 											@Override
 											public void run() {
 												if(currentPlayer.isOnline())
-													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(currentPlayer, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(currentPlayer, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getSpoofedUniqueId(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
 											}
-										}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0)));
+										}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0))).run();
 									}
 								}
-							}, 1000L);
+							}, 1000L).run();
 						}
 					}
 				}

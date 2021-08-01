@@ -1,5 +1,7 @@
 package net.dev.eazynick.api;
 
+import java.util.UUID;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 
@@ -9,14 +11,17 @@ public class PlayerNickEvent extends Event implements Cancellable {
 	private boolean cancelled = false;
 	private Player player;
 	private String nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName;
+	private UUID spoofedUniqueId;
 	private boolean isBungeeOrJoinNick, isRenick;
 	private int sortID;
 	
-	public PlayerNickEvent(Player player, String nickName, String skinName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, boolean isBungeeOrJoinNick, boolean isRenick, int sortID, String groupName) {
+	public PlayerNickEvent(Player player, String nickName, String skinName, UUID spoofedUniqueId, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, boolean isBungeeOrJoinNick, boolean isRenick, int sortID, String groupName) {
 		this.player = player;
 		
 		this.nickName = nickName;
 		this.skinName = skinName;
+		
+		this.spoofedUniqueId = (spoofedUniqueId == null) ? player.getUniqueId() : spoofedUniqueId;
 		
 		this.chatPrefix = chatPrefix;
 		this.chatSuffix = chatSuffix;
@@ -51,6 +56,14 @@ public class PlayerNickEvent extends Event implements Cancellable {
 	
 	public void setSkinName(String skinName) {
 		this.skinName = skinName;
+	}
+	
+	public UUID getSpoofedUniqueId() {
+		return spoofedUniqueId;
+	}
+	
+	public void setSpoofedUniqueId(UUID spoofedUniqueId) {
+		this.spoofedUniqueId = spoofedUniqueId;
 	}
 	
 	public String getChatPrefix() {
