@@ -196,9 +196,10 @@ public class EazyNick extends JavaPlugin {
 					
 					//Check for updates
 					if (spigotUpdater.checkForUpdates()) {
-						pluginManager.disablePlugin(instance);
+						Bukkit.getScheduler().runTask(instance, () -> pluginManager.disablePlugin(instance));
 						return;
 					}
+					
 					
 					//Cache loaded plugins
 					for(Plugin currentPlugin : Bukkit.getPluginManager().getPlugins())

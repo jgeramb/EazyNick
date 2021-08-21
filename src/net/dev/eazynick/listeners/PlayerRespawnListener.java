@@ -31,15 +31,17 @@ public class PlayerRespawnListener implements Listener {
 				@Override
 				public void run() {
 					api.unnickPlayerWithoutRemovingMySQL(false, true);
-				
-					new AsyncTask(new AsyncRunnable() {
-						
-						@Override
-						public void run() {
-							if(player.isOnline())
-								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getSpoofedUniqueId(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
-						}
-					}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0))).run();
+					
+					if(setupYamlFile.getConfiguration().getBoolean("KeepNickOnDeath")) {
+						new AsyncTask(new AsyncRunnable() {
+							
+							@Override
+							public void run() {
+								if(player.isOnline())
+									Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getSpoofedUniqueId(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
+							}
+						}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0))).run();
+					}
 				}
 			}, 50L).run();
 		}

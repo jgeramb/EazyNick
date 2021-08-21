@@ -25,7 +25,7 @@ public class MySQL {
 		if(!(isConnected())) {
 			try {
 				//Open connection
-				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false&characterEncoding=utf8&useUnicode=true&interactiveClient=true", username, password);
+				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&characterEncoding=utf8&useUnicode=true&interactiveClient=true", username, password);
 				
 				Bukkit.getLogger().info(PREFIX + "Connected to database successfully!");
 			} catch (SQLException ex) {
