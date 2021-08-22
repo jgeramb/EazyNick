@@ -303,20 +303,29 @@ public class NickManager extends ReflectionHelper {
 							
 							sendPacketNMS(player, packetRespawnPlayer);
 						
-							//Fix position
 							Object playerConnection = entityPlayer.getClass().getDeclaredField(is17 ? "b" : "playerConnection").get(entityPlayer);
-							playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX() - (is17 ? 100 : 0), player.getLocation().getY() + (is17 ? 100.5 : 0.25), player.getLocation().getZ() - (is17 ? 100 : 0), player.getLocation().getYaw(), player.getLocation().getPitch()));
+							
+							Bukkit.getScheduler().runTask(eazyNick, () -> {
+								try {
+									//Fix position
+									playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX() - (is17 ? 100 : 0), player.getLocation().getY() + (is17 ? 100.5 : 0.25), player.getLocation().getZ() - (is17 ? 100 : 0), player.getLocation().getYaw(), player.getLocation().getPitch()));
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							});
 							
 							if(is17) {
 								new AsyncTask(new AsyncRunnable() {
 									
 									@Override
 									public void run() {
-										try {
-											playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX() + 100, player.getLocation().getY() - 100, player.getLocation().getZ() + 100, player.getLocation().getYaw(), player.getLocation().getPitch()));
-										} catch (Exception ex) {
-											ex.printStackTrace();
-										}
+										Bukkit.getScheduler().runTask(eazyNick, () -> {
+											try {
+												playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX() + 100, player.getLocation().getY() - 100, player.getLocation().getZ() + 100, player.getLocation().getYaw(), player.getLocation().getPitch()));
+											} catch (Exception ex) {
+												ex.printStackTrace();
+											}
+										});
 									}
 								}, 10).run();
 							}
@@ -372,7 +381,7 @@ public class NickManager extends ReflectionHelper {
 									player.setHealth(oldHealth);
 									player.setLevel(oldLevel);
 								}
-							}, 250).run();
+							}, 150).run();
 						}
 					} catch (Exception ex) {
 						ex.printStackTrace();

@@ -43,8 +43,8 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("FakeExperienceLevel", -1);
 		configuration.addDefault("GetNewNickOnEveryServerSwitch", false);
 		configuration.addDefault("JoinNick", false);
-		configuration.addDefault("KeepNickOnWorldChange", true);
 		configuration.addDefault("KeepNickOnDeath", true);
+		configuration.addDefault("KeepNickOnWorldChange", true);
 		configuration.addDefault("LogNicknames", false);
 		configuration.addDefault("NeedItemToToggleNick", true);
 		configuration.addDefault("NickActionBarMessage", false);

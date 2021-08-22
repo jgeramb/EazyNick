@@ -11,8 +11,8 @@ import net.dev.eazynick.api.*;
 import net.dev.eazynick.hooks.LuckPermsHook;
 import net.dev.eazynick.utilities.AsyncTask;
 import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
-import net.dev.eazynick.utilities.configuration.yaml.*;
 import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.*;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 

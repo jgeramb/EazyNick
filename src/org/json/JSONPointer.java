@@ -5,9 +5,7 @@ import static java.lang.String.format;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /*
 Copyright (c) 2002 JSON.org

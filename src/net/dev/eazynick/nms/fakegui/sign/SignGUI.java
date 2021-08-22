@@ -13,8 +13,8 @@ import org.bukkit.event.Listener;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.nms.ReflectionHelper;
 import net.dev.eazynick.utilities.AsyncTask;
-import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
+import net.dev.eazynick.utilities.Utils;
 
 public class SignGUI implements Listener {
 

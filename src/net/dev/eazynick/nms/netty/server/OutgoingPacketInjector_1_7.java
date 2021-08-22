@@ -151,8 +151,8 @@ public class OutgoingPacketInjector_1_7 {
 											String name = (String) reflectionHelper.getField(msg.getClass(), "b").get(msg);
 											
 											for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
-												if(currentNickedPlayerData.getRealName().equalsIgnoreCase(name)) {
-													name = currentNickedPlayerData.getNickName();
+												if(name.contains(currentNickedPlayerData.getRealName())) {
+													name = name.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName());
 													break;
 												}
 											}
@@ -165,8 +165,8 @@ public class OutgoingPacketInjector_1_7 {
 											String name = (String) reflectionHelper.getField(msg.getClass(), "a").get(msg);
 											
 											for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
-												if(currentNickedPlayerData.getRealName().equalsIgnoreCase(name)) {
-													name = currentNickedPlayerData.getNickName();
+												if(name.contains(currentNickedPlayerData.getRealName())) {
+													name = name.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName());
 													break;
 												}
 											}
@@ -181,11 +181,11 @@ public class OutgoingPacketInjector_1_7 {
 												
 												for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
 													for (String currentName : new ArrayList<>(contents)) {
-														if(currentNickedPlayerData.getRealName().equalsIgnoreCase(currentName)) {
+														if(currentName.contains(currentNickedPlayerData.getRealName())) {
 															contents.remove(currentName);
 															
 															if(!(contents.contains(currentNickedPlayerData.getNickName())))
-																contents.add(currentNickedPlayerData.getNickName());
+																contents.add(currentName.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName()));
 															
 															break;
 														}
@@ -275,7 +275,7 @@ public class OutgoingPacketInjector_1_7 {
 	private Object replaceNames(Object iChatBaseComponent, boolean isChatPacket) {
 		Utils utils = eazyNick.getUtils();
 
-		Object editedComponent = null;
+		Object editedComponent = iChatBaseComponent;
 		
 		try {
 			if(iChatBaseComponent != null) {
@@ -305,7 +305,7 @@ public class OutgoingPacketInjector_1_7 {
 						String name = Bukkit.getPlayer(nickedPlayerData.getUniqueId()).getName();
 						
 						if(json.contains(name))
-							json = json.replaceAll(name, nickedPlayerData.getNickName());
+							json = json.replace(name, nickedPlayerData.getNickName());
 					}
 					
 					editedComponent = deserialize(json);

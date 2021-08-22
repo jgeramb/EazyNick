@@ -8,8 +8,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.*;
 import net.dev.eazynick.utilities.AsyncTask;
-import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
+import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class PlayerRespawnListener implements Listener {
