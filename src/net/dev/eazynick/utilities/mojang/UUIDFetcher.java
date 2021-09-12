@@ -49,14 +49,18 @@ public class UUIDFetcher {
 				while((line = bufferedReader.readLine()) != null)
 					response.append(line);
 				
-				JSONObject data = new JSONObject(response.toString());
-				UUID uniqueId = UUID.fromString(data.getString("id").replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
-				
-				//Cache data
-				uuidCache.put(name, uniqueId);
-				nameCache.put(uniqueId, data.getString("name"));
-
-				return uniqueId;
+				try {
+					//Parse response
+					JSONObject data = new JSONObject(response.toString());
+					UUID uniqueId = UUID.fromString(data.getString("id").replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
+					
+					//Cache data
+					uuidCache.put(name, uniqueId);
+					nameCache.put(uniqueId, data.getString("name"));
+	
+					return uniqueId;
+				} catch(VerifyError ignore) {
+				}
 			}
 		} catch (Exception ex) {
 			//Remove nickname from nickNames.yml

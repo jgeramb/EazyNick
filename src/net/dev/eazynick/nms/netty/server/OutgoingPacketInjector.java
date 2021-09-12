@@ -186,23 +186,27 @@ public class OutgoingPacketInjector {
 											super.write(ctx, msg, promise);
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
 											if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
-												//Replace names
-												ArrayList<String> contents = new ArrayList<>((List<String>) reflectionHelper.getField(msg.getClass(), version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : (is17 ? "j" : "h"))).get(msg));
+												List<String> contentsList = (List<String>) reflectionHelper.getField(msg.getClass(), version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : (is17 ? "j" : "h"))).get(msg);
 												
-												for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
-													for (String currentName : new ArrayList<>(contents)) {
-														if(currentName.contains(currentNickedPlayerData.getRealName())) {
-															contents.remove(currentName);
-															
-															if(!(contents.contains(currentNickedPlayerData.getNickName())))
-																contents.add(currentName.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName()));
-															
-															break;
+												if(contentsList != null) {
+													//Replace names
+													ArrayList<String> contents = new ArrayList<>(contentsList);
+													
+													for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
+														for (String currentName : new ArrayList<>(contents)) {
+															if(currentName.contains(currentNickedPlayerData.getRealName())) {
+																contents.remove(currentName);
+																
+																if(!(contents.contains(currentNickedPlayerData.getNickName())))
+																	contents.add(currentName.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName()));
+																
+																break;
+															}
 														}
 													}
+													
+													reflectionHelper.setField(msg, version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : (is17 ? "j" : "h")), contents);
 												}
-												
-												reflectionHelper.setField(msg, version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : (is17 ? "j" : "h")), contents);
 											}
 											
 											super.write(ctx, msg, promise);

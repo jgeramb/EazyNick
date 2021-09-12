@@ -283,6 +283,7 @@ public class Utils {
 										tagPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
 										tagSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
 										groupName = guiYamlFile.getConfiguration().getString("Settings.NickFormat.Rank" + i + ".GroupName");
+										sortID = setupYamlFile.getConfiguration().getInt("Settings.NickFormat.Rank" + i + ".SortID");
 									}
 								}
 								

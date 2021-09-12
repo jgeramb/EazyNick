@@ -45,14 +45,17 @@ public class UUIDFetcher_1_8_R1 {
 			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, timestamp / 1000)).openConnection();
 			connection.setReadTimeout(5000);
 
-			//Parse response
-			UUIDFetcher_1_8_R1 data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher_1_8_R1.class);
-
-			//Cache data
-			uuidCache.put(name, data.id);
-			nameCache.put(data.id, data.name);
-
-			return data.id;
+			try {
+				//Parse response
+				UUIDFetcher_1_8_R1 data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher_1_8_R1.class);
+	
+				//Cache data
+				uuidCache.put(name, data.id);
+				nameCache.put(data.id, data.name);
+	
+				return data.id;
+			} catch(VerifyError ignore) {
+			}
 		} catch (Exception ex) {
 			//Remove nickname from nickNames.yml
 			NickNameYamlFile nickNameYamlFile = eazyNick.getNickNameYamlFile();
