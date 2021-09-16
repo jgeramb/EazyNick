@@ -845,7 +845,8 @@ public class NickManager extends ReflectionHelper {
 			}
 			
 			//Create new fake scoreboard team
-			utils.getScoreboardTeamManagers().put(player.getUniqueId(), new ScoreboardTeamHandler(player, nickName, realName, tagPrefix, tagSuffix, sortID, groupName));
+			if(!(setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")))
+				utils.getScoreboardTeamManagers().put(player.getUniqueId(), new ScoreboardTeamHandler(player, nickName, realName, tagPrefix, tagSuffix, sortID, groupName));
 		}
 		
 		new AsyncTask(new AsyncRunnable() {

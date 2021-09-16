@@ -134,7 +134,7 @@ public class AnvilGUI {
 				inventory.setItem(slot.getSlot(), items.get(slot));
 			
 			String title = "Repairing";
-			Object iChatBaseComponent = is17 ? iChatBaseComponentClass.getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + title + "\"}") : reflectionHelper.getNMSClass(is17 ? "network.chat.ChatMessage" : "ChatMessage").getConstructor(String.class, Object[].class).newInstance(title);
+			Object iChatBaseComponent = is17 ? iChatBaseComponentClass.getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + title + "\"}") : reflectionHelper.getNMSClass("ChatMessage").getConstructor(String.class, Object[].class).newInstance(title, new Object[0]);
 
 			reflectionHelper.getField(entityHuman, is17 ? "bV" : "activeContainer").set(entityPlayer, container);
 			

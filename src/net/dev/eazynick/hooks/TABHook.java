@@ -32,8 +32,9 @@ public class TABHook {
 				}
 			}
 			
+			//TAB sorting (00, 01, ...)
 			//Update TAB team
-			String teamName = sortID + name;
+			String teamName = ((sortID < 10) ? "0" : "") + sortID + name;
 			
 			if(teamName.length() > 16)
 				teamName = teamName.substring(0, 16);
