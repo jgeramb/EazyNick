@@ -2,7 +2,6 @@ package net.dev.eazynick.utilities.configuration.yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +17,8 @@ import me.clip.placeholderapi.PlaceholderAPI;
 
 public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 
-	private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("#[a-fA-F0-9]{6}");
+	private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
+	private static final char COLOR_CHAR = ChatColor.COLOR_CHAR;
 	
 	protected EazyNick eazyNick;
 	private File directory, file;
@@ -116,17 +116,16 @@ public abstract class YamlFile implements ConfigurationFile<YamlConfiguration> {
 			
 			//HEX-Color-Support
 			if(version.startsWith("1_16") || version.startsWith("1_17")) {
-				try {
-					Matcher match = HEX_COLOR_PATTERN.matcher(string);
+				Matcher matcher = HEX_COLOR_PATTERN.matcher(string);
+				StringBuffer buffer = new StringBuffer(string.length() + 4 * 8);
+				
+				while (matcher.find()) {
+					String group = matcher.group(1);
 					
-					while (match.find()) {
-						String color = string.substring(match.start(), match.end());
-						string = string.replace(color, ChatColor.class.getMethod("of", String.class).invoke(null, color) + "");
-						match = HEX_COLOR_PATTERN.matcher(string);
-					}
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-					ex.printStackTrace();
+					matcher.appendReplacement(buffer, COLOR_CHAR + "x" + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1) + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3) + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5));
 				}
+				
+				string = matcher.appendTail(buffer).toString();
 			}
 			
 			return string;

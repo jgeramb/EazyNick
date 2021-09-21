@@ -91,9 +91,9 @@ public class PlayerNickListener implements Listener {
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnNick")) {
 				if(utils.isPluginInstalled("PlaceholderAPI"))
-					setupYamlFile.getConfiguration().getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, PlaceholderAPI.setPlaceholders(player, cmd)));
+					setupYamlFile.getConfiguration().getStringList("NickCommands.Nick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, PlaceholderAPI.setPlaceholders(player, command.replace("%player%", player.getName()).replace("%nickName%", nickName))));
 				else
-					setupYamlFile.getConfiguration().getStringList("NickCommands.Nick").forEach(cmd -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, cmd));
+					setupYamlFile.getConfiguration().getStringList("NickCommands.Nick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, command.replace("%player%", player.getName()).replace("%nickName%", nickName)));
 			}
 		}
 	}
