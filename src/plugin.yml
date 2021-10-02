@@ -87,6 +87,8 @@ permissions:
     description: Allows you to use /nick
   eazynick.nick.custom:
     description: Allows you to use /nick «name» + allows you to enter a name in the bookgui
+  eazynick.nick.reset:
+    description: Allows you to use /resetname and /unnick
   eazynick.skin.random:
     description: Allows you to use /changeskin
   eazynick.skin.custom:
@@ -95,8 +97,6 @@ permissions:
     description: Allows you to use  /resetskin
   eazynick.skin.fix:
     description: Allows you to use /fixskin
-  eazynick.nick.reset:
-    description: Allows you to use /resetname and /unnick
   eazynick.gui.classic:
     description: Allows you to use /nickgui
   eazynick.gui.list:
@@ -109,11 +109,11 @@ permissions:
     description: Allows you to use /nickother «player» «name»
   eazynick.other.nick.reset:
     description: Allows you to reset another players identity using /nickother «player»
-  eazynick.other.nick.random:
+  eazynick.other.skin.random:
     description: Allows you to use /changeskinother «player»
-  eazynick.other.nick.custom:
+  eazynick.other.skin.custom:
     description: Allows you to use /changeskinother «player» «name»
-  eazynick.other.nick.reset:
+  eazynick.other.skin.reset:
     description: Allows you to use /resetskinother «player»
   eazynick.nickedplayers:
     description: Allows you to use /nickedplayers
