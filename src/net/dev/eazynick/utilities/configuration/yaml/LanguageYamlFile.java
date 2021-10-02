@@ -51,6 +51,9 @@ public class LanguageYamlFile extends YamlFile {
 			configuration.addDefault("Messages.Other.SelectedNick", "%prefix%&7Du hast den Nicknamen von dem Spieler &a%playerName% &7auf &d%nickName% &7gesetzt");
 			configuration.addDefault("Messages.Other.Unnick", "%prefix%&7Du hast den Spieler &a%playerName% &7entnickt");
 			configuration.addDefault("Messages.Other.DisabledWorld", "%prefix%&cDer Spieler &a%playerName% &ckann in dieser Welt nicht genickt werden");
+			configuration.addDefault("Messages.Other.RandomSkin", "%prefix%&7Der Spieler &a%playerName% &7hat einen zufälligen Skin erhalten");
+			configuration.addDefault("Messages.Other.SelectedSkin", "%prefix%&7Der Spieler &a%playerName% &7hat den Skin von &d%skinName% &7erhalten");
+			configuration.addDefault("Messages.Other.ResetSkin", "%prefix%&7Der Skin von dem Spieler &a%playerName% &7wurde zurueckgesetzt");
 			configuration.addDefault("Messages.ReloadConfig", "%prefix%&7Die Konfigurationsdatei wurde neu geladen");
 			configuration.addDefault("Messages.FixSkin", "%prefix%&7Dein Skin wurde behoben");
 			configuration.addDefault("Messages.ResetSkin", "%prefix%&7Dein Skin wurde zurueckgesetzt");
@@ -83,7 +86,7 @@ public class LanguageYamlFile extends YamlFile {
 			configuration.addDefault("Messages.Nick", "%prefix%&7You play as&8: &a%name%");
 			configuration.addDefault("Messages.Unnick", "%prefix%&7Your nickname was removed");
 			configuration.addDefault("Messages.Name", "%prefix%&7Current nickname&8: &a%name%");
-			configuration.addDefault("Messages.SkinChanged", "%prefix%&7You have received a new skin&8: &a%skinName%");
+			configuration.addDefault("Messages.SkinChanged", "%prefix%&7You received a new skin&8: &a%skinName%");
 			configuration.addDefault("Messages.NotNicked", "%prefix%&cYou are not nicked");
 			configuration.addDefault("Messages.NickTooLong", "%prefix%&cThe nickname must not be longer than &a16 characters");
 			configuration.addDefault("Messages.NickTooShort", "%prefix%&cThe nickname must not be shorter than &a3 characters");
@@ -98,10 +101,13 @@ public class LanguageYamlFile extends YamlFile {
 			configuration.addDefault("Messages.PlayerNotFound", "%prefix%&cThe player was not found");
 			configuration.addDefault("Messages.NameNotAllowed", "%prefix%&cThis nickname is not allowed");
 			configuration.addDefault("Messages.RealName", "%prefix%&7The specified player is&8: &a%realName%");
-			configuration.addDefault("Messages.Other.RandomNick", "%prefix%&7You have nicked the player &a%playerName%");
-			configuration.addDefault("Messages.Other.SelectedNick", "%prefix%&7You have set the name of the player &a%playerName% &7to &d%nickName%");
-			configuration.addDefault("Messages.Other.Unnick", "%prefix%&7You have unnicked the player &a%playerName%");
+			configuration.addDefault("Messages.Other.RandomNick", "%prefix%&7You nicked the player &a%playerName%");
+			configuration.addDefault("Messages.Other.SelectedNick", "%prefix%&7You set the name of the player &a%playerName% &7to &d%nickName%");
+			configuration.addDefault("Messages.Other.Unnick", "%prefix%&7You unnicked the player &a%playerName%");
 			configuration.addDefault("Messages.Other.DisabledWorld", "%prefix%&cThe player &a%playerName% &ccannot be nicked in this world");
+			configuration.addDefault("Messages.Other.RandomSkin", "%prefix%&7The player &a%playerName% &7received a random skin");
+			configuration.addDefault("Messages.Other.SelectedSkin", "%prefix%&7The player &a%playerName% &7received the skin of &d%skinName%");
+			configuration.addDefault("Messages.Other.ResetSkin", "%prefix%&7The skin of the player &a%playerName% &7was reset");
 			configuration.addDefault("Messages.ReloadConfig", "%prefix%&7The configuration file was reloaded");
 			configuration.addDefault("Messages.FixSkin", "%prefix%&7Your skin was fixed");
 			configuration.addDefault("Messages.ResetSkin", "%prefix%&7Your skin was reset");

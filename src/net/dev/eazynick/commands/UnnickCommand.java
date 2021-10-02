@@ -28,7 +28,7 @@ public class UnnickCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("nick.reset")) {
+			if(player.hasPermission("eazynick.nick.reset")) {
 				if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
 				 else if((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {

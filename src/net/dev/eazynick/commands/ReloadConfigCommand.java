@@ -18,7 +18,7 @@ public class ReloadConfigCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("nick.reload")) {
+			if(player.hasPermission("eazynick.reload")) {
 				utils.reloadConfigs();
 				
 				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.ReloadConfig").replace("%prefix%", utils.getPrefix()));

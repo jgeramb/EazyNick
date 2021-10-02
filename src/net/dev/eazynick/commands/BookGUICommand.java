@@ -36,16 +36,16 @@ public class BookGUICommand implements CommandExecutor {
 			Player player = (Player) sender;
 			
 			if(new NickManager(player).isNicked()) {
-				if(player.hasPermission("nick.reset"))
+				if(player.hasPermission("eazynick.nick.reset"))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
 			} else if((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
-				if(player.hasPermission("nick.reset")) {
+				if(player.hasPermission("eazynick.nick.reset")) {
 					mysqlNickManager.removePlayer(player.getUniqueId());
 					mysqlPlayerDataManager.removeData(player.getUniqueId());
 					
 					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", prefix));
 				}
-			} else if(player.hasPermission("nick.gui")) {
+			} else if(player.hasPermission("eazynick.gui.book")) {
 				if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName()))) {
 					if(args.length == 0) {
 						if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page1.Enabled")) {
@@ -143,7 +143,7 @@ public class BookGUICommand implements CommandExecutor {
 						option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2] + " ENTERNAME"));
 						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.EnterName.Hover"))));
 						
-						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("nick.customnickname")))
+						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("eazynick.nick.custom")))
 							textComponents.add(option1);
 						
 						TextComponent option2 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.RandomName.Text").replace("%nl%", "\n"));
@@ -202,7 +202,7 @@ public class BookGUICommand implements CommandExecutor {
 						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2]  + " ENTERNAME"));
 						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.OptionEnterName.Hover"))));
 						
-						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("nick.customnickname")))
+						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("eazynick.nick.custom")))
 							textComponents.add(option3);
 						
 						for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page5.Text2").split("%nl%"))
@@ -210,7 +210,7 @@ public class BookGUICommand implements CommandExecutor {
 						
 						nmsBookUtils.open(player, nmsBookBuilder.create(guiYamlFile.getConfigString(player, "BookGUI.Page5.Title"), new BookPage(textComponents)));
 					} else if(args[3].equalsIgnoreCase("ENTERNAME")) {
-						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("nick.customnickname"))) {
+						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("eazynick.nick.custom"))) {
 							if(eazyNick.getVersion().equals("1_7_R4") || eazyNick.getVersion().equals("1_8_R1") || !(setupYamlFile.getConfiguration().getBoolean("UseSignGUIForCustomName") || setupYamlFile.getConfiguration().getBoolean("UseAnvilGUIForCustomName"))) {
 								utils.getPlayersTypingNameInChat().put(player.getUniqueId(), args[1] + " " + args[2]);
 								

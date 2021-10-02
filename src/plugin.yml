@@ -1,5 +1,5 @@
 name: EazyNick
-version: 3.7
+version: 3.8
 author: Justix
 main: net.dev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)
@@ -9,8 +9,13 @@ softdepend: [PlaceholderAPI, CloudNetAPI, ColoredTags, NametagEdit, PermissionsE
 load: POSTWORLD
 
 commands:
+  realname:
+    description: Shows the real name of a nicked player
+    aliases:
+    - rd
+    - realdisguise
   nick:
-    description: Changes your identity(skin, name, nametag, tabname, chatname)
+    description: Changes your identity (skin, name, nametag, tabname, chatname)
     aliases:
     - d
     - disguise
@@ -19,11 +24,6 @@ commands:
     aliases:
     - ud
     - undisguise
-  realname:
-    description: Shows the real name of a nicked player
-    aliases:
-    - rd
-    - realdisguise
   nickgui:
     description: Opens a gui to change/reset your identity
     aliases:
@@ -34,12 +34,18 @@ commands:
     aliases:
     - do
     - disguiseother
+  name:
+    description: Shows your active nickname
+  resetname:
+    description: Resets your name
   changeskin:
     description: Changes your skin
   resetskin:
     description: Resets your skin
-  resetname:
-    description: Resets your name
+  changeskinother:
+    description: Changes the skin of other players
+  resetskinother:
+    description: Resets the skin of other players
   nicklist:
     description: Opens a GUI with all random nicknames
     aliases:
@@ -47,16 +53,10 @@ commands:
     - disgusielist
   bookgui:
     description: Opens a Nick-GUI like on hypixel.net
-  guinick:
-    description: This command is only for the plugin, you do not require to know what this is for
   reloadconfig:
     description: Reloads the configuration file
   fixskin:
     description: Fixes your skin, if it was not loaded correctly
-  renick:
-    description: This command is only for the plugin, you do not require to know for what this is
-  name:
-    description: Shows your active nickname
   nickedplayers:
     description: Shows a list of all players, who are currently nicked
   eazynick:
@@ -69,34 +69,58 @@ commands:
     - togglenick
     - togglebungeedisguise
     - toggledisguise
+  guinick:
+    description: This command is only for the plugin, you do not require to know what this is for
+  renick:
+    description: This command is only for the plugin, you do not require to know for what this is
     
 permissions:
-  nick.showhelp:
+  eazynick.help:
     description: Allows you to use /eazynick
-  nick.realname:
-    description: Allows you to use /realname
-  nick.use:
-    description: Allows you to use /nick, /unnick, /name
-  nick.customnickname:
-    description: Allows you to use /nick «name»
-  nick.skin:
-    description: Allows you to use /changeskin, /changeskin «name» and /resetskin
-  nick.name:
-    description: Allows you to use /resetname
-  nick.gui:
-    description: Allows you to use /nickgui, /nicklist, /bookgui
-  nick.other:
-    description: Allows you to use /nickother «player» and /nickother «player» «name»
-  nick.nickedplayers:
-    description: Allows you to use /nickedplayers
-  nick.reload:
+  eazynick.reload:
     description: Allows you to use /reloadconfig
-  nick.fixskin:
-    description: Allows you to use /fixskin
-  nick.checkforupdates:
+  eazynick.updatecheck:
     description: Allows you to use /nickupdatecheck
-  nick.item:
+  eazynick.real:
+    description: Allows you to use /realname
+  eazynick.nick.random:
+    description: Allows you to use /nick
+  eazynick.nick.custom:
+    description: Allows you to use /nick «name» + allows you to enter a name in the bookgui
+  eazynick.skin.random:
+    description: Allows you to use /changeskin
+  eazynick.skin.custom:
+    description: Allows you to use /changeskin «name»
+  eazynick.skin.reset:
+    description: Allows you to use  /resetskin
+  eazynick.skin.fix:
+    description: Allows you to use /fixskin
+  eazynick.nick.reset:
+    description: Allows you to use /resetname and /unnick
+  eazynick.gui.classic:
+    description: Allows you to use /nickgui
+  eazynick.gui.list:
+    description: Allows you to use /nicklist
+  eazynick.gui.book:
+    description: Allows you to use /bookgui
+  eazynick.other.nick.random:
+    description: Allows you to use /nickother «player»
+  eazynick.other.nick.custom:
+    description: Allows you to use /nickother «player» «name»
+  eazynick.other.nick.reset:
+    description: Allows you to reset another players identity using /nickother «player»
+  eazynick.other.nick.random:
+    description: Allows you to use /changeskinother «player»
+  eazynick.other.nick.custom:
+    description: Allows you to use /changeskinother «player» «name»
+  eazynick.other.nick.reset:
+    description: Allows you to use /resetskinother «player»
+  eazynick.nickedplayers:
+    description: Allows you to use /nickedplayers
+  eazynick.item:
     description: Lets you receive the nick item (if enabled in setup.yml) and allows you to use /togglebungeenick
-  nick.bypass:
+  eazynick.actionbar.other:
+    description: Shows the alternate actionbar message
+  eazynick.bypass:
     description: See every player undisguised (if enabled in setup.yml)
     default: false

@@ -48,7 +48,7 @@ public class PlayerJoinListener implements Listener {
 			if(setupYamlFile.getConfiguration().getBoolean("OverwriteJoinQuitMessages") && ((setupYamlFile.getConfiguration().getBoolean("BungeeCord") && mysqlNickManager.isPlayerNicked(uniqueId)) || utils.getLastNickDatas().containsKey(uniqueId))) {
 				String message = setupYamlFile.getConfigString(player, "OverwrittenMessages.Join");
 				
-				if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) && mysqlNickManager.isPlayerNicked(uniqueId))
+				if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("eazynick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) && mysqlNickManager.isPlayerNicked(uniqueId))
 					message = message.replace("%name%", mysqlNickManager.getNickName(uniqueId)).replace("%displayName%", mysqlPlayerDataManager.getChatPrefix(uniqueId) + mysqlNickManager.getNickName(uniqueId) + mysqlPlayerDataManager.getChatSuffix(uniqueId));
 				else if(utils.getLastNickDatas().containsKey(uniqueId)) {
 					NickedPlayerData nickedPlayerData = utils.getLastNickDatas().get(uniqueId);
@@ -59,7 +59,7 @@ public class PlayerJoinListener implements Listener {
 					
 				event.setJoinMessage(message);
 			} else if ((event.getJoinMessage() != null) && (event.getJoinMessage() != "")) {
-				if (setupYamlFile.getConfiguration().getBoolean("BungeeCord") && (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) && mysqlNickManager.isPlayerNicked(uniqueId)) {
+				if (setupYamlFile.getConfiguration().getBoolean("BungeeCord") && (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("eazynick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) && mysqlNickManager.isPlayerNicked(uniqueId)) {
 					if (event.getJoinMessage().contains("formerly known as"))
 						event.setJoinMessage("§e" + player.getName() + " joined the game");
 	
@@ -78,57 +78,34 @@ public class PlayerJoinListener implements Listener {
 			}
 		}
 		
+		if(eazyNick.getVersion().equals("1_7_R4")) {
+			((OutgoingPacketInjector_1_7) eazyNick.getOutgoingPacketInjector()).unregister();
+			
+			OutgoingPacketInjector_1_7 outgoingPacketInjector = new OutgoingPacketInjector_1_7();
+			outgoingPacketInjector.init();
+			
+			eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
+			
+			utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector_1_7(player));
+		} else {
+			((OutgoingPacketInjector) eazyNick.getOutgoingPacketInjector()).unregister();
+
+			OutgoingPacketInjector outgoingPacketInjector = new OutgoingPacketInjector();
+			outgoingPacketInjector.init();
+			
+			eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
+			
+			utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector(player));
+		}
+		
 		new AsyncTask(new AsyncRunnable() {
 			
 			@Override
 			public void run() {
-				if(eazyNick.getVersion().equals("1_7_R4")) {
-					((OutgoingPacketInjector_1_7) eazyNick.getOutgoingPacketInjector()).unregister();
-					
-					OutgoingPacketInjector_1_7 outgoingPacketInjector = new OutgoingPacketInjector_1_7();
-					outgoingPacketInjector.init();
-					
-					eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
-					
-					utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector_1_7(player));
-				} else {
-					((OutgoingPacketInjector) eazyNick.getOutgoingPacketInjector()).unregister();
-	
-					OutgoingPacketInjector outgoingPacketInjector = new OutgoingPacketInjector();
-					outgoingPacketInjector.init();
-					
-					eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
-					
-					utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector(player));
-				}
-				
 				if(!(isAPIMode)) {
 					Bukkit.getScheduler().runTask(eazyNick, () -> {
-						if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && setupYamlFile.getConfiguration().getBoolean("ReNickAllOnNewPlayerJoinServer")) {
-							for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-								NickManager apiCurrentPlayer = new NickManager(currentPlayer);
-								
-								if (apiCurrentPlayer.isNicked()) {
-									NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).clone();
-									
-									apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false, false);
-									
-									new AsyncTask(new AsyncRunnable() {
-										
-										@Override
-										public void run() {
-											Bukkit.getScheduler().runTask(eazyNick, () -> {
-												if(currentPlayer.isOnline())
-													Bukkit.getPluginManager().callEvent(new PlayerNickEvent(currentPlayer, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getSpoofedUniqueId(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
-											});
-										}
-									}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0))).run();
-								}
-							}
-						}
-						
 						if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
-							if (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) {
+							if (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("eazynick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) {
 								if (mysqlNickManager.isPlayerNicked(uniqueId))
 									utils.performReNick(player);
 							} else if (mysqlNickManager.isPlayerNicked(uniqueId) && setupYamlFile.getConfiguration().getBoolean("GetNewNickOnEveryServerSwitch")) {
@@ -139,7 +116,7 @@ public class PlayerJoinListener implements Listener {
 							}
 			
 							if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
-								if (player.hasPermission("nick.item")) {
+								if (player.hasPermission("eazynick.item")) {
 									if (!(mysqlNickManager.isPlayerNicked(uniqueId)))
 										player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
 									else
@@ -148,7 +125,7 @@ public class PlayerJoinListener implements Listener {
 							}
 						} else {
 							if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
-								if (player.hasPermission("nick.item")) {
+								if (player.hasPermission("eazynick.item")) {
 									if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange"))
 										player.getInventory().setItem(setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1, new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
 									else
@@ -167,7 +144,7 @@ public class PlayerJoinListener implements Listener {
 						}
 						
 						if (setupYamlFile.getConfiguration().getBoolean("JoinNick")) {
-							if (!(api.isNicked()) && player.hasPermission("nick.use"))
+							if (!(api.isNicked()) && player.hasPermission("eazynick.nick.random"))
 								utils.performNick(player, "RANDOM");
 						}
 					});

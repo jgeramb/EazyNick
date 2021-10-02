@@ -21,7 +21,7 @@ public class ResetNameCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("nick.name")) {
+			if(player.hasPermission("eazynick.nick.reset")) {
 				NickManager api = new NickManager(player);
 				api.setName(api.getRealName());
 				

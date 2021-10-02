@@ -29,7 +29,7 @@ public class PlayerUnnickListener implements Listener {
 		if(!(event.isCancelled())) {
 			Player player = event.getPlayer();
 			NickManager api = new NickManager(player);
-			String nickName = api.getNickName(), name = api.getRealName(), uniqueIdString = player.getUniqueId().toString().replace("-", "");
+			String nickName = api.getNickName(), name = api.getRealName(), oldDisplayName = api.getOldDisplayName(), uniqueIdString = player.getUniqueId().toString().replace("-", "");
 	
 			if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnUnnick")) {
 				if(utils.isPluginInstalled("PlaceholderAPI"))
@@ -58,15 +58,20 @@ public class PlayerUnnickListener implements Listener {
 			
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
 				utils.sendConsole("§a" + nickName + " §8(" + player.getUniqueId().toString() + ") §7reset his nickname to §d" + name);
+
+			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnUnnick"))
+				Bukkit.getOnlinePlayers().forEach(currentPlayer -> languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Unnick.Quit").replace("%displayName%", player.getDisplayName()).replace("%displayname%", player.getDisplayName()).replace("%name%", nickName)));
 			
 			languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", utils.getPrefix()));
 			
-			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnUnnick")) {
-				Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
-					languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Unnick.Quit").replace("%displayName%", player.getDisplayName()).replace("%displayname%", player.getDisplayName()).replace("%name%", nickName));
-					languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Unnick.Join").replace("%displayName%", player.getDisplayName()).replace("%displayname%", player.getDisplayName()).replace("%name%", name));
-				});
-			}
+			new AsyncTask(new AsyncRunnable() {
+				
+				@Override
+				public void run() {
+					if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnUnnick"))
+						Bukkit.getOnlinePlayers().forEach(currentPlayer -> languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Unnick.Join").replace("%displayName%", oldDisplayName).replace("%displayname%", oldDisplayName).replace("%name%", name)));
+				}
+			}, 50L * 3).run();
 		}
 	}
 

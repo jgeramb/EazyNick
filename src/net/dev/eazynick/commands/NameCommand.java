@@ -20,16 +20,10 @@ public class NameCommand implements CommandExecutor {
 		
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
+			NickManager api = new NickManager(player);
 			
-			if(player.hasPermission("nick.use")) {
-				NickManager api = new NickManager(player);
-				
-				if(api.isNicked()) {
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Name").replace("%name%", api.getNickName()).replace("%prefix%", prefix));
-				} else
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NotNicked").replace("%prefix%", prefix));
-			} else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
+			if(api.isNicked())
+				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Name").replace("%name%", api.getNickName()).replace("%prefix%", prefix));
 		} else
 			utils.sendConsole(utils.getNotPlayer());
 		

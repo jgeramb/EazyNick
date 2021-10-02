@@ -19,7 +19,7 @@ public class ResetSkinCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("nick.skin")) {
+			if(player.hasPermission("eazynick.skin.reset")) {
 				NickManager api = new NickManager(player);
 				
 				api.changeSkin(api.getRealName());

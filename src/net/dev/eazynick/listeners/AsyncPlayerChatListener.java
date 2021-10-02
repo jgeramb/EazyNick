@@ -65,7 +65,7 @@ public class AsyncPlayerChatListener implements Listener {
 								currentPlayer.sendMessage(format);
 							else
 								currentPlayer.sendMessage(format.replace(player.getDisplayName(), api.getOldDisplayName()));
-						} else if (currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
+						} else if (currentPlayer.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
 							currentPlayer.sendMessage(format.replace(player.getDisplayName(), api.getOldDisplayName()));
 						else
 							currentPlayer.sendMessage(format);

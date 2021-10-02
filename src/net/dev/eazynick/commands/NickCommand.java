@@ -31,21 +31,21 @@ public class NickCommand implements CommandExecutor {
 			Player player = (Player) sender;
 			
 			if(new NickManager(player).isNicked()) {
-				if(player.hasPermission("nick.reset"))
+				if(player.hasPermission("eazynick.nick.reset"))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
 			} else if((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
-				if(player.hasPermission("nick.reset")) {
+				if(player.hasPermission("eazynick.nick.reset")) {
 					mysqlNickManager.removePlayer(player.getUniqueId());
 					mysqlPlayerDataManager.removeData(player.getUniqueId());
 					
 					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", prefix));
 				}
-			} else if(player.hasPermission("nick.use")) {
+			} else if(player.hasPermission("eazynick.nick.random") || player.hasPermission("eazynick.nick.custom")) {
 				if(utils.getCanUseNick().get(player.getUniqueId())) {
 					if(setupYamlFile.getConfiguration().getBoolean("OpenBookGUIOnNickCommand") && !(eazyNick.getVersion().startsWith("1_7"))) {
-						if(!(player.hasPermission("nick.gui"))) {
+						if(!(player.hasPermission("eazynick.gui.book"))) {
 							PermissionAttachment pa = player.addAttachment(eazyNick);
-							pa.setPermission("nick.gui", true);
+							pa.setPermission("eazynick.gui.book", true);
 							player.recalculatePermissions();
 							
 							player.chat("/bookgui");
@@ -59,11 +59,14 @@ public class NickCommand implements CommandExecutor {
 					else if(setupYamlFile.getConfiguration().getBoolean("OpenRankedNickGUIOnNickCommand"))
 						guiManager.openRankedNickGUI(player, "");
 					else if(args.length == 0) {
-						if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
-							utils.performNick(player, "RANDOM");
-						else
-							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", prefix));
-					} else if(player.hasPermission("nick.customnickname")) {
+						if(player.hasPermission("eazynick.nick.random")) {
+							if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
+								utils.performNick(player, "RANDOM");
+							else
+								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", prefix));
+						} else
+							languageYamlFile.sendMessage(player, utils.getNoPerm());
+					} else if(player.hasPermission("eazynick.nick.custom")) {
 						String name = args[0].replace("\"", ""), nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
 						boolean isCancelled = false;
 						

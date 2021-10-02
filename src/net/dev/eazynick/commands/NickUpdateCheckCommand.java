@@ -16,7 +16,7 @@ public class NickUpdateCheckCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("nick.checkforupdates"))
+			if(player.hasPermission("eazynick.updatecheck"))
 				eazyNick.getSpigotUpdater().checkForUpdates(player);
 			else
 				eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());

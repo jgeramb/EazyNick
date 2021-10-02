@@ -175,7 +175,7 @@ public class OutgoingPacketInjector_1_7 {
 											
 											super.write(ctx, msg, promise);
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
-											if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+											if(!(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
 												//Replace names
 												ArrayList<String> contents = new ArrayList<>((List<String>) reflectionHelper.getField(msg.getClass(), "e").get(msg));
 												

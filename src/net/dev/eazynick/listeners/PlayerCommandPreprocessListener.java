@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class PlayerCommandPreprocessListener implements Listener {
 
@@ -14,11 +15,12 @@ public class PlayerCommandPreprocessListener implements Listener {
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		Player player = event.getPlayer();
 		String msg = event.getMessage();
 		String[] args = msg.trim().split(" ");
-		boolean doReplace = eazyNick.getSetupYamlFile().getConfiguration().getBoolean("OverwriteNamesInCommands");
+		boolean doReplace = setupYamlFile.getConfiguration().getBoolean("OverwriteNamesInCommands"), allowRealName = setupYamlFile.getConfiguration().getBoolean("AllowRealNamesInCommands");
 		
 		for(String command : utils.getReplaceNameInCommandBlackList()) {
 			if(args[0].equalsIgnoreCase("/" + command))
@@ -30,7 +32,7 @@ public class PlayerCommandPreprocessListener implements Listener {
 				for (int i = 0; i < args.length; i++) {
 					if(args[i].equalsIgnoreCase(nickedPlayerData.getNickName()))
 						args[i] = nickedPlayerData.getRealName();
-					else if(args[i].equalsIgnoreCase(nickedPlayerData.getRealName()))
+					else if(args[i].equalsIgnoreCase(nickedPlayerData.getRealName()) && !(allowRealName))
 						args[i] = nickedPlayerData.getRealName() + "§r";
 				}
 			});

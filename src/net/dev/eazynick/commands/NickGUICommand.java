@@ -22,7 +22,7 @@ public class NickGUICommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("nick.gui")) {
+			if(player.hasPermission("eazynick.gui.classic")) {
 				Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "NickGUI.InventoryTitle"));
 				
 				for (int i = 0; i < inv.getSize(); i++)

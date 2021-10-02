@@ -333,7 +333,7 @@ public class Utils {
 								//Add nick data to mysql or nick player
 								new NickManager(player).setGroupName(groupName);
 								
-								if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && !(player.hasPermission("nick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission")) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && !(worldsWithDisabledLobbyMode.contains(player.getWorld().getName().toUpperCase()))) {
+								if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && !(player.hasPermission("eazynick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission")) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && !(worldsWithDisabledLobbyMode.contains(player.getWorld().getName().toUpperCase()))) {
 									eazyNick.getMySQLNickManager().addPlayer(player.getUniqueId(), name, skinName);
 									eazyNick.getMySQLPlayerDataManager().insertData(player.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
 									

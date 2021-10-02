@@ -347,7 +347,7 @@ public class GUIManager {
 			
 			player.openInventory(inv);
 		} else if(args.length == 2) {
-			if(player.hasPermission("nick.customnickname")) {
+			if(player.hasPermission("eazynick.nick.custom")) {
 				Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.InventoryTitle"));
 				
 				for (int i = 0; i < inv.getSize(); i++)

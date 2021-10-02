@@ -3,11 +3,15 @@ package net.dev.eazynick.api;
 import java.util.Random;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import com.mojang.authlib.GameProfile;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.utilities.MineSkinAPI;
 import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class NickedPlayerData {
 
@@ -73,40 +77,60 @@ public class NickedPlayerData {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		MineSkinAPI mineSkinAPI = eazyNick.getMineSkinAPI();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		String version = eazyNick.getVersion();
 		
-		skinProfile = version.startsWith("1_7") ? utils.getDefaultGameProfile_1_7() : utils.getDefaultGameProfile();
-		
-		try {
-			if(skinName.startsWith("MINESKIN:")) {
-				//Load skin from mineskin.org
-				if(version.startsWith("1_7")) {
-					((GameProfile) skinProfile).getProperties().removeAll("textures");
-					((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size())) : skinName.split(":")[1]));
-				} else {
-					((GameProfile) skinProfile).getProperties().removeAll("textures");
-					((GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size())) : skinName.split(":")[1]));
-				}
-			} else {
-				//Load skin from mojang api
-				if(version.startsWith("1_7"))
-					skinProfile = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
-				else if(version.equals("1_8_R1"))
-					skinProfile = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
-				else
-					skinProfile = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
-			}
+		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
+			skinProfile = version.startsWith("1_7") ? utils.getDefaultGameProfile_1_7() : utils.getDefaultGameProfile();
 			
-			return true;
-		} catch (Exception ex) {
-			if(eazyNick.getSetupYamlFile().getConfiguration().getBoolean("ShowProfileErrorMessages")) {
-				if(utils.isSupportMode()) {
-					utils.sendConsole("§cAn error occured while preparing skin profile§7:");
+			try {
+				Object profile = null;
+				
+				if(skinName.startsWith("MINESKIN:")) {
+					//Load skin from mineskin.org
+					if(version.startsWith("1_7")) {
+						((GameProfile) skinProfile).getProperties().removeAll("textures");
+						((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size())) : skinName.split(":")[1]));
+					} else {
+						((GameProfile) skinProfile).getProperties().removeAll("textures");
+						((GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size())) : skinName.split(":")[1]));
+					}
+				} else {
+					//Load skin from mojang api
+					if(version.startsWith("1_7"))
+						profile = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
+					else if(version.equals("1_8_R1"))
+						profile = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
+					else
+						profile = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
+				}
+				
+				if(profile != null)
+					skinProfile = profile;
+				
+				return true;
+			} catch (Exception ex) {
+				if(setupYamlFile.getConfiguration().getBoolean("ShowProfileErrorMessages")) {
+					if(utils.isSupportMode()) {
+						utils.sendConsole("§cAn error occured while preparing skin profile§7:");
+						
+						ex.printStackTrace();
+					} else
+						utils.sendConsole("§cAn error occured while preparing skin profile§7, §cthis is NOT a plugin error§7!");
+				}
+			}
+		} else {
+			Player player = Bukkit.getPlayer(uniqueId);
+			
+			if(player != null) {
+				try {
+					skinProfile = player.getClass().getMethod("getProfile").invoke(player);
 					
-					ex.printStackTrace();
-				} else
-					utils.sendConsole("§cAn error occured while preparing skin profile§7, §cthis is NOT a plugin error§7!");
+					return true;
+				} catch (Exception ignore) {
+				}
+
 			}
 		}
 		

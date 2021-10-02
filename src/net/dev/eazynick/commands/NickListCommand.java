@@ -30,14 +30,14 @@ public class NickListCommand implements CommandExecutor {
 			Player player = (Player) sender;
 			
 			if(new NickManager(player).isNicked()) {
-				if(player.hasPermission("nick.reset"))
+				if(player.hasPermission("eazynick.nick.reset"))
 					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
 			} else if((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
 				mysqlNickManager.removePlayer(player.getUniqueId());
 				mysqlPlayerDataManager.removeData(player.getUniqueId());
 				
 				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", prefix));
-			} else if(player.hasPermission("nick.gui")) {
+			} else if(player.hasPermission("eazynick.gui.list")) {
 				if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
 					eazyNick.getGUIManager().openNickList(player, 0);
 				else

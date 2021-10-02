@@ -33,6 +33,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("AllowPlayersToNickAsKnownPlayers", false);
 		configuration.addDefault("AllowPlayersToNickAsOnlinePlayers", false);
 		configuration.addDefault("AllowPlayersToUseSameNickName", false);
+		configuration.addDefault("AllowRealNamesInCommands", false);
 		configuration.addDefault("AllowSpecialCharactersInCustomName", false);
 		configuration.addDefault("ChangeLuckPermsPrefixAndSufix", false);
 		configuration.addDefault("ChangeNameAndPrefixAndSuffixInDeluxeChatFormat", false);
@@ -58,8 +59,6 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("OverwriteNamesInCommands", true);
 		configuration.addDefault("PrefixSuffixUpdateDelay", 100);
 		configuration.addDefault("RandomDisguiseDelay", false);
-		configuration.addDefault("ReNickAllOnNewPlayerJoinServer", true);
-		configuration.addDefault("ReNickAllOnNewPlayerJoinWorld", true);
 		configuration.addDefault("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled", true);
 		configuration.addDefault("ReplaceNickedChatFormat", true);
 		configuration.addDefault("SaveLocalNickDatas", false);
@@ -122,6 +121,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("Settings.ChangeOptions.DisplayName", true);
 		configuration.addDefault("Settings.ChangeOptions.PlayerListName", true);
 		configuration.addDefault("Settings.ChangeOptions.NameTag", true);
+		configuration.addDefault("Settings.ChangeOptions.Skin", true);
 		configuration.addDefault("Settings.NickFormat.Chat.Prefix", "&7");
 		configuration.addDefault("Settings.NickFormat.Chat.Suffix", "&r");
 		configuration.addDefault("Settings.NickFormat.PlayerList.Prefix", "&7");

@@ -25,7 +25,7 @@ public class NickedPlayersCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("nick.nickedplayers")) {
+			if(player.hasPermission("eazynick.nickedplayers")) {
 				List<? extends Player> nickedPlayers = Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())).collect(Collectors.toList());
 				
 				if(!(nickedPlayers.isEmpty())) {

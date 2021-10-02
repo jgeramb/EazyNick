@@ -131,7 +131,7 @@ public class ScoreboardTeamHandler {
 				String suffixForPlayer = suffix;
 				List<String> contents = Arrays.asList(nickName, realName);
 				
-				if(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission") && setupYamlFile.getConfiguration().getBoolean("BypassFormat.Show")) {
+				if(currentPlayer.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission") && setupYamlFile.getConfiguration().getBoolean("BypassFormat.Show")) {
 					prefixForPlayer = setupYamlFile.getConfigString(player, "BypassFormat.NameTagPrefix");
 					suffixForPlayer = setupYamlFile.getConfigString(player, "BypassFormat.NameTagSuffix");
 				}

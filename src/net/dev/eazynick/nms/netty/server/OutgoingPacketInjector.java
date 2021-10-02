@@ -115,7 +115,7 @@ public class OutgoingPacketInjector {
 											
 											super.write(ctx, msg, promise);
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
-											if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && !(utils.isVersion13OrLater())) {
+											if(!(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && !(utils.isVersion13OrLater())) {
 												String textToComplete = utils.getTextsToComplete().get(player);
 												String[] splitTextToComplete = textToComplete.trim().split(" ");
 												ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
@@ -185,7 +185,7 @@ public class OutgoingPacketInjector {
 											
 											super.write(ctx, msg, promise);
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
-											if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+											if(!(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
 												List<String> contentsList = (List<String>) reflectionHelper.getField(msg.getClass(), version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : (is17 ? "j" : "h"))).get(msg);
 												
 												if(contentsList != null) {

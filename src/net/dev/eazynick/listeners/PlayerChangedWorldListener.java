@@ -24,7 +24,7 @@ public class PlayerChangedWorldListener implements Listener {
 		NickManager api = new NickManager(player);
 		
 		if (!(utils.getWorldBlackList().contains(player.getWorld().getName().toUpperCase()))) {
-			if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(player.getUniqueId()) && !(api.isNicked()) && player.hasPermission("nick.use"))
+			if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(player.getUniqueId()) && !(api.isNicked()))
 				utils.performReNick(player);
 			else if(utils.getNickedPlayers().containsKey(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("KeepNickOnWorldChange") && !(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName()))) {
 				NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
@@ -51,39 +51,6 @@ public class PlayerChangedWorldListener implements Listener {
 						}
 					}
 				}, 1000L).run();
-			}
-			
-			if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && setupYamlFile.getConfiguration().getBoolean("ReNickAllOnNewPlayerJoinWorld")) {
-				for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-					if(currentPlayer != player) {
-						NickManager apiCurrentPlayer = new NickManager(currentPlayer);
-						
-						if (apiCurrentPlayer.isNicked() && currentPlayer.getWorld().getName().equals(player.getWorld().getName())) {
-							NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).clone();
-							
-							new AsyncTask(new AsyncRunnable() {
-								
-								@Override
-								public void run() {
-									if(player.isOnline()) {
-										apiCurrentPlayer.unnickPlayerWithoutRemovingMySQL(false, true);
-										
-										new AsyncTask(new AsyncRunnable() {
-											
-											@Override
-											public void run() {
-												Bukkit.getScheduler().runTask(eazyNick, () -> {
-													if(currentPlayer.isOnline())
-														Bukkit.getPluginManager().callEvent(new PlayerNickEvent(currentPlayer, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getSpoofedUniqueId(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
-												});
-											}
-										}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0))).run();
-									}
-								}
-							}, 1000L).run();
-						}
-					}
-				}
 			}
 		} else if(api.isNicked())
 			api.unnickPlayer();

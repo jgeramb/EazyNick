@@ -17,7 +17,7 @@ public class GuiNickCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("nick.use")) {
+			if(player.hasPermission("eazynick.nick.random") || player.hasPermission("eazynick.nick.custom")) {
 				NickManager api = new NickManager(player);
 				
 				if(!(api.isNicked())) {

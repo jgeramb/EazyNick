@@ -226,24 +226,26 @@ public class EazyNick extends JavaPlugin {
 			//Check if plugin features should be enabled -> APIMode: false
 			if (!(setupYamlFile.getConfiguration().getBoolean("APIMode"))) {
 				getCommand("eazynick").setExecutor(new PluginCommand());
-				getCommand("nickother").setExecutor(new NickOtherCommand());
-				getCommand("changeskin").setExecutor(new ChangeSkinCommand());
-				getCommand("nicklist").setExecutor(new NickListCommand());
 				getCommand("nick").setExecutor(new NickCommand());
 				getCommand("unnick").setExecutor(new UnnickCommand());
 				getCommand("name").setExecutor(new NameCommand());
-				getCommand("reloadconfig").setExecutor(new ReloadConfigCommand());
-				getCommand("fixskin").setExecutor(new FixSkinCommand());
-				getCommand("resetskin").setExecutor(new ResetSkinCommand());
 				getCommand("resetname").setExecutor(new ResetNameCommand());
-				getCommand("renick").setExecutor(new ReNickCommand());
-				getCommand("nickedplayers").setExecutor(new NickedPlayersCommand());
+				getCommand("reloadconfig").setExecutor(new ReloadConfigCommand());
 				getCommand("nickupdatecheck").setExecutor(new NickUpdateCheckCommand());
+				getCommand("nickother").setExecutor(new NickOtherCommand());
+				getCommand("changeskin").setExecutor(new ChangeSkinCommand());
+				getCommand("changeskinother").setExecutor(new ChangeSkinOtherCommand());
+				getCommand("resetskinother").setExecutor(new ResetSkinOtherCommand());
+				getCommand("resetskin").setExecutor(new ResetSkinCommand());
+				getCommand("fixskin").setExecutor(new FixSkinCommand());
+				getCommand("nicklist").setExecutor(new NickListCommand());
+				getCommand("bookgui").setExecutor(version.startsWith("1_7") ? new RankedNickGUICommand() : new BookGUICommand());
+				getCommand("nickgui").setExecutor(setupYamlFile.getConfiguration().getBoolean("OpenRankedNickGUIOnNickGUICommand") ? new RankedNickGUICommand() : new NickGUICommand());
+				getCommand("nickedplayers").setExecutor(new NickedPlayersCommand());
 				getCommand("togglebungeenick").setExecutor(new ToggleBungeeNickCommand());
 				getCommand("realname").setExecutor(new RealNameCommand());
-				getCommand("nickgui").setExecutor(setupYamlFile.getConfiguration().getBoolean("OpenRankedNickGUIOnNickGUICommand") ? new RankedNickGUICommand() : new NickGUICommand());
+				getCommand("renick").setExecutor(new ReNickCommand());
 				getCommand("guinick").setExecutor(new GuiNickCommand());
-				getCommand("bookgui").setExecutor(version.startsWith("1_7") ? new RankedNickGUICommand() : new BookGUICommand());
 				
 				//Register listeners for plugin events
 				pluginManager.registerEvents(new PlayerNickListener(), this);
@@ -278,7 +280,7 @@ public class EazyNick extends JavaPlugin {
 								String nickName = mysqlNickManager.getNickName(currentNickedPlayer.getUniqueId()), prefix = mysqlPlayerDataManager.getChatPrefix(currentNickedPlayer.getUniqueId()), suffix = mysqlPlayerDataManager.getChatSuffix(currentNickedPlayer.getUniqueId());
 								
 								if(!(utils.getWorldsWithDisabledActionBar().contains(currentNickedPlayer.getWorld().getName().toUpperCase())))
-									actionBarUtils.sendActionBar(currentNickedPlayer, languageYamlFile.getConfigString(currentNickedPlayer, currentNickedPlayer.hasPermission("nick.otheractionbarmessage") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", prefix).replace("%nickprefix%", prefix).replace("%nickSuffix%", suffix).replace("%nicksuffix%", suffix).replace("%prefix%", utils.getPrefix()));
+									actionBarUtils.sendActionBar(currentNickedPlayer, languageYamlFile.getConfigString(currentNickedPlayer, currentNickedPlayer.hasPermission("eazynick.actionbar.other") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", prefix).replace("%nickprefix%", prefix).replace("%nickSuffix%", suffix).replace("%nicksuffix%", suffix).replace("%prefix%", utils.getPrefix()));
 							});
 						}
 					}, 1000, 1000).run();

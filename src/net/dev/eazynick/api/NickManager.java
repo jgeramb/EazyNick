@@ -54,7 +54,7 @@ public class NickManager extends ReflectionHelper {
 		if((player.canSee(nickedPlayer) && player.getWorld().getName().equals(nickedPlayer.getWorld().getName()))) {
 			if(player.getEntityId() != nickedPlayer.getEntityId()) {
 				//Send packet to player who is not the player being nicked
-				if(!(player.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
+				if(!(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
 					sendPacketNMS(player, packet);
 			} else if(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))
 				//Send packet to player being nicked
@@ -67,7 +67,7 @@ public class NickManager extends ReflectionHelper {
 			if(currentPlayer.getWorld().getName().equals(player.getWorld().getName())) {
 				if((eazyNick.getVersion().startsWith("1_7") ? true : (!(player.getGameMode().equals(GameMode.SPECTATOR)) || currentPlayer.getGameMode().equals(GameMode.SPECTATOR))) && (currentPlayer.getEntityId() != player.getEntityId())) {
 					//Send packet to player who is not the player being nicked
-					if(!(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
+					if(!(currentPlayer.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")))
 						sendPacketNMS(currentPlayer, packet);
 				}
 			}
@@ -110,7 +110,7 @@ public class NickManager extends ReflectionHelper {
 				for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
 					if(currentPlayer.canSee(player)) {
 						if(!(currentPlayer.getUniqueId().equals(player.getUniqueId()))) {
-							if(!(currentPlayer.hasPermission("nick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+							if(!(currentPlayer.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
 								Object playerConenction = getNMSClass("EntityPlayer").getDeclaredField("playerConnection").get(currentPlayer.getClass().getMethod("getHandle").invoke(currentPlayer));
 								Object networkManager = playerConenction.getClass().getDeclaredField("networkManager").get(playerConenction);
 								int version = (int) networkManager.getClass().getMethod("getVersion").invoke(networkManager);
@@ -478,7 +478,7 @@ public class NickManager extends ReflectionHelper {
 					if(eazyNick.isEnabled() && utils.getNickedPlayers().containsKey(player.getUniqueId()) && (player != null) && player.isOnline() && !(utils.getWorldsWithDisabledActionBar().contains(player.getWorld().getName().toUpperCase()))) {
 						NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId());
 						
-						actionBarUtils.sendActionBar(player, eazyNick.getLanguageYamlFile().getConfigString(player, player.hasPermission("nick.otheractionbarmessage") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", nickedPlayerData.getChatPrefix()).replace("%nickprefix%", nickedPlayerData.getChatPrefix()).replace("%nickSuffix%", nickedPlayerData.getChatSuffix()).replace("%nicksuffix%", nickedPlayerData.getChatSuffix()).replace("%prefix%", utils.getPrefix()));
+						actionBarUtils.sendActionBar(player, eazyNick.getLanguageYamlFile().getConfigString(player, player.hasPermission("eazynick.actionbar.other") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", nickedPlayerData.getChatPrefix()).replace("%nickprefix%", nickedPlayerData.getChatPrefix()).replace("%nickSuffix%", nickedPlayerData.getChatSuffix()).replace("%nicksuffix%", nickedPlayerData.getChatSuffix()).replace("%prefix%", utils.getPrefix()));
 					} else {
 						if(player != null)
 							actionBarUtils.sendActionBar(player, "");
@@ -490,7 +490,7 @@ public class NickManager extends ReflectionHelper {
 		}
 		
 		//Update nick item
-		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("nick.item"))) {
+		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("eazynick.item"))) {
 			for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
 				ItemStack item = player.getInventory().getItem(slot);
 				
@@ -661,7 +661,7 @@ public class NickManager extends ReflectionHelper {
 		}
 		
 		//Update nick item
-		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("nick.item"))) {
+		if(setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")  && (player.hasPermission("eazynick.item"))) {
 			for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
 				ItemStack item = player.getInventory().getItem(slot);
 				

@@ -72,19 +72,15 @@ public class PlayerNickListener implements Listener {
 			if(setupYamlFile.getConfiguration().getBoolean("LogNicknames"))
 				utils.sendConsole("§a" + realName + " §8(" + player.getUniqueId().toString() + ") §7set his nickname to §d" + nickName);
 			
+			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnNnick"))
+				Bukkit.getOnlinePlayers().forEach(currentPlayer -> languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Nick.Quit").replace("%displayName%", oldDisplayName).replace("%displayname%", oldDisplayName).replace("%name%", api.getRealName())));
+			
 			api.nickPlayer(nickName, skinName);
 			
 			if(changePrefixAndSuffix)
 				api.updatePrefixSuffix(nickName, realName, event.getTagPrefix(), event.getTagSuffix(), event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), sortID, groupName);
 			
 			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), spoofedUniqueId, oldDisplayName, oldPlayerListName, realName, nickName, skinName, event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), event.getTagPrefix(), event.getTagSuffix(), groupName, sortID));
-			
-			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnNnick")) {
-				Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
-					languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Nick.Quit").replace("%displayName%", oldDisplayName).replace("%displayname%", oldDisplayName).replace("%name%", api.getRealName()));
-					languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Nick.Join").replace("%displayName%", player.getDisplayName()).replace("%displayname%", player.getDisplayName()).replace("%name%", nickName));
-				});
-			}
 			
 			if(!(event.isRenick()))
 				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages." + (event.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName).replace("%prefix%", utils.getPrefix()));
@@ -95,6 +91,9 @@ public class PlayerNickListener implements Listener {
 				else
 					setupYamlFile.getConfiguration().getStringList("NickCommands.Nick").forEach(command -> Bukkit.dispatchCommand(setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole") ? Bukkit.getConsoleSender() : player, command.replace("%player%", player.getName()).replace("%nickName%", nickName)));
 			}
+			
+			if(setupYamlFile.getConfiguration().getBoolean("NickMessage.OnNnick"))
+				Bukkit.getOnlinePlayers().forEach(currentPlayer -> languageYamlFile.sendMessage(currentPlayer, setupYamlFile.getConfigString(player, "NickMessage.Nick.Join").replace("%displayName%", player.getDisplayName()).replace("%displayname%", player.getDisplayName()).replace("%name%", nickName)));
 		}
 	}
 

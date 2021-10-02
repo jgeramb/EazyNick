@@ -9,7 +9,7 @@ import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 
-public class RealNameCommand implements CommandExecutor {
+public class ResetSkinOtherCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -22,17 +22,16 @@ public class RealNameCommand implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if(player.hasPermission("eazynick.real")) {
+			if(player.hasPermission("eazynick.other.skin.reset")) {
 				if(args.length >= 1) {
 					Player targetPlayer = Bukkit.getPlayer(args[0]);
 					
 					if(targetPlayer != null) {
-						if(utils.getNickedPlayers().containsKey(targetPlayer.getUniqueId())) {
-							String realName = new NickManager(targetPlayer).getRealName();
-							
-							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.RealName").replace("%realName%", realName).replace("%realname%", realName).replace("%prefix%", prefix));
-						} else
-							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerNotNicked").replace("%prefix%", prefix));
+						NickManager api = new NickManager(targetPlayer);
+				
+						api.changeSkin(api.getRealName());
+						
+						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Other.ResetSkin").replace("%playerName%", targetPlayer.getName()).replace("%playername%", targetPlayer.getName()).replace("%prefix%", utils.getPrefix()));
 					} else
 						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerNotFound").replace("%prefix%", prefix));
 				}

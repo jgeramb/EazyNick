@@ -25,7 +25,7 @@ public class PluginCommand implements CommandExecutor {
 		
 		PluginDescriptionFile desc = eazyNick.getDescription();
 
-		if(sender.hasPermission("nick.showhelp")) {
+		if(sender.hasPermission("eazynick.help")) {
 			if((args.length == 0) || args[0].equalsIgnoreCase("1")) {
 				sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
 				sender.sendMessage(prefix);
@@ -67,11 +67,11 @@ public class PluginCommand implements CommandExecutor {
 					sender.sendMessage(prefix + "§7/eazynick [1-3] §8» §aPlugin help");
 					sender.sendMessage(prefix);
 					sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
-				} else if(args[0].equalsIgnoreCase("reload") && sender.hasPermission("nick.reload")) {
+				} else if(args[0].equalsIgnoreCase("reload") && sender.hasPermission("eazynick.reload")) {
 					utils.reloadConfigs();
 					
 					languageYamlFile.sendMessage(sender, languageYamlFile.getConfigString("Messages.ReloadConfig").replace("%prefix%", prefix));
-				} else if(args[0].equalsIgnoreCase("support") && sender.hasPermission("nick.support")) {
+				} else if(args[0].equalsIgnoreCase("support") && sender.hasPermission("eazynick.support")) {
 					if(utils.isSupportMode()) {
 						utils.setSupportMode(false);
 						
