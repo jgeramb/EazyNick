@@ -96,7 +96,8 @@ public class OutgoingPacketInjector_1_7 {
 											Object playerObject = reflectionHelper.getField(msg.getClass(), "player").get(msg);
 											
 											if(playerObject != null) {
-												UUID uuid = ((GameProfile) playerObject).getId();
+												GameProfile playerProfile = (GameProfile) playerObject;
+												UUID uuid = playerProfile.getId();
 												
 												if(utils.getSoonNickedPlayers().containsKey(uuid) && utils.getSoonNickedPlayers().get(uuid).equals(NickReason.JOIN) && (reflectionHelper.getField(msg.getClass(), "action").getInt(msg) == 0))
 													return;
@@ -104,9 +105,11 @@ public class OutgoingPacketInjector_1_7 {
 												if(utils.getNickedPlayers().containsKey(uuid)) {
 													//Replace game profile with fake game profile (nicked player profile)
 													NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uuid);
+													boolean tabOverride = utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB");
+													String name = playerProfile.getName();
 													
-													reflectionHelper.setField(msg, "player", nickedPlayerData.getFakeGameProfile(false));
-													reflectionHelper.setField(msg, "username", nickedPlayerData.getNickName());
+													reflectionHelper.setField(msg, "player", tabOverride ? nickedPlayerData.getTABGameProfile(name, false) : nickedPlayerData.getFakeGameProfile(false));
+													reflectionHelper.setField(msg, "username", tabOverride ? name : nickedPlayerData.getNickName());
 												}
 											}
 											
@@ -114,28 +117,31 @@ public class OutgoingPacketInjector_1_7 {
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
 											String textToComplete = utils.getTextsToComplete().get(player);
 											String[] splitTextToComplete = textToComplete.trim().split(" ");
-											ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
 											
-											if(splitTextToComplete.length < 2)
-												textToComplete = "";
-											else
-												textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
-											
-											//Collect nicknames
-											Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
-											
-											utils.getNickedPlayers().values().forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
-	
-											//Process completions
-											newCompletions.addAll(Arrays.asList((String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg)));
-											newCompletions.removeIf(currentCompletion -> (Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion)).count() != 0));
-											newCompletions.addAll(StringUtil.copyPartialMatches(textToComplete, playerNames, new ArrayList<>()));
-											
-											//Sort completions alphabetically
-											Collections.sort(newCompletions);
-											
-											//Replace completions
-											reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
+											if(!(textToComplete.startsWith("/")) || (splitTextToComplete.length > 1)) {
+												ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
+												
+												if(splitTextToComplete.length < 2)
+													textToComplete = "";
+												else
+													textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
+												
+												//Collect nicknames
+												Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+												
+												utils.getNickedPlayers().values().forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
+		
+												//Process completions
+												newCompletions.addAll(Arrays.asList((String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg)));
+												newCompletions.removeIf(currentCompletion -> (Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion)).count() != 0));
+												newCompletions.addAll(StringUtil.copyPartialMatches(textToComplete, playerNames, new ArrayList<>()));
+												
+												//Sort completions alphabetically
+												Collections.sort(newCompletions);
+												
+												//Replace completions
+												reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
+											}
 											
 											super.write(ctx, msg, promise);
 										} else if (msg.getClass().getSimpleName().equals("PacketPlayOutChat") && setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {

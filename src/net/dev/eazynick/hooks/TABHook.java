@@ -2,6 +2,8 @@ package net.dev.eazynick.hooks;
 
 import org.bukkit.entity.Player;
 
+import net.dev.eazynick.EazyNick;
+
 import me.neznamy.tab.api.*;
 
 public class TABHook {
@@ -21,7 +23,7 @@ public class TABHook {
 			tabPlayer.setValueTemporarily(EnumProperty.TABSUFFIX, tabSuffix);
 			tabPlayer.setValueTemporarily(EnumProperty.CUSTOMTABNAME, name);
 			
-			if(!(tabPlayer.hasHiddenNametag())) {
+			if(!(tabPlayer.hasHiddenNametag()) && EazyNick.getInstance().getSetupYamlFile().getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
 				//Set temporarily nametag values
 				tabPlayer.setValueTemporarily(EnumProperty.TAGPREFIX, tagPrefix);
 				tabPlayer.setValueTemporarily(EnumProperty.TAGSUFFIX, tagSuffix);
@@ -52,7 +54,7 @@ public class TABHook {
 			tabPlayer.removeTemporaryValue(EnumProperty.TABSUFFIX);
 			tabPlayer.removeTemporaryValue(EnumProperty.CUSTOMTABNAME);
 			
-			if(!(tabPlayer.hasHiddenNametag())) {
+			if(tabPlayer.hasTemporaryValue(EnumProperty.TAGPREFIX) && tabPlayer.hasTemporaryValue(EnumProperty.TAGSUFFIX)) {
 				//Reset temporarily nametag values
 				tabPlayer.removeTemporaryValue(EnumProperty.TAGPREFIX);
 				tabPlayer.removeTemporaryValue(EnumProperty.TAGSUFFIX);

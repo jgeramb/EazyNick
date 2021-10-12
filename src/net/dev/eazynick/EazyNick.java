@@ -27,6 +27,8 @@ import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.*;
 import net.dev.eazynick.utilities.mojang.*;
 
+import me.neznamy.tab.api.TABAPI;
+
 public class EazyNick extends JavaPlugin {
 
 	private static EazyNick instance;
@@ -218,6 +220,11 @@ public class EazyNick extends JavaPlugin {
 							pluginManager.registerEvents(new DeluxeChatListener(), instance);
 							
 							utils.sendConsole("§7DeluxeChat hooked successfully!");
+						}
+						
+						if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) {
+							if(!(TABAPI.isUnlimitedNameTagModeEnabled()))
+								TABAPI.enableUnlimitedNameTagModePermanently();
 						}
 					});
 				}

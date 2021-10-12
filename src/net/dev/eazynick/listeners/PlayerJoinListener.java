@@ -106,13 +106,23 @@ public class PlayerJoinListener implements Listener {
 					Bukkit.getScheduler().runTask(eazyNick, () -> {
 						if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
 							if (!(setupYamlFile.getConfiguration().getBoolean("LobbyMode")) || (player.hasPermission("eazynick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) {
-								if (mysqlNickManager.isPlayerNicked(uniqueId))
-									utils.performReNick(player);
+								if (mysqlNickManager.isPlayerNicked(uniqueId)) {
+									String skinName = mysqlNickManager.getNickName(uniqueId);
+									
+									if((skinName != null) && !(skinName.equals(player.getName())))
+										utils.performReNick(player);
+									else
+										api.changeSkin(skinName);
+								}
 							} else if (mysqlNickManager.isPlayerNicked(uniqueId) && setupYamlFile.getConfiguration().getBoolean("GetNewNickOnEveryServerSwitch")) {
-								String name = api.getRandomName();
+								String nickName = mysqlNickManager.getNickName(uniqueId);
 								
-								mysqlNickManager.removePlayer(uniqueId);
-								mysqlNickManager.addPlayer(uniqueId, name, name);
+								if((nickName == null) || !(nickName.equals(player.getName()))) {
+									String name = api.getRandomName();
+									
+									mysqlNickManager.removePlayer(uniqueId);
+									mysqlNickManager.addPlayer(uniqueId, name, name);
+								}
 							}
 			
 							if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {

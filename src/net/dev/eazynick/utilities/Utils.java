@@ -177,7 +177,7 @@ public class Utils {
 			ArrayList<String> toAdd = new ArrayList<>();
 			
 			for (String blackListName : blackList)
-				toAdd.add(blackListName.toUpperCase());
+				toAdd.add(blackListName.toLowerCase());
 			
 			this.blackList = toAdd;
 		}
@@ -239,7 +239,7 @@ public class Utils {
 			if(!(setupYamlFile.getConfiguration().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
 				if(!(containsSpecialChars(nameWithoutColors)) || setupYamlFile.getConfiguration().getBoolean("AllowSpecialCharactersInCustomName")) {
 					//Check if name is allowed
-					if(!(blackList.contains(name.toUpperCase()))) {
+					if(!(containsBlackListEntry(name))) {
 						//Check if nickname is in use
 						boolean nickNameIsInUse = false;
 						
@@ -619,11 +619,22 @@ public class Utils {
 	}
 	
 	//String contains characters that are not allowed in minecraft usernames (allowed: a-z, A-Z, 0-9, _)
-	public boolean containsSpecialChars(String s) {
+	public boolean containsSpecialChars(String str) {
 		List<Character> allowCharacters = Chars.asList("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".toCharArray());
 		
-		for (char c : s.toCharArray()) {
+		for (char c : str.toCharArray()) {
 			if(!(allowCharacters.contains(c)))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean containsBlackListEntry(String str) {
+		String lowerCaseString = str.toLowerCase();
+		
+		for(String entry : blackList) {
+			if(lowerCaseString.contains(entry))
 				return true;
 		}
 		
@@ -692,10 +703,6 @@ public class Utils {
 	
 	public List<String> getReplaceNameInCommandBlackList() {
 		return replaceNameInCommandBlackList;
-	}
-	
-	public List<String> getBlackList() {
-		return blackList;
 	}
 	
 	public List<String> getWorldsWithDisabledLobbyMode() {

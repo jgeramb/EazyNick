@@ -336,16 +336,20 @@ public class GUIManager {
 			
 			player.openInventory(inv);
 		} else if(args.length == 1) {
-			Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.InventoryTitle"));
-			
-			for (int i = 0; i < inv.getSize(); i++)
-				inv.setItem(i, new ItemBuilder(Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, newVersion ? 0 : 15).setDisplayName("§r").build());
-			
-			inv.setItem(11, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Default.DisplayName")).setSkullOwner(player.getName()).build());
-			inv.setItem(13, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName")).build());
-			inv.setItem(15, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Random.DisplayName")).setSkullOwner("MHF_Question").build());
-			
-			player.openInventory(inv);
+			if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
+				Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.InventoryTitle"));
+				
+				for (int i = 0; i < inv.getSize(); i++)
+					inv.setItem(i, new ItemBuilder(Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, newVersion ? 0 : 15).setDisplayName("§r").build());
+				
+				inv.setItem(10, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Default.DisplayName")).setSkullOwner(player.getName()).build());
+				inv.setItem(12, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName")).build());
+				inv.setItem(14, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Random.DisplayName")).setSkullOwner("MHF_Question").build());
+				inv.setItem(16, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.SkinFromName.DisplayName")).setSkullOwner("Steve").build());
+				
+				player.openInventory(inv);
+			} else
+				openRankedNickGUI(player, text + " DEFAULT");
 		} else if(args.length == 2) {
 			if(player.hasPermission("eazynick.nick.custom")) {
 				Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.InventoryTitle"));

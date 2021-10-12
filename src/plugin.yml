@@ -1,5 +1,5 @@
 name: EazyNick
-version: 3.8
+version: 3.9
 author: Justix
 main: net.dev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)
@@ -78,7 +78,9 @@ permissions:
   eazynick.help:
     description: Allows you to use /eazynick
   eazynick.reload:
-    description: Allows you to use /reloadconfig
+    description: Allows you to use /reloadconfig and /eazynick reload
+  eazynick.support:
+    description: Allows you to use /eazynick support
   eazynick.updatecheck:
     description: Allows you to use /nickupdatecheck
   eazynick.real:
@@ -121,6 +123,8 @@ permissions:
     description: Lets you receive the nick item (if enabled in setup.yml) and allows you to use /togglebungeenick
   eazynick.actionbar.other:
     description: Shows the alternate actionbar message
+  eazynick.bypasslobbymode:
+    description: Lets you bypass the LobbyMode
   eazynick.bypass:
     description: See every player undisguised (if enabled in setup.yml)
     default: false

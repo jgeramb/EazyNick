@@ -73,6 +73,37 @@ public class NickedPlayerData {
 		return (version.startsWith("1_7") ? new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName) : new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName));
 	}
 	
+	public Object getTABGameProfile(String name, boolean spoofUniqueId) {
+		EazyNick eazyNick = EazyNick.getInstance();
+		
+		if(this.spoofedUniqueId == null)
+			this.spoofedUniqueId = this.uniqueId;
+		
+		String version = eazyNick.getVersion();
+		
+		try {
+			//Create and return new game profile
+			if(version.startsWith("1_7")) {
+				net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, name);
+				gameProfile.getProperties().removeAll("textures");
+				gameProfile.getProperties().putAll("textures", ((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().get("textures"));
+				
+				return gameProfile;
+			} else {
+				GameProfile gameProfile = new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, name);
+				gameProfile.getProperties().removeAll("textures");
+				gameProfile.getProperties().putAll("textures", ((GameProfile) skinProfile).getProperties().get("textures"));
+				
+				return gameProfile;
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		//Return default game profile
+		return (version.startsWith("1_7") ? new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, name) : new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, name));
+	}
+	
 	private boolean prepareSkinProfile() {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();

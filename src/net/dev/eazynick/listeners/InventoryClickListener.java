@@ -95,7 +95,7 @@ public class InventoryClickListener implements Listener {
 						event.setCancelled(true);
 						
 						if(!(displayName.equals("§r")))
-							guiManager.openRankedNickGUI(player, utils.getLastGUITexts().get(player.getUniqueId()) + (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Default.DisplayName")) ? " DEFAULT" : (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName")) ? " NORMAL" : " RANDOM")));
+							guiManager.openRankedNickGUI(player, utils.getLastGUITexts().get(player.getUniqueId()) + (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Default.DisplayName")) ? " DEFAULT" : (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName")) ? " NORMAL" : (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Random.DisplayName")) ? " RANDOM" : " SKINFROMNAME"))));
 					} else if (title.equalsIgnoreCase(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.InventoryTitle"))) {
 						event.setCancelled(true);
 						

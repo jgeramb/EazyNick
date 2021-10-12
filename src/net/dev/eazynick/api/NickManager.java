@@ -17,6 +17,7 @@ import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.hooks.TABHook;
 import net.dev.eazynick.nms.ReflectionHelper;
 import net.dev.eazynick.nms.ScoreboardTeamHandler;
+import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.utilities.*;
 import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
@@ -394,9 +395,13 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public void changeSkin(String skinName) {
+		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+		
+		UUID uniqueId = player.getUniqueId();
+		
 		if(skinName != null) {
-			if(utils.getNickedPlayers().containsKey(player.getUniqueId())) {
-				if(utils.getNickedPlayers().get(player.getUniqueId()).setSkinName(skinName) && utils.isPluginInstalled("SkinsRestorer")) {
+			if(utils.getNickedPlayers().containsKey(uniqueId)) {
+				if(utils.getNickedPlayers().get(uniqueId).setSkinName(skinName) && utils.isPluginInstalled("SkinsRestorer")) {
 					//Update skins restorer data synchronized
 					new Thread(() -> {
 						try {
@@ -413,7 +418,17 @@ public class NickManager extends ReflectionHelper {
 					return;
 				}
 			} else
-				utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), player.getName(), skinName, "", "", "", "", "", "", "default", 9999));
+				utils.getNickedPlayers().put(uniqueId, new NickedPlayerData(uniqueId, uniqueId, player.getDisplayName(), player.getPlayerListName(), player.getName(), player.getName(), skinName, "", "", "", "", "", "", "default", 9999));
+			
+			if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+				String nickName = mysqlNickManager.getNickName(uniqueId);
+				
+				if((nickName == null) || !(nickName.equals("NaN"))) {
+					mysqlNickManager.removePlayer(uniqueId);
+					mysqlNickManager.addPlayer(uniqueId, nickName, skinName);
+				} else
+					mysqlNickManager.addPlayer(uniqueId, player.getName(), skinName);
+			}
 			
 			//Respawn player and update tablist
 			updatePlayer(true);
@@ -421,11 +436,25 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public void changeSkinToMineSkinId(String mineSkinId) {
+		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+		
+		UUID uniqueId = player.getUniqueId();
+		
 		if(mineSkinId != null) {
-			if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
-				utils.getNickedPlayers().get(player.getUniqueId()).setSkinName("MINESKIN:" + mineSkinId);
+			if(utils.getNickedPlayers().containsKey(uniqueId))
+				utils.getNickedPlayers().get(uniqueId).setSkinName("MINESKIN:" + mineSkinId);
 			else
-				utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), player.getName(), "MINESKIN:" + mineSkinId, "", "", "", "", "", "", "default", 9999));
+				utils.getNickedPlayers().put(uniqueId, new NickedPlayerData(uniqueId, uniqueId, player.getDisplayName(), player.getPlayerListName(), player.getName(), player.getName(), "MINESKIN:" + mineSkinId, "", "", "", "", "", "", "default", 9999));
+			
+			if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+				String nickName = mysqlNickManager.getNickName(uniqueId);
+				
+				if((nickName == null) || !(nickName.equals("NaN"))) {
+					mysqlNickManager.removePlayer(uniqueId);
+					mysqlNickManager.addPlayer(uniqueId, nickName, "MINESKIN:" + mineSkinId);
+				} else
+					mysqlNickManager.addPlayer(uniqueId, player.getName(), "MINESKIN:" + mineSkinId);
+			}
 			
 			//Respawn player and update tablist
 			updatePlayer(true);
@@ -433,10 +462,12 @@ public class NickManager extends ReflectionHelper {
 	}
 	
 	public void setName(String nickName) {
-		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
-			utils.getNickedPlayers().get(player.getUniqueId()).setNickName(nickName);
+		UUID uniqueId = player.getUniqueId();
+		
+		if(utils.getNickedPlayers().containsKey(uniqueId))
+			utils.getNickedPlayers().get(uniqueId).setNickName(nickName);
 		else
-			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), player.getUniqueId(), player.getDisplayName(), player.getPlayerListName(), player.getName(), nickName, player.getName(), "", "", "", "", "", "", "default", 9999));
+			utils.getNickedPlayers().put(uniqueId, new NickedPlayerData(uniqueId, uniqueId, player.getDisplayName(), player.getPlayerListName(), player.getName(), nickName, player.getName(), "", "", "", "", "", "", "default", 9999));
 		
 		//Respawn player and update tablist
 		updatePlayer(true);

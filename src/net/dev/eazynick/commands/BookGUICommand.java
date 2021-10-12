@@ -95,56 +95,64 @@ public class BookGUICommand implements CommandExecutor {
 							nmsBookUtils.open(player, nmsBookBuilder.create(guiYamlFile.getConfigString(player, "BookGUI.Page2.Title"), new BookPage(textComponentsOfFirstPage), new BookPage(textComponentsOfSecondPage)));
 						}
 					} else if(args.length == 2) {
-						ArrayList<TextComponent> textComponents = new ArrayList<>();
-						
-						for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page3.Text").split("%nl%"))
-							textComponents.add(new TextComponent(s + "\n"));
-						
-						TextComponent option1 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.NormalSkin.Text").replace("%nl%", "\n"));
-						option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " DEFAULT"));
-						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.NormalSkin.Hover"))));
-						
-						textComponents.add(option1);
-						
-						TextComponent option2 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.SteveAlexSkin.Text").replace("%nl%", "\n"));
-						option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " NORMAL"));
-						option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.SteveAlexSkin.Hover"))));
-						
-						textComponents.add(option2);
-						
-						TextComponent option3 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.RandomSkin.Text").replace("%nl%", "\n"));
-						option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " RANDOM"));
-						option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.RandomSkin.Hover"))));
-						
-						textComponents.add(option3);
-						
-						TextComponent option4 = new TextComponent(setupYamlFile.getConfiguration().getBoolean("AllowBookGUISkinFromName") ? guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Text").replace("%nl%", "\n") : "");
-						option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " SKINFROMNAME"));
-						option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Hover"))));
-						
-						textComponents.add(option4);
-						
-						if(utils.getLastSkinNames().containsKey(player.getUniqueId())) {
-							TextComponent option5 = new TextComponent(utils.getLastSkinNames().containsKey(player.getUniqueId()) ? (guiYamlFile.getConfigString(player, "BookGUI.ReuseSkin.Text").replace("%skin%", utils.getLastSkinNames().get(player.getUniqueId()))).replace("%nl%", "\n") : "");
-							option5.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + utils.getLastSkinNames().get(player.getUniqueId())));
-							option5.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.ReuseSkin.Hover"))));
-						
-							textComponents.add(option5);
-						}
+						if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
+							ArrayList<TextComponent> textComponents = new ArrayList<>();
 							
-						nmsBookUtils.open(player, nmsBookBuilder.create(guiYamlFile.getConfigString(player, "BookGUI.Page3.Title"), new BookPage(textComponents)));
+							for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page3.Text").split("%nl%"))
+								textComponents.add(new TextComponent(s + "\n"));
+							
+							TextComponent option1 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.NormalSkin.Text").replace("%nl%", "\n"));
+							option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " DEFAULT"));
+							option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.NormalSkin.Hover"))));
+							
+							textComponents.add(option1);
+							
+							TextComponent option2 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.SteveAlexSkin.Text").replace("%nl%", "\n"));
+							option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " NORMAL"));
+							option2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.SteveAlexSkin.Hover"))));
+							
+							textComponents.add(option2);
+							
+							TextComponent option3 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.RandomSkin.Text").replace("%nl%", "\n"));
+							option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " RANDOM"));
+							option3.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.RandomSkin.Hover"))));
+							
+							textComponents.add(option3);
+							
+							TextComponent option4 = new TextComponent(setupYamlFile.getConfiguration().getBoolean("AllowBookGUISkinFromName") ? guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Text").replace("%nl%", "\n") : "");
+							option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " SKINFROMNAME"));
+							option4.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Hover"))));
+							
+							textComponents.add(option4);
+							
+							if(utils.getLastSkinNames().containsKey(player.getUniqueId())) {
+								TextComponent option5 = new TextComponent(utils.getLastSkinNames().containsKey(player.getUniqueId()) ? (guiYamlFile.getConfigString(player, "BookGUI.ReuseSkin.Text").replace("%skin%", utils.getLastSkinNames().get(player.getUniqueId()))).replace("%nl%", "\n") : "");
+								option5.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + utils.getLastSkinNames().get(player.getUniqueId())));
+								option5.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.ReuseSkin.Hover"))));
+							
+								textComponents.add(option5);
+							}
+								
+							nmsBookUtils.open(player, nmsBookBuilder.create(guiYamlFile.getConfigString(player, "BookGUI.Page3.Title"), new BookPage(textComponents)));
+						} else
+							player.chat("/bookgui " + args[0] + " " + args[1] + " DEFAULT");
 					} else if(args.length == 3) {
 						ArrayList<TextComponent> textComponents = new ArrayList<>();
 						
 						for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page4.Text").split("%nl%"))
 							textComponents.add(new TextComponent(s + "\n"));
 						
-						TextComponent option1 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.EnterName.Text").replace("%nl%", "\n"));
-						option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2] + " ENTERNAME"));
-						option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.EnterName.Hover"))));
-						
-						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("eazynick.nick.custom")))
+						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("eazynick.nick.custom"))) {
+							TextComponent option1 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.EnterName.Text").replace("%nl%", "\n"));
+							option1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2] + " ENTERNAME"));
+							option1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.EnterName.Hover"))));
+							
 							textComponents.add(option1);
+						} else if(!(utils.getLastNickNames().containsKey(player.getUniqueId()))) {
+							player.chat("/bookgui " + args[0] + " " + args[1] + " " + args[2] + " RANDOM");
+							
+							return true;
+						}
 						
 						TextComponent option2 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.RandomName.Text").replace("%nl%", "\n"));
 						option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " " + args[2] + " RANDOM"));

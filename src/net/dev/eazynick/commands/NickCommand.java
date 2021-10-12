@@ -73,11 +73,11 @@ public class NickCommand implements CommandExecutor {
 						if(nameWithoutColors.length() <= 16) {
 							if(!(setupYamlFile.getConfiguration().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
 								if(!(utils.containsSpecialChars(nameWithoutColors)) || setupYamlFile.getConfiguration().getBoolean("AllowSpecialCharactersInCustomName")) {
-									if(!(utils.getBlackList().contains(args[0].toUpperCase()))) {
+									if(!(utils.containsBlackListEntry(args[0]))) {
 										boolean nickNameIsInUse = false;
 										
 										for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
-											if(nickedPlayerData.getNickName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+											if(nickedPlayerData.getNickName().equalsIgnoreCase(name))
 												nickNameIsInUse = true;
 										}
 	
@@ -85,13 +85,13 @@ public class NickCommand implements CommandExecutor {
 											boolean playerWithNameIsKnown = false;
 											
 											for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-												if(currentPlayer.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+												if(currentPlayer.getName().equalsIgnoreCase(name))
 													playerWithNameIsKnown = true;
 											}
 												
 											try {
 												for (OfflinePlayer currentOfflinePlayer : Bukkit.getOfflinePlayers()) {
-													if((currentOfflinePlayer != null) && (currentOfflinePlayer.getName() != null) && currentOfflinePlayer.getName().toUpperCase().equalsIgnoreCase(name.toUpperCase()))
+													if((currentOfflinePlayer != null) && (currentOfflinePlayer.getName() != null) && currentOfflinePlayer.getName().equalsIgnoreCase(name))
 														playerWithNameIsKnown = true;
 												}
 											} catch (NullPointerException ignore) {

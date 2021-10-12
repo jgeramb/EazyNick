@@ -103,7 +103,8 @@ public class GUIYamlFile extends YamlFile {
 		configuration.addDefault("RankedNickGUI.Step2.Default.DisplayName", "&bMy normal skin");
 		configuration.addDefault("RankedNickGUI.Step2.Normal.DisplayName", "&bSteve/Alex skin");
 		configuration.addDefault("RankedNickGUI.Step2.Random.DisplayName", "&bRandom skin");
-		
+		configuration.addDefault("RankedNickGUI.Step2.SkinFromName.DisplayName", "&bUse skin of nickname");
+	
 		//Step 3
 		configuration.addDefault("RankedNickGUI.Step3.InventoryTitle", "&5Choose a name&8:");
 		configuration.addDefault("RankedNickGUI.Step3.Custom.DisplayName", "&bEnter a name");
