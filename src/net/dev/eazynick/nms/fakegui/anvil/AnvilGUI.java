@@ -30,11 +30,11 @@ public class AnvilGUI {
 		eazyNick = EazyNick.getInstance();
 		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
-		boolean is17 = eazyNick.getVersion().startsWith("1_17");
+		boolean is17 = eazyNick.getVersion().startsWith("1_17"), is18 = eazyNick.getVersion().startsWith("1_18");
 		
-		blockPositionClass = reflectionHelper.getNMSClass(is17 ? "core.BlockPosition" : "BlockPosition");
-		containerAnvil = reflectionHelper.getNMSClass(is17 ? "world.inventory.ContainerAnvil" : "ContainerAnvil");
-		entityHuman = reflectionHelper.getNMSClass(is17 ? "world.entity.player.EntityHuman" : "EntityHuman");
+		blockPositionClass = reflectionHelper.getNMSClass((is17 || is18) ? "core.BlockPosition" : "BlockPosition");
+		containerAnvil = reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.ContainerAnvil" : "ContainerAnvil");
+		entityHuman = reflectionHelper.getNMSClass((is17 || is18) ? "world.entity.player.EntityHuman" : "EntityHuman");
 		
 		this.player = player;
 		this.handler = handler;
@@ -120,13 +120,13 @@ public class AnvilGUI {
 		
 		try {
 			String version = eazyNick.getVersion();
-			boolean is17 = version.startsWith("1_17");
-			Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass(is17 ? "network.chat.IChatBaseComponent" : "IChatBaseComponent"), playerInventoryClass = reflectionHelper.getNMSClass(is17 ? "world.entity.player.PlayerInventory" : "PlayerInventory"), worldClass = reflectionHelper.getNMSClass(is17 ? "world.level.World" : "World");
-			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player), playerInventory = reflectionHelper.getField(reflectionHelper.getNMSClass(is17 ? "world.entity.player.EntityHuman" : "EntityHuman"), is17 ? "co" : "inventory").get(entityPlayer), world = reflectionHelper.getField(reflectionHelper.getNMSClass(is17 ? "world.entity.Entity" : "Entity"), is17 ? "t" : "world").get(entityPlayer), blockPosition = blockPositionClass.getConstructor(int.class, int.class, int.class).newInstance(0, 0, 0);
+			boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+			Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass((is17 || is18) ? "network.chat.IChatBaseComponent" : "IChatBaseComponent"), playerInventoryClass = reflectionHelper.getNMSClass((is17 || is18) ? "world.entity.player.PlayerInventory" : "PlayerInventory"), worldClass = reflectionHelper.getNMSClass((is17 || is18) ? "world.level.World" : "World");
+			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player), playerInventory = reflectionHelper.getField(reflectionHelper.getNMSClass((is17 || is18) ? "world.entity.player.EntityHuman" : "EntityHuman"), is18 ? "cp" : (is17 ? "co" : "inventory")).get(entityPlayer), world = reflectionHelper.getField(reflectionHelper.getNMSClass((is17 || is18) ? "world.entity.Entity" : "Entity"), (is17 || is18) ? "t" : "world").get(entityPlayer), blockPosition = blockPositionClass.getConstructor(int.class, int.class, int.class).newInstance(0, 0, 0);
 			int c = (int) invokeMethod("nextContainerCounter", entityPlayer);
-			Object container = (is17 || version.startsWith("1_16") || version.startsWith("1_15") || version.startsWith("1_14")) ? containerAnvil.getConstructor(int.class, playerInventoryClass, reflectionHelper.getNMSClass(is17 ? "world.inventory.ContainerAccess" : "ContainerAccess")).newInstance(c, playerInventory, reflectionHelper.getNMSClass(is17 ? "world.inventory.ContainerAccess" : "ContainerAccess").getMethod("at", worldClass, blockPositionClass).invoke(null, world, blockPosition)) : containerAnvil.getConstructor(playerInventoryClass, worldClass, blockPositionClass, entityHuman).newInstance(playerInventory, world, blockPosition, entityPlayer);
+			Object container = (is18 || is17 || version.startsWith("1_16") || version.startsWith("1_15") || version.startsWith("1_14")) ? containerAnvil.getConstructor(int.class, playerInventoryClass, reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.ContainerAccess" : "ContainerAccess")).newInstance(c, playerInventory, reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.ContainerAccess" : "ContainerAccess").getMethod(is18 ? "a" : "at", worldClass, blockPositionClass).invoke(null, world, blockPosition)) : containerAnvil.getConstructor(playerInventoryClass, worldClass, blockPositionClass, entityHuman).newInstance(playerInventory, world, blockPosition, entityPlayer);
 			
-			reflectionHelper.getField(reflectionHelper.getNMSClass(is17 ? "world.inventory.Container" : "Container"), "checkReachable").set(container, false);
+			reflectionHelper.getField(reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.Container" : "Container"), "checkReachable").set(container, false);
 
 			inventory = ((InventoryView) invokeMethod("getBukkitView", container)).getTopInventory();
 
@@ -134,25 +134,25 @@ public class AnvilGUI {
 				inventory.setItem(slot.getSlot(), items.get(slot));
 			
 			String title = "Repairing";
-			Object iChatBaseComponent = is17 ? iChatBaseComponentClass.getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + title + "\"}") : reflectionHelper.getNMSClass("ChatMessage").getConstructor(String.class, Object[].class).newInstance(title, new Object[0]);
+			Object iChatBaseComponent = (is17 || is18) ? iChatBaseComponentClass.getDeclaredClasses()[0].getMethod(is18 ? "b" : "a", String.class).invoke(null, "{\"text\":\"" + title + "\"}") : reflectionHelper.getNMSClass("ChatMessage").getConstructor(String.class, Object[].class).newInstance(title);
 
-			reflectionHelper.getField(entityHuman, is17 ? "bV" : "activeContainer").set(entityPlayer, container);
+			reflectionHelper.getField(entityHuman, is18 ? "bW" : (is17 ? "bV" : "activeContainer")).set(entityPlayer, container);
 			
-			reflectionHelper.getField(reflectionHelper.getNMSClass(is17 ? "world.inventory.ContainerAnvil" : "ContainerAnvil"), is17 ? "v" : ((version.startsWith("1_1") && !(version.startsWith("1_10") || version.startsWith("1_11"))) ? "renameText" : "l")).set(container, "Type in some text");
-			reflectionHelper.getField(reflectionHelper.getNMSClass(is17 ? "world.inventory.Container" : "Container"), is17 ? "j" : "windowId").set(container, c);
+			reflectionHelper.getField(reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.ContainerAnvil" : "ContainerAnvil"), (is17 || is18) ? "v" : ((version.startsWith("1_1") && !(version.startsWith("1_10") || version.startsWith("1_11"))) ? "renameText" : "l")).set(container, "Type in some text");
+			reflectionHelper.getField(reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.Container" : "Container"), (is17 || is18) ? "j" : "windowId").set(container, c);
 			
-			if(is17)
-				reflectionHelper.getField(reflectionHelper.getNMSClass(is17 ? "world.inventory.Container" : "Container"), "title").set(container, iChatBaseComponent);
+			if(is17 || is18)
+				reflectionHelper.getField(reflectionHelper.getNMSClass("world.inventory.Container"), "title").set(container, iChatBaseComponent);
 			
-			Object playerConnection = reflectionHelper.getField(reflectionHelper.getNMSClass(is17 ? "server.level.EntityPlayer" : "EntityPlayer"), is17 ? "b" : "playerConnection").get(entityPlayer);
-			Method sendPacket = getMethod("sendPacket", playerConnection.getClass(), reflectionHelper.getNMSClass(is17 ? "network.protocol.Packet" : "Packet"));
-			sendPacket.invoke(playerConnection, (is17 || version.startsWith("1_16")) ? reflectionHelper.getNMSClass(is17 ? "network.protocol.game.PacketPlayOutOpenWindow" : "PacketPlayOutOpenWindow").getConstructor(int.class, reflectionHelper.getNMSClass(is17 ? "world.inventory.Containers" : "Containers"), iChatBaseComponentClass).newInstance(c, reflectionHelper.getNMSClass(is17 ? "world.inventory.Containers" : "Containers").getDeclaredField(is17 ? "h" : "ANVIL").get(null), iChatBaseComponent) : reflectionHelper.getNMSClass("PacketPlayOutOpenWindow").getConstructor(int.class, String.class, iChatBaseComponentClass, int.class).newInstance(c, "minecraft:anvil", iChatBaseComponent, 0));
+			Object playerConnection = reflectionHelper.getField(reflectionHelper.getNMSClass((is17 || is18) ? "server.level.EntityPlayer" : "EntityPlayer"), (is17 || is18) ? "b" : "playerConnection").get(entityPlayer);
+			Method sendPacket = getMethod(is18 ? "a" : "sendPacket", playerConnection.getClass(), reflectionHelper.getNMSClass((is17 || is18) ? "network.protocol.Packet" : "Packet"));
+			sendPacket.invoke(playerConnection, (is17 || is18 || version.startsWith("1_16")) ? reflectionHelper.getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutOpenWindow" : "PacketPlayOutOpenWindow").getConstructor(int.class, reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.Containers" : "Containers"), iChatBaseComponentClass).newInstance(c, reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.Containers" : "Containers").getDeclaredField((is17 || is18) ? "h" : "ANVIL").get(null), iChatBaseComponent) : reflectionHelper.getNMSClass("PacketPlayOutOpenWindow").getConstructor(int.class, String.class, iChatBaseComponentClass, int.class).newInstance(c, "minecraft:anvil", iChatBaseComponent, 0));
 			
-			container.getClass().getMethod("addSlotListener", reflectionHelper.getNMSClass(is17 ? "world.inventory.ICrafting" : "ICrafting")).invoke(container, is17 ? reflectionHelper.getField(entityPlayer.getClass(), "cX").get(entityPlayer) : entityPlayer);
+			container.getClass().getMethod(is18 ? "a" : "addSlotListener", reflectionHelper.getNMSClass((is17 || is18) ? "world.inventory.ICrafting" : "ICrafting")).invoke(container, (is17 || is18) ? reflectionHelper.getField(entityPlayer.getClass(), is18 ? "db" : "cX").get(entityPlayer) : entityPlayer);
 		
-			if(is17) {
-				container.getClass().getMethod("a", reflectionHelper.getNMSClass("world.inventory.ContainerSynchronizer")).invoke(container, reflectionHelper.getField(entityPlayer.getClass(), "cW").get(entityPlayer));
-				container.getClass().getMethod("updateInventory").invoke(container);
+			if(is17 || is18) {
+				container.getClass().getMethod("a", reflectionHelper.getNMSClass("world.inventory.ContainerSynchronizer")).invoke(container, reflectionHelper.getField(entityPlayer.getClass(), is18 ? "da" : "cW").get(entityPlayer));
+				container.getClass().getMethod(is18 ? "b" : "updateInventory").invoke(container);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

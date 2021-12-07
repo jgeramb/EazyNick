@@ -41,7 +41,7 @@ public class NMSBookBuilder {
 			
 			for (BookPage bookPage : bookPages) {
 				if(!((bookPage == null) || bookPage.isEmpty()))
-					list.add((version.startsWith("1_17") || version.equals("1_16_R3")) ? craftChatMessage.getMethod("toJSON", reflectionHelper.getNMSClass(eazyNick.getVersion().startsWith("1_17") ? "network.chat.IChatBaseComponent" : "IChatBaseComponent")).invoke(null, craftChatMessage.getMethod("fromJSON", String.class).invoke(null, bookPage.getAsString())) : bookPage.getAsIChatBaseComponent());
+					list.add((version.equals("1_16_R3") || version.startsWith("1_17") || version.startsWith("1_18")) ? craftChatMessage.getMethod("toJSON", reflectionHelper.getNMSClass((version.startsWith("1_17") || version.startsWith("1_18")) ? "network.chat.IChatBaseComponent" : "IChatBaseComponent")).invoke(null, craftChatMessage.getMethod("fromJSON", String.class).invoke(null, bookPage.getAsString())) : bookPage.getAsIChatBaseComponent());
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -57,7 +57,9 @@ public class ReflectionHelper {
 
 	public Class<?> getNMSClass(String className) {
 		try {
-			return Class.forName(getVersion().startsWith("v1_17") ? ("net.minecraft." + className) : ("net.minecraft.server." + getVersion() + "." + className));
+			String version = getVersion();
+			
+			return Class.forName((version.startsWith("v1_17") || version.startsWith("v1_18")) ? ("net.minecraft." + className) : ("net.minecraft.server." + version + "." + className));
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

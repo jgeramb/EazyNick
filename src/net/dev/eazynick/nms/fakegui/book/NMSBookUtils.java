@@ -39,27 +39,27 @@ public class NMSBookUtils extends ReflectionHelper {
 				@Override
 				public void run() {
 					try {
-						boolean is17 = version.startsWith("1_17");
+						boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
 						Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 						Class<?> craftItemStackClass = getCraftClass("inventory.CraftItemStack");
 						Object nmsItemStack = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, book);
 						
 						if(!(version.startsWith("1_7") || version.startsWith("1_8"))) {
-							Class<?> enumHand = getNMSClass(is17 ? "world.EnumHand" : "EnumHand");
-							Object mainHand = getField(enumHand, is17 ? "a" : "MAIN_HAND").get(enumHand);
+							Class<?> enumHand = getNMSClass((is17 || is18) ? "world.EnumHand" : "EnumHand");
+							Object mainHand = getField(enumHand, (is17 || is18) ? "a" : "MAIN_HAND").get(enumHand);
 							
-							if(Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17")) {
-								Class<?> itemWrittenBook = getNMSClass(is17 ? "world.item.ItemWrittenBook" : "ItemWrittenBook");
+							if(Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || is17 || is18) {
+								Class<?> itemWrittenBook = getNMSClass((is17 || is18) ? "world.item.ItemWrittenBook" : "ItemWrittenBook");
 								
-								if ((boolean) itemWrittenBook.getMethod("a", getNMSClass(is17 ? "world.item.ItemStack" : "ItemStack"), getNMSClass(is17 ? "commands.CommandListenerWrapper" : "CommandListenerWrapper"), getNMSClass(is17 ? "world.entity.player.EntityHuman" : "EntityHuman")).invoke(itemWrittenBook, nmsItemStack, entityPlayer.getClass().getMethod("getCommandListener").invoke(entityPlayer), entityPlayer)) {
-									Object activeContainer = entityPlayer.getClass().getField(is17 ? "bV" : "activeContainer").get(entityPlayer);
+								if ((boolean) itemWrittenBook.getMethod("a", getNMSClass((is17 || is18) ? "world.item.ItemStack" : "ItemStack"), getNMSClass((is17 || is18) ? "commands.CommandListenerWrapper" : "CommandListenerWrapper"), getNMSClass((is17 || is18) ? "world.entity.player.EntityHuman" : "EntityHuman")).invoke(itemWrittenBook, nmsItemStack, entityPlayer.getClass().getMethod(is18 ? "cQ" : "getCommandListener").invoke(entityPlayer), entityPlayer)) {
+									Object activeContainer = entityPlayer.getClass().getField((is17 || is18) ? "bV" : "activeContainer").get(entityPlayer);
 									
 					                activeContainer.getClass().getMethod("c").invoke(activeContainer);
 					            }
 								
-					            Object packet = getNMSClass(is17 ? "network.protocol.game.PacketPlayOutOpenBook" : "PacketPlayOutOpenBook").getConstructor(enumHand).newInstance(mainHand);
-								Object playerConnection = entityPlayer.getClass().getField(is17 ? "b" : "playerConnection").get(entityPlayer);
-								playerConnection.getClass().getMethod("sendPacket", getNMSClass(is17 ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, packet);
+					            Object packet = getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutOpenBook" : "PacketPlayOutOpenBook").getConstructor(enumHand).newInstance(mainHand);
+								Object playerConnection = entityPlayer.getClass().getField((is17 || is18) ? "b" : "playerConnection").get(entityPlayer);
+								playerConnection.getClass().getMethod(is18 ? "a" : "sendPacket", getNMSClass((is17 || is18) ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, packet);
 							} else
 								entityPlayer.getClass().getMethod("a", getNMSClass("ItemStack"), enumHand).invoke(entityPlayer, nmsItemStack, mainHand);
 						} else {

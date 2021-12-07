@@ -1,5 +1,5 @@
 name: EazyNick
-version: 3.9
+version: '3.10'
 author: Justix
 main: net.dev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)

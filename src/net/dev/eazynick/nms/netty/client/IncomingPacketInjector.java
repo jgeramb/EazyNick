@@ -25,12 +25,13 @@ public class IncomingPacketInjector {
 		
 		try {
 			String version = eazyNick.getVersion();
+			boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-			Object playerConnection = entityPlayer.getClass().getField(version.startsWith("1_17") ? "b" : "playerConnection").get(entityPlayer);
-			Object networkManager = playerConnection.getClass().getField(version.startsWith("1_17") ? "a" : "networkManager").get(playerConnection);
+			Object playerConnection = entityPlayer.getClass().getField((is17 || is18) ? "b" : "playerConnection").get(entityPlayer);
+			Object networkManager = playerConnection.getClass().getField((is17 || is18) ? "a" : "networkManager").get(playerConnection);
 			
 			//Get netty channel
-			this.channel = (Channel) networkManager.getClass().getField(version.startsWith("1_17") ? "k" : "channel").get(networkManager);
+			this.channel = (Channel) networkManager.getClass().getField((is17 || is18) ? "k" : "channel").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
 			unregister();
@@ -43,7 +44,7 @@ public class IncomingPacketInjector {
 					if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
 						if(signGUI.getEditCompleteListeners().containsKey(player)) {
 							//Process SignGUI success
-							Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), version.startsWith("1_17") ? "c" : "b").get(packet);
+							Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), (is17 || is18) ? "c" : "b").get(packet);
 							
 							Bukkit.getScheduler().runTask(eazyNick, () -> {
 								try {

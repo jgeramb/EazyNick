@@ -74,7 +74,7 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 				return setupYamlFile.getConfigString(player, ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId())) ? "CustomPlaceholders.Global.Nicked" : "CustomPlaceholders.Global.Default");
 		
 			if(identifier.equals("health"))
-				return String.valueOf(Math.round(player.getHealth() + ((version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17")) ? player.getAbsorptionAmount() : (player.hasPotionEffect(PotionEffectType.ABSORPTION) ? ((player.getActivePotionEffects().stream().filter(currentPotionEffect -> currentPotionEffect.getType().equals(PotionEffectType.ABSORPTION)).findFirst().get().getAmplifier() + 1) * 2) : 0))));
+				return String.valueOf(Math.round(player.getHealth() + ((version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18")) ? player.getAbsorptionAmount() : (player.hasPotionEffect(PotionEffectType.ABSORPTION) ? ((player.getActivePotionEffects().stream().filter(currentPotionEffect -> currentPotionEffect.getType().equals(PotionEffectType.ABSORPTION)).findFirst().get().getAmplifier() + 1) * 2) : 0))));
 		}
 		
 		return "";

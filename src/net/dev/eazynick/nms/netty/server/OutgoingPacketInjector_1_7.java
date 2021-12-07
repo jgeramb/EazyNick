@@ -96,8 +96,7 @@ public class OutgoingPacketInjector_1_7 {
 											Object playerObject = reflectionHelper.getField(msg.getClass(), "player").get(msg);
 											
 											if(playerObject != null) {
-												GameProfile playerProfile = (GameProfile) playerObject;
-												UUID uuid = playerProfile.getId();
+												UUID uuid = ((GameProfile) playerObject).getId();
 												
 												if(utils.getSoonNickedPlayers().containsKey(uuid) && utils.getSoonNickedPlayers().get(uuid).equals(NickReason.JOIN) && (reflectionHelper.getField(msg.getClass(), "action").getInt(msg) == 0))
 													return;
@@ -105,11 +104,9 @@ public class OutgoingPacketInjector_1_7 {
 												if(utils.getNickedPlayers().containsKey(uuid)) {
 													//Replace game profile with fake game profile (nicked player profile)
 													NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uuid);
-													boolean tabOverride = utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB");
-													String name = playerProfile.getName();
 													
-													reflectionHelper.setField(msg, "player", tabOverride ? nickedPlayerData.getTABGameProfile(name, false) : nickedPlayerData.getFakeGameProfile(false));
-													reflectionHelper.setField(msg, "username", tabOverride ? name : nickedPlayerData.getNickName());
+													reflectionHelper.setField(msg, "player", nickedPlayerData.getFakeGameProfile(false));
+													reflectionHelper.setField(msg, "username", nickedPlayerData.getNickName());
 												}
 											}
 											
@@ -181,7 +178,7 @@ public class OutgoingPacketInjector_1_7 {
 											
 											super.write(ctx, msg, promise);
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
-											if(!(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+											if(!((player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) && !(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) && setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
 												//Replace names
 												ArrayList<String> contents = new ArrayList<>((List<String>) reflectionHelper.getField(msg.getClass(), "e").get(msg));
 												

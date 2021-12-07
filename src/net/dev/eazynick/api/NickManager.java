@@ -78,10 +78,10 @@ public class NickManager extends ReflectionHelper {
 	private void sendPacketNMS(Player player, Object packet) {
 		try {
 			//Send packet to player connection
-			boolean is17 = eazyNick.getVersion().startsWith("1_17");
+			boolean is17 = eazyNick.getVersion().startsWith("1_17"), is18 = eazyNick.getVersion().startsWith("1_18");
 			Object handle = player.getClass().getMethod("getHandle").invoke(player);
-			Object playerConnection = handle.getClass().getDeclaredField(is17 ? "b" : "playerConnection").get(handle);
-			playerConnection.getClass().getMethod("sendPacket", getNMSClass(is17 ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, packet);
+			Object playerConnection = handle.getClass().getDeclaredField((is17 || is18) ? "b" : "playerConnection").get(handle);
+			playerConnection.getClass().getMethod(is18 ? "a" : "sendPacket", getNMSClass((is17 || is18) ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, packet);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -146,7 +146,7 @@ public class NickManager extends ReflectionHelper {
 			}
 		} else {
 			try {
-				Class<?> enumPlayerInfoAction = serverVersion.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass(serverVersion.startsWith("1_17") ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction");
+				Class<?> enumPlayerInfoAction = serverVersion.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass((serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18")) ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction");
 				Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 				Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 				
@@ -160,13 +160,13 @@ public class NickManager extends ReflectionHelper {
 					try {
 						//Set listName field of EntityPlayer -> getPlayerListName()
 						Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
-						Field f = getNMSClass(serverVersion.startsWith("1_17") ? "server.level.EntityPlayer" : "EntityPlayer").getDeclaredField("listName");
+						Field f = getNMSClass((serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18")) ? "server.level.EntityPlayer" : "EntityPlayer").getDeclaredField("listName");
 						f.setAccessible(true);
 						f.set(entityPlayer, utils.isVersion13OrLater() ? craftChatMessage.getMethod("fromStringOrNull", String.class).invoke(craftChatMessage, finalName) : ((Object[]) craftChatMessage.getMethod("fromString", String.class).invoke(craftChatMessage, finalName))[0]);
 						
 						for(Player currentPlayer : Bukkit.getOnlinePlayers())
 							//Send packet to update tablist name
-							sendPacket(player, currentPlayer, getNMSClass(serverVersion.startsWith("1_17") ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField(serverVersion.startsWith("1_17") ? "d" : "UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray));
+							sendPacket(player, currentPlayer, getNMSClass((serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18")) ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField((serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18")) ? "d" : "UPDATE_DISPLAY_NAME").get(enumPlayerInfoAction), entityPlayerArray));
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -180,19 +180,19 @@ public class NickManager extends ReflectionHelper {
 	public void updatePlayer(boolean spawnPlayer) {
 		try {
 			String version = eazyNick.getVersion();
-			boolean is17 = version.startsWith("1_17");
+			boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 			
-			Object worldClient = entityPlayer.getClass().getMethod("getWorld").invoke(entityPlayer), worldData = worldClient.getClass().getMethod("getWorldData").invoke(worldClient), interactManager = entityPlayer.getClass().getField(is17 ? "d" : "playerInteractManager").get(entityPlayer);
+			Object worldClient = entityPlayer.getClass().getMethod(is18 ? "cA" : "getWorld").invoke(entityPlayer), worldData = worldClient.getClass().getMethod(is18 ? "n_" : "getWorldData").invoke(worldClient), interactManager = entityPlayer.getClass().getField((is17 || is18) ? "d" : "playerInteractManager").get(entityPlayer);
 			
 			//Despawn and remove from tablist
 			for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
 				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId()))) {
 					//Destroy entity
 					if(!((utils.isPluginInstalled("ViaRewind") || utils.isPluginInstalled("ViaBackwards") || utils.isPluginInstalled("ProtocolSupport")) && currentPlayer.equals(player)))
-						sendPacket(player, currentPlayer, getNMSClass(is17 ? "network.protocol.game.PacketPlayOutEntityDestroy" : "PacketPlayOutEntityDestroy").getConstructor((is17 && !(Bukkit.getVersion().contains("1.17.1"))) ? int.class : int[].class).newInstance((is17 && !(Bukkit.getVersion().contains("1.17.1"))) ? player.getEntityId() : new int[] { player.getEntityId() }));
+						sendPacket(player, currentPlayer, getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutEntityDestroy" : "PacketPlayOutEntityDestroy").getConstructor((is17 && !(Bukkit.getVersion().contains("1.17.1"))) ? int.class : int[].class).newInstance((is17 && !(Bukkit.getVersion().contains("1.17.1"))) ? player.getEntityId() : new int[] { player.getEntityId() }));
 				}
 				
 				if(!(utils.getSoonNickedPlayers().containsKey(player.getUniqueId()))) {
@@ -204,9 +204,9 @@ public class NickManager extends ReflectionHelper {
 						
 						packetPlayOutPlayerInfoRemove = playOutPlayerInfo.getMethod("removePlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 					} else {
-						Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass(is17 ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction"));
+						Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction"));
 						
-						packetPlayOutPlayerInfoRemove = getNMSClass(is17 ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField(is17 ? "e" : "REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+						packetPlayOutPlayerInfoRemove = getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField((is17 || is18) ? "e" : "REMOVE_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 					}
 					
 					sendPacket(player, currentPlayer, packetPlayOutPlayerInfoRemove);
@@ -234,9 +234,9 @@ public class NickManager extends ReflectionHelper {
 									
 									packetPlayOutPlayerInfoAdd = playOutPlayerInfo.getMethod("addPlayer", getNMSClass("EntityPlayer")).invoke(playOutPlayerInfo, entityPlayer);
 								} else {
-									Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass(is17 ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction"));
+									Class<?> enumPlayerInfoAction = (version.equals("1_8_R1") ? getNMSClass("EnumPlayerInfoAction") : getSubClass(getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo"), "EnumPlayerInfoAction"));
 									
-									packetPlayOutPlayerInfoAdd = getNMSClass(is17 ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField(is17 ? "a" : "ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
+									packetPlayOutPlayerInfoAdd = getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutPlayerInfo" : "PacketPlayOutPlayerInfo").getConstructor(enumPlayerInfoAction, entityPlayerArray.getClass()).newInstance(enumPlayerInfoAction.getDeclaredField((is17 || is18) ? "a" : "ADD_PLAYER").get(enumPlayerInfoAction), entityPlayerArray);
 								}
 								
 								sendPacket(player, currentPlayer, packetPlayOutPlayerInfoAdd);
@@ -245,12 +245,12 @@ public class NickManager extends ReflectionHelper {
 						
 						if(spawnPlayer) {
 							//Spawn player
-							sendPacketExceptSelf(player, getNMSClass(is17 ? "network.protocol.game.PacketPlayOutNamedEntitySpawn" : "PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass(is17 ? "world.entity.player.EntityHuman" : "EntityHuman")).newInstance(entityPlayer));
+							sendPacketExceptSelf(player, getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutNamedEntitySpawn" : "PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass((is17 || is18) ? "world.entity.player.EntityHuman" : "EntityHuman")).newInstance(entityPlayer));
 							
 							//Fix head and body rotation (Yaw + Pitch)
 							Object packetHeadRotation;
 							
-							if(is17)
+							if(is17 || is18)
 								packetHeadRotation = getNMSClass("network.protocol.game.PacketPlayOutEntityHeadRotation").getConstructor(getNMSClass("world.entity.Entity"), byte.class).newInstance(entityPlayer, (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)));
 							else {
 								packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
@@ -261,7 +261,7 @@ public class NickManager extends ReflectionHelper {
 							Class<?> packetPlayOutEntityLook = (version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : null;
 							
 							if(packetPlayOutEntityLook == null) {
-								for (Class<?> clazz : getNMSClass(is17 ? "network.protocol.game.PacketPlayOutEntity" : "PacketPlayOutEntity").getDeclaredClasses()) {
+								for (Class<?> clazz : getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutEntity" : "PacketPlayOutEntity").getDeclaredClasses()) {
 									if(clazz.getSimpleName().equals("PacketPlayOutEntityLook"))
 										packetPlayOutEntityLook = clazz;
 								}
@@ -275,11 +275,11 @@ public class NickManager extends ReflectionHelper {
 							//Self skin update
 							Object packetRespawnPlayer;
 							
-							if(version.startsWith("1_16") || is17) {
+							if(version.startsWith("1_16") || is17 || is18) {
 								Object craftWorld = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
-								Class<?> enumGameMode = getNMSClass(is17 ? "world.level.EnumGamemode" : "EnumGamemode");
+								Class<?> enumGameMode = getNMSClass((is17 || is18) ? "world.level.EnumGamemode" : "EnumGamemode");
 		
-								packetRespawnPlayer = version.equals("1_16_R1") ? getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true) : getNMSClass(is17 ? "network.protocol.game.PacketPlayOutRespawn" : "PacketPlayOutRespawn").getConstructor(getNMSClass(is17 ? "world.level.dimension.DimensionManager" : "DimensionManager"), getNMSClass(is17 ? "resources.ResourceKey" : "ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getDimensionManager").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass(is17 ? "world.level.biome.BiomeManager" : "BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true);
+								packetRespawnPlayer = version.equals("1_16_R1") ? getNMSClass("PacketPlayOutRespawn").getConstructor(getNMSClass("ResourceKey"), getNMSClass("ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod("getTypeKey").invoke(craftWorld), craftWorld.getClass().getMethod("getDimensionKey").invoke(craftWorld), getNMSClass("BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod("getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod("isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod("isFlatWorld").invoke(craftWorld), true) : getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutRespawn" : "PacketPlayOutRespawn").getConstructor(getNMSClass((is17 || is18) ? "world.level.dimension.DimensionManager" : "DimensionManager"), getNMSClass((is17 || is18) ? "resources.ResourceKey" : "ResourceKey"), long.class, enumGameMode, enumGameMode, boolean.class, boolean.class, boolean.class).newInstance(craftWorld.getClass().getMethod(is18 ? "q_" : "getDimensionManager").invoke(craftWorld), craftWorld.getClass().getMethod(is18 ? "aa" : "getDimensionKey").invoke(craftWorld), getNMSClass((is17 || is18) ? "world.level.biome.BiomeManager" : "BiomeManager").getMethod("a", long.class).invoke(null, player.getWorld().getSeed()), interactManager.getClass().getMethod(is18 ? "b" : "getGameMode").invoke(interactManager), interactManager.getClass().getMethod("c").invoke(interactManager), craftWorld.getClass().getMethod(is18 ? "ad" : "isDebugWorld").invoke(craftWorld), craftWorld.getClass().getMethod(is18 ? "D" : "isFlatWorld").invoke(craftWorld), true);
 							} else if(version.startsWith("1_15")) {
 								Class<?> dimensionManager = getNMSClass("DimensionManager");
 								Class<?> worldType = getNMSClass("WorldType");
@@ -304,18 +304,18 @@ public class NickManager extends ReflectionHelper {
 							
 							sendPacketNMS(player, packetRespawnPlayer);
 						
-							Object playerConnection = entityPlayer.getClass().getDeclaredField(is17 ? "b" : "playerConnection").get(entityPlayer);
+							Object playerConnection = entityPlayer.getClass().getDeclaredField((is17 || is18) ? "b" : "playerConnection").get(entityPlayer);
 							
 							Bukkit.getScheduler().runTask(eazyNick, () -> {
 								try {
 									//Fix position
-									playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX() - (is17 ? 100 : 0), player.getLocation().getY() + (is17 ? 100.5 : 0.25), player.getLocation().getZ() - (is17 ? 100 : 0), player.getLocation().getYaw(), player.getLocation().getPitch()));
+									playerConnection.getClass().getMethod("teleport", Location.class).invoke(playerConnection, new Location(player.getWorld(), player.getLocation().getX() - ((is17 || is18) ? 100 : 0), player.getLocation().getY() + ((is17 || is18) ? 100.5 : 0.25), player.getLocation().getZ() - ((is17 || is18) ? 100 : 0), player.getLocation().getYaw(), player.getLocation().getPitch()));
 								} catch (Exception ex) {
 									ex.printStackTrace();
 								}
 							});
 							
-							if(is17) {
+							if(is17 || is18) {
 								new AsyncTask(new AsyncRunnable() {
 									
 									@Override
@@ -896,9 +896,9 @@ public class NickManager extends ReflectionHelper {
 					
 					boolean tabNamePrefixSuffixChange = utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB");
 					
-					//Update TAB tablist prefix and suffix and nametag prefix, suffix and sort id
+					//Update TAB tablist prefix and suffix and nametag prefix, suffix and group
 					if(tabNamePrefixSuffixChange)
-						new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, sortID);
+						new TABHook(player).update(nickName, finalTabPrefix, finalTabSuffix, finalTagPrefix, finalTagSuffix, groupName);
 					
 					if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
 						String tmpTabPrefix = finalTabPrefix, tmpTabSuffix = finalTabSuffix, tmpTagPrefix = finalTagPrefix, tmpTagSuffix = finalTagSuffix;

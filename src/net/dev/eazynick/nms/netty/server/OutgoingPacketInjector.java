@@ -43,10 +43,10 @@ public class OutgoingPacketInjector {
 		handlerName = eazyNick.getDescription().getName().toLowerCase() + "_handler";
 		
 		String version = eazyNick.getVersion();
-		boolean is17 = version.startsWith("1_17");
+		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
 		
 		//Get Channel from NetworkManager
-		Field field = reflectionHelper.getFirstFieldByType(is17 ? reflectionHelper.getNMSClass("network.NetworkManager") : reflectionHelper.getNMSClass("NetworkManager"), Channel.class);
+		Field field = reflectionHelper.getFirstFieldByType((is17 || is18) ? reflectionHelper.getNMSClass("network.NetworkManager") : reflectionHelper.getNMSClass("NetworkManager"), Channel.class);
 		field.setAccessible(true);
 		
 		try {
@@ -58,7 +58,7 @@ public class OutgoingPacketInjector {
 			Object minecraftServer = dedicatedServer.get(craftServer);
 			
 			//Add packet handler to every ServerConnection and remove old ones
-			for(Object manager : Collections.synchronizedList((List<?>) getNetworkManagerList(minecraftServer.getClass().getMethod("getServerConnection").invoke(minecraftServer))).toArray()) {
+			for(Object manager : Collections.synchronizedList((List<?>) getNetworkManagerList(minecraftServer.getClass().getMethod(is18 ? "ad" : "getServerConnection").invoke(minecraftServer))).toArray()) {
 				Channel channel = (Channel) field.get(manager);
 				
 				if((channel.pipeline().context("packet_handler") != null)) {
@@ -102,16 +102,14 @@ public class OutgoingPacketInjector {
 											
 											if(b != null) {
 												for (Object playerInfoData : ((ArrayList<Object>) b)) {
-													UUID uuid = ((GameProfile) reflectionHelper.getField(playerInfoData.getClass(), is17 ? "c" : "d").get(playerInfoData)).getId();
+													UUID uuid = ((GameProfile) reflectionHelper.getField(playerInfoData.getClass(), (is17 || is18) ? "c" : "d").get(playerInfoData)).getId();
 	
 													if(utils.getSoonNickedPlayers().containsKey(uuid) && utils.getSoonNickedPlayers().get(uuid).equals(NickReason.JOIN) && reflectionHelper.getField(msg.getClass(), "a").get(msg).toString().endsWith("ADD_PLAYER"))
 														return;
 													
 													if(utils.getNickedPlayers().containsKey(uuid)) {
-														boolean changeUUID = uuid.equals(player.getUniqueId()) ? false : setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID");
-														
 														//Replace game profile with fake game profile (nicked player profile)
-														reflectionHelper.setField(playerInfoData, is17 ? "c" : "d", (utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) ? utils.getNickedPlayers().get(uuid).getTABGameProfile(((GameProfile) reflectionHelper.getField(playerInfoData.getClass(), is17 ? "c" : "d").get(playerInfoData)).getName(), changeUUID) : utils.getNickedPlayers().get(uuid).getFakeGameProfile(changeUUID));
+														reflectionHelper.setField(playerInfoData, (is17 || is18) ? "c" : "d", utils.getNickedPlayers().get(uuid).getFakeGameProfile(uuid.equals(player.getUniqueId()) ? false : setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")));
 													}
 												}
 											}
@@ -161,7 +159,7 @@ public class OutgoingPacketInjector {
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardObjective")) {
 											//Replace name
 											if(utils.isVersion13OrLater())
-												reflectionHelper.setField(msg, is17 ? "e" : "b", replaceNames(reflectionHelper.getField(msg.getClass(), is17 ? "e" : "b").get(msg), false));
+												reflectionHelper.setField(msg, (is17 || is18) ? "e" : "b", replaceNames(reflectionHelper.getField(msg.getClass(), (is17 || is18) ? "e" : "b").get(msg), false));
 											else {
 												String name = (String) reflectionHelper.getField(msg.getClass(), "b").get(msg);
 												
@@ -191,8 +189,8 @@ public class OutgoingPacketInjector {
 											
 											super.write(ctx, msg, promise);
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
-											if(!(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
-												List<String> contentsList = (List<String>) reflectionHelper.getField(msg.getClass(), version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : (is17 ? "j" : "h"))).get(msg);
+											if(!((player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) && !(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) && setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
+												List<String> contentsList = (List<String>) reflectionHelper.getField(msg.getClass(), version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : ((is17 || is18) ? "j" : "h"))).get(msg);
 												
 												if(contentsList != null) {
 													//Replace names
@@ -211,7 +209,7 @@ public class OutgoingPacketInjector {
 														}
 													}
 													
-													reflectionHelper.setField(msg, version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : (is17 ? "j" : "h")), contents);
+													reflectionHelper.setField(msg, version.equals("1_8_R1") ? "e" : ((version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1")) ? "g" : ((is17 || is18) ? "j" : "h")), contents);
 												}
 											}
 											
@@ -231,7 +229,7 @@ public class OutgoingPacketInjector {
 									try {
 										if (msg.getClass().getSimpleName().equals("PacketStatusOutServerInfo")) {
 											Object serverPing = reflectionHelper.getField(msg.getClass(), "b").get(msg);
-											Object serverPingPlayerSample = reflectionHelper.getField(serverPing.getClass(), is17 ? "d" : "b").get(serverPing);
+											Object serverPingPlayerSample = reflectionHelper.getField(serverPing.getClass(), (is17 || is18) ? "d" : "b").get(serverPing);
 											GameProfile[] gameProfileArray = (GameProfile[]) reflectionHelper.getField(serverPingPlayerSample.getClass(), "c").get(serverPingPlayerSample);
 											
 											for (int i = 0; i < gameProfileArray.length; i++) {
@@ -293,15 +291,16 @@ public class OutgoingPacketInjector {
 		Utils utils = eazyNick.getUtils();
 		
 		String version = eazyNick.getVersion();
+		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
 		Object editedComponent = iChatBaseComponent;
 		
 		try {
 			if(iChatBaseComponent != null) {
 				//Collect raw text from message
-				Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass(version.startsWith("1_17") ? "network.chat.IChatBaseComponent" : "IChatBaseComponent");
+				Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass((is17 || is18) ? "network.chat.IChatBaseComponent" : "IChatBaseComponent");
 				
 				String fullText = "";
-				Method method = iChatBaseComponentClass.getDeclaredMethod((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17")) ? "getSiblings" : "a");
+				Method method = iChatBaseComponentClass.getDeclaredMethod(is18 ? "b" : ((Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || is17) ? "getSiblings" : "a"));
 				method.setAccessible(true);
 				
 				for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {
@@ -343,7 +342,7 @@ public class OutgoingPacketInjector {
 	private String serialize(Object iChatBaseComponent) {
 		try {
 			String version = eazyNick.getVersion();
-			Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass(version.startsWith("1_17") ? "network.chat.IChatBaseComponent" : "IChatBaseComponent");
+			Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass((version.startsWith("1_17") || version.startsWith("1_18")) ? "network.chat.IChatBaseComponent" : "IChatBaseComponent");
 			
 			return ((String) (version.equals("1_8_R1") ? reflectionHelper.getNMSClass("ChatSerializer") : iChatBaseComponentClass.getDeclaredClasses()[0]).getMethod("a", iChatBaseComponentClass).invoke(null, iChatBaseComponent));
 		} catch (Exception ex) {
@@ -355,7 +354,7 @@ public class OutgoingPacketInjector {
 		try {
 			String version = eazyNick.getVersion();
 			
-			return (version.equals("1_8_R1") ? reflectionHelper.getNMSClass("ChatSerializer") : (reflectionHelper.getNMSClass(version.startsWith("1_17") ? "network.chat.IChatBaseComponent" : "IChatBaseComponent")).getDeclaredClasses()[0]).getMethod("a", String.class).invoke(null, json);
+			return (version.equals("1_8_R1") ? reflectionHelper.getNMSClass("ChatSerializer") : (reflectionHelper.getNMSClass((version.startsWith("1_17") || version.startsWith("1_18")) ? "network.chat.IChatBaseComponent" : "IChatBaseComponent")).getDeclaredClasses()[0]).getMethod(version.startsWith("1_18") ? "b" : "a", String.class).invoke(null, json);
 		} catch (Exception ex) {
 			return "";
 		}

@@ -25,10 +25,10 @@ public class BookPage {
 		ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
 		
 		String version = eazyNick.getVersion();
-		Class<?> chatSerializer = (version.startsWith("1_7") || version.equals("1_8_R1")) ? reflectionHelper.getNMSClass("ChatSerializer") : reflectionHelper.getNMSClass(version.startsWith("1_17") ? "network.chat.IChatBaseComponent" : "IChatBaseComponent").getDeclaredClasses()[0];
+		Class<?> chatSerializer = (version.startsWith("1_7") || version.equals("1_8_R1")) ? reflectionHelper.getNMSClass("ChatSerializer") : reflectionHelper.getNMSClass((version.startsWith("1_17") || version.startsWith("1_18")) ? "network.chat.IChatBaseComponent" : "IChatBaseComponent").getDeclaredClasses()[0];
 		
 		try {
-			return chatSerializer.getMethod("a", String.class).invoke(chatSerializer, getAsString());
+			return chatSerializer.getMethod(version.startsWith("1_18") ? "b" : "a", String.class).invoke(chatSerializer, getAsString());
 		} catch (Exception ex) {
 			return null;
 		}

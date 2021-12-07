@@ -32,27 +32,34 @@ public class SpigotUpdater {
 		Bukkit.getLogger().info("[Updater] Checking for updates...");
 		
 		ReadableByteChannel channel = null;
-		double newVersion = 0.0;
+		String latestRelease = "1.0";
+		int version = 0, subVersion = 0;
 		
 		File file = eazyNick.getPluginFile();
 
 		//Parse latest version from spigotmc.org as double
 		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://api.spigotmc.org/legacy/update.php?resource=51398").openStream()))) {
-			newVersion = Double.valueOf(reader.readLine()).doubleValue();
+			latestRelease = reader.readLine();
+			String[] fullVersion = latestRelease.split("\\.");
+			
+			version = Integer.parseInt(fullVersion[0]);
+			subVersion = Integer.parseInt(fullVersion[1]);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+		
+		String[] currentVersion = eazyNick.getDescription().getVersion().split("\\.");
 
 		//Check if version is outdated
-		if (newVersion > Double.valueOf(desc.getVersion()).doubleValue()) {
-			Bukkit.getLogger().info("[Updater] Found a new version (" + newVersion + ")");
+		if ((version > Integer.parseInt(currentVersion[0])) || (subVersion > Integer.parseInt(currentVersion[1]))) {
+			Bukkit.getLogger().info("[Updater] Found a new version (" + latestRelease + ")");
 
 			if (setupYamlFile.getConfiguration().getBoolean("AutoUpdater")) {
 				Bukkit.getLogger().info("[Updater] Starting download...");
 
 				try {
 					//Open connection
-					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/dl?id=1&ver=v" + newVersion).openConnection();
+					HttpURLConnection downloadURL = (HttpURLConnection) new URL("https://www.justix-dev.de/go/dl?id=1&ver=v" + latestRelease).openConnection();
 					downloadURL.setRequestProperty("User-Agent", "JustixDevelopment/Updater");
 					
 					//Open channel for downloading new file
@@ -69,7 +76,7 @@ public class SpigotUpdater {
 					throw new RuntimeException("File could not be saved", ex);
 				}
 
-				Bukkit.getLogger().info("[Updater] Successfully updated plugin to version " + newVersion + ". Please reload/restart your server now.");
+				Bukkit.getLogger().info("[Updater] Successfully updated plugin to version " + latestRelease + ". Please reload/restart your server now.");
 				
 				return true;
 			} else

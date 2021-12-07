@@ -38,7 +38,7 @@ public class SignGUI implements Listener {
 	
 	public void open(Player player, String line1, String line2, String line3, String line4, EditCompleteListener editCompleteListener) {
 		String version = eazyNick.getVersion();
-		boolean is17 = version.startsWith("1_17");
+		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
 		Block block = player.getWorld().getBlockAt(player.getLocation().clone().add(0, 250 - player.getLocation().getBlockY(), 0));
 		
 		blocks.put(player, block);
@@ -63,21 +63,21 @@ public class SignGUI implements Listener {
 				try {
 					boolean useCraftBlockEntityState = utils.isVersion13OrLater() || Bukkit.getVersion().contains("1.12.2") || Bukkit.getVersion().contains("1.12.1");
 					Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-					Object playerConnection = entityPlayer.getClass().getField(is17 ? "b" : "playerConnection").get(entityPlayer);
+					Object playerConnection = entityPlayer.getClass().getField((is17 || is18) ? "b" : "playerConnection").get(entityPlayer);
 	
 					Field tileField = (useCraftBlockEntityState ? reflectionHelper.getCraftClass("block.CraftBlockEntityState") : sign.getClass()).getDeclaredField(useCraftBlockEntityState ? "tileEntity" : "sign");
 					tileField.setAccessible(true);
 					Object tileSign = tileField.get(sign);
 	
-					Field editable = tileSign.getClass().getDeclaredField(is17 ? "f" : "isEditable");
+					Field editable = tileSign.getClass().getDeclaredField((is17 || is18) ? "f" : "isEditable");
 					editable.setAccessible(true);
 					editable.set(tileSign, true);
 					
-					Field handler = tileSign.getClass().getDeclaredField((version.startsWith("1_15") || version.startsWith("1_16")) ? "c" : (version.startsWith("1_14") ? "j" : (version.startsWith("1_13") ? "g" : (is17 ? "g" : "h"))));
+					Field handler = tileSign.getClass().getDeclaredField((version.startsWith("1_15") || version.startsWith("1_16")) ? "c" : (version.startsWith("1_14") ? "j" : (version.startsWith("1_13") ? "g" : ((is17 || is18) ? "g" : "h"))));
 					handler.setAccessible(true);
-					handler.set(tileSign, is17 ? player.getUniqueId() : entityPlayer);
+					handler.set(tileSign, (is17 || is18) ? player.getUniqueId() : entityPlayer);
 					
-					playerConnection.getClass().getDeclaredMethod("sendPacket", reflectionHelper.getNMSClass(is17 ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, reflectionHelper.getNMSClass(is17 ? "network.protocol.game.PacketPlayOutOpenSignEditor" : "PacketPlayOutOpenSignEditor").getConstructor(reflectionHelper.getNMSClass(is17 ? "core.BlockPosition" : "BlockPosition")).newInstance(reflectionHelper.getNMSClass(is17 ? "core.BlockPosition" : "BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
+					playerConnection.getClass().getDeclaredMethod(is18 ? "a" : "sendPacket", reflectionHelper.getNMSClass((is17 || is18) ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, reflectionHelper.getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutOpenSignEditor" : "PacketPlayOutOpenSignEditor").getConstructor(reflectionHelper.getNMSClass((is17 || is18) ? "core.BlockPosition" : "BlockPosition")).newInstance(reflectionHelper.getNMSClass((is17 || is18) ? "core.BlockPosition" : "BlockPosition").getConstructor(double.class, double.class, double.class).newInstance(sign.getX(), sign.getY(), sign.getZ())));
 				} catch (Exception ex) {
 		        	ex.printStackTrace();
 		        }

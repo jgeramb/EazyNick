@@ -27,8 +27,6 @@ import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import net.dev.eazynick.utilities.configuration.yaml.*;
 import net.dev.eazynick.utilities.mojang.*;
 
-import me.neznamy.tab.api.TABAPI;
-
 public class EazyNick extends JavaPlugin {
 
 	private static EazyNick instance;
@@ -162,7 +160,7 @@ public class EazyNick extends JavaPlugin {
 				|| version.equals("1_10_R1") || version.equals("1_11_R1") || version.equals("1_12_R1")
 				|| version.equals("1_13_R1") || version.equals("1_13_R2") || version.equals("1_14_R1")
 				|| version.equals("1_15_R1") || version.equals("1_16_R1") || version.equals("1_16_R2")
-				|| version.equals("1_16_R3") || version.equals("1_17_R1"))) {
+				|| version.equals("1_16_R3") || version.equals("1_17_R1") || version.equals("1_18_R1"))) {
 			utils.sendConsole("§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 
 			isCancelled = true;
@@ -220,11 +218,6 @@ public class EazyNick extends JavaPlugin {
 							pluginManager.registerEvents(new DeluxeChatListener(), instance);
 							
 							utils.sendConsole("§7DeluxeChat hooked successfully!");
-						}
-						
-						if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) {
-							if(!(TABAPI.isUnlimitedNameTagModeEnabled()))
-								TABAPI.enableUnlimitedNameTagModePermanently();
 						}
 					});
 				}
