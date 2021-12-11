@@ -37,7 +37,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("AllowSpecialCharactersInCustomName", false);
 		configuration.addDefault("ChangeLuckPermsPrefixAndSufix", false);
 		configuration.addDefault("ChangeNameAndPrefixAndSuffixInDeluxeChatFormat", false);
-		configuration.addDefault("ChangeNameAndPrefixAndSuffixInTAB", false);
+		configuration.addDefault("ChangeGroupAndPrefixAndSuffixInTAB", eazyNick.getUtils().isPluginInstalled("TAB", "NEZNAMY"));
 		configuration.addDefault("DisconnectUnnick", true);
 		configuration.addDefault("EnableBypassLobbyModePermission", true);
 		configuration.addDefault("EnableBypassPermission", false);

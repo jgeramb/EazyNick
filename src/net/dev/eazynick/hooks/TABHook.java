@@ -31,6 +31,9 @@ public class TABHook {
 			//Set temporarily tablist values
 			tablistFormatManager.setPrefix(tabPlayer, tabPrefix);
 			tablistFormatManager.setSuffix(tabPlayer, tabSuffix);
+			
+			//Change group name
+			tabPlayer.setTemporaryGroup(groupName);
 		}
 	}
 	
@@ -47,6 +50,9 @@ public class TABHook {
 			//Unset temporarily tablist values
 			tablistFormatManager.resetPrefix(tabPlayer);
 			tablistFormatManager.resetSuffix(tabPlayer);
+			
+			//Reset group name
+			tabPlayer.resetTemporaryGroup();
 		}
 	}
 

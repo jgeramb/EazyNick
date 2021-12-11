@@ -876,7 +876,7 @@ public class NickManager extends ReflectionHelper {
 			}
 			
 			//Create new fake scoreboard team
-			if(!(setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")))
+			if(!(setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB")))
 				utils.getScoreboardTeamManagers().put(player.getUniqueId(), new ScoreboardTeamHandler(player, nickName, realName, tagPrefix, tagSuffix, sortID, groupName));
 		}
 		
@@ -894,7 +894,7 @@ public class NickManager extends ReflectionHelper {
 						scoreboardTeamHandler.createTeam();
 					}
 					
-					boolean tabNamePrefixSuffixChange = utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB");
+					boolean tabNamePrefixSuffixChange = utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB");
 					
 					//Update TAB tablist prefix and suffix and nametag prefix, suffix and group
 					if(tabNamePrefixSuffixChange)

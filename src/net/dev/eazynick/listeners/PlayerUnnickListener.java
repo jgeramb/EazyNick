@@ -46,7 +46,7 @@ public class PlayerUnnickListener implements Listener {
 			if(utils.isPluginInstalled("LuckPerms"))
 				new LuckPermsHook(player).resetNodes();
 			
-			if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeNameAndPrefixAndSuffixInTAB")) {
+			if(utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB")) {
 				new AsyncTask(new AsyncRunnable() {
 
 					@Override
