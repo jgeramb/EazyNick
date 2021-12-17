@@ -79,8 +79,23 @@ public class PlayerNickListener implements Listener {
 			
 			if(changePrefixAndSuffix)
 				api.updatePrefixSuffix(nickName, realName, event.getTagPrefix(), event.getTagSuffix(), event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), sortID, groupName);
+			else {
+				if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName")) {
+					String playerListName = player.getPlayerListName();
+					
+					if(playerListName != null)
+						api.setPlayerListName(playerListName.replace(realName, nickName));
+				}
+				
+				if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.DisplayName")) {
+					String displayName = player.getDisplayName();
+					
+					if(displayName != null)
+						player.setDisplayName(displayName.replace(realName, nickName));
+				}
+			}
 			
-			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), spoofedUniqueId, oldDisplayName, oldPlayerListName, realName, nickName, skinName, event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), event.getTagPrefix(), event.getTagSuffix(), groupName, sortID));
+			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), spoofedUniqueId, changePrefixAndSuffix ? oldDisplayName : "NONE", changePrefixAndSuffix ? oldPlayerListName : "NONE", realName, nickName, skinName, event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), event.getTagPrefix(), event.getTagSuffix(), groupName, sortID));
 			
 			if(!(event.isRenick()))
 				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages." + (event.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName).replace("%prefix%", utils.getPrefix()));

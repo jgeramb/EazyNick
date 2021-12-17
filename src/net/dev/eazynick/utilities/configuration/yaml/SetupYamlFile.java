@@ -145,7 +145,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("AutoNickWorldBlackList", Arrays.asList("example_world"));
 		configuration.addDefault("BlackList", Arrays.asList("ExampleName"));
 		configuration.addDefault("DisabledNickWorlds", Arrays.asList("ExampleName"));
-		configuration.addDefault("MineSkinIds", Arrays.asList("1416741364", "898982494", "186233253"));
+		configuration.addDefault("MineSkinUUIDs", Arrays.asList("f6268b5d64044876bdb13d9dc1c808aa", "37c4366f257049b482a052ca26cf1acc", "f8011cd2c70447b49ed2fd6ca5fb47f4"));
 	}
 	
 	@Override

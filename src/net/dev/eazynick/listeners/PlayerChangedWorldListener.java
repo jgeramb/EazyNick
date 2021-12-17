@@ -1,15 +1,13 @@
 package net.dev.eazynick.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 
 import net.dev.eazynick.EazyNick;
-import net.dev.eazynick.api.*;
-import net.dev.eazynick.utilities.*;
-import net.dev.eazynick.utilities.AsyncTask.AsyncRunnable;
+import net.dev.eazynick.api.NickManager;
+import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class PlayerChangedWorldListener implements Listener {
@@ -26,32 +24,6 @@ public class PlayerChangedWorldListener implements Listener {
 		if (!(utils.getWorldBlackList().contains(player.getWorld().getName().toUpperCase()))) {
 			if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(player.getUniqueId()) && !(api.isNicked()))
 				utils.performReNick(player);
-			else if(utils.getNickedPlayers().containsKey(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("KeepNickOnWorldChange") && !(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName()))) {
-				NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId()).clone();
-				
-				utils.getSoonNickedPlayers().put(player.getUniqueId(), NickReason.WORLDCHANGE);
-				
-				new AsyncTask(new AsyncRunnable() {
-					
-					@Override
-					public void run() {
-						if(player.isOnline()) {
-							api.unnickPlayerWithoutRemovingMySQL(false, true);
-							
-							new AsyncTask(new AsyncRunnable() {
-								
-								@Override
-								public void run() {
-									Bukkit.getScheduler().runTask(eazyNick, () -> {
-										if(player.isOnline())
-											Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nickedPlayerData.getNickName(), nickedPlayerData.getSkinName(), nickedPlayerData.getSpoofedUniqueId(), nickedPlayerData.getChatPrefix(), nickedPlayerData.getChatSuffix(), nickedPlayerData.getTabPrefix(), nickedPlayerData.getTabSuffix(), nickedPlayerData.getTagPrefix(), nickedPlayerData.getTagSuffix(), false, true, nickedPlayerData.getSortID(), nickedPlayerData.getGroupName()));
-									});
-								}
-							}, 50L * (21 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? (20 * 2) : 0))).run();
-						}
-					}
-				}, 1000L).run();
-			}
 		} else if(api.isNicked())
 			api.unnickPlayer();
 	}

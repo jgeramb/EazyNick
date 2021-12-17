@@ -118,31 +118,34 @@ public class OutgoingPacketInjector {
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
 											if(!(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) && !(utils.isVersion13OrLater())) {
 												String textToComplete = utils.getTextsToComplete().get(player);
-												String[] splitTextToComplete = textToComplete.trim().split(" ");
 												
-												if(!(textToComplete.startsWith("/")) || (splitTextToComplete.length > 1)) {
-													ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
+												if(textToComplete != null) {
+													String[] splitTextToComplete = textToComplete.trim().split(" ");
 													
-													if(splitTextToComplete.length < 2)
-														textToComplete = "";
-													else
-														textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
+													if(!(textToComplete.startsWith("/")) || (splitTextToComplete.length > 1)) {
+														ArrayList<String> newCompletions = new ArrayList<>(), playerNames = new ArrayList<>();
+														
+														if(splitTextToComplete.length < 2)
+															textToComplete = "";
+														else
+															textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
+														
+														//Collect nicknames
+														Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+														
+														utils.getNickedPlayers().values().forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
+				
+														//Process completions
+														newCompletions.addAll(Arrays.asList((String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg)));
+														newCompletions.removeIf(currentCompletion -> (Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion)).count() != 0));
+														newCompletions.addAll(StringUtil.copyPartialMatches(textToComplete, playerNames, new ArrayList<>()));
 													
-													//Collect nicknames
-													Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+														//Sort completions alphabetically
+														Collections.sort(newCompletions);
 													
-													utils.getNickedPlayers().values().forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
-			
-													//Process completions
-													newCompletions.addAll(Arrays.asList((String[]) reflectionHelper.getField(msg.getClass(), "a").get(msg)));
-													newCompletions.removeIf(currentCompletion -> (Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion)).count() != 0));
-													newCompletions.addAll(StringUtil.copyPartialMatches(textToComplete, playerNames, new ArrayList<>()));
-												
-													//Sort completions alphabetically
-													Collections.sort(newCompletions);
-												
-													//Replace completions
-													reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
+														//Replace completions
+														reflectionHelper.setField(msg, "a", newCompletions.toArray(new String[0]));
+													}
 												}
 											}
 											

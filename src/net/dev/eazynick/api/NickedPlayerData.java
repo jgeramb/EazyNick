@@ -1,6 +1,5 @@
 package net.dev.eazynick.api;
 
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -122,10 +121,10 @@ public class NickedPlayerData {
 					//Load skin from mineskin.org
 					if(version.startsWith("1_7")) {
 						((GameProfile) skinProfile).getProperties().removeAll("textures");
-						((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size())) : skinName.split(":")[1]));
+						((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]));
 					} else {
 						((GameProfile) skinProfile).getProperties().removeAll("textures");
-						((GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getMineSkinIds().get(new Random().nextInt(utils.getMineSkinIds().size())) : skinName.split(":")[1]));
+						((GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]));
 					}
 				} else {
 					//Load skin from mojang api

@@ -38,7 +38,7 @@ public class ChangeSkinCommand implements CommandExecutor {
 					} else
 						languageYamlFile.sendMessage(player, utils.getNoPerm());
 				} else if(player.hasPermission("eazynick.skin.random")) {
-					String name = setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + utils.getRandomStringFromList(setupYamlFile.getConfiguration().getStringList("MineSkinIds"))) : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
+					String name = setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + utils.getRandomStringFromList(utils.getMineSkinUUIDs())) : utils.getNickNames().get((new Random().nextInt(utils.getNickNames().size())));
 					
 					api.changeSkin(name);
 					

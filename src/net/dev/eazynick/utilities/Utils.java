@@ -39,7 +39,7 @@ public class Utils {
 	private List<String> worldsWithDisabledActionBar = new ArrayList<>();
 	private List<String> replaceNameInCommandBlackList = new ArrayList<>();
 	private List<String> worldBlackList = new ArrayList<>();
-	private List<String> mineSkinIds = new ArrayList<>();
+	private List<String> mineSkinUUIDs = new ArrayList<>();
 	
 	//NickOnWorldChange -> nick item -> enabled
 	private ArrayList<UUID> nickOnWorldChangePlayers = new ArrayList<>();
@@ -157,7 +157,7 @@ public class Utils {
 		List<String> worldsWithDisabledActionBar = setupYamlFile.getConfiguration().getStringList("WorldsWithDisabledActionBar");
 		List<String> worldBlackList = setupYamlFile.getConfiguration().getStringList("AutoNickWorldBlackList");
 		
-		this.mineSkinIds = setupYamlFile.getConfiguration().getStringList("MineSkinIds");
+		this.mineSkinUUIDs = setupYamlFile.getConfiguration().getStringList("MineSkinUUIDs");
 
 		this.prefix = languageYamlFile.getConfigString("Messages.Prefix");
 		this.noPerm = languageYamlFile.getConfigString("Messages.NoPerm");
@@ -306,7 +306,7 @@ public class Utils {
 								else if(skinType.equalsIgnoreCase("NORMAL"))
 									skinName = new Random().nextBoolean() ? "Steve" : "Alex";
 								else if(skinType.equalsIgnoreCase("RANDOM"))
-									skinName = setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + getRandomStringFromList(setupYamlFile.getConfiguration().getStringList("MineSkinIds"))) : nickNames.get(new Random().nextInt(getNickNames().size()));
+									skinName = setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + getRandomStringFromList(mineSkinUUIDs)) : nickNames.get(new Random().nextInt(getNickNames().size()));
 								else if(skinType.equalsIgnoreCase("SKINFROMNAME"))
 									skinName = name;
 								else
@@ -454,7 +454,7 @@ public class Utils {
 		//Nick player
 		new NickManager(player).setGroupName(serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName"));
 		
-		Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nameWhithoutColors, setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + getRandomStringFromList(setupYamlFile.getConfiguration().getStringList("MineSkinIds"))) : nameWhithoutColors, setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID") ? (eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(name) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) : eazyNick.getUUIDFetcher().getUUID(name))) : player.getUniqueId(), chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID") : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.SortID"), serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")));
+		Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nameWhithoutColors, setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + getRandomStringFromList(mineSkinUUIDs)) : nameWhithoutColors, setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID") ? (eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(name) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) : eazyNick.getUUIDFetcher().getUUID(name))) : player.getUniqueId(), chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID") : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.SortID"), serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")));
 	}
 	
 	public void performReNick(Player player) {
@@ -721,8 +721,8 @@ public class Utils {
 		return worldBlackList;
 	}
 	
-	public List<String> getMineSkinIds() {
-		return mineSkinIds;
+	public List<String> getMineSkinUUIDs() {
+		return mineSkinUUIDs;
 	}
 	
 	public ArrayList<UUID> getNickOnWorldChangePlayers() {
