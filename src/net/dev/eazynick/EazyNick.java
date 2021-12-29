@@ -91,6 +91,12 @@ public class EazyNick extends JavaPlugin {
 		nmsBookUtils = new NMSBookUtils(this);
 		guiManager = new GUIManager(this);
 		
+		//Updater
+		try {
+            Class.forName(getClass().getPackage().getName() + ".PluginUpdater").newInstance();
+        } catch (Exception ignore) {
+        }
+		
 		//Fix essentials 'nick' command bug
 		if(utils.isPluginInstalled("Essentials"))
 			Bukkit.getScheduler().runTaskLater(this, this::initiatePlugin, 20);

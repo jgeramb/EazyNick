@@ -232,11 +232,23 @@ public class Utils {
 		String chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "", nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
 		String skinName = "";
 		boolean isCancelled = false;
-		int sortID = 9999;
+		int sortID = 9999, nameLengthMin = setupYamlFile.getConfiguration().getInt("Settings.NameLength.Min"), nameLengthMax = setupYamlFile.getConfiguration().getInt("Settings.NameLength.Max");
+		
+		if(nameLengthMin > 16)
+			nameLengthMin = 16;
+		
+		if(nameLengthMin < 1)
+			nameLengthMin = 1;
+		
+		if(nameLengthMax > 16)
+			nameLengthMax = 16;
+		
+		if(nameLengthMax < 1)
+			nameLengthMax = 1;
 		
 		//Check if name length is valid
-		if(nameWithoutColors.length() <= 16) {
-			if(!(setupYamlFile.getConfiguration().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
+		if(nameWithoutColors.length() <= nameLengthMax) {
+			if(nameWithoutColors.length() >= nameLengthMin) {
 				if(!(containsSpecialChars(nameWithoutColors)) || setupYamlFile.getConfiguration().getBoolean("AllowSpecialCharactersInCustomName")) {
 					//Check if name is allowed
 					if(!(containsBlackListEntry(name))) {

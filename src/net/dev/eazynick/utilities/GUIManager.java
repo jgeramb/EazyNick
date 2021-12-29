@@ -65,8 +65,21 @@ public class GUIManager {
 				@Override
 				public void onEditComplete(SignGUI.EditCompleteEvent event) {
 					String name = event.getLines()[0];
+					int nameLengthMin = setupYamlFile.getConfiguration().getInt("Settings.NameLength.Min"), nameLengthMax = setupYamlFile.getConfiguration().getInt("Settings.NameLength.Max");
 					
-					if(!(name.isEmpty()) && (name.length() <= 16) && (!(setupYamlFile.getConfiguration().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (name.length() > 2)))
+					if(nameLengthMin > 16)
+						nameLengthMin = 16;
+					
+					if(nameLengthMin < 1)
+						nameLengthMin = 1;
+					
+					if(nameLengthMax > 16)
+						nameLengthMax = 16;
+					
+					if(nameLengthMax < 1)
+						nameLengthMax = 1;
+					
+					if(!(name.isEmpty()) && (name.length() <= nameLengthMax) && (name.length() >= nameLengthMin))
 						utils.performRankedNick(player, rankName, skinType, name);
 				}
 			});

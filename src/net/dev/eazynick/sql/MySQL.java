@@ -3,16 +3,19 @@ package net.dev.eazynick.sql;
 import java.sql.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 
 public class MySQL {
 
-	public Connection con;
-	public String host, port, database, username, password;
+	private Logger logger;
+	private Connection connection;
+	private String host, port, database, username, password;
 	private final String PREFIX = "[MySQL] ";
 	
 	public MySQL(String host, String port, String database, String username, String password) {
+		this.logger = Bukkit.getLogger();
 		this.host = host;
 		this.port = port;
 		this.database = database;
@@ -25,31 +28,31 @@ public class MySQL {
 		if(!(isConnected())) {
 			try {
 				//Open connection
-				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&characterEncoding=utf8&useUnicode=true&interactiveClient=true&useSSL=false", username, password);
+				connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&characterEncoding=utf8&useUnicode=true&interactiveClient=true&useSSL=false", username, password);
 				
-				Bukkit.getLogger().info(PREFIX + "Connected to database successfully!");
+				logger.info(PREFIX + "Connected to database successfully!");
 			} catch (SQLException ex) {
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + "Connection to database failed!");
-				Bukkit.getLogger().log(Level.WARNING, PREFIX);
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + "Connection Properties:");
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + " Address: " + host + ":" + port);
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + " Database: " + database);
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + " Username: " + username);
+				logger.log(Level.WARNING, PREFIX + "Connection to database failed!");
+				logger.log(Level.WARNING, PREFIX);
+				logger.log(Level.WARNING, PREFIX + "Connection Properties:");
+				logger.log(Level.WARNING, PREFIX + " Address: " + host + ":" + port);
+				logger.log(Level.WARNING, PREFIX + " Database: " + database);
+				logger.log(Level.WARNING, PREFIX + " Username: " + username);
 				
 				String censoredPassword = "";
 				
 				for (int i = 0; i < password.length(); i++)
 					censoredPassword += "*";
 				
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + " Password: " + censoredPassword);
-				Bukkit.getLogger().log(Level.WARNING, PREFIX);
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + "---------- Stack trace START ----------");
-				Bukkit.getLogger().log(Level.WARNING, "");
+				logger.log(Level.WARNING, PREFIX + " Password: " + censoredPassword);
+				logger.log(Level.WARNING, PREFIX);
+				logger.log(Level.WARNING, PREFIX + "---------- Stack trace START ----------");
+				logger.log(Level.WARNING, "");
 				
 				ex.printStackTrace();
 				
-				Bukkit.getLogger().log(Level.WARNING, "");
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + "---------- Stack trace  END  ----------");
+				logger.log(Level.WARNING, "");
+				logger.log(Level.WARNING, PREFIX + "---------- Stack trace  END  ----------");
 			}
 		}
 	}
@@ -59,18 +62,18 @@ public class MySQL {
 		if(isConnected()) {
 			try {
 				//Close connection
-				con.close();
+				connection.close();
 				
-				Bukkit.getLogger().info(PREFIX + "Connection to database closed successfully!");
+				logger.info(PREFIX + "Connection to database closed successfully!");
 			} catch (SQLException ex) {
-				Bukkit.getLogger().log(Level.WARNING, PREFIX + "Could not close Connection to database!");
+				logger.log(Level.WARNING, PREFIX + "Could not close Connection to database!");
 			}
 		}
 	}
 
 	public boolean isConnected() {
 		try {
-			return ((con != null) && !(con.isClosed()));
+			return ((connection != null) && !(connection.isClosed()));
 		} catch (SQLException ignore) {
 		}
 		
@@ -83,7 +86,7 @@ public class MySQL {
 			new FutureTask<>(() -> {
 				try {
 					//Execute update
-					Statement s = con.createStatement();
+					Statement s = connection.createStatement();
 					s.executeUpdate(sql);
 					s.close();
 				} catch (SQLException ex) {
@@ -91,15 +94,15 @@ public class MySQL {
 					
 					if(msg.contains("The driver has not received any packets from the server.")) {
 						try {
-							con.close();
+							connection.close();
 						} catch (SQLException ex1) {
 						}
 						
-						con = null;
+						connection = null;
 						
 						connect();
 					} else
-						Bukkit.getLogger().log(Level.WARNING, PREFIX + "An error occured while executing mysql update (" + msg + ")!");
+						logger.log(Level.WARNING, PREFIX + "An error occured while executing mysql update (" + msg + ")!");
 				}
 			}, 1).run();
 		}
@@ -116,7 +119,7 @@ public class MySQL {
 						
 						try {
 							//Execute query
-							Statement s = con.createStatement();
+							Statement s = connection.createStatement();
 							ResultSet rs = s.executeQuery(qry);
 							
 							return rs;
@@ -125,15 +128,15 @@ public class MySQL {
 							
 							if(msg.contains("The driver has not received any packets from the server.")) {
 								try {
-									con.close();
+									connection.close();
 								} catch (SQLException ex1) {
 								}
 								
-								con = null;
+								connection = null;
 								
 								connect();
 							} else
-								Bukkit.getLogger().log(Level.WARNING, PREFIX + "An error occured while executing mysql update (" + msg + ")!");
+								logger.log(Level.WARNING, PREFIX + "An error occured while executing mysql update (" + msg + ")!");
 						}
 						
 						return null;
@@ -151,7 +154,7 @@ public class MySQL {
 	}
 
 	public Connection getConnection() {
-		return con;
+		return connection;
 	}
 
 }

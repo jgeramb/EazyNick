@@ -117,11 +117,11 @@ public class ScoreboardTeamHandler {
 	public void createTeam() {
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
+		String version = eazyNick.getVersion();
+		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+		
 		Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
 			try {
-				String version = eazyNick.getVersion();
-				boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
-				
 				//Create packet instance
 				Constructor<?> constructor = reflectionHelper.getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutScoreboardTeam" : "PacketPlayOutScoreboardTeam").getDeclaredConstructor((is17 || is18) ? new Class[] { String.class, int.class, Optional.class, Collection.class } : new Class[0]);
 				constructor.setAccessible(true);

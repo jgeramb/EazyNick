@@ -29,7 +29,6 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("AutoUpdater", true);
 		configuration.addDefault("AllowBookGUICustomName", true);
 		configuration.addDefault("AllowBookGUISkinFromName", false);
-		configuration.addDefault("AllowCustomNamesShorterThanThreeCharacters", false);
 		configuration.addDefault("AllowPlayersToNickAsKnownPlayers", false);
 		configuration.addDefault("AllowPlayersToNickAsOnlinePlayers", false);
 		configuration.addDefault("AllowPlayersToUseSameNickName", false);
@@ -117,6 +116,8 @@ public class SetupYamlFile extends YamlFile {
 
 		configuration.addDefault("Settings.NickDelay", (long) 0.5);
 		configuration.addDefault("Settings.ChatFormat", "%prefix%%nickName%%suffix%&7: &f%message%");
+		configuration.addDefault("Settings.NameLength.Min", 3);
+		configuration.addDefault("Settings.NameLength.Max", 16);
 		configuration.addDefault("Settings.ChangeOptions.UUID", true);
 		configuration.addDefault("Settings.ChangeOptions.DisplayName", true);
 		configuration.addDefault("Settings.ChangeOptions.PlayerListName", true);

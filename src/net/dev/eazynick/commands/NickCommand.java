@@ -69,9 +69,22 @@ public class NickCommand implements CommandExecutor {
 					} else if(player.hasPermission("eazynick.nick.custom")) {
 						String name = args[0].replace("\"", ""), nameWithoutColors = new StringUtils(name).removeColorCodes().getString();
 						boolean isCancelled = false;
+						int nameLengthMin = setupYamlFile.getConfiguration().getInt("Settings.NameLength.Min"), nameLengthMax = setupYamlFile.getConfiguration().getInt("Settings.NameLength.Max");
 						
-						if(nameWithoutColors.length() <= 16) {
-							if(!(setupYamlFile.getConfiguration().getBoolean("AllowCustomNamesShorterThanThreeCharacters")) || (nameWithoutColors.length() > 2)) {
+						if(nameLengthMin > 16)
+							nameLengthMin = 16;
+						
+						if(nameLengthMin < 1)
+							nameLengthMin = 1;
+						
+						if(nameLengthMax > 16)
+							nameLengthMax = 16;
+						
+						if(nameLengthMax < 1)
+							nameLengthMax = 1;
+						
+						if(nameWithoutColors.length() <= nameLengthMax) {
+							if(nameWithoutColors.length() >= nameLengthMin) {
 								if(!(utils.containsSpecialChars(nameWithoutColors)) || setupYamlFile.getConfiguration().getBoolean("AllowSpecialCharactersInCustomName")) {
 									if(!(utils.containsBlackListEntry(args[0]))) {
 										boolean nickNameIsInUse = false;
