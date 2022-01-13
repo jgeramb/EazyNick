@@ -24,8 +24,10 @@ public class PlayerChangedWorldListener implements Listener {
 		if (!(utils.getWorldBlackList().contains(player.getWorld().getName().toUpperCase()))) {
 			if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(player.getUniqueId()) && !(api.isNicked()))
 				utils.performReNick(player);
+			else if(!(setupYamlFile.getConfiguration().getBoolean("KeepNickOnWorldChange")))
+				api.unnickPlayerWithoutRemovingMySQL(false, true);
 		} else if(api.isNicked())
-			api.unnickPlayer();
+			api.unnickPlayerWithoutRemovingMySQL(false, true);
 	}
 
 }

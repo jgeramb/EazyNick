@@ -50,10 +50,7 @@ public class PlayerKickListener implements Listener {
 				utils.getOldExperienceLevels().remove(player.getUniqueId());
 			}
 			
-			if (setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || isBungeeCord)
-				api.unnickPlayerWithoutRemovingMySQL(false, false);
-			else
-				api.unnickPlayerWithoutRemovingMySQL(true, false);
+			api.unnickPlayerWithoutRemovingMySQL(setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || isBungeeCord, false);
 			
 			if(utils.isPluginInstalled("LuckPerms"))
 				new LuckPermsHook(player).resetNodes();

@@ -20,7 +20,7 @@ public class FixSkinCommand implements CommandExecutor {
 			Player player = (Player) sender;
 			
 			if(player.hasPermission("eazynick.skin.fix")) {
-				new NickManager(player).updatePlayer(true);
+				new NickManager(player).updatePlayer();
 				
 				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.FixSkin").replace("%prefix%", utils.getPrefix()));
 			} else

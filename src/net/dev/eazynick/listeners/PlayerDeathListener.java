@@ -7,33 +7,27 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
-import net.dev.eazynick.utilities.NickReason;
+import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 public class PlayerDeathListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();
+		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		Player player = event.getEntity();
-
-		NickManager api = new NickManager(player);
 		String deathMessage = ((event.getDeathMessage() == null) || event.getDeathMessage().isEmpty()) ? null : event.getDeathMessage();
-
-		if (api.isNicked()) {
-			eazyNick.getUtils().getSoonNickedPlayers().put(player.getUniqueId(), NickReason.DEATH);
+		NickManager api = new NickManager(player);
 			
-			if (deathMessage != null) {
-				if (!(eazyNick.getSetupYamlFile().getConfiguration().getBoolean("SeeNickSelf"))) {
-					event.setDeathMessage(null);
+		if(api.isNicked() && (deathMessage != null) && !(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))) {
+			event.setDeathMessage(null);
 
-					for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-						if (currentPlayer != player)
-							currentPlayer.sendMessage(deathMessage);
-						else
-							currentPlayer.sendMessage(deathMessage.replace(api.getNickFormat(), api.getOldDisplayName()));
-					}
-				}
+			for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+				if (currentPlayer != player)
+					currentPlayer.sendMessage(deathMessage);
+				else
+					currentPlayer.sendMessage(deathMessage.replace(api.getNickFormat(), api.getOldDisplayName()));
 			}
 		}
 	}
