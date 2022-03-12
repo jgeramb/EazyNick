@@ -22,6 +22,8 @@ import net.dev.eazynick.utilities.configuration.yaml.*;
 
 public class PlayerJoinListener implements Listener {
 
+	long start;
+	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();

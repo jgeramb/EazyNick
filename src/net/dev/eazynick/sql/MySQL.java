@@ -92,10 +92,10 @@ public class MySQL {
 				} catch (SQLException ex) {
 					String msg = ex.getMessage();
 					
-					if(msg.contains("The driver has not received any packets from the server.")) {
+					if(msg.contains("The driver has not received any packets from the server.") || msg.contains("The last packet successfully received from the server was")) {
 						try {
 							connection.close();
-						} catch (SQLException ex1) {
+						} catch (SQLException ignore) {
 						}
 						
 						connection = null;
@@ -126,10 +126,10 @@ public class MySQL {
 						} catch (SQLException ex) {
 							String msg = ex.getMessage();
 							
-							if(msg.contains("The driver has not received any packets from the server.")) {
+							if(msg.contains("The driver has not received any packets from the server.") || msg.contains("The last packet successfully received from the server was")) {
 								try {
 									connection.close();
-								} catch (SQLException ex1) {
+								} catch (SQLException ignore) {
 								}
 								
 								connection = null;

@@ -95,7 +95,7 @@ public class PlayerNickListener implements Listener {
 				}
 			}
 			
-			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), spoofedUniqueId, changePrefixAndSuffix ? oldDisplayName : "NONE", changePrefixAndSuffix ? oldPlayerListName : "NONE", realName, nickName, skinName, event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), event.getTagPrefix(), event.getTagSuffix(), groupName, sortID));
+			utils.getNickedPlayers().put(player.getUniqueId(), new NickedPlayerData(player.getUniqueId(), (utils.isPluginInstalled("TAB", "NEZNAMY") && setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB")) ? player.getUniqueId() : spoofedUniqueId, changePrefixAndSuffix ? oldDisplayName : "NONE", changePrefixAndSuffix ? oldPlayerListName : "NONE", realName, nickName, skinName, event.getChatPrefix(), event.getChatSuffix(), event.getTabPrefix(), event.getTabSuffix(), event.getTagPrefix(), event.getTagSuffix(), groupName, sortID));
 			
 			if(!(event.isRenick()))
 				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages." + (event.isJoinNick() ? "ActiveNick" : "Nick")).replace("%name%", nickName).replace("%prefix%", utils.getPrefix()));

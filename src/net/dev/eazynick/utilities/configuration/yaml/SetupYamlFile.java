@@ -69,6 +69,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("SwitchLuckPermsGroupByNicking", false);
 		configuration.addDefault("SwitchPermissionsExGroupByNicking", false);
 		configuration.addDefault("SwitchUltraPermissionsGroupByNicking", false);
+		configuration.addDefault("UpdatePlayerStats", false);
 		configuration.addDefault("UseAnvilGUIForCustomName", false);
 		configuration.addDefault("UseLocalRankPrefixes", true);
 		configuration.addDefault("UseMineSkinAPI", false);

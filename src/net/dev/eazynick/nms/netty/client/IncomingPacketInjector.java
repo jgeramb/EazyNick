@@ -31,7 +31,7 @@ public class IncomingPacketInjector {
 			Object networkManager = playerConnection.getClass().getField((is17 || is18) ? "a" : "networkManager").get(playerConnection);
 			
 			//Get netty channel
-			this.channel = (Channel) networkManager.getClass().getField((is17 || is18) ? "k" : "channel").get(networkManager);
+			this.channel = (Channel) networkManager.getClass().getField((is17 || is18) ? (version.equals("1_18_R2") ? "m" : "k") : "channel").get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
 			
 			unregister();

@@ -91,12 +91,6 @@ public class EazyNick extends JavaPlugin {
 		nmsBookUtils = new NMSBookUtils(this);
 		guiManager = new GUIManager(this);
 		
-		//Updater
-		try {
-            Class.forName(getClass().getPackage().getName() + ".PluginUpdater").newInstance();
-        } catch (Exception ignore) {
-        }
-		
 		//Fix essentials 'nick' command bug
 		if(utils.isPluginInstalled("Essentials"))
 			Bukkit.getScheduler().runTaskLater(this, this::initiatePlugin, 20);
@@ -166,7 +160,8 @@ public class EazyNick extends JavaPlugin {
 				|| version.equals("1_10_R1") || version.equals("1_11_R1") || version.equals("1_12_R1")
 				|| version.equals("1_13_R1") || version.equals("1_13_R2") || version.equals("1_14_R1")
 				|| version.equals("1_15_R1") || version.equals("1_16_R1") || version.equals("1_16_R2")
-				|| version.equals("1_16_R3") || version.equals("1_17_R1") || version.equals("1_18_R1"))) {
+				|| version.equals("1_16_R3") || version.equals("1_17_R1") || version.equals("1_18_R1")
+				|| version.equals("1_18_R2"))) {
 			utils.sendConsole("§cERROR§8: §eVersion is §4§lINCOMPATIBLE§e!");
 
 			isCancelled = true;
