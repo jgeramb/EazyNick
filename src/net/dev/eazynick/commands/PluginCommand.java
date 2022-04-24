@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import net.dev.eazynick.EazyNick;
+import net.dev.eazynick.api.NickedPlayerData;
 import net.dev.eazynick.utilities.Utils;
 import net.dev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
@@ -67,6 +68,44 @@ public class PluginCommand implements CommandExecutor {
 					sender.sendMessage(prefix + "§7/eazynick [1-3] §8» §aPlugin help");
 					sender.sendMessage(prefix);
 					sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+				} else if(args[0].equalsIgnoreCase("debug") && sender.hasPermission("eazynick.debug")) {
+					if(args.length >= 2) {
+						Player targetPlayer = Bukkit.getPlayer(args[1]);
+						
+						if(targetPlayer != null) {
+							sender.sendMessage(prefix + "§7§m-----§8 [ §5Debug Info §8] §7§m-----");
+							sender.sendMessage(prefix);
+							sender.sendMessage(prefix + "§5§lPlayer details");
+							
+							NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(targetPlayer.getUniqueId());
+							boolean isNicked = nickedPlayerData != null;
+							
+							if(isNicked) {
+								sender.sendMessage(prefix + "§8┣ §7Nicked §8» §aYes");
+								sender.sendMessage(prefix + "§8┣ §7Real name §8» §a" + nickedPlayerData.getRealName());
+								sender.sendMessage(prefix + "§8┣ §7Nickname §8» §a" + nickedPlayerData.getNickName());
+								sender.sendMessage(prefix + "§8┣ §7Skin §8» §a" + nickedPlayerData.getSkinName());
+								sender.sendMessage(prefix + "§8┣ §7UUID §8» §8'§f" + nickedPlayerData.getUniqueId() + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7Spoofed UUID §8» §8'§f" + nickedPlayerData.getSpoofedUniqueId() + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7Chat prefix §8» §8'§f" + nickedPlayerData.getChatPrefix().replace("§", "&") + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7Chat suffix §8» §8'§f" + nickedPlayerData.getChatSuffix().replace("§", "&") + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7Tab prefix §8» §8'§f" + nickedPlayerData.getTabPrefix().replace("§", "&") + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7Tab suffix §8» §8'§f" + nickedPlayerData.getTabSuffix().replace("§", "&") + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7Tag prefix §8» §8'§f" + nickedPlayerData.getTagPrefix().replace("§", "&") + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7Tag suffix §8» §8'§f" + nickedPlayerData.getTagSuffix().replace("§", "&") + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7Group name §8» §8'§f" + nickedPlayerData.getGroupName() + "§8'");
+								sender.sendMessage(prefix + "§8┣ §7SortID §8» §a" + nickedPlayerData.getSortID());
+								sender.sendMessage(prefix + "§8┣ §7Old chat name §8» §8'§f" + nickedPlayerData.getOldDisplayName().replace("§", "&") + "§8'");
+								sender.sendMessage(prefix + "§8┗ §7Old tab name §8» §8'§f" + nickedPlayerData.getOldPlayerListName().replace("§", "&") + "§8'");
+							} else
+								sender.sendMessage(prefix + "§8┗  §7Nicked §8» §cNo");
+						
+							sender.sendMessage(prefix);
+							sender.sendMessage(prefix + "§7§m-----§8 [ §5Debug Info §8] §7§m-----");
+						} else
+							languageYamlFile.sendMessage(sender, languageYamlFile.getConfigString(null, "Messages.PlayerNotFound").replace("%prefix%", prefix));
+					} else
+						sender.sendMessage(prefix + "§cYou need to enter a player name");
 				} else if(args[0].equalsIgnoreCase("reload") && sender.hasPermission("eazynick.reload")) {
 					utils.reloadConfigs();
 					

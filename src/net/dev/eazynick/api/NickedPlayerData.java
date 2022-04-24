@@ -287,15 +287,8 @@ public class NickedPlayerData {
 		this.groupName = groupName;
 	}
 	
-	public void setSkinProfile(Object skinProfile) {
-		this.skinProfile = skinProfile;
-	}
-	
 	public NickedPlayerData clone() {
-		NickedPlayerData nickedPlayerData = new NickedPlayerData(uniqueId, spoofedUniqueId, oldDisplayName, oldPlayerListName, realName, nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName, sortID);
-		nickedPlayerData.setSkinProfile(skinProfile);
-		
-		return nickedPlayerData;
+		return new NickedPlayerData(uniqueId, spoofedUniqueId, oldDisplayName, oldPlayerListName, realName, nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName, sortID);
 	}
 	
 	@Override

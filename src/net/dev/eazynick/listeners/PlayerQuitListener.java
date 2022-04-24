@@ -50,7 +50,7 @@ public class PlayerQuitListener implements Listener {
 				utils.getOldExperienceLevels().remove(player.getUniqueId());
 			}
 			
-			api.unnickPlayerWithoutRemovingMySQL(setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || isBungeeCord, false);
+			api.unnickPlayerWithoutRemovingMySQL(!(setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || isBungeeCord), false);
 			
 			if(utils.isPluginInstalled("LuckPerms"))
 				new LuckPermsHook(player).resetNodes();

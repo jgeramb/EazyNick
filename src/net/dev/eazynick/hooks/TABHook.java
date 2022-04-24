@@ -23,7 +23,7 @@ public class TABHook {
 		TablistFormatManager tablistFormatManager = api.getTablistFormatManager();
 		TabPlayer tabPlayer = api.getPlayer(player.getUniqueId());
 		
-		if(tabPlayer != null) {
+		if((teamManager != null) && (tablistFormatManager != null) && (tabPlayer != null)) {
 			//Set temporarily nametag values
 			teamManager.setPrefix(tabPlayer, tagPrefix);
 			teamManager.setSuffix(tabPlayer, tagSuffix);
@@ -42,7 +42,7 @@ public class TABHook {
 		TablistFormatManager tablistFormatManager = api.getTablistFormatManager();
 		TabPlayer tabPlayer = api.getPlayer(player.getUniqueId());
 		
-		if(tabPlayer != null) {
+		if((teamManager != null) && (tablistFormatManager != null) && (tabPlayer != null)) {
 			//Unset temporarily nametag values
 			teamManager.resetPrefix(tabPlayer);
 			teamManager.resetSuffix(tabPlayer);

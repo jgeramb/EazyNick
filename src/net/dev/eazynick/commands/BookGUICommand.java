@@ -213,9 +213,6 @@ public class BookGUICommand implements CommandExecutor {
 						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("eazynick.nick.custom")))
 							textComponents.add(option3);
 						
-						for(String s : guiYamlFile.getConfigString(player, "BookGUI.Page5.Text2").split("%nl%"))
-							textComponents.add(new TextComponent(s + "\n"));
-						
 						nmsBookUtils.open(player, nmsBookBuilder.create(guiYamlFile.getConfigString(player, "BookGUI.Page5.Title"), new BookPage(textComponents)));
 					} else if(args[3].equalsIgnoreCase("ENTERNAME")) {
 						if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUICustomName") && (player.hasPermission("eazynick.nick.custom"))) {

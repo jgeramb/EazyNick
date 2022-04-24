@@ -45,6 +45,7 @@ public class AsyncTask {
 			
 			thread.interrupt();
 		});
+		
 		thread.start();
 		
 		return this;

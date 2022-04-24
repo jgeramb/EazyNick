@@ -41,7 +41,7 @@ public class IncomingPacketInjector {
 				
 				@Override
 				public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-					if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
+					if(packet.getClass().getSimpleName().equals("PacketPlayInUpdateSign")) {
 						if(signGUI.getEditCompleteListeners().containsKey(player)) {
 							//Process SignGUI success
 							Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), (is17 || is18) ? "c" : "b").get(packet);

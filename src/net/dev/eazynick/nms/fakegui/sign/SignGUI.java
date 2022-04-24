@@ -3,8 +3,7 @@ package net.dev.eazynick.nms.fakegui.sign;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -54,7 +53,16 @@ public class SignGUI implements Listener {
 		sign.setLine(3, line4);
 		sign.update(false, false);
 		
-		Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> (currentPlayer != player)).forEach(currentPlayer -> currentPlayer.sendBlockChange(block.getLocation(), Material.AIR, (byte) 0));
+		Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> (currentPlayer != player)).forEach(currentPlayer -> {
+			if(is18) {
+				currentPlayer.sendBlockChange(block.getLocation(), Material.AIR.createBlockData());
+			} else {
+				try {
+					currentPlayer.getClass().getMethod("sendBlockChange", Location.class, Material.class, byte.class).invoke(currentPlayer, block.getLocation(), Material.AIR, (byte) 0);
+				} catch (Exception ignore) {
+				}
+			}
+		});
 		
 		new AsyncTask(new AsyncRunnable() {
 			

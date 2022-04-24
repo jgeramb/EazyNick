@@ -16,8 +16,7 @@ import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.NickManager;
 import net.dev.eazynick.api.NickedPlayerData;
 import net.dev.eazynick.nms.ReflectionHelper;
-import net.dev.eazynick.utilities.NickReason;
-import net.dev.eazynick.utilities.Utils;
+import net.dev.eazynick.utilities.*;
 import net.dev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 
 import io.netty.channel.*;
@@ -61,12 +60,28 @@ public class OutgoingPacketInjector {
 			for(Object manager : Collections.synchronizedList((List<?>) getNetworkManagerList(minecraftServer.getClass().getMethod(is18 ? "ad" : "getServerConnection").invoke(minecraftServer))).toArray()) {
 				Channel channel = (Channel) field.get(manager);
 				
-				if((channel.pipeline().context("packet_handler") != null)) {
+				if(channel.pipeline().get("packet_handler") != null) {
 					channels.add(channel);
 					
-					if (channel.pipeline().get(handlerName) != null)
-						channel.pipeline().remove(handlerName);
-					
+					if (channel.pipeline().get(handlerName) != null) {
+						Thread killThread = new Thread(() -> {
+							try {
+								channel.pipeline().remove(handlerName);
+							} catch (Exception ignore) {
+							}
+						});
+						
+						killThread.start();
+						
+						new AsyncTask(new AsyncTask.AsyncRunnable() {
+							
+							@Override
+							public void run() {
+								killThread.interrupt();
+							}
+						}, 50).run();
+					}
+						
 					try {
 						//Add new packet handler
 						channel.pipeline().addBefore("packet_handler", handlerName, new ChannelDuplexHandler() {
@@ -166,14 +181,16 @@ public class OutgoingPacketInjector {
 											else {
 												String name = (String) reflectionHelper.getField(msg.getClass(), "b").get(msg);
 												
-												for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
-													if(name.contains(currentNickedPlayerData.getRealName())) {
-														name = name.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName());
-														break;
+												if(name != null) {
+													for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
+														if(name.contains(currentNickedPlayerData.getRealName())) {
+															name = name.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName());
+															break;
+														}
 													}
+													
+													reflectionHelper.setField(msg, "b", name);
 												}
-												
-												reflectionHelper.setField(msg, "b", name);
 											}
 											
 											super.write(ctx, msg, promise);
@@ -181,14 +198,16 @@ public class OutgoingPacketInjector {
 											//Replace name
 											String name = (String) reflectionHelper.getField(msg.getClass(), "a").get(msg);
 											
-											for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
-												if(name.contains(currentNickedPlayerData.getRealName())) {
-													name = name.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName());
-													break;
+											if(name != null) {
+												for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
+													if(name.contains(currentNickedPlayerData.getRealName())) {
+														name = name.replace(currentNickedPlayerData.getRealName(), currentNickedPlayerData.getNickName());
+														break;
+													}
 												}
+												
+												reflectionHelper.setField(msg, "a", name);
 											}
-											
-											reflectionHelper.setField(msg, "a", name);
 											
 											super.write(ctx, msg, promise);
 										} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
@@ -261,7 +280,8 @@ public class OutgoingPacketInjector {
 							
 						});
 					} catch (Exception ex) {
-						if(!(ex.getMessage().contains("Duplicate handler")))
+						//Hide "Duplicate handler" and "NoSuchElementException" errors
+						if(!(ex.getMessage().contains("Duplicate handler") || ex.getMessage().contains("java.util.NoSuchElementException: packet_handler")))
 							ex.printStackTrace();
 					}
 				}
@@ -318,7 +338,7 @@ public class OutgoingPacketInjector {
 				}
 				
 				//Replace real names with nicknames
-				if((!(fullText.contains(ChatColor.stripColor(utils.getLastChatMessage())) || !(isChatPacket)) || fullText.startsWith(ChatColor.stripColor(utils.getPrefix())))) {
+				if(!((fullText.contains(ChatColor.stripColor(utils.getLastChatMessage())) && isChatPacket) || fullText.startsWith(ChatColor.stripColor(utils.getPrefix())))) {
 					String json = serialize(iChatBaseComponent);
 					
 					for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
@@ -364,10 +384,22 @@ public class OutgoingPacketInjector {
 	}
 	
 	public void unregister() {
-		try {
-			channels.stream().filter(currentChannel -> ((currentChannel != null) && (currentChannel.pipeline().get(handlerName) != null))).forEach(currentChannel -> currentChannel.pipeline().remove(handlerName));
-		} catch (Exception ignore) {
-		}
+		Thread killThread = new Thread(() -> channels.stream().filter(currentChannel -> ((currentChannel != null) && (currentChannel.pipeline().get(handlerName) != null))).forEach(currentChannel -> {
+			try {
+				currentChannel.pipeline().remove(handlerName);
+			} catch (Exception ignore) {
+			}
+		}));
+		
+		killThread.start();
+		
+		new AsyncTask(new AsyncTask.AsyncRunnable() {
+			
+			@Override
+			public void run() {
+				killThread.interrupt();
+			}
+		}, 50).run();
 	}
 	
 }

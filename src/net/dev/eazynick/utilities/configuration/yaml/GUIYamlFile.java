@@ -26,23 +26,22 @@ public class GUIYamlFile extends YamlFile {
 		
 		//BookGUI
 		configuration.addDefault("BookGUI.Page1.Title", "Info");
-		configuration.addDefault("BookGUI.Page1.Text", "&0Nicknames allow you to play with a different%nl%username to not get recognized.%nl%%nl%All rules still apply. You can still be reported and all name history is stored.%nl%%nl%");
+		configuration.addDefault("BookGUI.Page1.Text", "&0Nicknames allow you to play with a different username to not get recognized.%nl%%nl%All rules still apply.%nl%You can still be reported and all name history is stored.%nl%%nl%");
 		configuration.addDefault("BookGUI.Page1.Enabled", true);
 		configuration.addDefault("BookGUI.Page2.Title", "Ranks");
-		configuration.addDefault("BookGUI.Page2.Text", "&0Let's get you set up%nl%with your nickname!%nl%First, you'll need to%nl%choose which &lRANK%nl%&0you would like to be%nl%shown as when nicked.%nl%%nl%");
+		configuration.addDefault("BookGUI.Page2.Text", "&0Let's get you set up with your nickname!%nl%First, you'll need to choose which &lRANK% &0you would like to be shown as when nicked.%nl%%nl%");
 		configuration.addDefault("BookGUI.Page3.Title", "Skin");
 		configuration.addDefault("BookGUI.Page3.Text","&0Awesome! Now, which &lSKIN &0would you like to have while nicked?%nl%%nl%");
 		configuration.addDefault("BookGUI.Page4.Title", "Name");
 		configuration.addDefault("BookGUI.Page4.Text", "&0Alright, now you'll need to choose the &0&lNAME &0to use!%nl%%nl%");
 		configuration.addDefault("BookGUI.Page5.Title", "RandomNick");
 		configuration.addDefault("BookGUI.Page5.Text", "&0We've generated a random username for you:%nl%&l%name%%nl%");
-		configuration.addDefault("BookGUI.Page5.Text2", "&0To go back to being your usual self, type:%nl%&l/nick reset");
 		configuration.addDefault("BookGUI.Page6.Title", "Done");
-		configuration.addDefault("BookGUI.Page6.Text.SingleServer", "&0You have finished setting up your nickname!%nl%%nl%You are now nicked as%nl%%name%&0.%nl%%nl%To go back to being your usual self, type:%nl%&l/nick reset");
-		configuration.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!%nl%%nl%When you go into a game, you will be nicked as%nl%%name%&0.%nl%%nl%To go back to being your usual self, type:%nl%&l/nick reset");
+		configuration.addDefault("BookGUI.Page6.Text.SingleServer", "&0You have finished setting up your nickname!%nl%%nl%You are now nicked as %name%&0.%nl%%nl%To go back to being your usual self, type:%nl%&l/nick reset");
+		configuration.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!%nl%%nl%When you go into a game, you will be nicked as %name%&0.You will not be nicked in lobbies.%nl%%nl%To go back to being your usual self, type:%nl%&l/nick reset");
 		configuration.addDefault("BookGUI.Page6.Enabled", true);
 		
-		configuration.addDefault("BookGUI.Accept.Text", arrow + " &nI understand, set&r%nl%&0&nup my nickname&r");
+		configuration.addDefault("BookGUI.Accept.Text", arrow + " &nI understand, set up&r%nl%&0&nmy nickname&r");
 		configuration.addDefault("BookGUI.Accept.Hover", "&fClick here to proceed");
 		configuration.addDefault("BookGUI.Rank.Text", arrow + " %rank%%nl%");
 		configuration.addDefault("BookGUI.Rank.Hover", "&fClick here to be shown as %rank%");
@@ -64,7 +63,7 @@ public class GUIYamlFile extends YamlFile {
 		configuration.addDefault("BookGUI.ReuseName.Hover", "&fClick here to reuse '%name%'");
 		configuration.addDefault("BookGUI.OptionUseName.Text", "     &a&nUSE NAME&r%nl%");
 		configuration.addDefault("BookGUI.OptionUseName.Hover", "&fClick here to use this name.");
-		configuration.addDefault("BookGUI.OptionTryAgain.Text", "     &c&nTRY AGAIN&r%nl%%nl%");
+		configuration.addDefault("BookGUI.OptionTryAgain.Text", "     &c&nTRY AGAIN&r");
 		configuration.addDefault("BookGUI.OptionTryAgain.Hover", "&fClick here to generate another name.");
 		configuration.addDefault("BookGUI.OptionEnterName.Text", "&0&nOr enter a name to&r%nl%&0&nuse.&r%nl%%nl%");
 		configuration.addDefault("BookGUI.OptionEnterName.Hover", "&fClick here to enter a name");

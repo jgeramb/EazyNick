@@ -12,8 +12,6 @@ import net.dev.eazynick.EazyNick;
 import net.dev.eazynick.api.*;
 import net.dev.eazynick.nms.netty.client.IncomingPacketInjector;
 import net.dev.eazynick.nms.netty.client.IncomingPacketInjector_1_7;
-import net.dev.eazynick.nms.netty.server.OutgoingPacketInjector;
-import net.dev.eazynick.nms.netty.server.OutgoingPacketInjector_1_7;
 import net.dev.eazynick.sql.MySQLNickManager;
 import net.dev.eazynick.sql.MySQLPlayerDataManager;
 import net.dev.eazynick.utilities.*;
@@ -22,8 +20,6 @@ import net.dev.eazynick.utilities.configuration.yaml.*;
 
 public class PlayerJoinListener implements Listener {
 
-	long start;
-	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		EazyNick eazyNick = EazyNick.getInstance();
@@ -80,25 +76,14 @@ public class PlayerJoinListener implements Listener {
 			}
 		}
 		
-		if(eazyNick.getVersion().equals("1_7_R4")) {
-			((OutgoingPacketInjector_1_7) eazyNick.getOutgoingPacketInjector()).unregister();
-			
-			OutgoingPacketInjector_1_7 outgoingPacketInjector = new OutgoingPacketInjector_1_7();
-			outgoingPacketInjector.init();
-			
-			eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
-			
-			utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector_1_7(player));
-		} else {
-			((OutgoingPacketInjector) eazyNick.getOutgoingPacketInjector()).unregister();
-
-			OutgoingPacketInjector outgoingPacketInjector = new OutgoingPacketInjector();
-			outgoingPacketInjector.init();
-			
-			eazyNick.setOutgoingPacketInjector(outgoingPacketInjector);
-			
-			utils.getIncomingPacketInjectors().put(uniqueId, new IncomingPacketInjector(player));
+		try {
+			Object outgoingPacketInjector = eazyNick.getOutgoingPacketInjector();
+			outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
+		
+		utils.getIncomingPacketInjectors().put(player.getUniqueId(), eazyNick.getVersion().startsWith("1_7") ? new IncomingPacketInjector_1_7(player) : new IncomingPacketInjector(player));
 		
 		new AsyncTask(new AsyncRunnable() {
 			
@@ -126,7 +111,7 @@ public class PlayerJoinListener implements Listener {
 									mysqlNickManager.addPlayer(uniqueId, name, name);
 								}
 							}
-			
+							
 							if (setupYamlFile.getConfiguration().getBoolean("NickItem.getOnJoin")) {
 								if (player.hasPermission("eazynick.item")) {
 									if (!(mysqlNickManager.isPlayerNicked(uniqueId)))

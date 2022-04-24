@@ -595,33 +595,37 @@ public class Utils {
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 		
-		//Check if player has nick item
-		boolean hasItem = (player.getItemInHand() != null) && (player.getItemInHand().getType() != Material.AIR && player.getItemInHand().getItemMeta() != null && player.getItemInHand().getItemMeta().getDisplayName() != null) && (player.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")) || player.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")));
-		
-		if(setupYamlFile.getConfiguration().getBoolean("NeedItemToToggleNick") && !(hasItem))
-			return;
-		
-		if(mysqlNickManager.isPlayerNicked(player.getUniqueId())) {
-			//Remove player from mysql
-			mysqlNickManager.removePlayer(player.getUniqueId());
-			mysqlPlayerDataManager.removeData(player.getUniqueId());
+		try {
+			//Check if player has nick item
+			ItemStack itemInHand = (eazyNick.getVersion().startsWith("1_8") || eazyNick.getVersion().startsWith("1_7")) ? (ItemStack) player.getClass().getMethod("getItemInHand").invoke(player) : player.getInventory().getItemInMainHand();
+			boolean hasItem = (itemInHand != null) && (itemInHand.getType() != Material.AIR && itemInHand.getItemMeta() != null && itemInHand.getItemMeta().getDisplayName() != null) && (itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")) || itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")));
 			
-			//Update nick item
-			if(hasItem)
-				player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
-
-			languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickDisabled").replace("%prefix%", prefix));
-		} else {
-			String name = nickNames.get((new Random().nextInt(nickNames.size())));
-
-			//Add player to mysql
-			mysqlNickManager.addPlayer(player.getUniqueId(), name, name);
+			if(setupYamlFile.getConfiguration().getBoolean("NeedItemToToggleNick") && !(hasItem))
+				return;
 			
-			//Update nick item
-			if(hasItem)
-				player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled")).build());
-
-			languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickEnabled").replace("%prefix%", prefix));
+			if(mysqlNickManager.isPlayerNicked(player.getUniqueId())) {
+				//Remove player from mysql
+				mysqlNickManager.removePlayer(player.getUniqueId());
+				mysqlPlayerDataManager.removeData(player.getUniqueId());
+				
+				//Update nick item
+				if(hasItem)
+					player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
+	
+				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickDisabled").replace("%prefix%", prefix));
+			} else {
+				String name = nickNames.get((new Random().nextInt(nickNames.size())));
+	
+				//Add player to mysql
+				mysqlNickManager.addPlayer(player.getUniqueId(), name, name);
+				
+				//Update nick item
+				if(hasItem)
+					player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled")).build());
+	
+				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickEnabled").replace("%prefix%", prefix));
+			}
+		} catch (Exception ignore) {
 		}
 	}
 	
