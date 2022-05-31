@@ -24,26 +24,40 @@ public class UnnickCommand implements CommandExecutor {
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
-		
-		String prefix = utils.getPrefix();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.nick.reset")) {
-				if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
-					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
-				 else if((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
-					mysqlNickManager.removePlayer(player.getUniqueId());
-					mysqlPlayerDataManager.removeData(player.getUniqueId());
-					
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", prefix));
-				} else
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NotNicked").replace("%prefix%", prefix));
-			} else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
+		String prefix = utils.getPrefix();
+		Player player = (Player) sender;
+
+		if(!(player.hasPermission("eazynick.nick.reset"))) {
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
+			return true;
+		}
+
+		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
+		else if((mysqlNickManager != null)
+				&& mysqlNickManager.isPlayerNicked(player.getUniqueId())
+				&& setupYamlFile.getConfiguration().getBoolean("LobbyMode")
+				&& setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
+			mysqlNickManager.removePlayer(player.getUniqueId());
+			mysqlPlayerDataManager.removeData(player.getUniqueId());
+
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.Unnick")
+							.replace("%prefix%", prefix)
+			);
+		} else
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.NotNicked")
+							.replace("%prefix%", prefix)
+			);
 		
 		return true;
 	}

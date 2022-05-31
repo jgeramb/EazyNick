@@ -42,19 +42,17 @@ public class PlayerCommandPreprocessListener implements Listener {
 		
 		String msg2 = msg.toString().toLowerCase().replace("bukkit:", "");
 		
-		if (msg2.startsWith("/help nick") || msg2.startsWith("/help eazynick") || msg2.startsWith("/? nick") || msg2.startsWith("/? eazynick")) {
-			if (player.hasPermission("bukkit.command.help")) {
-				event.setCancelled(true);
+		if (!(msg2.startsWith("/help nick") || msg2.startsWith("/help eazynick") || msg2.startsWith("/? nick") || msg2.startsWith("/? eazynick")) || !(player.hasPermission("bukkit.command.help"))) return;
 
-				player.sendMessage("§e--------- §fHelp: " + eazyNick.getDescription().getName() + " §e----------------------");
-				player.sendMessage("§7Below is a list of all " + eazyNick.getDescription().getName() + " commands:");
+		event.setCancelled(true);
 
-				PluginCommand command = eazyNick.getCommand("eazynick");
+		player.sendMessage("§e--------- §fHelp: " + eazyNick.getDescription().getName() + " §e----------------------");
+		player.sendMessage("§7Below is a list of all " + eazyNick.getDescription().getName() + " commands:");
 
-				if(command != null)
-					player.sendMessage("§6/eazynick: §f" + command.getDescription());
-			}
-		}
+		PluginCommand command = eazyNick.getCommand("eazynick");
+
+		if(command != null)
+			player.sendMessage("§6/eazynick: §f" + command.getDescription());
 	}
 
 }

@@ -29,7 +29,7 @@ public class GUIYamlFile extends YamlFile {
 		configuration.addDefault("BookGUI.Page1.Text", "&0Nicknames allow you to play with a different username to not get recognized.%nl%%nl%All rules still apply.%nl%You can still be reported and all name history is stored.%nl%%nl%");
 		configuration.addDefault("BookGUI.Page1.Enabled", true);
 		configuration.addDefault("BookGUI.Page2.Title", "Ranks");
-		configuration.addDefault("BookGUI.Page2.Text", "&0Let's get you set up with your nickname!%nl%First, you'll need to choose which &lRANK% &0you would like to be shown as when nicked.%nl%%nl%");
+		configuration.addDefault("BookGUI.Page2.Text", "&0Let's get you set up with your nickname!%nl%First, you'll need to choose which &lRANK%nl%&0you would like to be shown as when nicked.%nl%%nl%");
 		configuration.addDefault("BookGUI.Page3.Title", "Skin");
 		configuration.addDefault("BookGUI.Page3.Text","&0Awesome! Now, which &lSKIN &0would you like to have while nicked?%nl%%nl%");
 		configuration.addDefault("BookGUI.Page4.Title", "Name");
@@ -53,7 +53,7 @@ public class GUIYamlFile extends YamlFile {
 		configuration.addDefault("BookGUI.RandomSkin.Hover", "&fClick here to use a random skin");
 		configuration.addDefault("BookGUI.SkinFromName.Text", arrow + " &0Use skin of nickname%nl%");
 		configuration.addDefault("BookGUI.SkinFromName.Hover", "&fClick here to use the skin of your nickname");
-		configuration.addDefault("BookGUI.ReuseSkin.Text", arrow + " &0Reuse %skin%%nl%");
+		configuration.addDefault("BookGUI.ReuseSkin.Text", arrow + " &0Reuse '%skin%'%nl%");
 		configuration.addDefault("BookGUI.ReuseSkin.Hover", "&fClick here to reuse your previous skin");
 		configuration.addDefault("BookGUI.EnterName.Text", arrow + " &0Enter a name%nl%");
 		configuration.addDefault("BookGUI.EnterName.Hover", "&fClick here to enter a name");
@@ -63,9 +63,9 @@ public class GUIYamlFile extends YamlFile {
 		configuration.addDefault("BookGUI.ReuseName.Hover", "&fClick here to reuse '%name%'");
 		configuration.addDefault("BookGUI.OptionUseName.Text", "     &a&nUSE NAME&r%nl%");
 		configuration.addDefault("BookGUI.OptionUseName.Hover", "&fClick here to use this name.");
-		configuration.addDefault("BookGUI.OptionTryAgain.Text", "     &c&nTRY AGAIN&r");
+		configuration.addDefault("BookGUI.OptionTryAgain.Text", "     &c&nTRY AGAIN&r%nl%%nl%");
 		configuration.addDefault("BookGUI.OptionTryAgain.Hover", "&fClick here to generate another name.");
-		configuration.addDefault("BookGUI.OptionEnterName.Text", "&0&nOr enter a name to&r%nl%&0&nuse.&r%nl%%nl%");
+		configuration.addDefault("BookGUI.OptionEnterName.Text", "&0&nOr enter a name to&r%nl%&0&nuse.");
 		configuration.addDefault("BookGUI.OptionEnterName.Hover", "&fClick here to enter a name");
 		
 		configuration.addDefault("SignGUI.Line1", "");

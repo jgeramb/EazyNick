@@ -15,7 +15,8 @@ public class PlayerRespawnListener implements Listener {
 		Player player = event.getPlayer();
 		NickManager api = new NickManager(player);
 		
-		if(api.isNicked() && !(EazyNick.getInstance().getSetupYamlFile().getConfiguration().getBoolean("KeepNickOnDeath")))
+		if(api.isNicked()
+				&& !(EazyNick.getInstance().getSetupYamlFile().getConfiguration().getBoolean("KeepNickOnDeath")))
 			api.unnickPlayerWithoutRemovingMySQL(false, true);
 	}
 

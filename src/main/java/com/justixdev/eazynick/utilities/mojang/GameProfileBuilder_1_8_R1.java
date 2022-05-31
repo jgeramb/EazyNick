@@ -18,7 +18,12 @@ import java.util.concurrent.TimeUnit;
 
 public class GameProfileBuilder_1_8_R1 {
 
-	private final com.google.gson.Gson GSON = new com.google.gson.GsonBuilder().disableHtmlEscaping().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).registerTypeAdapter(GameProfile.class, new GameProfileBuilder_1_8_R1.GameProfileSerializer()).registerTypeAdapter(PropertyMap.class, new PropertyMap.Serializer()).create();
+	private final com.google.gson.Gson GSON = new com.google.gson.GsonBuilder()
+			.disableHtmlEscaping()
+			.registerTypeAdapter(UUID.class, new UUIDTypeAdapter())
+			.registerTypeAdapter(GameProfile.class, new GameProfileBuilder_1_8_R1.GameProfileSerializer())
+			.registerTypeAdapter(PropertyMap.class, new PropertyMap.Serializer())
+			.create();
 	private final HashMap<UUID, GameProfileBuilder_1_8_R1.CachedProfile> CACHE = new HashMap<>();
 
 	public GameProfile fetch(UUID uuid) throws IOException {
@@ -32,7 +37,10 @@ public class GameProfileBuilder_1_8_R1 {
 		else {
 			// Open http connection
 			String SERVICE_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
-			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(SERVICE_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
+			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(
+					SERVICE_URL,
+					UUIDTypeAdapter.fromUUID(uuid)
+			)).openConnection();
 			connection.setReadTimeout(5000);
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -54,7 +62,10 @@ public class GameProfileBuilder_1_8_R1 {
 				}
 			}
 
-			com.google.gson.JsonObject error = GSON.fromJson(new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine(), com.google.gson.JsonObject.class);
+			com.google.gson.JsonObject error = GSON.fromJson(
+					new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine(),
+					com.google.gson.JsonObject.class
+			);
 
 			throw new IOException(error.get("error").getAsString() + ": " + error.get("errorMessage").getAsString());
 		}
@@ -70,7 +81,10 @@ public class GameProfileBuilder_1_8_R1 {
 			GameProfile profile = new GameProfile(id, name);
 
 			if (object.has("properties")) {
-				for (Entry<String, Property> prop : ((PropertyMap) context.deserialize(object.get("properties"), PropertyMap.class)).entries())
+				for (Entry<String, Property> prop : ((PropertyMap) context.deserialize(
+						object.get("properties"),
+						PropertyMap.class
+				)).entries())
 					profile.getProperties().put(prop.getKey(), prop.getValue());
 			}
 

@@ -17,8 +17,17 @@ public class PlayerDropItemListener implements Listener {
 		
 		Player player = event.getPlayer();
 
-		if ((event.getItemDrop().getItemStack().getType() != Material.AIR) && (event.getItemDrop().getItemStack().getItemMeta() != null) && event.getItemDrop().getItemStack().getItemMeta().hasDisplayName()) {
-			if (event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Enabled")) || event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled")) || event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Enabled")) || event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled")) || event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")) || event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled"))) {
+		if ((event.getItemDrop().getItemStack().getType() != Material.AIR)
+				&& (event.getItemDrop().getItemStack().getItemMeta() != null) 
+				&& event.getItemDrop().getItemStack().getItemMeta().hasDisplayName()) {
+			String displayName = event.getItemDrop().getItemStack().getItemMeta().getDisplayName();
+
+			if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Enabled")) 
+					|| displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled")) 
+					|| displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Enabled")) 
+					|| displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled")) 
+					|| displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")) 
+					|| displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled"))) {
 				if (!(eazyNick.getSetupYamlFile().getConfiguration().getBoolean("NickItem.InventorySettings.PlayersCanDropItem")))
 					event.setCancelled(true);
 			}

@@ -115,7 +115,7 @@ public class Utils {
 		this.nickNames = new ArrayList<>();
 		this.blackList = new ArrayList<>();
 		this.worldsWithDisabledLobbyMode = new ArrayList<>();
-		this. worldsWithDisabledPrefixAndSuffix = new ArrayList<>();
+		this.worldsWithDisabledPrefixAndSuffix = new ArrayList<>();
 		this.worldsWithDisabledActionBar = new ArrayList<>();
 		this.replaceNameInCommandBlackList = new ArrayList<>();
 		this.worldBlackList = new ArrayList<>();
@@ -201,14 +201,11 @@ public class Utils {
 		nickNameYamlFile.reload();
 		guiYamlFile.reload();
 		languageYamlFile.reload();
-
-		// Set messages language
-		languageYamlFile.setLanguage(setupYamlFile.getConfiguration().getString("Language"));
 		
 		// Import nickNames from 'nickNames.yml'
 		nickNames.clear();
 		nickNames.addAll(nickNameYamlFile.getConfiguration().getStringList("NickNames"));
-		
+
 		// Import from 'setup.yml'
 		replaceNameInCommandBlackList.clear();
 		replaceNameInCommandBlackList.addAll(setupYamlFile.getConfiguration().getStringList("ReplaceNameInCommandBlackList"));
@@ -247,126 +244,250 @@ public class Utils {
 		NMSBookBuilder nmsBookBuilder = eazyNick.getNMSBookBuilder();
 		
 		// Initialize nick data
-		String chatPrefix = "", chatSuffix = "", tabPrefix = "", tabSuffix = "", tagPrefix = "", tagSuffix = "", nameWithoutColors = new StringUtils(name).getPureString();
+		String chatPrefix = "",
+				chatSuffix = "",
+				tabPrefix = "",
+				tabSuffix = "",
+				tagPrefix = "",
+				tagSuffix = "",
+				nameWithoutColors = new StringUtils(name).getPureString();
 		String skinName;
-		int sortID = 9999, nameLengthMin = Math.max(Math.min(setupYamlFile.getConfiguration().getInt("Settings.NameLength.Min"), 16), 1), nameLengthMax = Math.max(Math.min(setupYamlFile.getConfiguration().getInt("Settings.NameLength.Max"), 16), 1);
+		int sortID = 9999,
+				nameLengthMin = Math.max(Math.min(setupYamlFile.getConfiguration().getInt("Settings.NameLength.Min"), 16), 1),
+				nameLengthMax = Math.max(Math.min(setupYamlFile.getConfiguration().getInt("Settings.NameLength.Max"), 16), 1);
 		
 		// Check if name length is valid
-		if(nameWithoutColors.length() <= nameLengthMax) {
-			if(nameWithoutColors.length() >= nameLengthMin) {
-				if(!(containsSpecialChars(nameWithoutColors)) || setupYamlFile.getConfiguration().getBoolean("AllowSpecialCharactersInCustomName")) {
-					// Check if name is allowed
-					if(!(containsBlackListEntry(name))) {
-						// Check if nickname is in use
-						if(nickedPlayers.values().stream().noneMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(name)) || setupYamlFile.getConfiguration().getBoolean("AllowPlayersToUseSameNickName")) {
-							// Check if player is known on the server (in usercache.json)
-							if(!(setupYamlFile.getConfiguration().getBoolean("AllowPlayersToNickAsKnownPlayers")) && (Bukkit.getOnlinePlayers().stream().anyMatch(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(name)) || Stream.of(Bukkit.getOfflinePlayers()).anyMatch(currentOfflinePlayer -> name.equalsIgnoreCase(currentOfflinePlayer.getName())))) {
-								// Import rank data from 'guis.yml'
-								String groupName = "";
-								
-								for (int i = 1; i <= 18; i++) {
-									String permission = guiYamlFile.getConfigString("RankGUI.Rank" + i + ".Permission");
-									
-									if(rankName.equalsIgnoreCase(guiYamlFile.getConfiguration().getString("RankGUI.Rank" + i + ".RankName")) && guiYamlFile.getConfiguration().getBoolean("RankGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || player.hasPermission(permission))) {
-										chatPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
-										chatSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
-										tabPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
-										tabSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
-										tagPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
-										tagSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
-										groupName = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".GroupName");
-										sortID = guiYamlFile.getConfiguration().getInt("Settings.NickFormat.Rank" + i + ".SortID");
-									}
-								}
-								
-								if(groupName.isEmpty())
-									return;
-								
-								//Add support for %randomColor% placeholder
-								String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
-								
-								chatPrefix = chatPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-								chatSuffix = chatSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-								tabPrefix = tabPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-								tabSuffix = tabSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-								tagPrefix = tagPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-								tagSuffix = tagSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-								
-								//Set skin name depending on skin type
-								if(skinType.equalsIgnoreCase("DEFAULT"))
-									skinName = player.getName();
-								else if(skinType.equalsIgnoreCase("NORMAL"))
-									skinName = new Random().nextBoolean() ? "Steve" : "Alex";
-								else if(skinType.equalsIgnoreCase("RANDOM"))
-									skinName = setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + getRandomStringFromList(mineSkinUUIDs)) : nickNames.get(new Random().nextInt(getNickNames().size()));
-								else if(skinType.equalsIgnoreCase("SKINFROMNAME"))
-									skinName = name;
-								else
-									skinName = skinType;
-								
-								//Update last name & skin cache
-								lastSkinNames.put(player.getUniqueId(), skinName.startsWith("MINESKIN:") ? "RANDOM" : skinName);
-								lastNickNames.put(player.getUniqueId(), name);
-								
-								//Fix book still in inventory bug
-								for (ItemStack item : player.getInventory().getContents()) {
-									if((item != null) && item.getType().equals(Material.WRITTEN_BOOK) && (item.getItemMeta() != null)) {
-										if(Objects.equals(((BookMeta) item.getItemMeta()).getAuthor(), eazyNick.getDescription().getName()))
-											player.getInventory().remove(item);
-									}
-								}
-								
-								//Add nick data to mysql or nick player
-								new NickManager(player).setGroupName(groupName);
-								
-								if(setupYamlFile.getConfiguration().getBoolean("BungeeCord") && !(player.hasPermission("eazynick.bypasslobbymode") && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission")) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && !(worldsWithDisabledLobbyMode.contains(player.getWorld().getName().toUpperCase()))) {
-									eazyNick.getMySQLNickManager().addPlayer(player.getUniqueId(), name, skinName);
-									eazyNick.getMySQLPlayerDataManager().insertData(player.getUniqueId(), "NONE", chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix);
-									
-									if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
-										ArrayList<TextComponent> textComponents = new ArrayList<>();
+		if(nameWithoutColors.length() > nameLengthMax) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.NickTooLong")
+							.replace("%prefix%", prefix)
+			);
+			return;
+		}
 
-										Arrays.asList(guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.BungeeCord").replace("%name%", chatPrefix + name + chatSuffix).split("%nl%")).forEach(s -> textComponents.add(new TextComponent(s + "\n")));
-										
-										nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
-									}
-								} else {
-									PlayerNickEvent playerNickEvent = new PlayerNickEvent(player, name, skinName, setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID") ? (eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(name) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) : eazyNick.getUUIDFetcher().getUUID(name))) : player.getUniqueId(), chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, sortID, groupName);
-									
-									Bukkit.getPluginManager().callEvent(playerNickEvent);
-									
-									if(!(playerNickEvent.isCancelled())) {
-										String finalChatPrefix = chatPrefix, finalChatSuffix = chatSuffix;
-										
-										new AsyncTask(new AsyncRunnable() {
-											
-											@Override
-											public void run() {
-												Bukkit.getScheduler().runTask(eazyNick, () -> {
-													if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled") && !(eazyNick.getVersion().equals("1_7_R4"))) {
-														ArrayList<TextComponent> textComponents = new ArrayList<>();
+		if(nameWithoutColors.length() < nameLengthMin) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.NickTooShort")
+							.replace("%prefix%", prefix)
+			);
+			return;
+		}
 
-														Arrays.asList(guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer").replace("%name%", finalChatPrefix + name + finalChatSuffix).split("%nl%")).forEach(s -> textComponents.add(new TextComponent(s + "\n")));
-														
-														nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
-													}
-												});
-											}
-										}, 400 + (setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay") ? 2000 : 0)).run();
-									}
-								}
-							} else
-								languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerWithThisNameIsKnown").replace("%prefix%", prefix));
-						} else
-							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickNameAlreadyInUse").replace("%prefix%", prefix));
-					} else
-						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NameNotAllowed").replace("%prefix%", prefix));
-				} else
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickContainsSpecialCharacters").replace("%prefix%", prefix));
-			} else
-				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickTooShort").replace("%prefix%", prefix));
-		} else
-			languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickTooLong").replace("%prefix%", prefix));
+		if(containsSpecialChars(nameWithoutColors)
+				&& !(setupYamlFile.getConfiguration().getBoolean("AllowSpecialCharactersInCustomName"))) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.NickContainsSpecialCharacters")
+							.replace("%prefix%", prefix)
+			);
+			return;
+		}
+
+		if(containsBlackListEntry(nameWithoutColors)) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.NameNotAllowed")
+							.replace("%prefix%", prefix)
+			);
+			return;
+		}
+
+		if(nickedPlayers
+				.values()
+				.stream()
+				.anyMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(name))
+				&& !(setupYamlFile.getConfiguration().getBoolean("AllowPlayersToUseSameNickName"))) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.NickNameAlreadyInUse")
+							.replace("%prefix%", prefix)
+			);
+			return;
+		}
+
+		if(
+				(
+						Bukkit.getOnlinePlayers()
+								.stream()
+								.anyMatch(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(name))
+								|| Stream.of(Bukkit.getOfflinePlayers())
+								.anyMatch(currentOfflinePlayer -> name.equalsIgnoreCase(currentOfflinePlayer.getName()))
+				)
+						&& !(setupYamlFile.getConfiguration().getBoolean("AllowPlayersToNickAsKnownPlayers"))
+		) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.PlayerWithThisNameIsKnown")
+							.replace("%prefix%", prefix)
+			);
+			return;
+		}
+
+		// Import rank data from 'guis.yml'
+		String groupName = "";
+
+		for (int i = 1; i <= 18; i++) {
+			String permission = guiYamlFile.getConfigString("RankGUI.Rank" + i + ".Permission");
+
+			if(rankName.equalsIgnoreCase(guiYamlFile.getConfiguration().getString("RankGUI.Rank" + i + ".RankName"))
+					&& guiYamlFile.getConfiguration().getBoolean("RankGUI.Rank" + i + ".Enabled")
+					&& (
+							permission.equalsIgnoreCase("NONE")
+							|| player.hasPermission(permission)
+					)
+			) {
+				chatPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".ChatPrefix");
+				chatSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".ChatSuffix");
+				tabPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TabPrefix");
+				tabSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TabSuffix");
+				tagPrefix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagPrefix");
+				tagSuffix = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".TagSuffix");
+				groupName = guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".GroupName");
+				sortID = guiYamlFile.getConfiguration().getInt("Settings.NickFormat.Rank" + i + ".SortID");
+			}
+		}
+
+		if(groupName.isEmpty())
+			return;
+
+		//Add support for %randomColor% placeholder
+		String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
+
+		chatPrefix = chatPrefix
+				.replace("%randomColor%", randomColor)
+				.replace("%randomcolor%", randomColor);
+		chatSuffix = chatSuffix
+				.replace("%randomColor%", randomColor)
+				.replace("%randomcolor%", randomColor);
+		tabPrefix = tabPrefix
+				.replace("%randomColor%", randomColor)
+				.replace("%randomcolor%", randomColor);
+		tabSuffix = tabSuffix
+				.replace("%randomColor%", randomColor)
+				.replace("%randomcolor%", randomColor);
+		tagPrefix = tagPrefix
+				.replace("%randomColor%", randomColor)
+				.replace("%randomcolor%", randomColor);
+		tagSuffix = tagSuffix
+				.replace("%randomColor%", randomColor)
+				.replace("%randomcolor%", randomColor);
+
+		//Set skin name depending on skin type
+		if(skinType.equalsIgnoreCase("DEFAULT"))
+			skinName = player.getName();
+		else if(skinType.equalsIgnoreCase("NORMAL"))
+			skinName = new Random().nextBoolean() ? "Steve" : "Alex";
+		else if(skinType.equalsIgnoreCase("RANDOM"))
+			skinName = setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI")
+					? ("MINESKIN:" + getRandomStringFromList(mineSkinUUIDs))
+					: nickNames.get(new Random().nextInt(getNickNames().size()));
+		else if(skinType.equalsIgnoreCase("SKINFROMNAME"))
+			skinName = name;
+		else
+			skinName = skinType;
+
+		//Update last name & skin cache
+		lastSkinNames.put(player.getUniqueId(), skinName.startsWith("MINESKIN:") ? "RANDOM" : skinName);
+		lastNickNames.put(player.getUniqueId(), name);
+
+		//Fix book still in inventory bug
+		for (ItemStack item : player.getInventory().getContents()) {
+			if((item != null) && item.getType().equals(Material.WRITTEN_BOOK) && (item.getItemMeta() != null)) {
+				if(Objects.equals(((BookMeta) item.getItemMeta()).getAuthor(), eazyNick.getDescription().getName()))
+					player.getInventory().remove(item);
+			}
+		}
+
+		//Add nick data to mysql or nick player
+		new NickManager(player).setGroupName(groupName);
+
+		if(setupYamlFile.getConfiguration().getBoolean("BungeeCord")
+				&& !(player.hasPermission("eazynick.bypasslobbymode")
+				&& setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))
+				&& setupYamlFile.getConfiguration().getBoolean("LobbyMode")
+				&& !(worldsWithDisabledLobbyMode.contains(player.getWorld().getName().toUpperCase()))) {
+			eazyNick.getMySQLNickManager().addPlayer(player.getUniqueId(), name, skinName);
+			eazyNick.getMySQLPlayerDataManager().insertData(
+					player.getUniqueId(),
+					"NONE",
+					chatPrefix,
+					chatSuffix,
+					tabPrefix,
+					tabSuffix,
+					tagPrefix,
+					tagSuffix
+			);
+
+			if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled")
+					&& !(eazyNick.getVersion().equals("1_7_R4"))) {
+				ArrayList<TextComponent> textComponents = new ArrayList<>();
+
+				Arrays.asList(guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.BungeeCord")
+						.replace("%name%", chatPrefix + name + chatSuffix)
+						.split("%nl%"))
+						.forEach(s -> textComponents.add(new TextComponent(s + "\n")));
+
+				nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
+			}
+		} else {
+			PlayerNickEvent playerNickEvent = new PlayerNickEvent(
+					player,
+					name,
+					skinName,
+					setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
+							? (
+									eazyNick.getVersion().startsWith("1_7")
+											? eazyNick.getUUIDFetcher_1_7().getUUID(name)
+											: (
+													eazyNick.getVersion().equals("1_8_R1")
+															? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)
+															: eazyNick.getUUIDFetcher().getUUID(name)
+									)
+							)
+							: player.getUniqueId(),
+					chatPrefix,
+					chatSuffix,
+					tabPrefix,
+					tabSuffix,
+					tagPrefix,
+					tagSuffix,
+					false,
+					false,
+					sortID,
+					groupName
+			);
+
+			Bukkit.getPluginManager().callEvent(playerNickEvent);
+
+			if(!(playerNickEvent.isCancelled())) {
+				String finalChatPrefix = chatPrefix, finalChatSuffix = chatSuffix;
+
+				new AsyncTask(new AsyncRunnable() {
+
+					@Override
+					public void run() {
+						Bukkit.getScheduler().runTask(eazyNick, () -> {
+							if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled")
+									&& !(eazyNick.getVersion().equals("1_7_R4"))) {
+								ArrayList<TextComponent> textComponents = new ArrayList<>();
+
+								Arrays.asList(guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer")
+										.replace("%name%", finalChatPrefix + name + finalChatSuffix)
+										.split("%nl%"))
+										.forEach(s -> textComponents.add(new TextComponent(s + "\n")));
+
+								nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
+							}
+						});
+					}
+				}, 400 + (
+						setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay")
+								? 2000 : 0
+				)).run();
+			}
+		}
 	}
 
 	// Command 'nick', 'nickother', 'nickgui' -> Nick & nick item
@@ -375,7 +496,9 @@ public class Utils {
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		//Process name
-		String name = customNickName.equals("RANDOM") ? nickNames.get((new Random().nextInt(nickNames.size()))) : customNickName;
+		String name = customNickName.equals("RANDOM")
+				? nickNames.get((new Random().nextInt(nickNames.size())))
+				: customNickName;
 		
 		// Make sure that random nick is not being used
 		if(customNickName.equals("RANDOM") && !(setupYamlFile.getConfiguration().getBoolean("AllowPlayersToUseSameNickName"))) {
@@ -383,7 +506,10 @@ public class Utils {
 
 			do {
 				currentName.set(nickNames.get((new Random().nextInt(nickNames.size()))));
-			} while (nickedPlayers.values().stream().anyMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(currentName.get())));
+			} while (nickedPlayers
+					.values()
+					.stream()
+					.anyMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(currentName.get())));
 		}
 		
 		//Collect nick data
@@ -416,23 +542,74 @@ public class Utils {
 			tagPrefix = chatPrefix;
 			tagSuffix = chatSuffix;
 		} else {
-			chatPrefix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix") : setupYamlFile.getConfigString("Settings.NickFormat.Chat.Prefix"));
-			chatSuffix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix") : setupYamlFile.getConfigString("Settings.NickFormat.Chat.Suffix"));
-			tabPrefix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : setupYamlFile.getConfigString("Settings.NickFormat.PlayerList.Prefix"));
-			tabSuffix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : setupYamlFile.getConfigString("Settings.NickFormat.PlayerList.Suffix"));
-			tagPrefix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix") : setupYamlFile.getConfigString("Settings.NickFormat.NameTag.Prefix"));
-			tagSuffix = (serverFull ? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix") : setupYamlFile.getConfigString("Settings.NickFormat.NameTag.Suffix"));
+			chatPrefix = (serverFull
+					? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Prefix")
+					: setupYamlFile.getConfigString("Settings.NickFormat.Chat.Prefix"));
+			chatSuffix = (serverFull
+					? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.Chat.Suffix")
+					: setupYamlFile.getConfigString("Settings.NickFormat.Chat.Suffix"));
+			tabPrefix = (serverFull
+					? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Prefix")
+					: setupYamlFile.getConfigString("Settings.NickFormat.PlayerList.Prefix"));
+			tabSuffix = (serverFull
+					? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.PlayerList.Suffix")
+					: setupYamlFile.getConfigString("Settings.NickFormat.PlayerList.Suffix"));
+			tagPrefix = (serverFull
+					? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Prefix")
+					: setupYamlFile.getConfigString("Settings.NickFormat.NameTag.Prefix"));
+			tagSuffix = (serverFull
+					? setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.NameTag.Suffix")
+					: setupYamlFile.getConfigString("Settings.NickFormat.NameTag.Suffix"));
 		}
 
 		// Nick player
-		new NickManager(player).setGroupName(serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName"));
+		new NickManager(player).setGroupName(serverFull
+				? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName")
+				: setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
+		);
 		
-		Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, nameWithoutColors, setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI") ? ("MINESKIN:" + getRandomStringFromList(mineSkinUUIDs)) : nameWithoutColors, setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID") ? (eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(name) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) : eazyNick.getUUIDFetcher().getUUID(name))) : player.getUniqueId(), chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, false, false, serverFull ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID") : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.SortID"), serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")));
+		Bukkit.getPluginManager().callEvent(
+				new PlayerNickEvent(
+						player,
+						nameWithoutColors,
+						setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI")
+								? ("MINESKIN:" + getRandomStringFromList(mineSkinUUIDs))
+								: nameWithoutColors,
+						setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
+								? (
+										eazyNick.getVersion().startsWith("1_7")
+												? eazyNick.getUUIDFetcher_1_7().getUUID(name)
+												: (
+														eazyNick.getVersion().equals("1_8_R1")
+																? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)
+																: eazyNick.getUUIDFetcher().getUUID(name)))
+								: player.getUniqueId(),
+						chatPrefix,
+						chatSuffix,
+						tabPrefix,
+						tabSuffix,
+						tagPrefix,
+						tagSuffix,
+						false,
+						false,
+						serverFull
+								? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID")
+								: setupYamlFile.getConfiguration().getInt("Settings.NickFormat.SortID"),
+						serverFull
+								? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName")
+								: setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
+				)
+		);
 	}
 	
 	public void performReNick(Player player) {
 		// Nick player
-		performReNick(player, nickOnWorldChangePlayers.contains(player.getUniqueId()) ? nickNames.get((new Random().nextInt(nickNames.size()))) : EazyNick.getInstance().getMySQLNickManager().getNickName(player.getUniqueId()));
+		performReNick(
+				player,
+				nickOnWorldChangePlayers.contains(player.getUniqueId())
+						? nickNames.get((new Random().nextInt(nickNames.size())))
+						: EazyNick.getInstance().getMySQLNickManager().getNickName(player.getUniqueId())
+		);
 	}
 	
 	public void performReNick(Player player, String name) {
@@ -444,10 +621,26 @@ public class Utils {
 			MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 			MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 
-			if(nickedPlayers.values().stream().noneMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(name)) || setupYamlFile.getConfiguration().getBoolean("AllowPlayersToUseSameNickName")) {
+			if(nickedPlayers.values().stream().noneMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(name))
+					|| setupYamlFile.getConfiguration().getBoolean("AllowPlayersToUseSameNickName")) {
 				// Check if player is known on the server (in usercache.json)
-				if(!(setupYamlFile.getConfiguration().getBoolean("AllowPlayersToNickAsKnownPlayers")) && (Bukkit.getOnlinePlayers().stream().anyMatch(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(name)) || Stream.of(Bukkit.getOfflinePlayers()).anyMatch(currentOfflinePlayer -> name.equalsIgnoreCase(currentOfflinePlayer.getName())))) {
-					UUID spoofedUniqueId = setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID") ? (eazyNick.getVersion().startsWith("1_7") ? eazyNick.getUUIDFetcher_1_7().getUUID(name) : (eazyNick.getVersion().equals("1_8_R1") ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name) : eazyNick.getUUIDFetcher().getUUID(name))) : player.getUniqueId();
+				if(setupYamlFile.getConfiguration().getBoolean("AllowPlayersToNickAsKnownPlayers")
+						|| (
+								Bukkit.getOnlinePlayers().stream().noneMatch(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(name))
+								&& Stream.of(Bukkit.getOfflinePlayers()).noneMatch(currentOfflinePlayer -> name.equalsIgnoreCase(currentOfflinePlayer.getName()))
+						)
+				) {
+					UUID spoofedUniqueId = setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
+							? (
+									eazyNick.getVersion().startsWith("1_7")
+											? eazyNick.getUUIDFetcher_1_7().getUUID(name)
+											: (
+													eazyNick.getVersion().equals("1_8_R1")
+															? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)
+															: eazyNick.getUUIDFetcher().getUUID(name)
+											)
+							)
+							: player.getUniqueId();
 					
 					// Check if the nickname is different from the real name
 					if(!(name.equalsIgnoreCase(player.getName()))) {
@@ -456,11 +649,18 @@ public class Utils {
 							
 							if(setupYamlFile.getConfiguration().contains("UseLocalRankPrefixes")) {
 								// Use MySQL data as fallback data
-								String groupName = mysqlPlayerDataManager.getGroupName(player.getUniqueId()), chatPrefix = mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()), chatSuffix = mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()), tabPrefix = mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()), tabSuffix = mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()), tagPrefix = mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()), tagSuffix = mysqlPlayerDataManager.getTagSuffix(player.getUniqueId());
+								String groupName = mysqlPlayerDataManager.getGroupName(player.getUniqueId()),
+										chatPrefix = mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()),
+										chatSuffix = mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()),
+										tabPrefix = mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()),
+										tabSuffix = mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()),
+										tagPrefix = mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()),
+										tagSuffix = mysqlPlayerDataManager.getTagSuffix(player.getUniqueId());
 								int sortID = 9999;
 								
 								// Import from 'setup.yml'
-								if(groupName.equalsIgnoreCase(setupYamlFile.getConfigString("Settings.NickFormat.GroupName")) || groupName.equalsIgnoreCase(setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.GroupName"))) {
+								if(groupName.equalsIgnoreCase(setupYamlFile.getConfigString("Settings.NickFormat.GroupName"))
+										|| groupName.equalsIgnoreCase(setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.GroupName"))) {
 									String serverFullRank = (getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? ".ServerFullRank" : "";
 									
 									chatPrefix = setupYamlFile.getConfigString("Settings.NickFormat" + serverFullRank + ".Chat.Prefix");
@@ -483,12 +683,24 @@ public class Utils {
 											
 											String randomColor = "§" + ("0123456789abcdef".charAt(new Random().nextInt(16)));
 											
-											chatPrefix = chatPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-											chatSuffix = chatSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-											tabPrefix = tabPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-											tabSuffix = tabSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-											tagPrefix = tagPrefix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
-											tagSuffix = tagSuffix.replaceAll("%randomColor%", randomColor).replaceAll("%randomcolor%", randomColor);
+											chatPrefix = chatPrefix
+													.replace("%randomColor%", randomColor)
+													.replace("%randomcolor%", randomColor);
+											chatSuffix = chatSuffix
+													.replace("%randomColor%", randomColor)
+													.replace("%randomcolor%", randomColor);
+											tabPrefix = tabPrefix
+													.replace("%randomColor%", randomColor)
+													.replace("%randomcolor%", randomColor);
+											tabSuffix = tabSuffix
+													.replace("%randomColor%", randomColor)
+													.replace("%randomcolor%", randomColor);
+											tagPrefix = tagPrefix
+													.replace("%randomColor%", randomColor)
+													.replace("%randomcolor%", randomColor);
+											tagSuffix = tagSuffix
+													.replace("%randomColor%", randomColor)
+													.replace("%randomcolor%", randomColor);
 											
 											break;
 										}
@@ -496,27 +708,90 @@ public class Utils {
 								}
 								
 								// Nick player
-								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), spoofedUniqueId, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, true, false, sortID, mysqlPlayerDataManager.getGroupName(player.getUniqueId())));
+								Bukkit.getPluginManager().callEvent(
+										new PlayerNickEvent(
+												player,
+												name,
+												mysqlNickManager.getSkinName(player.getUniqueId()),
+												spoofedUniqueId,
+												chatPrefix,
+												chatSuffix,
+												tabPrefix,
+												tabSuffix,
+												tagPrefix,
+												tagSuffix,
+												true,
+												false,
+												sortID,
+												mysqlPlayerDataManager.getGroupName(player.getUniqueId())
+										)
+								);
 							} else
 								// Nick player using MySQL data
-								Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), spoofedUniqueId, mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()), mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTagSuffix(player.getUniqueId()), true, false, 9999, mysqlPlayerDataManager.getGroupName(player.getUniqueId())));
+								Bukkit.getPluginManager().callEvent(
+										new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), spoofedUniqueId, mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()), mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTagSuffix(player.getUniqueId()), true, false, 9999, mysqlPlayerDataManager.getGroupName(player.getUniqueId())));
 						} else {
 							// Import data from 'setup.yml'
 							boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
-							String prefix = serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.NameTag.Prefix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.NameTag.Prefix");
-							String suffix = serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.NameTag.Suffix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.NameTag.Suffix");
+							String prefix = serverFull
+									? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.NameTag.Prefix")
+									: setupYamlFile.getConfigString(player, "Settings.NickFormat.NameTag.Prefix");
+							String suffix = serverFull
+									? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.NameTag.Suffix")
+									: setupYamlFile.getConfigString(player, "Settings.NickFormat.NameTag.Suffix");
 						
 							// Nick player
-							new NickManager(player).setGroupName(serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName"));
+							new NickManager(player).setGroupName(
+									serverFull
+											? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName")
+											: setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
+							);
 							
-							Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), spoofedUniqueId, serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Prefix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Prefix"), serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Suffix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Suffix"), serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Prefix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Prefix"), serverFull ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Suffix") : setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Suffix"), prefix, suffix, true, false, (getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID") : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.GrSortIDoupName"), (getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName") : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")));
+							Bukkit.getPluginManager().callEvent(
+									new PlayerNickEvent(
+											player,
+											name,
+											mysqlNickManager.getSkinName(player.getUniqueId()),
+											spoofedUniqueId,
+											serverFull
+													? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Prefix")
+													: setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Prefix"),
+											serverFull
+													? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Suffix")
+													: setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Suffix"),
+											serverFull
+													? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Prefix")
+													: setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Prefix"),
+											serverFull
+													? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Suffix")
+													: setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Suffix"),
+											prefix,
+											suffix,
+											true,
+											false,
+											(getOnlinePlayerCount() >= Bukkit.getMaxPlayers())
+													? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID")
+													: setupYamlFile.getConfiguration().getInt("Settings.NickFormat.GrSortIDoupName"),
+											(getOnlinePlayerCount() >= Bukkit.getMaxPlayers())
+													? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName")
+													: setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
+									)
+							);
 						}
 					} else
 						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.CanNotNickAsSelf").replace("%prefix%", prefix));
 				} else
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerWithThisNameIsKnown").replace("%prefix%", prefix));
+					languageYamlFile.sendMessage(
+							player,
+							languageYamlFile.getConfigString(player, "Messages.PlayerWithThisNameIsKnown")
+									.replace("%prefix%", prefix)
+					);
 			} else
-				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickNameAlreadyInUse").replace("%prefix%", prefix));
+				languageYamlFile.sendMessage(
+						player,
+						languageYamlFile.getConfigString(player, "Messages.NickNameAlreadyInUse")
+								.replace("%prefix%", prefix)
+				);
 		}
 	}
 	
@@ -530,8 +805,17 @@ public class Utils {
 		
 		try {
 			// Check if the player has a nick item
-			ItemStack itemInHand = (eazyNick.getVersion().startsWith("1_8") || eazyNick.getVersion().startsWith("1_7")) ? (ItemStack) player.getClass().getMethod("getItemInHand").invoke(player) : player.getInventory().getItemInMainHand();
-			boolean hasItem = (itemInHand != null) && (itemInHand.getType() != Material.AIR) && (itemInHand.getItemMeta() != null) && (itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")) || itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")));
+			ItemStack itemInHand = (eazyNick.getVersion().startsWith("1_8")
+					|| eazyNick.getVersion().startsWith("1_7"))
+							? (ItemStack) player.getClass().getMethod("getItemInHand").invoke(player)
+							: player.getInventory().getItemInMainHand();
+			boolean hasItem = (itemInHand != null)
+					&& (itemInHand.getType() != Material.AIR)
+					&& (itemInHand.getItemMeta() != null)
+					&& (
+							itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled"))
+							|| itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled"))
+					);
 			
 			if(setupYamlFile.getConfiguration().getBoolean("NeedItemToToggleNick") && !(hasItem))
 				return;
@@ -543,9 +827,23 @@ public class Utils {
 				
 				// Update the nick item
 				if(hasItem)
-					player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfigString("NickItem.ItemType.Disabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled")).build());
+					player.getInventory().setItem(
+							player.getInventory().getHeldItemSlot(),
+							new ItemBuilder(
+									Material.getMaterial(setupYamlFile.getConfigString("NickItem.ItemType.Disabled")),
+									setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"),
+									setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled")
+							)
+									.setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled"))
+									.setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n"))
+									.setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled"))
+									.build()
+					);
 	
-				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickDisabled").replace("%prefix%", prefix));
+				languageYamlFile.sendMessage(
+						player,
+						languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickDisabled").replace("%prefix%", prefix)
+				);
 			} else {
 				String name = nickNames.get((new Random().nextInt(nickNames.size())));
 	
@@ -554,9 +852,23 @@ public class Utils {
 				
 				// Update the nick item
 				if(hasItem)
-					player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBuilder(Material.getMaterial(setupYamlFile.getConfigString("NickItem.ItemType.Enabled")), setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"), setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")).setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled")).setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n")).setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled")).build());
+					player.getInventory().setItem(
+							player.getInventory().getHeldItemSlot(),
+							new ItemBuilder(
+									Material.getMaterial(setupYamlFile.getConfigString("NickItem.ItemType.Enabled")),
+									setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"),
+									setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled")
+							)
+									.setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled"))
+									.setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n"))
+									.setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled"))
+									.build()
+					);
 	
-				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickEnabled").replace("%prefix%", prefix));
+				languageYamlFile.sendMessage(
+						player,
+						languageYamlFile.getConfigString(player, "Messages.BungeeAutoNickEnabled").replace("%prefix%", prefix)
+				);
 			}
 		} catch (Exception ignore) {
 		}
@@ -569,39 +881,39 @@ public class Utils {
 	
 	//String contains characters that are not allowed in minecraft usernames (allowed: a-z, A-Z, 0-9, _)
 	public boolean containsSpecialChars(String str) {
-		List<Character> allowCharacters = Chars.asList("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".toCharArray());
-		
-		for (char c : str.toCharArray()) {
-			if(!(allowCharacters.contains(c)))
-				return true;
-		}
-		
-		return false;
+		return !(new HashSet<>(Chars.asList("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".toCharArray()))
+				.containsAll(Chars.asList(str.toCharArray())));
 	}
 	
 	public boolean containsBlackListEntry(String str) {
 		String lowerCaseString = str.toLowerCase();
-		
-		for(String entry : blackList) {
-			if(lowerCaseString.contains(entry))
-				return true;
-		}
-		
-		return false;
+
+		return blackList.stream().anyMatch(currentEntry -> currentEntry.contains(lowerCaseString));
 	}
 
 	//Default game profile (Steve)
 	public GameProfile getDefaultGameProfile() {
 		GameProfile gameProfile = new GameProfile(getDefaultUniqueId(), getDefaultName());
-		gameProfile.getProperties().put("textures", new Property("textures", getDefaultSkinValue(), getDefaultSkinSignature()));
+		gameProfile.getProperties().put(
+				"textures",
+				new Property("textures", getDefaultSkinValue(), getDefaultSkinSignature())
+		);
 		
 		return gameProfile;
 	}
 	
 	//Default 1.7 game profile ("Steve")
 	public net.minecraft.util.com.mojang.authlib.GameProfile getDefaultGameProfile_1_7() {
-		net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(getDefaultUniqueId(), getDefaultName());
-		gameProfile.getProperties().put("textures", new net.minecraft.util.com.mojang.authlib.properties.Property("textures", getDefaultSkinValue(), getDefaultSkinSignature()));
+		net.minecraft.util.com.mojang.authlib.GameProfile gameProfile =
+				new net.minecraft.util.com.mojang.authlib.GameProfile(getDefaultUniqueId(), getDefaultName());
+		gameProfile.getProperties().put(
+				"textures",
+				new net.minecraft.util.com.mojang.authlib.properties.Property(
+						"textures",
+						getDefaultSkinValue(),
+						getDefaultSkinSignature()
+				)
+		);
 		
 		return gameProfile;
 	}

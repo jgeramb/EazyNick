@@ -18,31 +18,52 @@ public class RealNameCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-		
-		String prefix = utils.getPrefix();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.real")) {
-				if(args.length >= 1) {
-					Player targetPlayer = Bukkit.getPlayer(args[0]);
-					
-					if(targetPlayer != null) {
-						if(utils.getNickedPlayers().containsKey(targetPlayer.getUniqueId())) {
-							String realName = new NickManager(targetPlayer).getRealName();
-							
-							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.RealName").replace("%realName%", realName).replace("%realname%", realName).replace("%prefix%", prefix));
-						} else
-							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerNotNicked").replace("%prefix%", prefix));
-					} else
-						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerNotFound").replace("%prefix%", prefix));
-				}
-			} else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
-		
+			return true;
+		}
+
+		Player player = (Player) sender;
+
+		if(!(player.hasPermission("eazynick.real"))) {
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
+			return true;
+		}
+
+		if(args.length < 1) return true;
+
+		String prefix = utils.getPrefix();
+		Player targetPlayer = Bukkit.getPlayer(args[0]);
+
+		if(targetPlayer == null) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.PlayerNotFound")
+							.replace("%prefix%", prefix)
+			);
+			return true;
+		}
+
+		if(utils.getNickedPlayers().containsKey(targetPlayer.getUniqueId())) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.PlayerNotNicked")
+							.replace("%prefix%", prefix)
+			);
+			return true;
+		}
+
+		String realName = new NickManager(targetPlayer).getRealName();
+
+		languageYamlFile.sendMessage(
+				player,
+				languageYamlFile.getConfigString(player, "Messages.RealName")
+						.replace("%realName%", realName)
+						.replace("%realname%", realName)
+						.replace("%prefix%", prefix)
+		);
+
 		return true;
 	}
 	

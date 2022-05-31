@@ -33,16 +33,32 @@ public class MineSkinAPI {
 		
 		try {
 			// Open api connection
-			HttpURLConnection textureConnection = (HttpURLConnection) new URL(String.format(URL_FORMAT, id)).openConnection();
+			HttpURLConnection textureConnection = (HttpURLConnection) new URL(String.format(
+					URL_FORMAT,
+					id
+			)).openConnection();
 			textureConnection.setRequestProperty("User-Agent", "JustixDevelopment/MineSkinHook " + pluginVersion);
 			textureConnection.setRequestMethod("GET");
 			textureConnection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
 
 			// Parse response to GameProfile Property
-			JsonObject jsonObject = new GsonBuilder().setPrettyPrinting().create().fromJson(new BufferedReader(new InputStreamReader(textureConnection.getInputStream())), JsonObject.class);
-			JsonObject texture = jsonObject.get("data").getAsJsonObject().get("texture").getAsJsonObject();
+			JsonObject jsonObject = new GsonBuilder()
+					.setPrettyPrinting()
+					.create()
+					.fromJson(
+							new BufferedReader(new InputStreamReader(textureConnection.getInputStream())),
+							JsonObject.class
+					);
+			JsonObject texture = jsonObject.get("data")
+					.getAsJsonObject()
+					.get("texture")
+					.getAsJsonObject();
 			
-			props.add(new Property("textures", texture.get("value").getAsString(), texture.get("signature").getAsString()));
+			props.add(new Property(
+					"textures",
+					texture.get("value").getAsString(),
+					texture.get("signature").getAsString())
+			);
 		} catch (IOException ex) {
 			LOGGER.log(Level.SEVERE, "Could not download MineSkin textures: " + ex.getMessage());
 		}
@@ -55,16 +71,32 @@ public class MineSkinAPI {
 		
 		try {
 			// Open api connection
-			HttpURLConnection textureConnection = (HttpURLConnection) new URL(String.format(URL_FORMAT, id)).openConnection();
+			HttpURLConnection textureConnection = (HttpURLConnection) new URL(String.format(
+					URL_FORMAT,
+					id
+			)).openConnection();
 			textureConnection.setRequestProperty("User-Agent", "JustixDevelopment/MineSkinHook " + pluginVersion);
 			textureConnection.setRequestMethod("GET");
 			textureConnection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
 
 			// Parse response to GameProfile Property
-			net.minecraft.util.com.google.gson.JsonObject jsonObject = new net.minecraft.util.com.google.gson.GsonBuilder().setPrettyPrinting().create().fromJson(new BufferedReader(new InputStreamReader(textureConnection.getInputStream())), net.minecraft.util.com.google.gson.JsonObject.class);
-			net.minecraft.util.com.google.gson.JsonObject texture = jsonObject.get("data").getAsJsonObject().get("texture").getAsJsonObject();
+			net.minecraft.util.com.google.gson.JsonObject jsonObject = new net.minecraft.util.com.google.gson.GsonBuilder()
+					.setPrettyPrinting()
+					.create()
+					.fromJson(
+							new BufferedReader(new InputStreamReader(textureConnection.getInputStream())),
+							net.minecraft.util.com.google.gson.JsonObject.class
+					);
+			net.minecraft.util.com.google.gson.JsonObject texture = jsonObject.get("data")
+					.getAsJsonObject()
+					.get("texture")
+					.getAsJsonObject();
 			
-			props.add(new net.minecraft.util.com.mojang.authlib.properties.Property("textures", texture.get("value").getAsString(), texture.get("signature").getAsString()));
+			props.add(new net.minecraft.util.com.mojang.authlib.properties.Property(
+					"textures",
+					texture.get("value").getAsString(),
+					texture.get("signature").getAsString())
+			);
 		} catch (IOException ex) {
 			LOGGER.log(Level.SEVERE, "Could not download MineSkin textures: " + ex.getMessage());
 		}

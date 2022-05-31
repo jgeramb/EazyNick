@@ -38,7 +38,11 @@ public class UUIDFetcher {
 		try {
 			// Open api connection
 			String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s?at=%d";
-			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, timestamp / 1000)).openConnection();
+			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(
+					UUID_URL,
+					name,
+					timestamp / 1000
+			)).openConnection();
 			connection.setReadTimeout(5000);
 
 			// Parse response
@@ -52,7 +56,12 @@ public class UUIDFetcher {
 				try {
 					// Parse response
 					JsonObject data = GSON.fromJson(response.toString(), JsonObject.class);
-					UUID uniqueId = UUID.fromString(data.get("id").getAsString().replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
+					UUID uniqueId = UUID.fromString(data.get("id")
+							.getAsString()
+							.replaceFirst(
+									"(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})",
+									"$1-$2-$3-$4-$5"
+							));
 					
 					// Cache data
 					UUID_CACHE.put(name, uniqueId);
@@ -69,7 +78,10 @@ public class UUIDFetcher {
 			List<String> list = nickNameYamlFile.getConfiguration().getStringList("NickNames");
 			final String finalName = name;
 
-			new ArrayList<>(list).stream().filter(currentNickName -> currentNickName.equalsIgnoreCase(finalName)).forEach(currentNickName -> {
+			new ArrayList<>(list)
+					.stream()
+					.filter(currentNickName -> currentNickName.equalsIgnoreCase(finalName))
+					.forEach(currentNickName -> {
 				list.remove(currentNickName);
 				utils.getNickNames().remove(currentNickName);
 			});
@@ -99,7 +111,10 @@ public class UUIDFetcher {
 		try {
 			// Open api connection
 			String NAME_URL = "https://api.mojang.com/user/profiles/%s/names";
-			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
+			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(
+					NAME_URL,
+					UUIDTypeAdapter.fromUUID(uuid)
+			)).openConnection();
 			connection.setReadTimeout(5000);
 
 			// Parse response

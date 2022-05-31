@@ -5,16 +5,12 @@ import org.bukkit.command.CommandSender;
 
 public class LanguageYamlFile extends YamlFile {
 
-	private String language;
-
 	public LanguageYamlFile(EazyNick eazyNick) {
 		super(eazyNick, "lang/", eazyNick.getSetupYamlFile().getConfigString("Language"));
-
-		this.language = eazyNick.getSetupYamlFile().getConfigString("Language");
 	}
 	@Override
 	public void setDefaults() {
-		if(language.equalsIgnoreCase("de_DE")) {
+		if(eazyNick.getSetupYamlFile().getConfigString("Language").equalsIgnoreCase("de_DE")) {
 			configuration.addDefault("NickActionBarMessage", "%prefix%&7Du spielst als&8: &a%nickPrefix%%nickName%%nickSuffix%");
 			configuration.addDefault("NickActionBarMessageOther", "&7Du spielst als&8: &a%nickPrefix%%nickName%%nickSuffix%");
 			
@@ -128,10 +124,6 @@ public class LanguageYamlFile extends YamlFile {
 	public void sendMessage(CommandSender sender, String message) {
 		if((message != null) && !(message.trim().isEmpty()))
 			sender.sendMessage(message);
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
 	}
 
 }

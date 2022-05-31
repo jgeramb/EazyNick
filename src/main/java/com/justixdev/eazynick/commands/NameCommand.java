@@ -17,18 +17,25 @@ public class NameCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-		
-		String prefix = utils.getPrefix();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			NickManager api = new NickManager(player);
-			
-			if(api.isNicked())
-				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Name").replace("%name%", api.getNickName()).replace("%prefix%", prefix));
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
-		
+			return true;
+		}
+
+		String prefix = utils.getPrefix();
+		Player player = (Player) sender;
+		NickManager api = new NickManager(player);
+
+		if(!(api.isNicked())) return true;
+
+		languageYamlFile.sendMessage(
+				player,
+				languageYamlFile.getConfigString(player, "Messages.Name")
+						.replace("%name%", api.getNickName())
+						.replace("%prefix%", prefix)
+		);
+
 		return true;
 	}
 	

@@ -21,29 +21,49 @@ public class NickedPlayersCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-		
-		String prefix = utils.getPrefix();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.nickedplayers")) {
-				List<? extends Player> nickedPlayers = Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())).collect(Collectors.toList());
-				
-				if(!(nickedPlayers.isEmpty())) {
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickedPlayers.CurrentNickedPlayers").replace("%prefix%", prefix));
-					
-					for (Player currentNickedPlayer : nickedPlayers) {
-						NickManager api = new NickManager(currentNickedPlayer);
-						
-						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickedPlayers.PlayerInfo").replace("%realName%", api.getRealName()).replace("%realname%", api.getRealName()).replace("%nickName%", api.getNickName()).replace("%nickname%", api.getNickName()).replace("%prefix%", prefix));
-					}
-				} else
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.NickedPlayers.NoPlayerIsNicked").replace("%prefix%", prefix));
-			} else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
+		String prefix = utils.getPrefix();
+		Player player = (Player) sender;
+
+		if(player.hasPermission("eazynick.nickedplayers")) {
+			List<? extends Player> nickedPlayers = Bukkit.getOnlinePlayers()
+					.stream()
+					.filter(currentPlayer -> utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId()))
+					.collect(Collectors.toList());
+
+			if(!(nickedPlayers.isEmpty())) {
+				languageYamlFile.sendMessage(
+						player,
+						languageYamlFile.getConfigString(player, "Messages.NickedPlayers.CurrentNickedPlayers")
+								.replace("%prefix%", prefix)
+				);
+
+				for (Player currentNickedPlayer : nickedPlayers) {
+					NickManager api = new NickManager(currentNickedPlayer);
+
+					languageYamlFile.sendMessage(
+							player,
+							languageYamlFile.getConfigString(player, "Messages.NickedPlayers.PlayerInfo")
+									.replace("%realName%", api.getRealName())
+									.replace("%realname%", api.getRealName())
+									.replace("%nickName%", api.getNickName())
+									.replace("%nickname%", api.getNickName())
+									.replace("%prefix%", prefix)
+					);
+				}
+			} else
+				languageYamlFile.sendMessage(
+						player,
+						languageYamlFile.getConfigString(player, "Messages.NickedPlayers.NoPlayerIsNicked")
+								.replace("%prefix%", prefix)
+				);
+		} else
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
 		
 		return true;
 	}

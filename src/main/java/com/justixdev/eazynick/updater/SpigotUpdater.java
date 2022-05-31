@@ -41,41 +41,42 @@ public class SpigotUpdater {
 			final String latestVersion = reader.readLine();
 
 			// Check if version is up-to-date
-			if (!(latestVersion.equals(pluginDescription.getVersion()))) {
-				Bukkit.getLogger().log(Level.INFO, prefix + "Found a new version: " + latestVersion);
-
-				if (setupYamlFile.getConfiguration().getBoolean("AutoUpdater")) {
-					Bukkit.getLogger().log(Level.INFO, prefix + "Starting download...");
-
-					try {
-						// Open connection to download server
-						HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://www.justix-dev.com/go/dl?id=1&ver=v" + latestVersion).openConnection();
-						downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
-
-						// Download file
-						ReadableByteChannel fileChannel = Channels.newChannel(downloadConnection.getInputStream());
-
-						// Save downloaded file
-						try(FileOutputStream localFileStream = new FileOutputStream(eazyNick.getPluginFile())) {
-							localFileStream.getChannel().transferFrom(fileChannel, 0L, Long.MAX_VALUE);
-							localFileStream.flush();
-						} catch (IOException ex) {
-							Bukkit.getLogger().log(Level.SEVERE, "Could not save file: " + ex.getMessage());
-						}
-
-						Bukkit.getLogger().log(Level.INFO, prefix + "Successfully updated plugin to version '" + latestVersion + "', please restart/reload your server");
-
-						return true;
-					} catch (IOException ex) {
-						Bukkit.getLogger().log(Level.SEVERE, "Could not download file: " + ex.getMessage());
-					}
-				} else {
-					Bukkit.getLogger().log(Level.INFO, prefix + "Download the update here: " + pluginDescription.getWebsite());
-
-					return true;
-				}
-			} else
+			if (latestVersion.equals(pluginDescription.getVersion())) {
 				Bukkit.getLogger().log(Level.INFO, "No new version available");
+				return false;
+			}
+
+			Bukkit.getLogger().log(Level.INFO, prefix + "Found a new version: " + latestVersion);
+
+			if (!(setupYamlFile.getConfiguration().getBoolean("AutoUpdater"))) {
+				Bukkit.getLogger().log(Level.INFO, prefix + "Download the update here: " + pluginDescription.getWebsite());
+				return true;
+			}
+
+			Bukkit.getLogger().log(Level.INFO, prefix + "Starting download...");
+
+			try {
+				// Open connection to download server
+				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://www.justix-dev.com/go/dl?id=1&ver=v" + latestVersion).openConnection();
+				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
+
+				// Download file
+				ReadableByteChannel fileChannel = Channels.newChannel(downloadConnection.getInputStream());
+
+				// Save downloaded file
+				try(FileOutputStream localFileStream = new FileOutputStream(eazyNick.getPluginFile())) {
+					localFileStream.getChannel().transferFrom(fileChannel, 0L, Long.MAX_VALUE);
+					localFileStream.flush();
+				} catch (IOException ex) {
+					Bukkit.getLogger().log(Level.SEVERE, "Could not save file: " + ex.getMessage());
+				}
+
+				Bukkit.getLogger().log(Level.INFO, prefix + "Successfully updated plugin to version '" + latestVersion + "', please restart/reload your server");
+
+				return true;
+			} catch (IOException ex) {
+				Bukkit.getLogger().log(Level.SEVERE, "Could not download file: " + ex.getMessage());
+			}
 		} catch (IOException ex) {
 			Bukkit.getLogger().log(Level.SEVERE, "Could not fetch latest version: " + ex.getMessage());
 		}
@@ -93,36 +94,36 @@ public class SpigotUpdater {
 			final String latestVersion = reader.readLine();
 
 			// Check if version is up-to-date
-			if (!(latestVersion.equals(pluginDescription.getVersion()))) {
-				player.sendMessage(prefix + "§aUpdater §8» §7Found a new version: §d" + latestVersion);
-
-				if (setupYamlFile.getConfiguration().getBoolean("AutoUpdater")) {
-					player.sendMessage(prefix + "§aUpdater §8» §7Starting download...");
-
-					try {
-						// Open connection to download server
-						HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://www.justix-dev.com/go/dl?id=1&ver=v" + latestVersion).openConnection();
-						downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
-
-						// Download file
-						ReadableByteChannel fileChannel = Channels.newChannel(downloadConnection.getInputStream());
-
-						// Save downloaded file
-						try(FileOutputStream localFileStream = new FileOutputStream(eazyNick.getPluginFile())) {
-							localFileStream.getChannel().transferFrom(fileChannel, 0L, Long.MAX_VALUE);
-							localFileStream.flush();
-						} catch (IOException ex) {
-							Bukkit.getLogger().log(Level.SEVERE, "Could not save file: " + ex.getMessage());
-						}
-
-						player.sendMessage(prefix + "§aUpdater §8» §7Successfully updated plugin to version §8'§d" + latestVersion + "§8'§7, please restart/reload your server");
-					} catch (IOException ex) {
-						Bukkit.getLogger().log(Level.SEVERE, "Could not download file: " + ex.getMessage());
-					}
-				} else
-					player.sendMessage(prefix + "§aUpdater §8» §7Download the update here§8: §d" + pluginDescription.getWebsite());
-			} else
+			if (latestVersion.equals(pluginDescription.getVersion()))
 				player.sendMessage(prefix + "§aUpdater §8» §cNo new version available");
+
+			player.sendMessage(prefix + "§aUpdater §8» §7Found a new version: §d" + latestVersion);
+
+			if (!(setupYamlFile.getConfiguration().getBoolean("AutoUpdater")))
+				player.sendMessage(prefix + "§aUpdater §8» §7Download the update here§8: §d" + pluginDescription.getWebsite());
+
+			player.sendMessage(prefix + "§aUpdater §8» §7Starting download...");
+
+			try {
+				// Open connection to download server
+				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://www.justix-dev.com/go/dl?id=1&ver=v" + latestVersion).openConnection();
+				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
+
+				// Download file
+				ReadableByteChannel fileChannel = Channels.newChannel(downloadConnection.getInputStream());
+
+				// Save downloaded file
+				try(FileOutputStream localFileStream = new FileOutputStream(eazyNick.getPluginFile())) {
+					localFileStream.getChannel().transferFrom(fileChannel, 0L, Long.MAX_VALUE);
+					localFileStream.flush();
+				} catch (IOException ex) {
+					Bukkit.getLogger().log(Level.SEVERE, "Could not save file: " + ex.getMessage());
+				}
+
+				player.sendMessage(prefix + "§aUpdater §8» §7Successfully updated plugin to version §8'§d" + latestVersion + "§8'§7, please restart/reload your server");
+			} catch (IOException ex) {
+				Bukkit.getLogger().log(Level.SEVERE, "Could not download file: " + ex.getMessage());
+			}
 		} catch (IOException ex) {
 			Bukkit.getLogger().log(Level.SEVERE, "Could not fetch latest version: " + ex.getMessage());
 		}

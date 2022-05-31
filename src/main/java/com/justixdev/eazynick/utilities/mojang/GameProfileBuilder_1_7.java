@@ -18,7 +18,12 @@ import java.util.concurrent.TimeUnit;
 
 public class GameProfileBuilder_1_7 {
 
-	private final com.google.gson.Gson GSON = new com.google.gson.GsonBuilder().disableHtmlEscaping().registerTypeAdapter(UUID.class, new com.mojang.util.UUIDTypeAdapter()).registerTypeAdapter(com.mojang.authlib.GameProfile.class, new GameProfileBuilder_1_7.GameProfileSerializer()).registerTypeAdapter(com.mojang.authlib.properties.PropertyMap.class, new com.mojang.authlib.properties.PropertyMap.Serializer()).create();
+	private final com.google.gson.Gson GSON = new com.google.gson.GsonBuilder()
+			.disableHtmlEscaping()
+			.registerTypeAdapter(UUID.class, new com.mojang.util.UUIDTypeAdapter())
+			.registerTypeAdapter(com.mojang.authlib.GameProfile.class, new GameProfileBuilder_1_7.GameProfileSerializer())
+			.registerTypeAdapter(com.mojang.authlib.properties.PropertyMap.class, new com.mojang.authlib.properties.PropertyMap.Serializer())
+			.create();
 	private final HashMap<UUID, GameProfileBuilder_1_7.CachedProfile> CACHE = new HashMap<>();
 
 	public com.mojang.authlib.GameProfile fetch(UUID uuid) throws IOException {
@@ -32,7 +37,10 @@ public class GameProfileBuilder_1_7 {
 		else {
 			// Open http connection
 			String SERVICE_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
-			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(SERVICE_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
+			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(
+					SERVICE_URL,
+					UUIDTypeAdapter.fromUUID(uuid)
+			)).openConnection();
 			connection.setReadTimeout(5000);
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -54,7 +62,10 @@ public class GameProfileBuilder_1_7 {
 				}
 			}
 
-			com.google.gson.JsonObject error = GSON.fromJson(new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine(), com.google.gson.JsonObject.class);
+			com.google.gson.JsonObject error = GSON.fromJson(
+					new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine(),
+					com.google.gson.JsonObject.class
+			);
 
 			throw new IOException(error.get("error").getAsString() + ": " + error.get("errorMessage").getAsString());
 		}
@@ -70,7 +81,10 @@ public class GameProfileBuilder_1_7 {
 			com.mojang.authlib.GameProfile profile = new com.mojang.authlib.GameProfile(id, name);
 
 			if (object.has("properties")) {
-				for (Entry<String, Property> prop : ((com.mojang.authlib.properties.PropertyMap) context.deserialize(object.get("properties"), PropertyMap.class)).entries())
+				for (Entry<String, Property> prop : ((com.mojang.authlib.properties.PropertyMap) context.deserialize(
+						object.get("properties"),
+						PropertyMap.class
+				)).entries())
 					profile.getProperties().put(prop.getKey(), prop.getValue());
 			}
 

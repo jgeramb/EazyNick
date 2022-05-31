@@ -18,39 +18,62 @@ public class ChangeSkinOtherCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-		
-		String prefix = utils.getPrefix();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(args.length >= 1) {
-				Player targetPlayer = Bukkit.getPlayer(args[0]);
-				
-				if(targetPlayer != null) {
-					NickManager api = new NickManager(targetPlayer);
-					
-					if(args.length >= 2) {
-						if(player.hasPermission("eazynick.other.skin.custom")) {
-							String name = args[1].trim();
-							
-							languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Other.SelectedSkin").replace("%playerName%", targetPlayer.getName()).replace("%playername%", targetPlayer.getName()).replace("%skinName%", name).replace("%skinname%", name).replace("%prefix%", prefix));
-							
-							api.changeSkin(name);
-						} else
-							languageYamlFile.sendMessage(player, utils.getNoPerm());
-					} else if(player.hasPermission("eazynick.other.skin.random")) {
-						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Other.RandomSkin").replace("%playerName%", targetPlayer.getName()).replace("%playername%", targetPlayer.getName()).replace("%prefix%", prefix));
-						
-						api.changeSkin(api.getRandomName());
-					} else
-						languageYamlFile.sendMessage(player, utils.getNoPerm());
-				} else
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerNotFound").replace("%prefix%", prefix));
-			}
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
-		
+			return true;
+		}
+
+		String prefix = utils.getPrefix();
+		Player player = (Player) sender;
+
+		if(args.length < 1) return true;
+
+		Player targetPlayer = Bukkit.getPlayer(args[0]);
+
+		if(targetPlayer == null) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.PlayerNotFound")
+							.replace("%prefix%", prefix)
+			);
+			return true;
+		}
+
+		NickManager api = new NickManager(targetPlayer);
+
+		if(args.length >= 2) {
+			if(!(player.hasPermission("eazynick.other.skin.custom"))) {
+				languageYamlFile.sendMessage(player, utils.getNoPerm());
+				return true;
+			}
+
+			String name = args[1].trim();
+
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.Other.SelectedSkin")
+							.replace("%playerName%", targetPlayer.getName())
+							.replace("%playername%", targetPlayer.getName())
+							.replace("%skinName%", name)
+							.replace("%skinname%", name)
+							.replace("%prefix%", prefix)
+			);
+
+			api.changeSkin(name);
+		} else if(player.hasPermission("eazynick.other.skin.random")) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.Other.RandomSkin")
+							.replace("%playerName%", targetPlayer.getName())
+							.replace("%playername%", targetPlayer.getName())
+							.replace("%prefix%", prefix)
+			);
+
+			api.changeSkin(api.getRandomName());
+		} else
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
+
 		return true;
 	}
 

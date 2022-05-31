@@ -18,10 +18,14 @@ public class PlayerDeathListener implements Listener {
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		Player player = event.getEntity();
-		String deathMessage = ((event.getDeathMessage() == null) || event.getDeathMessage().isEmpty()) ? null : event.getDeathMessage();
+		String deathMessage = ((event.getDeathMessage() == null) || event.getDeathMessage().isEmpty())
+				? null
+				: event.getDeathMessage();
 		NickManager api = new NickManager(player);
 			
-		if(api.isNicked() && (deathMessage != null) && !(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))) {
+		if(api.isNicked()
+				&& (deathMessage != null)
+				&& !(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))) {
 			event.setDeathMessage(null);
 
 			for (Player currentPlayer : Bukkit.getOnlinePlayers()) {

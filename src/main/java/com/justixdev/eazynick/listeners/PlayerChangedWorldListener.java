@@ -21,7 +21,9 @@ public class PlayerChangedWorldListener implements Listener {
 		NickManager api = new NickManager(player);
 		
 		if (!(utils.getWorldBlackList().contains(player.getWorld().getName().toUpperCase()))) {
-			if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange") && utils.getNickOnWorldChangePlayers().contains(player.getUniqueId()) && !(api.isNicked()))
+			if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange")
+					&& utils.getNickOnWorldChangePlayers().contains(player.getUniqueId())
+					&& !(api.isNicked()))
 				utils.performReNick(player);
 			else if(!(setupYamlFile.getConfiguration().getBoolean("KeepNickOnWorldChange")))
 				api.unnickPlayerWithoutRemovingMySQL(false, true);

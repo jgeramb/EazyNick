@@ -14,16 +14,20 @@ public class NickUpdateCheckCommand implements CommandExecutor {
 	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.updatecheck"))
-				eazyNick.getSpigotUpdater().checkForUpdates(player);
-			else
-				eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
+		Player player = (Player) sender;
+
+		if(!(player.hasPermission("eazynick.updatecheck"))) {
+			eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
+			return true;
+		}
+
+		eazyNick.getSpigotUpdater().checkForUpdates(player);
 		
 		return true;
 	}

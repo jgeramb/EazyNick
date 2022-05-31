@@ -35,17 +35,22 @@ public class IncomingPacketInjector_1_7 {
 			
 			unregister();
 			
-			if (channel.pipeline().get(handlerName) == null) {
-				//Add packet handler to netty channel
-				channel.pipeline().addBefore("packet_handler", handlerName, new ChannelDuplexHandler() {
-					
-					@Override
-					public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-						if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
-							if(signGUI.getEditCompleteListeners().containsKey(player)) {
+			if (channel.pipeline().get(handlerName) != null) return;
+
+			//Add packet handler to netty channel
+			channel.pipeline().addBefore(
+					"packet_handler",
+					handlerName,
+					new ChannelDuplexHandler() {
+
+						@Override
+						public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+							if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
+								if(!(signGUI.getEditCompleteListeners().containsKey(player))) return;
+
 								//Process SignGUI success
 								Object[] rawLines = (Object[]) reflectionHelper.getField(packet.getClass(), "b").get(packet);
-								
+
 								Bukkit.getScheduler().runTask(eazyNick, () -> {
 									try {
 										String[] lines = new String[4];
@@ -73,17 +78,19 @@ public class IncomingPacketInjector_1_7 {
 							} else if(packet.getClass().getName().endsWith("PacketPlayInTabComplete")) {
 								try {
 									//Cache input text
-									eazyNick.getUtils().getTextsToComplete().put(player, (String) reflectionHelper.getField(packet.getClass(), "a").get(packet));
+									eazyNick.getUtils().getTextsToComplete().put(
+											player,
+											(String) reflectionHelper.getField(packet.getClass(), "a").get(packet)
+									);
 								} catch (IllegalArgumentException | IllegalAccessException ex) {
 									ex.printStackTrace();
 								}
 							}
-							
+
 							super.channelRead(ctx, packet);
 						}
 					}
-				});
-			}
+			);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

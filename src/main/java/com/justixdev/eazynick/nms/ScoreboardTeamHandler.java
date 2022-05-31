@@ -45,10 +45,22 @@ public class ScoreboardTeamHandler {
 			boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
 			
 			// Create packet instance
-			Constructor<?> constructor = reflectionHelper.getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutScoreboardTeam" : "PacketPlayOutScoreboardTeam").getDeclaredConstructor((is17 || is18) ? new Class[] { String.class, int.class, Optional.class, Collection.class } : new Class[0]);
+			Constructor<?> constructor = reflectionHelper.getNMSClass(
+					(is17 || is18)
+							? "network.protocol.game.PacketPlayOutScoreboardTeam"
+							: "PacketPlayOutScoreboardTeam"
+			).getDeclaredConstructor(
+					(is17 || is18)
+							? new Class[] { String.class, int.class, Optional.class, Collection.class }
+							: new Class[0]
+			);
 			constructor.setAccessible(true);
 			
-			packet = constructor.newInstance((is17 || is18) ? new Object[] { null, 0, null, new ArrayList<>() } : new Object[0]);
+			packet = constructor.newInstance(
+					(is17 || is18)
+							? new Object[] { null, 0, null, new ArrayList<>() }
+							: new Object[0]
+			);
 			
 			// Set packet fields
 			if(!(version.equals("1_7_R4") || version.equals("1_8_R1"))) {
@@ -63,11 +75,34 @@ public class ScoreboardTeamHandler {
 							reflectionHelper.setField(packet, "h", 1);
 							reflectionHelper.setField(packet, "i", teamName);
 							
-							Object scoreboardTeam = reflectionHelper.getNMSClass("world.scores.ScoreboardTeam").getConstructor(reflectionHelper.getNMSClass("world.scores.Scoreboard"), String.class).newInstance(null, teamName);
-							reflectionHelper.setField(scoreboardTeam, is18 ? "d" : "e", teamName);
+							Object scoreboardTeam = reflectionHelper.getNMSClass("world.scores.ScoreboardTeam")
+									.getConstructor(
+											reflectionHelper.getNMSClass("world.scores.Scoreboard"),
+											String.class
+									)
+									.newInstance(null, teamName);
+							reflectionHelper.setField(
+									scoreboardTeam,
+									is18
+											? "d"
+											: "e",
+									teamName
+							);
 
 							//noinspection OptionalGetWithoutIsPresent
-							reflectionHelper.setField(packet, "k", Optional.of(reflectionHelper.getSubClass(packet.getClass(), "b").get().getConstructor(scoreboardTeam.getClass()).newInstance(scoreboardTeam)));
+							reflectionHelper.setField(
+									packet,
+									"k",
+									Optional.of(
+											reflectionHelper.getSubClass(
+													packet.getClass(),
+													"b"
+											)
+													.get()
+													.getConstructor(scoreboardTeam.getClass())
+													.newInstance(scoreboardTeam)
+									)
+							);
 						} else {
 							reflectionHelper.setField(packet, "a", teamName);
 							reflectionHelper.setField(packet, "b", getAsIChatBaseComponent(teamName));
@@ -98,9 +133,20 @@ public class ScoreboardTeamHandler {
 			}*/
 			
 			// Send packet to destroy team
-			Bukkit.getOnlinePlayers().stream().filter(receivedPacket::contains).forEach(currentPlayer -> sendPacket(currentPlayer, packet));
+			Bukkit.getOnlinePlayers()
+					.stream()
+					.filter(receivedPacket::contains)
+					.forEach(currentPlayer -> sendPacket(currentPlayer, packet));
 		} catch (Exception ex) {
-			Bukkit.getLogger().log(Level.SEVERE, "Could not send packet to destroy scoreboard team of " + realName + " (" + nickName + "): " + ex.getMessage());
+			Bukkit.getLogger().log(
+					Level.SEVERE,
+					"Could not send packet to destroy scoreboard team of "
+							+ realName
+							+ " ("
+							+ nickName
+							+ "): "
+							+ ex.getMessage()
+			);
 		}
 	}
 
@@ -113,17 +159,31 @@ public class ScoreboardTeamHandler {
 		Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
 			try {
 				// Create packet instance
-				Constructor<?> constructor = reflectionHelper.getNMSClass((is17 || is18) ? "network.protocol.game.PacketPlayOutScoreboardTeam" : "PacketPlayOutScoreboardTeam").getDeclaredConstructor((is17 || is18) ? new Class[] { String.class, int.class, Optional.class, Collection.class } : new Class[0]);
+				Constructor<?> constructor = reflectionHelper.getNMSClass(
+						(is17 || is18)
+								? "network.protocol.game.PacketPlayOutScoreboardTeam"
+								: "PacketPlayOutScoreboardTeam"
+				).getDeclaredConstructor(
+						(is17 || is18)
+								? new Class[] { String.class, int.class, Optional.class, Collection.class }
+								: new Class[0]
+				);
 				constructor.setAccessible(true);
 				
-				packet = constructor.newInstance((is17 || is18) ? new Object[] { null, 0, null, new ArrayList<>() } : new Object[0]);
+				packet = constructor.newInstance(
+						(is17 || is18)
+								? new Object[] { null, 0, null, new ArrayList<>() }
+								: new Object[0]
+				);
 				
 				// Determine which prefix should be shown
 				String prefixForPlayer = prefix;
 				String suffixForPlayer = suffix;
 				List<String> contents = Arrays.asList(nickName, realName);
 				
-				if(currentPlayer.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission") && setupYamlFile.getConfiguration().getBoolean("BypassFormat.Show")) {
+				if(currentPlayer.hasPermission("eazynick.bypass")
+						&& setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")
+						&& setupYamlFile.getConfiguration().getBoolean("BypassFormat.Show")) {
 					prefixForPlayer = setupYamlFile.getConfigString(player, "BypassFormat.NameTagPrefix");
 					suffixForPlayer = setupYamlFile.getConfigString(player, "BypassFormat.NameTagSuffix");
 				}
@@ -227,23 +287,46 @@ public class ScoreboardTeamHandler {
 								reflectionHelper.setField(packet, "i", teamName);
 								reflectionHelper.setField(packet, "j", contents);
 								
-								Object scoreboardTeam = reflectionHelper.getNMSClass("world.scores.ScoreboardTeam").getConstructor(reflectionHelper.getNMSClass("world.scores.Scoreboard"), String.class).newInstance(null, teamName);
+								Object scoreboardTeam = reflectionHelper.getNMSClass("world.scores.ScoreboardTeam")
+										.getConstructor(
+												reflectionHelper.getNMSClass("world.scores.Scoreboard"),
+												String.class
+										).newInstance(null, teamName);
 								reflectionHelper.setField(scoreboardTeam, is18 ? "d" : "e", teamName);
 								reflectionHelper.setField(scoreboardTeam, is18 ? "g" : "h", getAsIChatBaseComponent(prefix));							
 								reflectionHelper.setField(scoreboardTeam, is18 ? "h" : "i", getAsIChatBaseComponent(suffix));							
 								reflectionHelper.setField(scoreboardTeam, is18 ? "i" : "j", false);							
 								reflectionHelper.setField(scoreboardTeam, is18 ? "j" : "k", false);							
-								reflectionHelper.setField(scoreboardTeam, is18 ? "m" : "n", reflectionHelper.getField(reflectionHelper.getNMSClass("EnumChatFormat"), colorName).get(null));
+								reflectionHelper.setField(
+										scoreboardTeam,
+										is18
+												? "m"
+												: "n",
+										reflectionHelper.getField(reflectionHelper.getNMSClass("EnumChatFormat"), colorName).get(null)
+								);
 
 								//noinspection OptionalGetWithoutIsPresent
-								reflectionHelper.setField(packet, "k", Optional.of(reflectionHelper.getSubClass(packet.getClass(), "b").get().getConstructor(scoreboardTeam.getClass()).newInstance(scoreboardTeam)));
+								reflectionHelper.setField(
+										packet,
+										"k",
+										Optional.of(reflectionHelper.getSubClass(packet.getClass(), "b").get()
+												.getConstructor(scoreboardTeam.getClass())
+												.newInstance(scoreboardTeam))
+								);
 							} else {
 								reflectionHelper.setField(packet, "a", teamName);
 								reflectionHelper.setField(packet, "b", getAsIChatBaseComponent(teamName));
 								reflectionHelper.setField(packet, "c", getAsIChatBaseComponent(prefixForPlayer));
 								reflectionHelper.setField(packet, "d", getAsIChatBaseComponent(suffixForPlayer));
 								reflectionHelper.setField(packet, "e", "ALWAYS");
-								reflectionHelper.setField(packet, "g", reflectionHelper.getField(reflectionHelper.getNMSClass("EnumChatFormat"), colorName).get(null));
+								reflectionHelper.setField(
+										packet,
+										"g",
+										reflectionHelper.getField(
+												reflectionHelper.getNMSClass("EnumChatFormat"),
+												colorName
+										).get(null)
+								);
 								reflectionHelper.setField(packet, "h", contents);
 								reflectionHelper.setField(packet, "j", 0);
 							}
@@ -275,7 +358,15 @@ public class ScoreboardTeamHandler {
 				if(!(receivedPacket.contains(currentPlayer)))
 					receivedPacket.add(currentPlayer);
 			} catch (Exception ex) {
-				Bukkit.getLogger().log(Level.SEVERE, "Could not send packet to create scoreboard team of " + realName + " (" + nickName + "): " + ex.getMessage());
+				Bukkit.getLogger().log(
+						Level.SEVERE,
+						"Could not send packet to create scoreboard team of "
+								+ realName
+								+ " ("
+								+ nickName
+								+ "): "
+								+ ex.getMessage()
+				);
 			}
 		});
 	}
@@ -285,7 +376,14 @@ public class ScoreboardTeamHandler {
 		
 		try {
 			// Create IChatBaseComponent from String using ChatSerializer
-			return reflectionHelper.getNMSClass((version.startsWith("1_17") || version.startsWith("1_18")) ? "network.chat.IChatBaseComponent" : "IChatBaseComponent").getDeclaredClasses()[0].getMethod(version.startsWith("1_18") ? "b" : "a", String.class).invoke(null, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
+			return reflectionHelper.getNMSClass(
+					(version.startsWith("1_17") || version.startsWith("1_18"))
+							? "network.chat.IChatBaseComponent"
+							: "IChatBaseComponent"
+			)
+					.getDeclaredClasses()[0]
+					.getMethod(version.startsWith("1_18") ? "b" : "a", String.class)
+					.invoke(null, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
 		} catch (Exception ex) {
 			return null;
 		}
@@ -298,8 +396,20 @@ public class ScoreboardTeamHandler {
 		try {
 			// Send packet to player
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-			Object playerConnection = entityPlayer.getClass().getField((is17 || is18) ? "b" : "playerConnection").get(entityPlayer);
-			playerConnection.getClass().getMethod(is18 ? "a" : "sendPacket", reflectionHelper.getNMSClass((is17 || is18) ? "network.protocol.Packet" : "Packet")).invoke(playerConnection, packet);
+			Object playerConnection = entityPlayer.getClass().getField(
+					(is17 || is18)
+							? "b"
+							: "playerConnection"
+			).get(entityPlayer);
+			playerConnection.getClass().getMethod(
+					is18
+							? "a"
+							: "sendPacket",
+					reflectionHelper.getNMSClass(
+							(is17 || is18)
+									? "network.protocol.Packet"
+									: "Packet"
+					)).invoke(playerConnection, packet);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

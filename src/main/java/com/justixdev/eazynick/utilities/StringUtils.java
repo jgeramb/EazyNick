@@ -22,7 +22,7 @@ public class StringUtils {
 	}
 
 	public String getColoredString() {
-		String version = EazyNick.getInstance().getVersion(), coloredString = ChatColor.translateAlternateColorCodes('&', string);
+		String version = EazyNick.getInstance().getVersion();
 
 		// HEX-Color-Support
 		if(version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18")) {
@@ -34,15 +34,33 @@ public class StringUtils {
 
 				// Convert for example #fff to #ffffff
 				if(group.length() == 3)
-					matcher.appendReplacement(buffer, COLOR_CHAR + "x" + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1) + COLOR_CHAR + group.charAt(1) + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(2));
+					matcher.appendReplacement(
+							buffer,
+							COLOR_CHAR + "x"
+									+ COLOR_CHAR + group.charAt(0)
+									+ COLOR_CHAR + group.charAt(0)
+									+ COLOR_CHAR + group.charAt(1)
+									+ COLOR_CHAR + group.charAt(1)
+									+ COLOR_CHAR + group.charAt(2)
+									+ COLOR_CHAR + group.charAt(2)
+					);
 				else
-					matcher.appendReplacement(buffer, COLOR_CHAR + "x" + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1) + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3) + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5));
+					matcher.appendReplacement(
+							buffer,
+							COLOR_CHAR + "x"
+									+ COLOR_CHAR + group.charAt(0)
+									+ COLOR_CHAR + group.charAt(1)
+									+ COLOR_CHAR + group.charAt(2)
+									+ COLOR_CHAR + group.charAt(3)
+									+ COLOR_CHAR + group.charAt(4)
+									+ COLOR_CHAR + group.charAt(5)
+					);
 			}
 
 			string = matcher.appendTail(buffer).toString();
 		}
 
-		return coloredString;
+		return ChatColor.translateAlternateColorCodes('&', string);
 	}
 	
 }

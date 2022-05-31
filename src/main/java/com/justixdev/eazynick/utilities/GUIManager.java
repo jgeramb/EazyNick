@@ -29,7 +29,13 @@ public class GUIManager {
 	}
 
 	public void openNickList(Player player, int page) {
-		Inventory inv = Bukkit.createInventory(null, 45, guiYamlFile.getConfigString(player, "NickNameGUI.InventoryTitle").replace("%currentPage%", String.valueOf(page + 1)).replace("%currentpage%", String.valueOf(page + 1)));
+		Inventory inv = Bukkit.createInventory(
+				null,
+				45,
+				guiYamlFile.getConfigString(player, "NickNameGUI.InventoryTitle")
+						.replace("%currentPage%", String.valueOf(page + 1))
+						.replace("%currentpage%", String.valueOf(page + 1))
+		);
 		ArrayList<String> toShow = new ArrayList<>();
 		
 		player.openInventory(inv);
@@ -44,22 +50,50 @@ public class GUIManager {
 		int i = 0;
 		
 		for (String nickName : toShow) {
-			inv.setItem(i, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "NickNameGUI.NickName.DisplayName").replace("%nickName%", nickName).replace("%nickname%", nickName)).setSkullOwner((toShow.size() > 12) ? "MHF_Question" : nickName).build());
+			inv.setItem(
+					i,
+					new ItemBuilder(1)
+							.setDisplayName(
+									guiYamlFile.getConfigString(player, "NickNameGUI.NickName.DisplayName")
+											.replace("%nickName%", nickName)
+											.replace("%nickname%", nickName)
+							).setSkullOwner(
+									(toShow.size() > 12)
+											? "MHF_Question"
+											: nickName
+							).build()
+			);
 			i++;
 		}
 			
 		if(page != 0)
-			inv.setItem(36, new ItemBuilder(Material.ARROW).setDisplayName(guiYamlFile.getConfigString(player, "NickNameGUI.Previous.DisplayName")).build());
+			inv.setItem(
+					36,
+					new ItemBuilder(Material.ARROW)
+							.setDisplayName(guiYamlFile.getConfigString(player, "NickNameGUI.Previous.DisplayName"))
+							.build()
+			);
 		
 		if(utils.getNickNames().size() > ((page + 1) * 36))
-			inv.setItem(44, new ItemBuilder(Material.ARROW).setDisplayName(guiYamlFile.getConfigString(player, "NickNameGUI.Next.DisplayName")).build());
+			inv.setItem(
+					44,
+					new ItemBuilder(Material.ARROW)
+							.setDisplayName(guiYamlFile.getConfigString(player, "NickNameGUI.Next.DisplayName"))
+							.build()
+			);
 		
 		utils.getNickNameListPages().put(player.getUniqueId(), page);
 	}
 	
 	public void openCustomGUI(Player player, String rankName, String skinType) {
 		if(setupYamlFile.getConfiguration().getBoolean("UseSignGUIForCustomName")) {
-			signGUI.open(player, guiYamlFile.getConfigString(player, "SignGUI.Line1"), guiYamlFile.getConfigString(player, "SignGUI.Line2"), guiYamlFile.getConfigString(player, "SignGUI.Line3"), guiYamlFile.getConfigString(player, "SignGUI.Line4"), event -> {
+			signGUI.open(
+					player,
+					guiYamlFile.getConfigString(player, "SignGUI.Line1"),
+					guiYamlFile.getConfigString(player, "SignGUI.Line2"),
+					guiYamlFile.getConfigString(player, "SignGUI.Line3"),
+					guiYamlFile.getConfigString(player, "SignGUI.Line4"),
+					event -> {
 				String name = event.getLines()[0];
 				int nameLengthMin = Math.max(Math.min(setupYamlFile.getConfiguration().getInt("Settings.NameLength.Min"), 16), 1), nameLengthMax = Math.max(Math.min(setupYamlFile.getConfiguration().getInt("Settings.NameLength.Max"), 16), 1);
 
@@ -79,7 +113,12 @@ public class GUIManager {
 				}
 			});
 			
-			gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, new ItemBuilder(Material.PAPER).setDisplayName(guiYamlFile.getConfigString(player, "AnvilGUI.Title")).build());
+			gui.setSlot(
+					AnvilGUI.AnvilSlot.INPUT_LEFT,
+					new ItemBuilder(Material.PAPER)
+							.setDisplayName(guiYamlFile.getConfigString(player, "AnvilGUI.Title"))
+							.build()
+			);
 
 			try {
 				gui.open();
@@ -99,10 +138,28 @@ public class GUIManager {
 		String[] args = text.isEmpty() ? new String[0] : text.split(" ");
 		
 		if(args.length == 0) {
-			Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.InventoryTitle"));
+			Inventory inv = Bukkit.createInventory(
+					null,
+					27,
+					guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.InventoryTitle")
+			);
 			
 			for (int i = 0; i < inv.getSize(); i++)
-				inv.setItem(i, new ItemBuilder(Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, newVersion ? 0 : 15).setDisplayName("§r").build());
+				inv.setItem(
+						i,
+						new ItemBuilder(
+								Material.getMaterial(newVersion
+										? "BLACK_STAINED_GLASS_PANE"
+										: "STAINED_GLASS_PANE"
+								),
+								1,
+								newVersion
+										? 0
+										: 15
+						)
+								.setDisplayName("§r")
+								.build()
+				);
 			
 			ArrayList<ItemStack> availableRanks = new ArrayList<>();
 			
@@ -110,7 +167,15 @@ public class GUIManager {
 				String permission = guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".Permission");
 				
 				if(guiYamlFile.getConfiguration().getBoolean("RankGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || player.hasPermission(permission)))
-					availableRanks.add(new ItemBuilder(Material.valueOf(guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.Rank" + i + ".ItemType")), 1, guiYamlFile.getConfiguration().getInt("RankedNickGUI.Step1.Rank" + i + ".MetaData")).setDisplayName(guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".Rank")).build());
+					availableRanks.add(
+							new ItemBuilder(
+									Material.valueOf(guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.Rank" + i + ".ItemType")),
+									1,
+									guiYamlFile.getConfiguration().getInt("RankedNickGUI.Step1.Rank" + i + ".MetaData")
+							)
+									.setDisplayName(guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".Rank"))
+									.build()
+					);
 			}
 			
 			switch (availableRanks.size()) {
@@ -322,48 +387,177 @@ public class GUIManager {
 					inv.setItem(26, availableRanks.get(17));
 					break;
 				default:
-					inv.setItem(13, new ItemBuilder(Material.valueOf(newVersion ? "RED_STAINED_GLASS" : "GLASS"), 1, newVersion ? 0 : 14).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.NoRankAvailable.DisplayName")).build());
+					inv.setItem(
+							13,
+							new ItemBuilder(
+									Material.valueOf(
+											newVersion
+													? "RED_STAINED_GLASS"
+													: "GLASS"
+									),
+									1,
+									newVersion
+											? 0
+											: 14
+							)
+									.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.NoRankAvailable.DisplayName"))
+									.build()
+					);
 					break;
 			}
 			
 			player.openInventory(inv);
 		} else if(args.length == 1) {
 			if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
-				Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.InventoryTitle"));
+				Inventory inv = Bukkit.createInventory(
+						null,
+						27,
+						guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.InventoryTitle")
+				);
 				
 				for (int i = 0; i < inv.getSize(); i++)
-					inv.setItem(i, new ItemBuilder(Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, newVersion ? 0 : 15).setDisplayName("§r").build());
+					inv.setItem(
+							i,
+							new ItemBuilder(
+									Material.getMaterial(
+											newVersion
+													? "BLACK_STAINED_GLASS_PANE"
+													: "STAINED_GLASS_PANE"
+									),
+									1,
+									newVersion
+											? 0
+											: 15
+							)
+									.setDisplayName("§r")
+									.build()
+					);
 				
-				inv.setItem(10, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Default.DisplayName")).setSkullOwner(player.getName()).build());
-				inv.setItem(12, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName")).build());
-				inv.setItem(14, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Random.DisplayName")).setSkullOwner("MHF_Question").build());
-				inv.setItem(16, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.SkinFromName.DisplayName")).setSkullOwner("Steve").build());
+				inv.setItem(
+						10,
+						new ItemBuilder(1)
+								.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Default.DisplayName"))
+								.setSkullOwner(player.getName())
+								.build()
+				);
+				inv.setItem(
+						12,
+						new ItemBuilder(1)
+								.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName"))
+								.build()
+				);
+				inv.setItem(
+						14,
+						new ItemBuilder(1)
+								.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Random.DisplayName"))
+								.setSkullOwner("MHF_Question")
+								.build()
+				);
+				inv.setItem(
+						16,
+						new ItemBuilder(1)
+								.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.SkinFromName.DisplayName"))
+								.setSkullOwner("Steve")
+								.build()
+				);
 				
 				player.openInventory(inv);
 			} else
 				openRankedNickGUI(player, text + " DEFAULT");
 		} else if(args.length == 2) {
 			if(player.hasPermission("eazynick.nick.custom")) {
-				Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.InventoryTitle"));
+				Inventory inv = Bukkit.createInventory(
+						null,
+						27,
+						guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.InventoryTitle")
+				);
 				
 				for (int i = 0; i < inv.getSize(); i++)
-					inv.setItem(i, new ItemBuilder(Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, newVersion ? 0 : 15).setDisplayName("§r").build());
+					inv.setItem(
+							i,
+							new ItemBuilder(Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, newVersion ? 0 : 15).setDisplayName("§r").build());
 				
-				inv.setItem(12, new ItemBuilder(Material.valueOf((newVersion && !(eazyNick.getVersion().startsWith("1_13"))) ? "OAK_SIGN" : "SIGN")).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Custom.DisplayName")).build());
-				inv.setItem(14, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Random.DisplayName")).setSkullOwner("MHF_Question").build());
+				inv.setItem(
+						12,
+						new ItemBuilder(
+								Material.valueOf(
+										(newVersion && !(eazyNick.getVersion().startsWith("1_13")))
+												? "OAK_SIGN"
+												: "SIGN"
+								)
+						)
+								.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Custom.DisplayName"))
+								.build()
+				);
+				inv.setItem(
+						14,
+						new ItemBuilder(1)
+								.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Random.DisplayName"))
+								.setSkullOwner("MHF_Question")
+								.build()
+				);
 				
 				player.openInventory(inv);
 			} else
 				openRankedNickGUI(player, text + " RANDOM");
 		} else {
-			Inventory inv = Bukkit.createInventory(null, 27, guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.InventoryTitle").replace("%nickName%", args[2]).replace("%nickname%", args[2]));
+			Inventory inv = Bukkit.createInventory(
+					null,
+					27,
+					guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.InventoryTitle")
+							.replace("%nickName%", args[2])
+							.replace("%nickname%", args[2])
+			);
 			
 			for (int i = 0; i < inv.getSize(); i++)
-				inv.setItem(i, new ItemBuilder(Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, newVersion ? 0 : 15).setDisplayName("§r").build());
+				inv.setItem(
+						i,
+						new ItemBuilder(
+								Material.getMaterial(
+										newVersion
+												? "BLACK_STAINED_GLASS_PANE"
+												: "STAINED_GLASS_PANE"
+								),
+								1,
+								newVersion
+										? 0
+										: 15
+						)
+								.setDisplayName("§r")
+								.build()
+				);
 			
-			inv.setItem(11, new ItemBuilder(Material.valueOf(newVersion ? "LIME_WOOL" : "WOOL"), 1, newVersion ? 0 : 5).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Use.DisplayName")).build());
-			inv.setItem(13, new ItemBuilder(1).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Retry.DisplayName")).build());
-			inv.setItem(15, new ItemBuilder(Material.valueOf((newVersion && !(eazyNick.getVersion().startsWith("1_13"))) ? "OAK_SIGN" : "SIGN")).setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Custom.DisplayName")).build());
+			inv.setItem(
+					11,
+					new ItemBuilder(
+							Material.valueOf(
+									newVersion
+											? "LIME_WOOL"
+											: "WOOL"
+							),
+							1,
+							newVersion ? 0 : 5
+					)
+							.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Use.DisplayName"))
+							.build()
+			);
+			inv.setItem(
+					13,
+					new ItemBuilder(1)
+							.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Retry.DisplayName"))
+							.build());
+			inv.setItem(
+					15,
+					new ItemBuilder(
+							Material.valueOf(
+									(newVersion && !(eazyNick.getVersion().startsWith("1_13")))
+											? "OAK_SIGN"
+											: "SIGN"
+							)
+					)
+							.setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Custom.DisplayName"))
+							.build()
+			);
 			
 			player.openInventory(inv);
 		}

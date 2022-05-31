@@ -21,7 +21,16 @@ public class ItemBuilder {
 	private ItemMeta itemMeta;
 	
 	public ItemBuilder(int amount) {
-		this(Material.getMaterial(EazyNick.getInstance().getUtils().isVersion13OrLater() ? "PLAYER_HEAD" : "SKULL_ITEM"), amount, EazyNick.getInstance().getUtils().isVersion13OrLater() ? 0 : 3);
+		this(Material.getMaterial(
+				EazyNick.getInstance().getUtils().isVersion13OrLater()
+						? "PLAYER_HEAD"
+						: "SKULL_ITEM"
+				),
+				amount,
+				EazyNick.getInstance().getUtils().isVersion13OrLater()
+						? 0
+						: 3)
+		;
 	}
 	
 	public ItemBuilder(Material mat) {
@@ -35,7 +44,15 @@ public class ItemBuilder {
 	public ItemBuilder(Material mat, int amount, int subID) {
 		if(!(EazyNick.getInstance().getUtils().isVersion13OrLater())) {
 			try {
-				this.itemStack = ItemStack.class.getConstructor(Material.class, int.class, short.class).newInstance(mat, amount, (short) subID);
+				this.itemStack = ItemStack.class.getConstructor(
+						Material.class,
+						int.class,
+						short.class
+				).newInstance(
+						mat,
+						amount,
+						(short) subID
+				);
 			} catch (Exception ignore) {
 				this.itemStack = new ItemStack(mat, amount);
 			}
@@ -48,7 +65,13 @@ public class ItemBuilder {
 	public ItemBuilder setDurability(int durability) {
 		if(!(EazyNick.getInstance().getUtils().isVersion13OrLater())) {
 			try {
-                itemStack.getClass().getMethod("setDurability", short.class).invoke(itemStack, (short) durability);
+                itemStack.getClass().getMethod(
+						"setDurability",
+						short.class
+				).invoke(
+						itemStack,
+						(short) durability
+				);
 			} catch (Exception ignore) {
 			}
 		}
@@ -63,7 +86,11 @@ public class ItemBuilder {
 	}
 	
 	public ItemBuilder setLore(String... lore) {
-		itemMeta.setLore((lore == null) ? new ArrayList<>() : Arrays.asList(lore));
+		itemMeta.setLore(
+				(lore == null)
+						? new ArrayList<>()
+						: Arrays.asList(lore)
+		);
 		
 		return this;
 	}
@@ -87,11 +114,26 @@ public class ItemBuilder {
 			
 			try {
 				if(eazyNick.getVersion().startsWith("1_7"))
-					value = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(owner)).getProperties().get("textures").iterator().next().getValue();
+					value = eazyNick.getGameProfileBuilder_1_7()
+							.fetch(eazyNick.getUUIDFetcher_1_7().getUUID(owner))
+							.getProperties().get("textures")
+							.iterator()
+							.next()
+							.getValue();
 				else if(eazyNick.getVersion().equals("1_8_R1"))
-					value = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(owner)).getProperties().get("textures").iterator().next().getValue();
+					value = eazyNick.getGameProfileBuilder_1_8_R1()
+							.fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(owner))
+							.getProperties().get("textures")
+							.iterator()
+							.next()
+							.getValue();
 				else
-					value = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(owner)).getProperties().get("textures").iterator().next().getValue();
+					value = eazyNick.getGameProfileBuilder()
+							.fetch(eazyNick.getUUIDFetcher().getUUID(owner))
+							.getProperties().get("textures")
+							.iterator()
+							.next()
+							.getValue();
 			} catch (Exception ignore) {
 			}
 			
@@ -108,15 +150,27 @@ public class ItemBuilder {
         	Object profile;
         	
         	if(version.startsWith("1_7")) {
-	        	net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(UUID.randomUUID(), "MHF_Custom");
+	        	net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(
+						UUID.randomUUID(),
+						"MHF_Custom"
+				);
 	            gameProfile.getProperties().removeAll("textures");
-	            gameProfile.getProperties().put("textures", new net.minecraft.util.com.mojang.authlib.properties.Property("textures", value));
+	            gameProfile.getProperties().put("textures", new net.minecraft.util.com.mojang.authlib.properties.Property(
+						"textures",
+						value
+				));
 	            
 	            profile = gameProfile;
         	} else {
-	        	GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "MHF_Custom");
+	        	GameProfile gameProfile = new GameProfile(
+						UUID.randomUUID(),
+						"MHF_Custom"
+				);
 	            gameProfile.getProperties().removeAll("textures");
-	            gameProfile.getProperties().put("textures", new Property("textures", value));
+	            gameProfile.getProperties().put("textures", new Property(
+						"textures",
+						value
+				));
 	            
 	            profile = gameProfile;
         	}

@@ -25,26 +25,35 @@ public class RankedNickGUICommand implements CommandExecutor {
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(new NickManager(player).isNicked()) {
-				if(player.hasPermission("eazynick.nick.reset"))
-					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
-			} else if((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()) && setupYamlFile.getConfiguration().getBoolean("LobbyMode") && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
-				if(player.hasPermission("eazynick.nick.reset")) {
-					mysqlNickManager.removePlayer(player.getUniqueId());
-					mysqlPlayerDataManager.removeData(player.getUniqueId());
-					
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Unnick").replace("%prefix%", utils.getPrefix()));
-				}
-			} else if(player.hasPermission("eazynick.gui.book"))
-				eazyNick.getGUIManager().openRankedNickGUI(player, "");
-			else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
+		Player player = (Player) sender;
+
+		if(new NickManager(player).isNicked()) {
+			if(player.hasPermission("eazynick.nick.reset"))
+				Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
+		} else if((mysqlNickManager != null)
+				&& mysqlNickManager.isPlayerNicked(player.getUniqueId())
+				&& setupYamlFile.getConfiguration().getBoolean("LobbyMode")
+				&& setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
+			if(player.hasPermission("eazynick.nick.reset")) {
+				mysqlNickManager.removePlayer(player.getUniqueId());
+				mysqlPlayerDataManager.removeData(player.getUniqueId());
+
+				languageYamlFile.sendMessage(
+						player,
+						languageYamlFile.getConfigString(player, "Messages.Unnick")
+								.replace("%prefix%", utils.getPrefix())
+				);
+			}
+		} else if(player.hasPermission("eazynick.gui.book"))
+			eazyNick.getGUIManager().openRankedNickGUI(player, "");
+		else
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
 		
 		return true;
 	}

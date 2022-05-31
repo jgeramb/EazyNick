@@ -97,10 +97,12 @@ public class EazyNick extends JavaPlugin {
 		nmsBookUtils = new NMSBookUtils(this);
 		guiManager = new GUIManager(this);
 		
-		try {			
-            Class.forName(getClass().getPackage().getName() + ".PluginUpdater").getConstructor(String.class).newInstance(getName());
-        } catch (Exception ignore) {
-        }
+		try {
+			Class.forName(getClass().getPackage().getName() + ".PluginUpdater")
+					.getConstructor(String.class)
+					.newInstance(getName());
+		} catch (Exception ignore) {
+		}
 		
 		// Fix essentials '/nick' command bug
 		if(utils.isPluginInstalled("Essentials"))
@@ -128,7 +130,10 @@ public class EazyNick extends JavaPlugin {
 					Object incomingPacketInjector = utils.getIncomingPacketInjectors().get(uuid);
 					
 					try {
-						incomingPacketInjector.getClass().getMethod("unregister").invoke(incomingPacketInjector);
+						incomingPacketInjector
+								.getClass()
+								.getMethod("unregister")
+								.invoke(incomingPacketInjector);
 					} catch (Exception ignore) {
 					}
 				}
@@ -140,7 +145,10 @@ public class EazyNick extends JavaPlugin {
 		if(outgoingPacketInjector != null) {
 			// Unregister injected packet handlers (server -> client)
 			try {
-				outgoingPacketInjector.getClass().getMethod("unregister").invoke(outgoingPacketInjector);
+				outgoingPacketInjector
+						.getClass()
+						.getMethod("unregister")
+						.invoke(outgoingPacketInjector);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -210,7 +218,9 @@ public class EazyNick extends JavaPlugin {
 					}
 					
 					// Cache loaded plugins
-					Stream.of(Bukkit.getPluginManager().getPlugins()).filter(Plugin::isEnabled).forEach(currentPlugin -> utils.getLoadedPlugins().put(currentPlugin.getName(), currentPlugin.getDescription().getAuthors()));
+					Stream.of(Bukkit.getPluginManager().getPlugins())
+							.filter(Plugin::isEnabled)
+							.forEach(currentPlugin -> utils.getLoadedPlugins().put(currentPlugin.getName(), currentPlugin.getDescription().getAuthors()));
 					
 					Bukkit.getScheduler().runTask(instance, () -> {
 						// Prepare PlaceholderAPI placeholders
@@ -240,8 +250,16 @@ public class EazyNick extends JavaPlugin {
 				getCommand("resetskin").setExecutor(new ResetSkinCommand());
 				getCommand("fixskin").setExecutor(new FixSkinCommand());
 				getCommand("nicklist").setExecutor(new NickListCommand());
-				getCommand("bookgui").setExecutor(version.startsWith("1_7") ? new RankedNickGUICommand() : new BookGUICommand());
-				getCommand("nickgui").setExecutor(setupYamlFile.getConfiguration().getBoolean("OpenRankedNickGUIOnNickGUICommand") ? new RankedNickGUICommand() : new NickGUICommand());
+				getCommand("bookgui").setExecutor(
+						version.startsWith("1_7")
+								? new RankedNickGUICommand()
+								: new BookGUICommand()
+				);
+				getCommand("nickgui").setExecutor(
+						setupYamlFile.getConfiguration().getBoolean("OpenRankedNickGUIOnNickGUICommand")
+								? new RankedNickGUICommand()
+								: new NickGUICommand()
+				);
 				getCommand("nickedplayers").setExecutor(new NickedPlayersCommand());
 				getCommand("togglebungeenick").setExecutor(new ToggleBungeeNickCommand());
 				getCommand("realname").setExecutor(new RealNameCommand());
@@ -267,21 +285,50 @@ public class EazyNick extends JavaPlugin {
 				//Allow every player to use nick + initialize IncomingPacketInjector
 				Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
 					utils.getCanUseNick().put(currentPlayer.getUniqueId(), 0L);
-					utils.getIncomingPacketInjectors().put(currentPlayer.getUniqueId(), version.startsWith("1_7") ? new IncomingPacketInjector_1_7(currentPlayer) : new IncomingPacketInjector(currentPlayer));
+					utils.getIncomingPacketInjectors().put(
+							currentPlayer.getUniqueId(),
+							version.startsWith("1_7")
+									? new IncomingPacketInjector_1_7(currentPlayer)
+									: new IncomingPacketInjector(currentPlayer)
+					);
 				});
 				
 				//Start action bar scheduler
-				if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage") && setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked") && setupYamlFile.getConfiguration().getBoolean("BungeeCord") && setupYamlFile.getConfiguration().getBoolean("LobbyMode")) {
+				if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage")
+						&& setupYamlFile.getConfiguration().getBoolean("ShowNickActionBarWhenMySQLNicked")
+						&& setupYamlFile.getConfiguration().getBoolean("BungeeCord")
+						&& setupYamlFile.getConfiguration().getBoolean("LobbyMode")) {
 					new AsyncTask(new AsyncRunnable() {
 						
 						@Override
 						public void run() {
 							//Display action bar to players that are nicked in mysql
-							Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> (mysqlNickManager.isPlayerNicked(currentPlayer.getUniqueId()) && !(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())))).forEach(currentNickedPlayer -> {
-								String nickName = mysqlNickManager.getNickName(currentNickedPlayer.getUniqueId()), prefix = mysqlPlayerDataManager.getChatPrefix(currentNickedPlayer.getUniqueId()), suffix = mysqlPlayerDataManager.getChatSuffix(currentNickedPlayer.getUniqueId());
+							Bukkit.getOnlinePlayers()
+									.stream()
+									.filter(currentPlayer -> (
+											mysqlNickManager.isPlayerNicked(currentPlayer.getUniqueId())
+											&& !(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())))
+									).forEach(currentNickedPlayer -> {
+								String nickName = mysqlNickManager.getNickName(currentNickedPlayer.getUniqueId()),
+										prefix = mysqlPlayerDataManager.getChatPrefix(currentNickedPlayer.getUniqueId()),
+										suffix = mysqlPlayerDataManager.getChatSuffix(currentNickedPlayer.getUniqueId());
 								
 								if(!(utils.getWorldsWithDisabledActionBar().contains(currentNickedPlayer.getWorld().getName().toUpperCase())))
-									actionBarUtils.sendActionBar(currentNickedPlayer, languageYamlFile.getConfigString(currentNickedPlayer, currentNickedPlayer.hasPermission("eazynick.actionbar.other") ? "NickActionBarMessageOther" : "NickActionBarMessage").replace("%nickName%", nickName).replace("%nickname%", nickName).replace("%nickPrefix%", prefix).replace("%nickprefix%", prefix).replace("%nickSuffix%", suffix).replace("%nicksuffix%", suffix).replace("%prefix%", utils.getPrefix()));
+									actionBarUtils.sendActionBar(
+											currentNickedPlayer,
+											languageYamlFile.getConfigString(currentNickedPlayer,
+													currentNickedPlayer.hasPermission("eazynick.actionbar.other")
+															? "NickActionBarMessageOther"
+															: "NickActionBarMessage"
+											)
+													.replace("%nickName%", nickName)
+													.replace("%nickname%", nickName)
+													.replace("%nickPrefix%", prefix)
+													.replace("%nickprefix%", prefix)
+													.replace("%nickSuffix%", suffix)
+													.replace("%nicksuffix%", suffix)
+													.replace("%prefix%", utils.getPrefix())
+									);
 							});
 						}
 					}, 1000, 1000).run();
@@ -300,7 +347,13 @@ public class EazyNick extends JavaPlugin {
 			// Prepare BungeeCord/MySQL mode
 			if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
 				// Open mysql connection
-				mysql = new MySQL(setupYamlFile.getConfiguration().getString("BungeeMySQL.hostname"), setupYamlFile.getConfiguration().getString("BungeeMySQL.port"), setupYamlFile.getConfiguration().getString("BungeeMySQL.database"), setupYamlFile.getConfiguration().getString("BungeeMySQL.username"), setupYamlFile.getConfiguration().getString("BungeeMySQL.password"));
+				mysql = new MySQL(
+						setupYamlFile.getConfiguration().getString("BungeeMySQL.hostname"),
+						setupYamlFile.getConfiguration().getString("BungeeMySQL.port"),
+						setupYamlFile.getConfiguration().getString("BungeeMySQL.database"),
+						setupYamlFile.getConfiguration().getString("BungeeMySQL.username"),
+						setupYamlFile.getConfiguration().getString("BungeeMySQL.password")
+				);
 
 				// Create default tables
 				mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (UUID varchar(64), NickName varchar(64), SkinName varchar(64))");
@@ -313,7 +366,10 @@ public class EazyNick extends JavaPlugin {
 			
 			// Initialize bStats
 			BStatsMetrics bStatsMetrics = new BStatsMetrics(this, 11663);
-			bStatsMetrics.addCustomChart(new BStatsMetrics.SimplePie("mysql", () -> (setupYamlFile.getConfiguration().getBoolean("BungeeCord") ? "yes" : "no")));
+			bStatsMetrics.addCustomChart(new BStatsMetrics.SimplePie(
+					"mysql",
+					() -> (setupYamlFile.getConfiguration().getBoolean("BungeeCord") ? "yes" : "no")
+			));
 			
 			utils.sendConsole("");
 			utils.sendConsole("§7Plugin by§8: §a" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));

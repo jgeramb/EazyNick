@@ -17,18 +17,26 @@ public class FixSkinCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.skin.fix")) {
-				new NickManager(player).updatePlayer();
-				
-				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.FixSkin").replace("%prefix%", utils.getPrefix()));
-			} else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
+		Player player = (Player) sender;
+
+		if(!(player.hasPermission("eazynick.skin.fix"))) {
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
+			return true;
+		}
+
+		new NickManager(player).updatePlayer();
+
+		languageYamlFile.sendMessage(
+				player,
+				languageYamlFile.getConfigString(player, "Messages.FixSkin")
+						.replace("%prefix%", utils.getPrefix())
+		);
 		
 		return true;
 	}

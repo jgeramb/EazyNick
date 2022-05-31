@@ -26,7 +26,9 @@ public class ReflectionHelper {
 	}
 	
 	public Optional<Class<?>> getSubClass(Class<?> clazz, String className) {
-		return Stream.of(clazz.getDeclaredClasses()).filter(subClazz -> subClazz.getSimpleName().equals(className)).findFirst();
+		return Stream.of(clazz.getDeclaredClasses())
+				.filter(subClazz -> subClazz.getSimpleName().equals(className))
+				.findFirst();
 	}
 	
 	public Field getField(Class<?> clazz, String fieldName) {
@@ -46,7 +48,11 @@ public class ReflectionHelper {
 		try {
 			String version = getVersion();
 			
-			return Class.forName((version.startsWith("v1_17") || version.startsWith("v1_18")) ? ("net.minecraft." + className) : ("net.minecraft.server." + version + "." + className));
+			return Class.forName(
+					(version.startsWith("v1_17") || version.startsWith("v1_18"))
+							? ("net.minecraft." + className)
+							: ("net.minecraft.server." + version + "." + className)
+			);
 		} catch (ClassNotFoundException ex) {
 			ex.printStackTrace();
 		}

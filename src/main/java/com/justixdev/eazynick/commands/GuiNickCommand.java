@@ -15,21 +15,25 @@ public class GuiNickCommand implements CommandExecutor {
 	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.nick.random") || player.hasPermission("eazynick.nick.custom")) {
-				NickManager api = new NickManager(player);
-				
-				if(!(api.isNicked())) {
-					if(args.length >= 3)
-						utils.performRankedNick(player, args[0], args[1], args[2]);
-				}
-			} else
-				eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+		
+		Player player = (Player) sender;
+
+		if(!(player.hasPermission("eazynick.nick.random")
+				|| player.hasPermission("eazynick.nick.custom"))) {
+			eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
+			return true;
+		}
+
+		NickManager api = new NickManager(player);
+
+		if(api.isNicked() || (args.length < 3)) return true;
+
+		utils.performRankedNick(player, args[0], args[1], args[2]);
 		
 		return true;
 	}

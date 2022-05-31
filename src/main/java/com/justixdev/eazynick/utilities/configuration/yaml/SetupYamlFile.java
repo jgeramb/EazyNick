@@ -146,7 +146,14 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("AutoNickWorldBlackList", Collections.singletonList("example_world"));
 		configuration.addDefault("BlackList", Collections.singletonList("ExampleName"));
 		configuration.addDefault("DisabledNickWorlds", Collections.singletonList("ExampleName"));
-		configuration.addDefault("MineSkinUUIDs", Arrays.asList("f6268b5d64044876bdb13d9dc1c808aa", "37c4366f257049b482a052ca26cf1acc", "f8011cd2c70447b49ed2fd6ca5fb47f4"));
+		configuration.addDefault(
+				"MineSkinUUIDs",
+				Arrays.asList(
+						"f6268b5d64044876bdb13d9dc1c808aa",
+						"37c4366f257049b482a052ca26cf1acc",
+						"f8011cd2c70447b49ed2fd6ca5fb47f4"
+				)
+		);
 	}
 	
 	@Override
@@ -158,7 +165,10 @@ public class SetupYamlFile extends YamlFile {
 			Utils utils = eazyNick.getUtils();
 			utils.sendConsole("§cBungeeCord-Mode enabled§8, §cplease reload/restart your server now");
 			
-			Bukkit.getOnlinePlayers().stream().filter(currentPlayer -> currentPlayer.hasPermission("eazynick.notify")).forEach(currentPlayer -> currentPlayer.sendMessage("§cBungeeCord-Mode enabled§8, §cplease reload/restart your server now"));
+			Bukkit.getOnlinePlayers()
+					.stream()
+					.filter(currentPlayer -> currentPlayer.hasPermission("eazynick.notify"))
+					.forEach(currentPlayer -> currentPlayer.sendMessage("§cBungeeCord-Mode enabled§8, §cplease reload/restart your server now"));
 			Bukkit.getPluginManager().disablePlugin(eazyNick);
 		}
 	}

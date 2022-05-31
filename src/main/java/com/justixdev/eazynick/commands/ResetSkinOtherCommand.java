@@ -18,30 +18,39 @@ public class ResetSkinOtherCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-		
+
+		if(!(sender instanceof Player)) {
+			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
 		String prefix = utils.getPrefix();
 		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.other.skin.reset")) {
-				if(args.length >= 1) {
-					Player targetPlayer = Bukkit.getPlayer(args[0]);
-					
-					if(targetPlayer != null) {
-						NickManager api = new NickManager(targetPlayer);
-				
-						api.changeSkin(api.getRealName());
-						
-						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Other.ResetSkin").replace("%playerName%", targetPlayer.getName()).replace("%playername%", targetPlayer.getName()).replace("%prefix%", utils.getPrefix()));
-					} else
-						languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.PlayerNotFound").replace("%prefix%", prefix));
-				}
-			} else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
-		} else
-			utils.sendConsole(utils.getNotPlayer());
-		
+		Player player = (Player) sender;
+
+		if(!(player.hasPermission("eazynick.other.skin.reset"))) {
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
+			return true;
+		}
+
+		if(args.length < 1) return true;
+
+		Player targetPlayer = Bukkit.getPlayer(args[0]);
+
+		if(targetPlayer == null) {
+			languageYamlFile.sendMessage(
+					player,
+					languageYamlFile.getConfigString(player, "Messages.PlayerNotFound")
+							.replace("%prefix%", prefix)
+			);
+			return true;
+		}
+
+		NickManager api = new NickManager(targetPlayer);
+		api.changeSkin(api.getRealName());
+
+		languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Other.ResetSkin").replace("%playerName%", targetPlayer.getName()).replace("%playername%", targetPlayer.getName()).replace("%prefix%", utils.getPrefix()));
+
 		return true;
 	}
 	

@@ -19,22 +19,30 @@ public class ResetNameCommand implements CommandExecutor {
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.nick.reset")) {
-				NickManager api = new NickManager(player);
-				api.setName(api.getRealName());
-				
-				if(mysqlNickManager != null)
-					mysqlNickManager.removePlayer(player.getUniqueId());
-				
-				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.ResetName").replace("%prefix%", utils.getPrefix()));
-			} else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
+		Player player = (Player) sender;
+
+		if(!(player.hasPermission("eazynick.nick.reset"))) {
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
+			return true;
+		}
+
+		NickManager api = new NickManager(player);
+		api.setName(api.getRealName());
+
+		if(mysqlNickManager != null)
+			mysqlNickManager.removePlayer(player.getUniqueId());
+
+		languageYamlFile.sendMessage(
+				player,
+				languageYamlFile.getConfigString(player, "Messages.ResetName")
+						.replace("%prefix%", utils.getPrefix())
+		);
 		
 		return true;
 	}

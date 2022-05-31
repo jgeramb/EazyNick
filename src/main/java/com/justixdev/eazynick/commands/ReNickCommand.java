@@ -20,20 +20,28 @@ public class ReNickCommand implements CommandExecutor {
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(utils.getNickOnWorldChangePlayers().contains(player.getUniqueId()) || ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()))) {
-				if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
-					Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
-				else if(!(eazyNick.getSetupYamlFile().getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
-					utils.performReNick(player);
-				else
-					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", utils.getPrefix()));
-			}
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
+		Player player = (Player) sender;
+
+		if(utils.getNickOnWorldChangePlayers().contains(player.getUniqueId())
+				|| ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()))) {
+			if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
+				Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
+			else if(!(eazyNick.getSetupYamlFile().getConfiguration().getStringList("DisabledNickWorlds")
+					.contains(player.getWorld().getName())))
+				utils.performReNick(player);
+			else
+				languageYamlFile.sendMessage(
+						player,
+						languageYamlFile.getConfigString(player, "Messages.DisabledWorld")
+								.replace("%prefix%", utils.getPrefix())
+				);
+		}
 		
 		return true;
 	}

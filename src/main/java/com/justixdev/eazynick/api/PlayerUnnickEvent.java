@@ -29,9 +29,13 @@ public class PlayerUnnickEvent extends Event implements Cancellable {
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
 	}
-	
+
 	@Override
 	public @NotNull HandlerList getHandlers() {
+		return HANDLER_LIST;
+	}
+
+	public static HandlerList getHandlerList() {
 		return HANDLER_LIST;
 	}
 

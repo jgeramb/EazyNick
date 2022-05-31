@@ -61,7 +61,21 @@ public class BStatsMetrics {
         boolean logErrors = config.getBoolean("logFailedRequests", false);
         boolean logSentData = config.getBoolean("logSentData", false);
         boolean logResponseStatusText = config.getBoolean("logResponseStatusText", false);
-        metricsBase = new MetricsBase("bukkit", serverUUID, serviceId, enabled, this::appendPlatformData, this::appendServiceData, submitDataTask -> Bukkit.getScheduler().runTask(plugin, submitDataTask), plugin::isEnabled, (message, error) -> this.plugin.getLogger().log(Level.WARNING, message, error), (message) -> this.plugin.getLogger().log(Level.INFO, message), logErrors, logSentData, logResponseStatusText);
+        metricsBase = new MetricsBase(
+                "bukkit",
+                serverUUID,
+                serviceId,
+                enabled,
+                this::appendPlatformData,
+                this::appendServiceData,
+                submitDataTask -> Bukkit.getScheduler().runTask(plugin, submitDataTask),
+                plugin::isEnabled,
+                (message, error) -> this.plugin.getLogger().log(Level.WARNING, message, error),
+                (message) -> this.plugin.getLogger().log(Level.INFO, message),
+                logErrors,
+                logSentData,
+                logResponseStatusText
+        );
     }
 
     public void addCustomChart(CustomChart chart) {
@@ -88,7 +102,9 @@ public class BStatsMetrics {
         try {
             Method onlinePlayersMethod = Class.forName("org.bukkit.Server").getMethod("getOnlinePlayers");
 
-            return onlinePlayersMethod.getReturnType().equals(Collection.class) ? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size() : ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
+            return onlinePlayersMethod.getReturnType().equals(Collection.class)
+                    ? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size()
+                    : ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
         } catch (Exception e) {
             return Bukkit.getOnlinePlayers().size();
         }
@@ -98,7 +114,10 @@ public class BStatsMetrics {
 
         public static final String METRICS_VERSION = "2.2.1", REPORT_URL = "https://bStats.org/api/v2/data/%s";
 
-        private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, task -> new Thread(task, "bStats-Metrics"));
+        private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
+                1,
+                task -> new Thread(task, "bStats-Metrics")
+        );
 
         private final String platform;
         private final String serverUuid;
@@ -174,7 +193,11 @@ public class BStatsMetrics {
             final JsonObjectBuilder serviceJsonBuilder = new JsonObjectBuilder();
             appendServiceDataConsumer.accept(serviceJsonBuilder);
 
-            JsonObjectBuilder.JsonObject[] chartData = customCharts.stream().map(customChart -> customChart.getRequestJsonObject(errorLogger, logErrors)).filter(Objects::nonNull).toArray(JsonObjectBuilder.JsonObject[]::new);
+            JsonObjectBuilder.JsonObject[] chartData = customCharts
+                    .stream()
+                    .map(customChart -> customChart.getRequestJsonObject(errorLogger, logErrors))
+                    .filter(Objects::nonNull)
+                    .toArray(JsonObjectBuilder.JsonObject[]::new);
 
             serviceJsonBuilder.appendField("id", serviceId);
             serviceJsonBuilder.appendField("customCharts", chartData);
@@ -230,11 +253,13 @@ public class BStatsMetrics {
         }
 
         private void checkRelocation() {
-            if (System.getProperty("bstats.relocatecheck") == null || !System.getProperty("bstats.relocatecheck").equals("false")) {
+            if ((System.getProperty("bstats.relocatecheck") == null)
+                    || !(System.getProperty("bstats.relocatecheck").equals("false"))) {
                 final String defaultPackage = new String(new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's'});
                 final String examplePackage = new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
 
-                if (MetricsBase.class.getPackage().getName().startsWith(defaultPackage) || MetricsBase.class.getPackage().getName().startsWith(examplePackage))
+                if (MetricsBase.class.getPackage().getName().startsWith(defaultPackage)
+                        || MetricsBase.class.getPackage().getName().startsWith(examplePackage))
                     throw new IllegalStateException("bStats Metrics class has not been relocated correctly!");
             }
         }
@@ -347,7 +372,10 @@ public class BStatsMetrics {
             if (values == null)
                 throw new IllegalArgumentException("JSON values must not be null");
 
-            String escapedValues = Arrays.stream(values).map(JsonObject::toString).collect(Collectors.joining(","));
+            String escapedValues = Arrays
+                    .stream(values)
+                    .map(JsonObject::toString)
+                    .collect(Collectors.joining(","));
 
             appendFieldUnescaped(key, "[" + escapedValues + "]");
 

@@ -24,50 +24,60 @@ public class MySQL {
 	}
 
 	public void connect() {
-		//Make sure no connection is open
-		if(!(isConnected())) {
-			try {
-				//Open connection
-				connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&characterEncoding=utf8&useUnicode=true&interactiveClient=true&useSSL=false", username, password);
+		// Make sure no connection is open
+		if(isConnected()) return;
 
-				LOGGER.info(PREFIX + "Connected to database successfully!");
-			} catch (SQLException ex) {
-				LOGGER.log(Level.WARNING, PREFIX + "Connection to database failed!");
-				LOGGER.log(Level.WARNING, PREFIX);
-				LOGGER.log(Level.WARNING, PREFIX + "Connection Properties:");
-				LOGGER.log(Level.WARNING, PREFIX + " Address: " + host + ":" + port);
-				LOGGER.log(Level.WARNING, PREFIX + " Database: " + database);
-				LOGGER.log(Level.WARNING, PREFIX + " Username: " + username);
+		try {
+			// Open connection
+			connection = DriverManager.getConnection(
+					"jdbc:mysql://"
+							+ host
+							+ ":"
+							+ port
+							+ "/"
+							+ database
+							+ "?autoReconnect=true&characterEncoding=utf8&useUnicode=true&interactiveClient=true&useSSL=false",
+					username,
+					password
+			);
 
-				StringBuilder censoredPassword = new StringBuilder();
+			LOGGER.info(PREFIX + "Connected to database successfully!");
+		} catch (SQLException ex) {
+			LOGGER.log(Level.WARNING, PREFIX + "Connection to database failed!");
+			LOGGER.log(Level.WARNING, PREFIX);
+			LOGGER.log(Level.WARNING, PREFIX + "Connection Properties:");
+			LOGGER.log(Level.WARNING, PREFIX + " Address: " + host + ":" + port);
+			LOGGER.log(Level.WARNING, PREFIX + " Database: " + database);
+			LOGGER.log(Level.WARNING, PREFIX + " Username: " + username);
 
-				for (int i = 0; i < password.length(); i++)
-					censoredPassword.append("*");
+			StringBuilder censoredPassword = new StringBuilder();
 
-				LOGGER.log(Level.WARNING, PREFIX + " Password: " + censoredPassword);
-				LOGGER.log(Level.WARNING, PREFIX);
-				LOGGER.log(Level.WARNING, PREFIX + "---------- Stack trace START ----------");
-				LOGGER.log(Level.WARNING, "");
-				
-				ex.printStackTrace();
+			for (int i = 0; i < password.length(); i++)
+				censoredPassword.append("*");
 
-				LOGGER.log(Level.WARNING, "");
-				LOGGER.log(Level.WARNING, PREFIX + "---------- Stack trace  END  ----------");
-			}
+			LOGGER.log(Level.WARNING, PREFIX + " Password: " + censoredPassword);
+			LOGGER.log(Level.WARNING, PREFIX);
+			LOGGER.log(Level.WARNING, PREFIX + "---------- Stack trace START ----------");
+			LOGGER.log(Level.WARNING, "");
+
+			ex.printStackTrace();
+
+			LOGGER.log(Level.WARNING, "");
+			LOGGER.log(Level.WARNING, PREFIX + "---------- Stack trace  END  ----------");
 		}
 	}
 
 	public void disconnect() {
 		//Check if connection is open
-		if(isConnected()) {
-			try {
-				//Close connection
-				connection.close();
+		if(!(isConnected())) return;
 
-				LOGGER.info(PREFIX + "Connection to database closed successfully!");
-			} catch (SQLException ex) {
-				LOGGER.log(Level.WARNING, PREFIX + "Could not close Connection to database!");
-			}
+		try {
+			//Close connection
+			connection.close();
+
+			LOGGER.info(PREFIX + "Connection to database closed successfully!");
+		} catch (SQLException ex) {
+			LOGGER.log(Level.WARNING, PREFIX + "Could not close Connection to database!");
 		}
 	}
 
@@ -81,65 +91,73 @@ public class MySQL {
 	}
 
 	public void update(String sql) {
-		//Check if connection is open
-		if(isConnected()) {
-			new FutureTask<>(() -> {
+		// Check if connection is open
+		if(!(isConnected())) return;
+
+		new FutureTask<>(() -> {
+			try {
+				// Execute update
+				Statement s = connection.createStatement();
+				s.executeUpdate(sql);
+				s.close();
+			} catch (SQLException ex) {
+				String msg = ex.getMessage();
+
+				if(msg.contains("The driver has not received any packets from the server.")
+						|| msg.contains("The last packet successfully received from the server was")) {
+					try {
+						connection.close();
+					} catch (SQLException ignore) {
+					}
+
+					connection = null;
+
+					connect();
+				} else
+					LOGGER.log(
+							Level.WARNING,
+							PREFIX + "An error occurred while executing mysql update (" + msg + ")!"
+					);
+			}
+		}, 1).run();
+	}
+
+	public ResultSet getResult(String query) {
+		// Check if connection is open
+		if(!(isConnected())) return null;
+
+		try {
+			final FutureTask<ResultSet> task = new FutureTask<>(() -> {
 				try {
-					//Execute update
-					Statement s = connection.createStatement();
-					s.executeUpdate(sql);
-					s.close();
+					// Execute query
+					return connection.createStatement().executeQuery(query);
 				} catch (SQLException ex) {
 					String msg = ex.getMessage();
-					
-					if(msg.contains("The driver has not received any packets from the server.") || msg.contains("The last packet successfully received from the server was")) {
+
+					if (msg.contains("The driver has not received any packets from the server.")
+							|| msg.contains("The last packet successfully received from the server was")) {
 						try {
 							connection.close();
 						} catch (SQLException ignore) {
 						}
-						
+
 						connection = null;
-						
+
 						connect();
 					} else
-						LOGGER.log(Level.WARNING, PREFIX + "An error occurred while executing mysql update (" + msg + ")!");
+						LOGGER.log(
+								Level.WARNING,
+								PREFIX + "An error occurred while executing mysql update (" + msg + ")!"
+						);
 				}
-			}, 1).run();
-		}
-	}
 
-	public ResultSet getResult(String query) {
-		//Check if connection is open
-		if(isConnected()) {
-			try {
-				final FutureTask<ResultSet> task = new FutureTask<>(() -> {
-					try {
-						//Execute query
-						return connection.createStatement().executeQuery(query);
-					} catch (SQLException ex) {
-						String msg = ex.getMessage();
+				return null;
+			});
 
-						if (msg.contains("The driver has not received any packets from the server.") || msg.contains("The last packet successfully received from the server was")) {
-							try {
-								connection.close();
-							} catch (SQLException ignore) {
-							}
+			task.run();
 
-							connection = null;
-
-							connect();
-						} else
-							LOGGER.log(Level.WARNING, PREFIX + "An error occurred while executing mysql update (" + msg + ")!");
-					}
-
-					return null;
-				});
-				
-				task.run();
-			
-				return task.get();
-			} catch (InterruptedException | ExecutionException ignore) {
-			}
+			return task.get();
+		} catch (InterruptedException | ExecutionException ignore) {
 		}
 		
 		return null;

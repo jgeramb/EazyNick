@@ -17,20 +17,27 @@ public class ResetSkinCommand implements CommandExecutor {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-		
-		if(sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if(player.hasPermission("eazynick.skin.reset")) {
-				NickManager api = new NickManager(player);
-				
-				api.changeSkin(api.getRealName());
-				
-				languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.ResetSkin").replace("%prefix%", utils.getPrefix()));
-			} else
-				languageYamlFile.sendMessage(player, utils.getNoPerm());
-		} else
+
+		if(!(sender instanceof Player)) {
 			utils.sendConsole(utils.getNotPlayer());
+			return true;
+		}
+
+		Player player = (Player) sender;
+
+		if(!(player.hasPermission("eazynick.skin.reset"))) {
+			languageYamlFile.sendMessage(player, utils.getNoPerm());
+			return true;
+		}
+
+		NickManager api = new NickManager(player);
+		api.changeSkin(api.getRealName());
+
+		languageYamlFile.sendMessage(
+				player,
+				languageYamlFile.getConfigString(player, "Messages.ResetSkin")
+						.replace("%prefix%", utils.getPrefix())
+		);
 		
 		return true;
 	}
