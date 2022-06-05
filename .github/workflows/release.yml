@@ -45,4 +45,4 @@ jobs:
           title: v${{ steps.version.outputs.version }}
           automatic_release_tag: v${{ steps.version.outputs.version }}
           files: |
-            target/eazynick*.jar
+            target/EazyNick*.jar
