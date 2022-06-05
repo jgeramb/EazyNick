@@ -100,13 +100,6 @@
         </dependency>
         <dependency>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/UltraPermissions.jar</systemPath>
-            <groupId>me.TechsCode</groupId>
-            <artifactId>ultrapermissions</artifactId>
-            <version>4.9.1</version>
-        </dependency>
-        <dependency>
-            <scope>system</scope>
             <systemPath>${basedir}/lib/PermissionsEx-1.23.4.jar</systemPath>
             <groupId>ru.tehkode</groupId>
             <artifactId>permissions</artifactId>
