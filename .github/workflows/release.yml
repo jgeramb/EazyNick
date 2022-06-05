@@ -1,9 +1,10 @@
-name: Java CI with Maven
+name: Release New version
 
 on:
-  push:
-      - 'v*'
   workflow_dispatch:
+  push:
+    tags:        
+      - 'v*'  
 
 jobs:
   build:
