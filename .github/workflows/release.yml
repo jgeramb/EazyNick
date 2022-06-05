@@ -31,8 +31,8 @@ jobs:
         sed -i 's/0.0.0/${{ steps.version.outputs.version }}/g' src/main/resources/plugin.yml
         grep src/main/resources/plugin.yml -e ${{ steps.version.outputs.version }}
         mvn -B package --file pom.xml
-        cp target/eazynick-* target/eazynick.jar
-        cp target/eazynick-* target/eazynick-v${{ steps.version.outputs.version }}.jar
+        cp target/eazynick-* target/EazyNick.jar
+        mv target/eazynick-* target/EazyNick-v${{ steps.version.outputs.version }}.jar
 
     - uses: actions/upload-artifact@v3
       with:

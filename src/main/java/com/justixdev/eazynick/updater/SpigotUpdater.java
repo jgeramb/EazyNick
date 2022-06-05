@@ -34,6 +34,11 @@ public class SpigotUpdater {
 	}
 
 	public boolean checkForUpdates() {
+		String currentVersion = pluginDescription.getVersion();
+
+		if(currentVersion.equals("0.0.0"))
+			return false;
+
 		Bukkit.getLogger().log(Level.INFO, prefix + "Checking for updates...");
 
 		// Fetch the latest version from spigotmc.org
@@ -41,7 +46,7 @@ public class SpigotUpdater {
 			final String latestVersion = reader.readLine();
 
 			// Check if version is up-to-date
-			if (latestVersion.equals(pluginDescription.getVersion())) {
+			if (latestVersion.equals(currentVersion)) {
 				Bukkit.getLogger().log(Level.INFO, "No new version available");
 				return false;
 			}
