@@ -70,10 +70,6 @@ public class Utils {
 	private final Map<UUID, Object> oldLuckPermsGroups;
 	private final Map<UUID, Object> luckPermsPrefixes, luckPermsSuffixes;
 	
-	// UltraPermissions old player data
-	private final Map<UUID, Map<String, Long>> oldUltraPermissionsGroups;
-	private final Map<UUID, String> ultraPermissionsPrefixes, ultraPermissionsSuffixes;
-	
 	//NameTagEdit old player data
 	private final Map<UUID, String> nametagEditPrefixes, nametagEditSuffixes;
 	
@@ -138,10 +134,6 @@ public class Utils {
 		this.oldLuckPermsGroups = new HashMap<>();
 		this.luckPermsPrefixes = new HashMap<>();
 		this.luckPermsSuffixes = new HashMap<>();
-
-		this.oldUltraPermissionsGroups = new HashMap<>();
-		this.ultraPermissionsPrefixes = new HashMap<>();
-		this.ultraPermissionsSuffixes = new HashMap<>();
 
 		this.nametagEditPrefixes = new HashMap<>();
 		this.nametagEditSuffixes = new HashMap<>();
@@ -1040,18 +1032,6 @@ public class Utils {
 	
 	public Map<UUID, Object> getLuckPermsSuffixes() {
 		return luckPermsSuffixes;
-	}
-	
-	public Map<UUID, Map<String, Long>> getOldUltraPermissionsGroups() {
-		return oldUltraPermissionsGroups;
-	}
-	
-	public Map<UUID, String> getUltraPermissionsPrefixes() {
-		return ultraPermissionsPrefixes;
-	}
-	
-	public Map<UUID, String> getUltraPermissionsSuffixes() {
-		return ultraPermissionsSuffixes;
 	}
 	
 	public Map<UUID, String> getNametagEditPrefixes() {

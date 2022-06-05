@@ -16,8 +16,6 @@ import com.nametagedit.plugin.api.data.Nametag;
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
 import de.dytanic.cloudnet.lib.player.permission.PermissionEntity;
-import me.TechsCode.UltraPermissions.UltraPermissions;
-import me.TechsCode.UltraPermissions.UltraPermissionsAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.skinsrestorer.api.PlayerWrapper;
@@ -1197,41 +1195,6 @@ public class NickManager extends ReflectionHelper {
 			}
 		}
 
-		// Reset UltraPermissions prefix, suffix and group
-		if(utils.isPluginInstalled("UltraPermissions")) {
-			UltraPermissionsAPI api = UltraPermissions.getAPI();
-			Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional =
-					api.getUsers().uuid(player.getUniqueId());
-
-			if(userOptional.isPresent()) {
-				me.TechsCode.UltraPermissions.storage.objects.User user = userOptional.get();
-
-				if(utils.getOldUltraPermissionsGroups().containsKey(player.getUniqueId())) {
-					Map<String, Long> data = utils.getOldUltraPermissionsGroups().get(player.getUniqueId());
-
-					data.keySet().forEach(group -> api
-							.getGroups()
-							.name(group)
-							.ifPresent(tmpGroup -> user.addGroup(tmpGroup, data.get(group)))
-					);
-
-					utils.getOldUltraPermissionsGroups().remove(player.getUniqueId());
-				}
-
-				if(utils.getUltraPermissionsPrefixes().containsKey(player.getUniqueId())) {
-					user.setPrefix(utils.getUltraPermissionsPrefixes().get(player.getUniqueId()));
-
-					utils.getUltraPermissionsPrefixes().remove(player.getUniqueId());
-				}
-
-				if(utils.getUltraPermissionsSuffixes().containsKey(player.getUniqueId())) {
-					user.setSuffix(utils.getUltraPermissionsSuffixes().get(player.getUniqueId()));
-
-					utils.getUltraPermissionsSuffixes().remove(player.getUniqueId());
-				}
-			}
-		}
-
 		// Reset PermissionsEx prefix, suffix and group
 		if(utils.isPluginInstalled("PermissionsEx")) {
 			PermissionUser user = PermissionsEx.getUser(player);
@@ -1690,53 +1653,6 @@ public class NickManager extends ReflectionHelper {
 		// Set chat name
 		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.DisplayName"))
 			player.setDisplayName(chatPrefix + nickName + chatSuffix);
-		
-		// Update UltraPermissions prefix, suffix and group
-		if(utils.isPluginInstalled("UltraPermissions")) {
-			UltraPermissionsAPI api = UltraPermissions.getAPI();
-			Optional<me.TechsCode.UltraPermissions.storage.objects.User> userOptional = api.getUsers().uuid(player.getUniqueId());
-			
-			if(userOptional.isPresent()) {
-				me.TechsCode.UltraPermissions.storage.objects.User user = userOptional.get();
-
-				utils.getUltraPermissionsPrefixes().put(
-						player.getUniqueId(),
-						user.getPrefix().filter(value -> !(value.trim().isEmpty())).orElse(null)
-				);
-				utils.getUltraPermissionsSuffixes().put(
-						player.getUniqueId(),
-						user.getSuffix().filter(value -> !(value.trim().isEmpty())).orElse(null)
-				);
-				
-				user.setPrefix(tabPrefix);
-				user.setSuffix(tabSuffix);
-				
-				if(!(setupYamlFile.getConfiguration().getBoolean("SwitchUltraPermissionsGroupByNicking")) || groupName.equalsIgnoreCase("NONE")) return;
-
-				if(!(utils.getOldUltraPermissionsGroups().containsKey(player.getUniqueId())))
-					utils.getOldUltraPermissionsGroups().put(player.getUniqueId(), new HashMap<>());
-
-				for (me.TechsCode.UltraPermissions.base.storage.Stored<me.TechsCode.UltraPermissions.storage.objects.Group> groupStored : user.getGroups()) {
-					if(groupStored.isPresent()) {
-						Optional<me.TechsCode.UltraPermissions.storage.objects.Group> groupOptional = groupStored.get();
-
-						if(groupOptional.isPresent()) {
-							me.TechsCode.UltraPermissions.storage.objects.Group group = groupOptional.get();
-							utils.getOldUltraPermissionsGroups().get(player.getUniqueId()).put(
-									group.getName(),
-									user.getGroupExpiry(groupStored)
-							);
-
-							user.removeGroup(group);
-						}
-					}
-				}
-
-				Optional<me.TechsCode.UltraPermissions.storage.objects.Group> group = api.getGroups().name(groupName);
-
-				group.ifPresent(user::addGroup);
-			}
-		}
 		
 		// Update PermissionsEx prefix, suffix and group
 		if(utils.isPluginInstalled("PermissionsEx")) {

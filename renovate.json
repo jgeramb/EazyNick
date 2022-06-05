@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "includeForks": true,
+  "baseBranches": ["main", "Stable", "master", "old", "latest", "develop"]
+}
