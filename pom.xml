@@ -6,7 +6,7 @@
 
     <groupId>com.justixdev</groupId>
     <artifactId>eazynick</artifactId>
-    <version>3.13.0</version>
+    <version>0.0.0</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

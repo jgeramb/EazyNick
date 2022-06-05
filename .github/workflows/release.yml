@@ -26,6 +26,7 @@ jobs:
 
     - name: Build with Maven
       run: | 
+        sed -i 's/"0.0.0"/"${{ steps.version.outputs.version }}"/g' pom.xml
         mvn -B package --file pom.xml
         cp target/eazynick-* target/eazynick.jar
 
@@ -38,7 +39,7 @@ jobs:
       with:
         prerelease: false
         repo_token: ${{ github.token }}
-        title: ${{ steps.version.outputs.version }}
-        automatic_release_tag: ${{ steps.version.outputs.version }}
+        title: v${{ steps.version.outputs.version }}
+        automatic_release_tag: v${{ steps.version.outputs.version }}
         files: |
           target/eazynick*.jar
