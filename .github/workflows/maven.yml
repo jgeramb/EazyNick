@@ -24,9 +24,8 @@ jobs:
 
     - name: Build with Maven
       run: | 
-        sed -i 's/"0.0.0"/"${{ steps.version.outputs.version }}"/g' pom.xml
-        grep pom.xml -e "0.0.0"
-        grep pom.xml -e "${{ steps.version.outputs.version }}"
+        sed -i 's/0.0.0/${{ steps.version.outputs.version }}/g' pom.xml
+        grep pom.xml -e ${{ steps.version.outputs.version }}
         mvn -B package --file pom.xml
         cp target/eazynick-* target/eazynick.jar
         cp target/eazynick-* target/eazynick-v${{ steps.version.outputs.version }}.jar
