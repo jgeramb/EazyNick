@@ -32,5 +32,6 @@ jobs:
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         prerelease: false
+        repo_token: ${{ github.token }}
         files: |
           target/eazynick*.jar
