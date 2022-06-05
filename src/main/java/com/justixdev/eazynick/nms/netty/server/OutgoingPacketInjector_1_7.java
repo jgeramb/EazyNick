@@ -201,7 +201,7 @@ public class OutgoingPacketInjector_1_7 {
 										String[] splitTextToComplete = textToComplete.trim().split(" ");
 
 										if(!(textToComplete.startsWith("/")) || (splitTextToComplete.length > 1)) {
-											List<String> newCompletions, playerNames = new ArrayList<>();
+											List<String> playerNames = new ArrayList<>();
 
 											if(splitTextToComplete.length < 2)
 												textToComplete = "";
@@ -219,7 +219,7 @@ public class OutgoingPacketInjector_1_7 {
 													.forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
 
 											//Process completions
-											newCompletions = new ArrayList<>(Arrays.asList((String[]) reflectionHelper.getField(
+											List<String> newCompletions = new ArrayList<>(Arrays.asList((String[]) reflectionHelper.getField(
 													msg.getClass(),
 													"a"
 											).get(msg)));
@@ -302,7 +302,7 @@ public class OutgoingPacketInjector_1_7 {
 												&& setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")
 										) {
 											//Replace names
-											ArrayList<String> contents = new ArrayList<>((List<String>) reflectionHelper.getField(
+											List<String> contents = new ArrayList<>((List<String>) reflectionHelper.getField(
 													msg.getClass(),
 													"e"
 											).get(msg));

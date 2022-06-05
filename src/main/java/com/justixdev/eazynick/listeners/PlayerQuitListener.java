@@ -110,7 +110,7 @@ public class PlayerQuitListener implements Listener {
 							);
 				
 				event.setQuitMessage(message);
-			} else if (!((event.getQuitMessage() == null) && event.getQuitMessage().isEmpty())) {
+			} else if ((event.getQuitMessage() != null) && !(event.getQuitMessage().isEmpty())) {
 				if (event.getQuitMessage().contains("formerly known as"))
 					event.setQuitMessage("§e" + player.getName() + " left the game.");
 

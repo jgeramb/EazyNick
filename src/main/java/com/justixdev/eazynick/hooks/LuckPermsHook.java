@@ -6,7 +6,6 @@ import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;

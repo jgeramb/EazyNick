@@ -45,7 +45,7 @@ public class UUIDFetcher {
 			)).openConnection();
 			connection.setReadTimeout(5000);
 
-			// Parse response
+			// Read response
 			try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 				StringBuilder response = new StringBuilder();
 				String line;
@@ -104,7 +104,7 @@ public class UUIDFetcher {
 	}
 
 	public String getName(String name, UUID uuid) {
-		//C heck for cached name
+		// Check for cached name
 		if (NAME_CACHE.containsKey(uuid))
 			return NAME_CACHE.get(uuid);
 
@@ -117,14 +117,15 @@ public class UUIDFetcher {
 			)).openConnection();
 			connection.setReadTimeout(5000);
 
-			// Parse response
+			// Read response
 			try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 				StringBuilder response = new StringBuilder();
 				String line;
 				
 				while((line = bufferedReader.readLine()) != null)
 					response.append(line);
-				
+
+				// Parse response
 				JsonArray data = GSON.fromJson(response.toString(), JsonArray.class);
 				JsonObject currentNameData = (JsonObject) data.get(data.size() - 1);
 				

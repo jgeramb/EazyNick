@@ -221,7 +221,7 @@ public class OutgoingPacketInjector {
 												String[] splitTextToComplete = textToComplete.trim().split(" ");
 
 												if(!(textToComplete.startsWith("/")) || (splitTextToComplete.length > 1)) {
-													List<String> newCompletions, playerNames = new ArrayList<>();
+													List<String> playerNames = new ArrayList<>();
 
 													if(splitTextToComplete.length < 2)
 														textToComplete = "";
@@ -239,7 +239,7 @@ public class OutgoingPacketInjector {
 															.forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
 
 													//Process completions
-													newCompletions = new ArrayList<>(Arrays.asList((String[]) reflectionHelper.getField(
+													List<String> newCompletions = new ArrayList<>(Arrays.asList((String[]) reflectionHelper.getField(
 															msg.getClass(),
 															"a"
 													).get(msg)));
@@ -365,7 +365,7 @@ public class OutgoingPacketInjector {
 
 											if(contentsList != null) {
 												//Replace names
-												List<String> contents = (List<String>) contentsList;
+												List<String> contents = new ArrayList<>((List<String>) contentsList);
 
 												for (NickedPlayerData currentNickedPlayerData : utils.getNickedPlayers().values()) {
 													for (String currentName : new ArrayList<>(contents)) {

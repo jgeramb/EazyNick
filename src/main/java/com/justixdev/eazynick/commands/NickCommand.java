@@ -177,7 +177,7 @@ public class NickCommand implements CommandExecutor {
 					return true;
 				}
 
-				if(!(name.equalsIgnoreCase(player.getName()))) {
+				if(name.equalsIgnoreCase(player.getName())) {
 					languageYamlFile.sendMessage(
 							player,
 							languageYamlFile.getConfigString(player, "Messages.CanNotNickAsSelf")
@@ -186,19 +186,21 @@ public class NickCommand implements CommandExecutor {
 					return true;
 				}
 
-				if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())))
-					utils.performNick(
-							player,
-							ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4")
-									? eazyNick.getUUIDFetcher_1_7().getName(name, eazyNick.getUUIDFetcher_1_7().getUUID(name))
-									: (eazyNick.getVersion().equals("1_8_R1")
-											? eazyNick.getUUIDFetcher_1_8_R1().getName(name, eazyNick.getUUIDFetcher_1_8_R1().getUUID(name))
-											: eazyNick.getUUIDFetcher().getName(name, eazyNick.getUUIDFetcher().getUUID(name))
-									)
-							)
-					);
-				else
+				if(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds").contains(player.getWorld().getName())) {
 					languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.DisabledWorld").replace("%prefix%", prefix));
+					return true;
+				}
+
+				utils.performNick(
+						player,
+						ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4")
+								? eazyNick.getUUIDFetcher_1_7().getName(nameWithoutColors, eazyNick.getUUIDFetcher_1_7().getUUID(nameWithoutColors))
+								: (eazyNick.getVersion().equals("1_8_R1")
+										? eazyNick.getUUIDFetcher_1_8_R1().getName(nameWithoutColors, eazyNick.getUUIDFetcher_1_8_R1().getUUID(nameWithoutColors))
+										: eazyNick.getUUIDFetcher().getName(nameWithoutColors, eazyNick.getUUIDFetcher().getUUID(nameWithoutColors))
+								)
+						)
+				);
 			} else
 				languageYamlFile.sendMessage(player, utils.getNoPerm());
 		} else
