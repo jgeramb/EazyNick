@@ -15,7 +15,7 @@ jobs:
 
       - name: Read .version file
         id: version
-        run: echo "::set-output name=version::$(cat .version)"
+        run: echo "::set-output name=version::$(cat .github/.version)"
 
       - name: Set up JDK 8
         uses: actions/setup-java@v3
