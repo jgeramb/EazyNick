@@ -28,8 +28,8 @@ jobs:
         name: artifacts
         path: target/*.jar
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          prerelease: false
-          files: |
-            target/eazynick*.jar
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        prerelease: false
+        files: |
+          target/eazynick*.jar
