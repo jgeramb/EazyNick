@@ -3,6 +3,5 @@
     "config:base"
   ],
   "includeForks": true,
-  "automerge": true,
   "baseBranches": ["main", "Stable", "master", "old", "latest", "develop"]
 }
