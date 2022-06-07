@@ -65,7 +65,7 @@ public class SpigotUpdater {
 				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
 				//Enable to follow redirects
-				HttpURLConnection.setFollowRedirects(true);  
+				HttpsURLConnection.setFollowRedirects(true);  
 
 				// Download file
 				ReadableByteChannel fileChannel = Channels.newChannel(downloadConnection.getInputStream());
@@ -116,7 +116,7 @@ public class SpigotUpdater {
 				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
 				//Enable to follow redirects
-				HttpURLConnection.setFollowRedirects(true);  
+				HttpsURLConnection.setFollowRedirects(true);  
 
 				// Download file
 				ReadableByteChannel fileChannel = Channels.newChannel(downloadConnection.getInputStream());
