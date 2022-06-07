@@ -61,12 +61,12 @@ public class SpigotUpdater {
 			Bukkit.getLogger().log(Level.INFO, prefix + "Starting download...");
 
 			try {
-				//Enable to follow redirects
-				HttpURLConnection.setFollowRedirects(true);
-				HttpURLConnection.setInstanceFollowRedirects(true);
 				// Open connection to download server
 				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
+				//Enable to follow redirects
+				downloadConnection.setFollowRedirects(true);
+				downloadConnection.setInstanceFollowRedirects(true);
 
 				// Download file
 				ReadableByteChannel fileChannel = Channels.newChannel(downloadConnection.getInputStream());
@@ -113,12 +113,12 @@ public class SpigotUpdater {
 			player.sendMessage(prefix + "§aUpdater §8» §7Starting download...");
 
 			try {
-				//Enable to follow redirects
-				HttpURLConnection.setFollowRedirects(true);
-				HttpURLConnection.setInstanceFollowRedirects(true);
 				// Open connection to download server
 				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
+				//Enable to follow redirects
+				downloadConnection.setFollowRedirects(true);
+				downloadConnection.setInstanceFollowRedirects(true);
 
 				// Download file
 				ReadableByteChannel fileChannel = Channels.newChannel(downloadConnection.getInputStream());
