@@ -61,8 +61,11 @@ public class SpigotUpdater {
 			Bukkit.getLogger().log(Level.INFO, prefix + "Starting download...");
 
 			try {
+				//Enable to follow redirects
+				HttpURLConnection.setFollowRedirects(true);
+				HttpURLConnection.setInstanceFollowRedirects(true);
 				// Open connection to download server
-				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/tag/v" + latestVersion + "/download/EazyNick.jar").openConnection();
+				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
 
 				// Download file
@@ -110,8 +113,11 @@ public class SpigotUpdater {
 			player.sendMessage(prefix + "§aUpdater §8» §7Starting download...");
 
 			try {
+				//Enable to follow redirects
+				HttpURLConnection.setFollowRedirects(true);
+				HttpURLConnection.setInstanceFollowRedirects(true);
 				// Open connection to download server
-				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/tag/v" + latestVersion + "/download/EazyNick.jar").openConnection();
+				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
 
 				// Download file
