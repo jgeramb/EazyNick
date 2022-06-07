@@ -119,10 +119,5 @@
             <artifactId>spigot-1.8.0</artifactId>
             <version>1.8-R0.1-SNAPSHOT-latest</version>
         </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20220320</version>
-        </dependency>
     </dependencies>
 </project>
