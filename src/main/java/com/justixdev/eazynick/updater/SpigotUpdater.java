@@ -42,7 +42,7 @@ public class SpigotUpdater {
 		Bukkit.getLogger().log(Level.INFO, prefix + "Checking for updates...");
 
 		// Fetch the latest version from spigotmc.org
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://api.spigotmc.org/legacy/update.php?resource=51398").openStream()))) {
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/JustixDevelopment/EazyNick/master/.github/.version").openStream()))) {
 			final String latestVersion = reader.readLine();
 
 			// Check if version is up-to-date
@@ -62,7 +62,7 @@ public class SpigotUpdater {
 
 			try {
 				// Open connection to download server
-				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://www.justix-dev.com/go/dl?id=1&ver=v" + latestVersion).openConnection();
+				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
 
 				// Download file
@@ -95,7 +95,7 @@ public class SpigotUpdater {
 		Bukkit.getLogger().log(Level.INFO, "§aUpdater §8» §7Checking for updates...");
 
 		// Fetch the latest version from spigotmc.org
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://api.spigotmc.org/legacy/update.php?resource=51398").openStream()))) {
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/JustixDevelopment/EazyNick/master/.github/.version").openStream()))) {
 			final String latestVersion = reader.readLine();
 
 			// Check if version is up-to-date
@@ -111,7 +111,7 @@ public class SpigotUpdater {
 
 			try {
 				// Open connection to download server
-				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://www.justix-dev.com/go/dl?id=1&ver=v" + latestVersion).openConnection();
+				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
 
 				// Download file
