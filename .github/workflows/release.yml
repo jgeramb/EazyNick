@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - .github/workflows/release.yml
-      - .version
+      - .github/.version
 
 jobs:
   build:
