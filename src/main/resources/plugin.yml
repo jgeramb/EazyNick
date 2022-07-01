@@ -1,5 +1,5 @@
 name: EazyNick
-version: ${project.version}
+version: '0.0.0'
 author: Justix
 main: com.justixdev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)

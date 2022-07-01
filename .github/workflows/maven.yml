@@ -26,6 +26,8 @@ jobs:
       run: | 
         sed -i 's/0.0.0/${{ steps.version.outputs.version }}/g' pom.xml
         grep pom.xml -e ${{ steps.version.outputs.version }}
+        sed -i 's/0.0.0/${{ steps.version.outputs.version }}/g' src/main/resources/plugin.yml
+        grep src/main/resources/plugin.yml -e ${{ steps.version.outputs.version }}
         mvn -B package --file pom.xml
         mv target/eazynick-* target/EazyNick.jar
 
