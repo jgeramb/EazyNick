@@ -14,7 +14,7 @@ import com.justixdev.eazynick.nms.netty.server.OutgoingPacketInjector_1_7;
 import com.justixdev.eazynick.sql.MySQL;
 import com.justixdev.eazynick.sql.MySQLNickManager;
 import com.justixdev.eazynick.sql.MySQLPlayerDataManager;
-import com.justixdev.eazynick.updater.SpigotUpdater;
+import com.justixdev.eazynick.updater.Updater;
 import com.justixdev.eazynick.utilities.*;
 import com.justixdev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import com.justixdev.eazynick.utilities.configuration.BaseFileFactory;
@@ -40,14 +40,14 @@ public class EazyNick extends JavaPlugin {
 	}
 	
 	private File pluginFile;
-	private String version = "XX_XX_RXX";
+	private String version;
 	private boolean isCancelled;
 
 	private MySQL mysql;
 	private MySQLNickManager mysqlNickManager;
 	private MySQLPlayerDataManager mysqlPlayerDataManager;
 	
-	private SpigotUpdater spigotUpdater;
+	private Updater updater;
 	private Utils utils;
 	private GUIManager guiManager;
 	private ActionBarUtils actionBarUtils;
@@ -89,7 +89,7 @@ public class EazyNick extends JavaPlugin {
 		guiYamlFile = configurationFactory.createConfigurationFile(this, GUIYamlFile.class);
 		languageYamlFile = configurationFactory.createConfigurationFile(this, LanguageYamlFile.class);
 
-		spigotUpdater = new SpigotUpdater(this);
+		updater = new Updater(this);
 		mineSkinAPI = new MineSkinAPI(getVersion());
 		
 		signGUI = new SignGUI(this);
@@ -212,7 +212,7 @@ public class EazyNick extends JavaPlugin {
 					}
 
 					// Check for plugin updates
-					if (spigotUpdater.checkForUpdates()) {
+					if (updater.checkForUpdates()) {
 						Bukkit.getScheduler().runTask(instance, () -> pluginManager.disablePlugin(instance));
 						return;
 					}
@@ -399,8 +399,8 @@ public class EazyNick extends JavaPlugin {
 		return version;
 	}
 	
-	public SpigotUpdater getSpigotUpdater() {
-		return spigotUpdater;
+	public Updater getUpdater() {
+		return updater;
 	}
 	
 	public Utils getUtils() {

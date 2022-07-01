@@ -27,7 +27,7 @@ public class NickUpdateCheckCommand implements CommandExecutor {
 			return true;
 		}
 
-		eazyNick.getSpigotUpdater().checkForUpdates(player);
+		eazyNick.getUpdater().checkForUpdates(player);
 		
 		return true;
 	}
