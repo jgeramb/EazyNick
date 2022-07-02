@@ -41,7 +41,7 @@ public class GUIYamlFile extends YamlFile {
 		configuration.addDefault("BookGUI.Page6.Text.BungeeCord", "&0You have finished setting up your nickname!%nl%%nl%When you go into a game, you will be nicked as %name%&0.You will not be nicked in lobbies.%nl%%nl%To go back to being your usual self, type:%nl%&l/nick reset");
 		configuration.addDefault("BookGUI.Page6.Enabled", true);
 		
-		configuration.addDefault("BookGUI.Accept.Text", arrow + " &nI understand, set up&r%nl%&0&nmy nickname&r");
+		configuration.addDefault("BookGUI.Accept.Text", arrow + " &nI understand, set up my nickname&r");
 		configuration.addDefault("BookGUI.Accept.Hover", "&fClick here to proceed");
 		configuration.addDefault("BookGUI.Rank.Text", arrow + " %rank%%nl%");
 		configuration.addDefault("BookGUI.Rank.Hover", "&fClick here to be shown as %rank%");

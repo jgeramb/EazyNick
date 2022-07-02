@@ -48,7 +48,7 @@ public class BookGUICommand implements CommandExecutor {
 			return true;
 		}
 
-		boolean is17_or_18 = eazyNick.getVersion().startsWith("1_17") || eazyNick.getVersion().startsWith("1_18");
+		boolean is1_17To1_19 = eazyNick.getVersion().startsWith("1_17") || eazyNick.getVersion().startsWith("1_18") || eazyNick.getVersion().startsWith("1_19");
 		String prefix = utils.getPrefix();
 		Player player = (Player) sender;
 
@@ -97,7 +97,7 @@ public class BookGUICommand implements CommandExecutor {
 					TextComponent option = new TextComponent(lineText + "\n");
 					option.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui accept"));
 
-					if(is17_or_18)
+					if(is1_17To1_19)
 						option.setHoverEvent(new HoverEvent(
 								HoverEvent.Action.SHOW_TEXT,
 								Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.Accept.Hover")))
@@ -148,7 +148,7 @@ public class BookGUICommand implements CommandExecutor {
 							"/bookgui " + args[0] + " " + rankName
 					));
 
-					if(is17_or_18)
+					if(is1_17To1_19)
 						textComponent.setHoverEvent(new HoverEvent(
 								HoverEvent.Action.SHOW_TEXT,
 								Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.Rank.Hover").replace("%rank%", rank)))
@@ -197,7 +197,7 @@ public class BookGUICommand implements CommandExecutor {
 					"/bookgui " + args[0] + " " + args[1] + " DEFAULT"
 			));
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option1.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.NormalSkin.Hover")))
@@ -214,7 +214,7 @@ public class BookGUICommand implements CommandExecutor {
 					.replace("%nl%", "\n"));
 			option2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " NORMAL"));
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option2.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.SteveAlexSkin.Hover")))
@@ -231,7 +231,7 @@ public class BookGUICommand implements CommandExecutor {
 					.replace("%nl%", "\n"));
 			option3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " RANDOM"));
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option3.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.RandomSkin.Hover")))
@@ -249,7 +249,7 @@ public class BookGUICommand implements CommandExecutor {
 					: "");
 			option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " SKINFROMNAME"));
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option4.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Hover")))
@@ -273,7 +273,7 @@ public class BookGUICommand implements CommandExecutor {
 						"/bookgui " + args[0] + " " + args[1] + " " + utils.getLastSkinNames().get(player.getUniqueId())
 				));
 
-				if(is17_or_18)
+				if(is1_17To1_19)
 					option4.setHoverEvent(new HoverEvent(
 							HoverEvent.Action.SHOW_TEXT,
 							Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.ReuseSkin.Hover")))
@@ -312,7 +312,7 @@ public class BookGUICommand implements CommandExecutor {
 					"/bookgui " + args[0] + " " + args[1] + " " + args[2] + " ENTERNAME"
 			));
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option1.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.EnterName.Hover")))
@@ -332,7 +332,7 @@ public class BookGUICommand implements CommandExecutor {
 					"/bookgui " + args[0] + " " + args[1] + " " + args[2] + " RANDOM"
 			));
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option2.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.RandomName.Hover")))
@@ -355,7 +355,7 @@ public class BookGUICommand implements CommandExecutor {
 				option3.setClickEvent(new ClickEvent(
 						ClickEvent.Action.RUN_COMMAND, "/guinick " + args[1] + " " + args[2] + " " + utils.getLastNickNames().get(player.getUniqueId())));
 
-				if(is17_or_18)
+				if(is1_17To1_19)
 					option3.setHoverEvent(new HoverEvent(
 							HoverEvent.Action.SHOW_TEXT,
 							Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.ReuseName.Hover")
@@ -402,7 +402,7 @@ public class BookGUICommand implements CommandExecutor {
 					"/guinick " + args[1] + " " + args[2]  + " " + name)
 			);
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option1.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.OptionUseName.Hover")))
@@ -422,7 +422,7 @@ public class BookGUICommand implements CommandExecutor {
 					"/bookgui " + args[0] + " " + args[1] + " " + args[2]  + " RANDOM"
 			));
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option2.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.OptionTryAgain.Hover")))
@@ -442,7 +442,7 @@ public class BookGUICommand implements CommandExecutor {
 					"/bookgui " + args[0] + " " + args[1] + " " + args[2]  + " ENTERNAME"
 			));
 
-			if(is17_or_18)
+			if(is1_17To1_19)
 				option3.setHoverEvent(new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.OptionEnterName.Hover")))

@@ -34,26 +34,30 @@ public class Updater {
 	}
 
 	public boolean checkForUpdates() {
-		String currentVersion = pluginDescription.getVersion();
-
-		if(currentVersion.equals("0.0.0"))
-			return false;
-
 		Bukkit.getLogger().log(Level.INFO, prefix + "Checking for updates...");
 
-		// Fetch the latest version from spigotmc.org
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/JustixDevelopment/EazyNick/master/.github/.version").openStream()))) {
-			final String latestVersion = reader.readLine();
+		// Fetch the latest version from GitHub repository
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(
+				"https://raw.githubusercontent.com/JustixDevelopment/EazyNick/master/.github/.version"
+		).openStream()))) {
+			final String publishedVersion = reader.readLine();
+			final VersionComparisonResult versionComparisonResult = compareVersions(pluginDescription.getVersion(), publishedVersion);
 
 			// Check if version is up-to-date
-			if (latestVersion.equals(currentVersion)) {
+			if (versionComparisonResult.equals(VersionComparisonResult.UP_TO_DATE) || versionComparisonResult.equals(VersionComparisonResult.DEV)) {
 				Bukkit.getLogger().log(Level.INFO, "No new version available");
 				return false;
 			}
 
-			Bukkit.getLogger().log(Level.INFO, prefix + "Found a new version: " + latestVersion);
+			Bukkit.getLogger().log(Level.INFO, prefix + "Found a new version: " + publishedVersion);
 
-			if (!(setupYamlFile.getConfiguration().getBoolean("AutoUpdater"))) {
+			if (
+					!(setupYamlFile.getConfiguration().getBoolean("AutoUpdater"))
+					|| (
+							!(setupYamlFile.getConfiguration().getBoolean("AutoUpdatePreReleases"))
+							&& versionComparisonResult.equals(VersionComparisonResult.OUTDATED_PRE_RELEASE)
+					)
+			) {
 				Bukkit.getLogger().log(Level.INFO, prefix + "Download the update here: " + pluginDescription.getWebsite());
 				return true;
 			}
@@ -62,7 +66,9 @@ public class Updater {
 
 			try {
 				// Open connection to download server
-				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
+				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL(
+						"https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar"
+				).openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
 				downloadConnection.setInstanceFollowRedirects(true);
 
@@ -75,9 +81,10 @@ public class Updater {
 					localFileStream.flush();
 				} catch (IOException ex) {
 					Bukkit.getLogger().log(Level.SEVERE, "Could not save file: " + ex.getMessage());
+					return false;
 				}
 
-				Bukkit.getLogger().log(Level.INFO, prefix + "Successfully updated plugin to version '" + latestVersion + "', please restart/reload your server");
+				Bukkit.getLogger().log(Level.INFO, prefix + "Successfully updated plugin to version '" + publishedVersion + "', please restart/reload your server");
 
 				return true;
 			} catch (IOException ex) {
@@ -93,26 +100,43 @@ public class Updater {
 	public void checkForUpdates(Player player) {
 		final String prefix = utils.getPrefix();
 
-		Bukkit.getLogger().log(Level.INFO, "§aUpdater §8» §7Checking for updates...");
+		player.sendMessage(prefix + "§aUpdater §8» §7Checking for updates...");
 
-		// Fetch the latest version from spigotmc.org
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/JustixDevelopment/EazyNick/master/.github/.version").openStream()))) {
-			final String latestVersion = reader.readLine();
+		// Fetch the latest version from GitHub repository
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(
+				"https://raw.githubusercontent.com/JustixDevelopment/EazyNick/master/.github/.version"
+		).openStream()))) {
+			final String publishedVersion = reader.readLine();
+			final VersionComparisonResult versionComparisonResult = compareVersions(pluginDescription.getVersion(), publishedVersion);
 
 			// Check if version is up-to-date
-			if (latestVersion.equals(pluginDescription.getVersion()))
+			if (versionComparisonResult.equals(VersionComparisonResult.UP_TO_DATE) || versionComparisonResult.equals(VersionComparisonResult.DEV)) {
 				player.sendMessage(prefix + "§aUpdater §8» §cNo new version available");
+				return;
+			}
 
-			player.sendMessage(prefix + "§aUpdater §8» §7Found a new version: §d" + latestVersion);
+			player.sendMessage(prefix + "§aUpdater §8» §7Found a new version: §d" + publishedVersion);
 
-			if (!(setupYamlFile.getConfiguration().getBoolean("AutoUpdater")))
+			Bukkit.getLogger().log(Level.INFO, prefix + "Found a new version: " + publishedVersion);
+
+			if (
+					!(setupYamlFile.getConfiguration().getBoolean("AutoUpdater"))
+					|| (
+							!(setupYamlFile.getConfiguration().getBoolean("AutoUpdatePreReleases"))
+							&& versionComparisonResult.equals(VersionComparisonResult.OUTDATED_PRE_RELEASE)
+					)
+			) {
 				player.sendMessage(prefix + "§aUpdater §8» §7Download the update here§8: §d" + pluginDescription.getWebsite());
+				return;
+			}
 
 			player.sendMessage(prefix + "§aUpdater §8» §7Starting download...");
 
 			try {
 				// Open connection to download server
-				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL("https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar").openConnection();
+				HttpsURLConnection downloadConnection = (HttpsURLConnection) new URL(
+						"https://github.com/JustixDevelopment/EazyNick/releases/latest/download/EazyNick.jar"
+				).openConnection();
 				downloadConnection.setRequestProperty("User-Agent", "JustixDevelopment/Updater " + pluginDescription.getVersion());
 				downloadConnection.setInstanceFollowRedirects(true);
 
@@ -125,15 +149,55 @@ public class Updater {
 					localFileStream.flush();
 				} catch (IOException ex) {
 					Bukkit.getLogger().log(Level.SEVERE, "Could not save file: " + ex.getMessage());
+					return;
 				}
 
-				player.sendMessage(prefix + "§aUpdater §8» §7Successfully updated plugin to version §8'§d" + latestVersion + "§8'§7, please restart/reload your server");
+				player.sendMessage(prefix + "§aUpdater §8» §7Successfully updated plugin to version §8'§d" + publishedVersion + "§8'§7, please restart/reload your server");
 			} catch (IOException ex) {
 				Bukkit.getLogger().log(Level.SEVERE, "Could not download file: " + ex.getMessage());
 			}
 		} catch (IOException ex) {
 			Bukkit.getLogger().log(Level.SEVERE, "Could not fetch latest version: " + ex.getMessage());
 		}
+	}
+
+	public VersionComparisonResult compareVersions(String current, String published) {
+		String[] versionPartsCurrent = current.split("\\."), versionPartsPublished = published.split("\\.");
+
+		if((versionPartsCurrent.length == 3) && (versionPartsPublished.length == 3)) {
+			int[] currentVersion = new int[] {
+					Integer.parseInt(versionPartsCurrent[0]),
+					Integer.parseInt(versionPartsCurrent[1]),
+					Integer.parseInt(versionPartsCurrent[2])
+			}, publishedVersion = new int[] {
+					Integer.parseInt(versionPartsPublished[0]),
+					Integer.parseInt(versionPartsPublished[1]),
+					Integer.parseInt(versionPartsPublished[2])
+			};
+
+			if(
+					(publishedVersion[0] == currentVersion[0])
+					&& (publishedVersion[1] == currentVersion[1])
+					&& (publishedVersion[2] == currentVersion[2])
+			)
+				return VersionComparisonResult.UP_TO_DATE;
+
+			if(
+					(currentVersion[0] > publishedVersion[0])
+					|| (currentVersion[1] > publishedVersion[1])
+					|| (currentVersion[2] > publishedVersion[2])
+			)
+				return VersionComparisonResult.DEV;
+
+			if(
+					(publishedVersion[0] == currentVersion[0])
+					&& (publishedVersion[1] == currentVersion[1])
+					&& (publishedVersion[2] > currentVersion[2])
+			)
+				return VersionComparisonResult.OUTDATED_PRE_RELEASE;
+		}
+
+		return VersionComparisonResult.OUTDATED_RELEASE;
 	}
 
 }

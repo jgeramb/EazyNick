@@ -177,7 +177,7 @@ public class EazyNick extends JavaPlugin {
 		int versionNumber = Integer.parseInt(version.split("_")[1]);
 
 		// Check if bukkit version is compatible
-		if ((versionNumber < 7) || (versionNumber > 18)) {
+		if ((versionNumber < 7) || (versionNumber > 19)) {
 			utils.sendConsole("§cYour version is currently not supported");
 
 			isCancelled = true;

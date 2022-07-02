@@ -27,6 +27,7 @@ public class SetupYamlFile extends YamlFile {
 
 		configuration.addDefault("APIMode", false);
 		configuration.addDefault("AutoUpdater", true);
+		configuration.addDefault("AutoUpdatePreReleases", false);
 		configuration.addDefault("AllowBookGUICustomName", true);
 		configuration.addDefault("AllowBookGUISkinFromName", false);
 		configuration.addDefault("AllowPlayersToNickAsKnownPlayers", false);

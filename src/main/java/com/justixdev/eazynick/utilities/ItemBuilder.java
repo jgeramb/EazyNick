@@ -29,8 +29,8 @@ public class ItemBuilder {
 				amount,
 				EazyNick.getInstance().getUtils().isVersion13OrLater()
 						? 0
-						: 3)
-		;
+						: 3
+		);
 	}
 	
 	public ItemBuilder(Material mat) {
@@ -56,10 +56,10 @@ public class ItemBuilder {
 			} catch (Exception ignore) {
 				this.itemStack = new ItemStack(mat, amount);
 			}
-		}
+		} else
+			this.itemStack = new ItemStack(mat, amount);
 
-		if(itemStack != null)
-			this.itemMeta = itemStack.getItemMeta();
+		this.itemMeta = itemStack.getItemMeta();
 	}
 
 	public ItemBuilder setDurability(int durability) {

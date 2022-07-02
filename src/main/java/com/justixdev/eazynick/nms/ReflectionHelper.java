@@ -49,7 +49,7 @@ public class ReflectionHelper {
 			String version = getVersion();
 			
 			return Class.forName(
-					(version.startsWith("v1_17") || version.startsWith("v1_18"))
+					(version.startsWith("v1_17") || version.startsWith("v1_18") || version.startsWith("v1_19"))
 							? ("net.minecraft." + className)
 							: ("net.minecraft.server." + version + "." + className)
 			);

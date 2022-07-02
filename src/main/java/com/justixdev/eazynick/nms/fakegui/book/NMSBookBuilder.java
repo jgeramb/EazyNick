@@ -47,11 +47,11 @@ public class NMSBookBuilder {
 				for (BookPage bookPage : bookPages) {
 					if (!((bookPage == null) || bookPage.isEmpty()))
 						list.add(
-								(version.equals("1_16_R3") || version.startsWith("1_17") || version.startsWith("1_18"))
+								(version.equals("1_16_R3") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
 										? craftChatMessage.getMethod(
 												"toJSON",
 												reflectionHelper.getNMSClass(
-														(version.startsWith("1_17") || version.startsWith("1_18"))
+														(version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
 																? "network.chat.IChatBaseComponent"
 																: "IChatBaseComponent"
 												)

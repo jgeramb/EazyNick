@@ -138,7 +138,7 @@ public class OutgoingPacketInjector_1_7 {
 											? (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
 											: (
 													currentInetSocketAddress.getAddress().getHostAddress().equals(ip)
-													|| (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
+													&& (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
 											)
 									);
 

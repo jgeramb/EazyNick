@@ -41,11 +41,11 @@ public class OutgoingPacketInjector {
 		handlerName = eazyNick.getDescription().getName().toLowerCase() + "_handler";
 		
 		String version = eazyNick.getVersion();
-		boolean is18 = version.startsWith("1_18");
+		boolean is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 		
 		//Get Channel from NetworkManager
 		reflectionHelper.getFirstFieldByType(
-				(version.startsWith("1_17") || is18)
+				(version.startsWith("1_17") || is1_18 || is1_19)
 						? reflectionHelper.getNMSClass("network.NetworkManager")
 						: reflectionHelper.getNMSClass("NetworkManager"),
 				Channel.class
@@ -65,7 +65,7 @@ public class OutgoingPacketInjector {
 				//Add packet handler to every ServerConnection and remove old ones
 				for(Object manager : Collections.synchronizedList((List<?>) getNetworkManagerList(
 						minecraftServer.getClass().getMethod(
-								is18
+								(is1_18 || is1_19)
 										? "ad"
 										: "getServerConnection"
 						).invoke(minecraftServer)
@@ -123,11 +123,11 @@ public class OutgoingPacketInjector {
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		String version = eazyNick.getVersion();
-		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+		boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 		
 		try {
 			//Add new packet handler
-			channel.pipeline().addAfter(
+			channel.pipeline().addBefore(
 					"packet_handler",
 					handlerName,
 					new ChannelDuplexHandler() {
@@ -146,7 +146,7 @@ public class OutgoingPacketInjector {
 											? (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
 											: (
 													currentInetSocketAddress.getAddress().getHostAddress().equals(ip)
-													|| (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
+													&& (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
 											)
 									);
 
@@ -180,7 +180,7 @@ public class OutgoingPacketInjector {
 											for (Object playerInfoData : ((List<?>) b)) {
 												UUID uuid = ((GameProfile) reflectionHelper.getField(
 														playerInfoData.getClass(),
-														(is17 || is18)
+														(is1_17 || is1_18 || is1_19)
 																? "c"
 																: "d"
 												).get(playerInfoData)).getId();
@@ -198,7 +198,7 @@ public class OutgoingPacketInjector {
 													//Replace game profile with fake game profile (nicked player profile)
 													reflectionHelper.setField(
 															playerInfoData,
-															(is17 || is18)
+															(is1_17 || is1_18 || is1_19)
 																	? "c"
 																	: "d",
 															utils.getNickedPlayers().get(uuid).getFakeGameProfile(
@@ -214,7 +214,8 @@ public class OutgoingPacketInjector {
 									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
 										if(!(player.hasPermission("eazynick.bypass")
 												&& setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
-												&& !(utils.isVersion13OrLater())) {
+												&& !(utils.isVersion13OrLater())
+										) {
 											String textToComplete = utils.getTextsToComplete().get(player);
 
 											if(textToComplete != null) {
@@ -231,8 +232,8 @@ public class OutgoingPacketInjector {
 													//Collect nicknames
 													Bukkit.getOnlinePlayers()
 															.stream()
-															.filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked())).
-															forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+															.filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked()))
+															.forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
 
 													utils.getNickedPlayers()
 															.values()
@@ -287,13 +288,13 @@ public class OutgoingPacketInjector {
 										//Replace name
 										if(utils.isVersion13OrLater())
 											reflectionHelper.setField(msg,
-													(is17 || is18)
+													(is1_17 || is1_18 || is1_19)
 															? "e"
 															: "b",
 													replaceNames(
 															reflectionHelper.getField(
 																	msg.getClass(),
-																	(is17 || is18)
+																	(is1_17 || is1_18 || is1_19)
 																			? "e"
 																			: "b"
 															).get(msg),
@@ -356,7 +357,7 @@ public class OutgoingPacketInjector {
 															(version.equals("1_8_R2") || version.equals("1_8_R3") || version.equals("1_9_R1"))
 																	? "g"
 																	: (
-																			(is17 || is18)
+																			(is1_17 || is1_18 || is1_19)
 																					? "j"
 																					: "h"
 																	)
@@ -410,7 +411,7 @@ public class OutgoingPacketInjector {
 										Object serverPing = reflectionHelper.getField(msg.getClass(), "b").get(msg);
 										Object serverPingPlayerSample = reflectionHelper.getField(
 												serverPing.getClass(),
-												(is17 || is18)
+												(is1_17 || is1_18 || is1_19)
 														? "d"
 														: "b"
 										).get(serverPing);
@@ -487,24 +488,24 @@ public class OutgoingPacketInjector {
 		Utils utils = eazyNick.getUtils();
 		
 		String version = eazyNick.getVersion();
-		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+		boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 		Object editedComponent = iChatBaseComponent;
 		
 		try {
 			if(iChatBaseComponent != null) {
 				//Collect raw text from message
 				Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass(
-						(is17 || is18)
+						(is1_17 || is1_18 || is1_19)
 								? "network.chat.IChatBaseComponent"
 								: "IChatBaseComponent"
 				);
 				
 				StringBuilder fullText = new StringBuilder();
 				Method method = iChatBaseComponentClass.getDeclaredMethod(
-						is18
+						(is1_18 || is1_19)
 								? "b"
 								: (
-										(Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || is17)
+										(Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || is1_17)
 												? "getSiblings"
 												: "a"
 								)
@@ -561,7 +562,7 @@ public class OutgoingPacketInjector {
 		try {
 			String version = eazyNick.getVersion();
 			Class<?> iChatBaseComponentClass = reflectionHelper.getNMSClass(
-					(version.startsWith("1_17") || version.startsWith("1_18"))
+					(version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
 							? "network.chat.IChatBaseComponent"
 							: "IChatBaseComponent"
 			);
@@ -587,9 +588,10 @@ public class OutgoingPacketInjector {
 									? "network.chat.IChatBaseComponent"
 									: "IChatBaseComponent"
 					)).getDeclaredClasses()[0]
-			).getMethod(version.startsWith("1_18")
-					? "b"
-					: "a",
+			).getMethod(
+					(version.startsWith("1_18") || version.startsWith("1_19"))
+							? "b"
+							: "a",
 					String.class
 			).invoke(null, json);
 		} catch (Exception ex) {

@@ -26,31 +26,33 @@ public class IncomingPacketInjector {
 		
 		try {
 			String version = eazyNick.getVersion();
-			boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+			boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 			Object playerConnection = entityPlayer.getClass().getField(
-					(is17 || is18)
+					(is1_17 || is1_18 || is1_19)
 							? "b"
 							: "playerConnection"
 			).get(entityPlayer);
 			Object networkManager = playerConnection.getClass().getField(
-					(is17 || is18)
-							? "a"
-							: "networkManager"
+					is1_19
+							? "b"
+							: (is1_17 || is1_18)
+									? "a"
+									: "networkManager"
 			).get(playerConnection);
 			
 			//Get netty channel
 			this.channel = (Channel) networkManager.getClass().getField(
-					(is17 || is18)
+					(is1_17 || is1_18 || is1_19)
 							? (
-									version.equals("1_18_R2")
+									(version.equals("1_18_R2") || is1_19)
 											? "m"
 											: "k"
 							)
 							: "channel"
 			).get(networkManager);
 			this.handlerName = eazyNick.getDescription().getName().toLowerCase() + "_injector";
-			
+
 			unregister();
 			
 			if (channel.pipeline().get(handlerName) != null) return;
@@ -68,7 +70,7 @@ public class IncomingPacketInjector {
 								//Process SignGUI success
 								Object[] rawLines = (Object[]) reflectionHelper.getField(
 										packet.getClass(),
-										(is17 || is18)
+										(is1_17 || is1_18 || is1_19)
 												? "c"
 												: "b"
 								).get(packet);

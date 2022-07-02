@@ -72,14 +72,14 @@ public class NickManager extends ReflectionHelper {
 	private void sendPacketNMS(Player player, Object packet) {
 		try {
 			// Send packet to player connection
-			boolean is17 = eazyNick.getVersion().startsWith("1_17"), is18 = eazyNick.getVersion().startsWith("1_18");
+			boolean is1_17 = eazyNick.getVersion().startsWith("1_17"), is1_18 = eazyNick.getVersion().startsWith("1_18"), is1_19 = eazyNick.getVersion().startsWith("1_19");
 			Object handle = player.getClass().getMethod("getHandle").invoke(player);
-			Object playerConnection = handle.getClass().getDeclaredField((is17 || is18) ? "b" : "playerConnection").get(handle);
+			Object playerConnection = handle.getClass().getDeclaredField((is1_17 || is1_18 || is1_19) ? "b" : "playerConnection").get(handle);
 			playerConnection.getClass().getMethod(
-					is18
+					(is1_18 || is1_19)
 							? "a"
 							: "sendPacket",
-					getNMSClass((is17 || is18)
+					getNMSClass((is1_17 || is1_18 || is1_19)
 							? "network.protocol.Packet"
 							: "Packet")
 			).invoke(playerConnection, packet);
@@ -173,11 +173,12 @@ public class NickManager extends ReflectionHelper {
 			}
 		} else {
 			final String finalName = name;
+			boolean is1_17To1_19 = serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18") || serverVersion.startsWith("1_19");
 
 			(serverVersion.equals("1_8_R1")
 					? Optional.of(getNMSClass("EnumPlayerInfoAction"))
 					: getSubClass(getNMSClass(
-							(serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18"))
+							is1_17To1_19
 									? "network.protocol.game.PacketPlayOutPlayerInfo"
 									: "PacketPlayOutPlayerInfo"
 							),
@@ -197,7 +198,7 @@ public class NickManager extends ReflectionHelper {
 							// Set listName field of EntityPlayer -> getPlayerListName()
 							Class<?> craftChatMessage = getCraftClass("util.CraftChatMessage");
 							Field f = getNMSClass(
-									(serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18"))
+									is1_17To1_19
 											? "server.level.EntityPlayer"
 											: "EntityPlayer"
 							).getDeclaredField("listName");
@@ -220,7 +221,7 @@ public class NickManager extends ReflectionHelper {
 										player,
 										currentPlayer,
 										getNMSClass(
-												(serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18"))
+												is1_17To1_19
 														? "network.protocol.game.PacketPlayOutPlayerInfo"
 														: "PacketPlayOutPlayerInfo"
 										).getConstructor(
@@ -228,7 +229,7 @@ public class NickManager extends ReflectionHelper {
 												entityPlayerArray.getClass()
 										).newInstance(
 												enumPlayerInfoActionClass.getDeclaredField(
-														(serverVersion.startsWith("1_17") || serverVersion.startsWith("1_18"))
+														is1_17To1_19
 																? "d"
 																: "UPDATE_DISPLAY_NAME"
 												).get(enumPlayerInfoActionClass),
@@ -249,19 +250,19 @@ public class NickManager extends ReflectionHelper {
 		try {
 			final Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 			String version = eazyNick.getVersion();
-			boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+			boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 
-			Object worldClient = entityPlayer.getClass().getMethod(is18 ? "cA" : "getWorld").invoke(entityPlayer),
+			Object worldClient = entityPlayer.getClass().getMethod(is1_19 ? "cD" : (is1_18 ? "cA" : "getWorld")).invoke(entityPlayer),
 					worldData = worldClient.getClass().getMethod(
-							is18
+							(is1_18 || is1_19)
 									? "n_"
 									: "getWorldData"
 					).invoke(worldClient),
 					interactManager = entityPlayer.getClass()
-							.getField((is17 || is18)
+							.getField((is1_17 || is1_18 || is1_19)
 									? "d"
 									: "playerInteractManager"
 							).get(entityPlayer);
@@ -277,15 +278,15 @@ public class NickManager extends ReflectionHelper {
 						)
 							//noinspection SuspiciousTernaryOperatorInVarargsCall
 							sendPacket(player, currentPlayer, getNMSClass(
-									(is17 || is18)
+									(is1_17 || is1_18 || is1_19)
 											? "network.protocol.game.PacketPlayOutEntityDestroy"
 											: "PacketPlayOutEntityDestroy"
 							).getConstructor(
-									(is17 && !(Bukkit.getVersion().contains("1.17.1")))
+									(is1_17 && !(Bukkit.getVersion().contains("1.17.1")))
 											? int.class
 											: int[].class
 							).newInstance(
-									(is17 && !(Bukkit.getVersion().contains("1.17.1")))
+									(is1_17 && !(Bukkit.getVersion().contains("1.17.1")))
 											? player.getEntityId()
 											: new int[] { player.getEntityId() }
 							));
@@ -306,7 +307,7 @@ public class NickManager extends ReflectionHelper {
 									? Optional.of(getNMSClass("EnumPlayerInfoAction"))
 									: getSubClass(
 											getNMSClass(
-													(is17 || is18)
+													(is1_17 || is1_18 || is1_19)
 															? "network.protocol.game.PacketPlayOutPlayerInfo"
 															: "PacketPlayOutPlayerInfo"
 											),
@@ -317,7 +318,7 @@ public class NickManager extends ReflectionHelper {
 							if(enumPlayerInfoActionClass.isPresent())
 								//noinspection JavaReflectionInvocation
 								packetPlayOutPlayerInfoRemove = getNMSClass(
-										(is17 || is18)
+										(is1_17 || is1_18 || is1_19)
 												? "network.protocol.game.PacketPlayOutPlayerInfo"
 												: "PacketPlayOutPlayerInfo"
 								).getConstructor(
@@ -325,7 +326,7 @@ public class NickManager extends ReflectionHelper {
 										entityPlayerArray.getClass()
 								).newInstance(
 										enumPlayerInfoActionClass.get().getDeclaredField(
-												(is17 || is18)
+												(is1_17 || is1_18 || is1_19)
 														? "e"
 														: "REMOVE_PLAYER"
 										).get(enumPlayerInfoActionClass),
@@ -371,7 +372,7 @@ public class NickManager extends ReflectionHelper {
 														? Optional.of(getNMSClass("EnumPlayerInfoAction"))
 														: getSubClass(
 																getNMSClass(
-																		(is17 || is18)
+																		(is1_17 || is1_18 || is1_19)
 																				? "network.protocol.game.PacketPlayOutPlayerInfo"
 																				: "PacketPlayOutPlayerInfo"
 																),
@@ -381,7 +382,7 @@ public class NickManager extends ReflectionHelper {
 
 										if(enumPlayerInfoActionClass.isPresent())
 											packetPlayOutPlayerInfoAdd = getNMSClass(
-													(is17 || is18)
+													(is1_17 || is1_18 || is1_19)
 															? "network.protocol.game.PacketPlayOutPlayerInfo"
 															: "PacketPlayOutPlayerInfo"
 											).getConstructor(
@@ -389,7 +390,7 @@ public class NickManager extends ReflectionHelper {
 													entityPlayerArray.getClass()
 											).newInstance(
 													enumPlayerInfoActionClass.get().getDeclaredField(
-															(is17 || is18)
+															(is1_17 || is1_18 || is1_19)
 																	? "a"
 																	: "ADD_PLAYER"
 													).get(enumPlayerInfoActionClass),
@@ -409,11 +410,11 @@ public class NickManager extends ReflectionHelper {
 						sendPacketExceptSelf(
 								player,
 								getNMSClass(
-										(is17 || is18)
+										(is1_17 || is1_18 || is1_19)
 												? "network.protocol.game.PacketPlayOutNamedEntitySpawn"
 												: "PacketPlayOutNamedEntitySpawn"
 								).getConstructor(getNMSClass(
-										(is17 || is18)
+										(is1_17 || is1_18 || is1_19)
 												? "world.entity.player.EntityHuman"
 												: "EntityHuman"
 								)).newInstance(entityPlayer), players);
@@ -421,7 +422,7 @@ public class NickManager extends ReflectionHelper {
 						// Fix head and body rotation (Yaw + Pitch)
 						Object packetHeadRotation;
 
-						if(is17 || is18)
+						if(is1_17 || is1_18 || is1_19)
 							packetHeadRotation = getNMSClass("network.protocol.game.PacketPlayOutEntityHeadRotation")
 									.getConstructor(
 											getNMSClass("world.entity.Entity"),
@@ -431,7 +432,7 @@ public class NickManager extends ReflectionHelper {
 											(byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F))
 									);
 						else {
-							packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").newInstance();
+							packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").getDeclaredConstructor().newInstance();
 							setField(packetHeadRotation, "a", player.getEntityId());
 							setField(packetHeadRotation, "b", (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)));
 						}
@@ -440,7 +441,7 @@ public class NickManager extends ReflectionHelper {
 
 						if(packetPlayOutEntityLook == null) {
 							for (Class<?> clazz : getNMSClass(
-									(is17 || is18)
+									(is1_17 || is1_18 || is1_19)
 											? "network.protocol.game.PacketPlayOutEntity"
 											: "PacketPlayOutEntity"
 							).getDeclaredClasses()) {
@@ -449,7 +450,7 @@ public class NickManager extends ReflectionHelper {
 							}
 						}
 
-						if(packetPlayOutEntityLook != null)
+						if(packetPlayOutEntityLook != null) {
 							sendPacketExceptSelf(
 									player,
 									packetPlayOutEntityLook.getConstructor(
@@ -463,6 +464,7 @@ public class NickManager extends ReflectionHelper {
 											(byte) ((int) (player.getLocation().getPitch() * 256.0F / 360.0F)),
 											true
 									), players);
+						}
 
 						sendPacketExceptSelf(
 								player,
@@ -479,13 +481,37 @@ public class NickManager extends ReflectionHelper {
 							// Self skin update
 							Object packetRespawnPlayer;
 
-							if(version.equals("1_18_R2")) {
+							if(is1_19) {
 								Object worldServer = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
-								Class<?> enumGameMode = getNMSClass(
-										(is17 || is18)
-												? "world.level.EnumGamemode"
-												: "EnumGamemode"
-								);
+								Class<?> enumGameMode = getNMSClass("world.level.EnumGamemode");
+
+								packetRespawnPlayer = getNMSClass("network.protocol.game.PacketPlayOutRespawn")
+										.getConstructor(
+												getNMSClass("resources.ResourceKey"),
+												getNMSClass("resources.ResourceKey"),
+												long.class,
+												enumGameMode,
+												enumGameMode,
+												boolean.class,
+												boolean.class,
+												boolean.class,
+												Optional.class
+										).newInstance(
+												worldServer.getClass().getMethod("Z").invoke(worldServer),
+												worldServer.getClass().getMethod("ab").invoke(worldServer),
+												getNMSClass("world.level.biome.BiomeManager")
+														.getMethod("a", long.class)
+														.invoke(null, player.getWorld().getSeed()),
+												interactManager.getClass().getMethod("b").invoke(interactManager),
+												interactManager.getClass().getMethod("c").invoke(interactManager),
+												worldServer.getClass().getMethod("ae").invoke(worldServer),
+												worldServer.getClass().getMethod("A").invoke(worldServer),
+												true,
+												entityPlayer.getClass().getMethod("ga").invoke(entityPlayer)
+										);
+							} else if(version.equals("1_18_R2")) {
+								Object worldServer = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
+								Class<?> enumGameMode = getNMSClass("world.level.EnumGamemode");
 
 								packetRespawnPlayer = getNMSClass("network.protocol.game.PacketPlayOutRespawn")
 										.getConstructor(
@@ -509,14 +535,14 @@ public class NickManager extends ReflectionHelper {
 												worldServer.getClass().getMethod("C").invoke(worldServer),
 												true
 										);
-							} else if(version.startsWith("1_16") || is17 || is18) {
+							} else if(version.startsWith("1_16") || is1_17 || is1_18) {
 								Object worldServer = player
 										.getWorld()
 										.getClass()
 										.getMethod("getHandle")
 										.invoke(player.getWorld());
 								Class<?> enumGameMode = getNMSClass(
-										(is17 || is18)
+										(is1_17 || is1_18)
 												? "world.level.EnumGamemode"
 												: "EnumGamemode"
 								);
@@ -556,17 +582,17 @@ public class NickManager extends ReflectionHelper {
 												true
 										)
 										: getNMSClass(
-												(is17 || is18)
+												(is1_17 || is1_18)
 														? "network.protocol.game.PacketPlayOutRespawn"
 														: "PacketPlayOutRespawn"
 										).getConstructor(
 												getNMSClass(
-														(is17 || is18)
+														(is1_17 || is1_18)
 																? "world.level.dimension.DimensionManager"
 																: "DimensionManager"
 												),
 												getNMSClass(
-														(is17 || is18)
+														(is1_17 || is1_18)
 																? "resources.ResourceKey"
 																: "ResourceKey"
 												),
@@ -578,17 +604,17 @@ public class NickManager extends ReflectionHelper {
 												boolean.class
 										).newInstance(
 												worldServer.getClass().getMethod(
-														is18
+														is1_18
 																? "q_"
 																: "getDimensionManager"
 												).invoke(worldServer),
 												worldServer.getClass().getMethod(
-														is18
+														is1_18
 																? "aa"
 																: "getDimensionKey"
 												).invoke(worldServer),
 												getNMSClass(
-														(is17 || is18)
+														(is1_17 || is1_18)
 																? "world.level.biome.BiomeManager"
 																: "BiomeManager"
 												).getMethod("a", long.class).invoke(
@@ -596,18 +622,18 @@ public class NickManager extends ReflectionHelper {
 														player.getWorld().getSeed()
 												),
 												interactManager.getClass().getMethod(
-														is18
+														is1_18
 																? "b"
 																: "getGameMode"
 												).invoke(interactManager),
 												interactManager.getClass().getMethod("c").invoke(interactManager),
 												worldServer.getClass().getMethod(
-														is18
+														is1_18
 																? "ad"
 																: "isDebugWorld"
 												).invoke(worldServer),
 												worldServer.getClass().getMethod(
-														is18
+														is1_18
 																? "D"
 																: "isFlatWorld"
 												).invoke(worldServer),
@@ -746,10 +772,12 @@ public class NickManager extends ReflectionHelper {
 
 							// Fix position
 							Object playerConnection = entityPlayer.getClass().getDeclaredField(
-									(is17 || is18)
+									(is1_17 || is1_18 || is1_19)
 											? "b"
 											: "playerConnection"
 							).get(entityPlayer);
+
+							boolean teleportFar = is1_17 || version.equals("1_18_R1") || is1_19;
 
 							Bukkit.getScheduler().runTask(eazyNick, () -> {
 								try {
@@ -760,11 +788,11 @@ public class NickManager extends ReflectionHelper {
 													new Location(
 															player.getWorld(),
 															player.getLocation().getX()
-																	+ ((is17 || version.equals("1_18_R1")) ? 100 : 0),
+																	+ (teleportFar ? 100 : 0),
 															player.getLocation().getY()
-																	+ ((is17 || version.equals("1_18_R1")) ? 100.25 : 0.25),
+																	+ (teleportFar ? 100.25 : 0.25),
 															player.getLocation().getZ()
-																	+ ((is17 || version.equals("1_18_R1")) ? 100 : 0),
+																	+ (teleportFar ? 100 : 0),
 															player.getLocation().getYaw(),
 															player.getLocation().getPitch()
 													)
@@ -774,7 +802,7 @@ public class NickManager extends ReflectionHelper {
 								}
 							});
 
-							if(is17 || version.equals("1_18_R1")) {
+							if(teleportFar) {
 								new AsyncTask(new AsyncRunnable() {
 
 									@Override
@@ -1562,76 +1590,27 @@ public class NickManager extends ReflectionHelper {
 							scoreboardTeamHandler.createTeam();
 						}
 
-						boolean tabNamePrefixSuffixChange = utils.isPluginInstalled("TAB", "NEZNAMY")
+						boolean tabGroupPrefixSuffixChange = utils.isPluginInstalled("TAB", "NEZNAMY")
 								&& setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB");
 
 						// Update TAB tablist prefix and suffix and nametag prefix, suffix and group
-						if(tabNamePrefixSuffixChange)
+						if(tabGroupPrefixSuffixChange)
 							new TABHook(player).update(finalTabPrefix, finalTabSuffix, tagPrefix, tagSuffix, groupName);
 
 						if(!(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName"))) return;
 
-						String tmpTabPrefix = finalTabPrefix,
-								tmpTabSuffix = finalTabSuffix,
-								tmpTagPrefix = tagPrefix,
-								tmpTagSuffix = tagSuffix;
-
-						// Replace PlaceholderAPI placeholders
-						if(utils.isPluginInstalled("PlaceholderAPI")) {
-							tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
-							tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
-							tmpTagPrefix = PlaceholderAPI.setPlaceholders(player, tmpTagPrefix);
-							tmpTagSuffix = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix);
-						}
-
 						// Update tablist name
-						if(!(tabNamePrefixSuffixChange))
-							setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
+						if(!(tabGroupPrefixSuffixChange)) {
+							String tmpTabPrefix = finalTabPrefix,
+									tmpTabSuffix = finalTabSuffix;
 
-						// Update NametagEdit prefix and suffix synchronously
-						if(utils.isPluginInstalled("NametagEdit")) {
-							Bukkit.getScheduler().runTask(eazyNick, () -> {
-								utils.getNametagEditPrefixes().remove(player.getUniqueId());
-								utils.getNametagEditSuffixes().remove(player.getUniqueId());
-
-								INametagApi nametagEditAPI = NametagEdit.getApi();
-								Nametag nametag = nametagEditAPI.getNametag(player);
-
-								utils.getNametagEditPrefixes().put(player.getUniqueId(), nametag.getPrefix());
-								utils.getNametagEditSuffixes().put(player.getUniqueId(), nametag.getSuffix());
-
-								String tmpTagPrefix2 = tagPrefix, tmpTagSuffix2 = tagSuffix;
-
-								if(utils.isPluginInstalled("PlaceholderAPI")) {
-									tmpTagPrefix2 = PlaceholderAPI.setPlaceholders(player, tmpTagPrefix2);
-									tmpTagSuffix2 = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix2);
-								}
-
-								nametagEditAPI.setPrefix(player, tmpTagPrefix2);
-								nametagEditAPI.setSuffix(player, tmpTagSuffix2);
-								nametagEditAPI.reloadNametag(player);
-							});
-						}
-
-						// Update CloudNet v2 prefix and suffix
-						if(utils.isPluginInstalled("CloudNetAPI")) {
-							CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
-
-							if(setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
-								PermissionEntity entity = cloudPlayer.getPermissionEntity();
-								de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup =
-										entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
-
-								utils.getOldCloudNETPrefixes().put(player.getUniqueId(), entity.getPrefix());
-								utils.getOldCloudNETSuffixes().put(player.getUniqueId(), entity.getSuffix());
-								utils.getOldCloudNETTagIDs().put(player.getUniqueId(), highestPermissionGroup.getTagId());
-
-								entity.setPrefix(tmpTagPrefix);
-								entity.setSuffix(tmpTagSuffix);
-								highestPermissionGroup.setPrefix(tmpTagPrefix);
-								highestPermissionGroup.setSuffix(tmpTagSuffix);
-								highestPermissionGroup.setTagId(Integer.MAX_VALUE);
+							// Replace PlaceholderAPI placeholders
+							if(utils.isPluginInstalled("PlaceholderAPI")) {
+								tmpTabPrefix = PlaceholderAPI.setPlaceholders(player, tmpTabPrefix);
+								tmpTabSuffix = PlaceholderAPI.setPlaceholders(player, tmpTabSuffix);
 							}
+
+							setPlayerListName(tmpTabPrefix + nickName + tmpTabSuffix);
 						}
 					}
 				},
@@ -1653,6 +1632,52 @@ public class NickManager extends ReflectionHelper {
 		// Set chat name
 		if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.DisplayName"))
 			player.setDisplayName(chatPrefix + nickName + chatSuffix);
+
+		Bukkit.getScheduler().runTask(eazyNick, () -> {
+			String tmpTagPrefix = tagPrefix, tmpTagSuffix = tagSuffix;
+
+			if (utils.isPluginInstalled("PlaceholderAPI")) {
+				tmpTagPrefix = PlaceholderAPI.setPlaceholders(player, tmpTagPrefix);
+				tmpTagSuffix = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix);
+			}
+
+			// Update NametagEdit prefix and suffix synchronously
+			if (utils.isPluginInstalled("NametagEdit")) {
+				utils.getNametagEditPrefixes().remove(player.getUniqueId());
+				utils.getNametagEditSuffixes().remove(player.getUniqueId());
+
+				INametagApi nametagEditAPI = NametagEdit.getApi();
+				Nametag nametag = nametagEditAPI.getNametag(player);
+
+				utils.getNametagEditPrefixes().put(player.getUniqueId(), nametag.getPrefix());
+				utils.getNametagEditSuffixes().put(player.getUniqueId(), nametag.getSuffix());
+
+				nametagEditAPI.setPrefix(player, tmpTagPrefix);
+				nametagEditAPI.setSuffix(player, tmpTagSuffix);
+				nametagEditAPI.reloadNametag(player);
+			}
+
+			// Update CloudNet v2 prefix and suffix
+			if (utils.isPluginInstalled("CloudNetAPI")) {
+				CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
+
+				if (setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+					PermissionEntity entity = cloudPlayer.getPermissionEntity();
+					de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup =
+							entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
+
+					utils.getOldCloudNETPrefixes().put(player.getUniqueId(), entity.getPrefix());
+					utils.getOldCloudNETSuffixes().put(player.getUniqueId(), entity.getSuffix());
+					utils.getOldCloudNETTagIDs().put(player.getUniqueId(), highestPermissionGroup.getTagId());
+
+					entity.setPrefix(tmpTagPrefix);
+					entity.setSuffix(tmpTagSuffix);
+					highestPermissionGroup.setPrefix(tmpTagPrefix);
+					highestPermissionGroup.setSuffix(tmpTagSuffix);
+					highestPermissionGroup.setTagId(Integer.MAX_VALUE);
+				}
+			}
+		});
 		
 		// Update PermissionsEx prefix, suffix and group
 		if(utils.isPluginInstalled("PermissionsEx")) {

@@ -141,7 +141,7 @@ public class PluginCommand implements CommandExecutor {
 					sender.sendMessage(prefix);
 
 					if(sender instanceof Player) {
-						if(eazyNick.getVersion().startsWith("1_17") || eazyNick.getVersion().startsWith("1_18"))
+						if(eazyNick.getVersion().startsWith("1_17") || eazyNick.getVersion().startsWith("1_18") || eazyNick.getVersion().startsWith("1_19"))
 							((Player) sender).spigot().sendMessage(new ComponentBuilder(prefix + "§71. Join the discord server §8(discord.justix-dev.com)").event(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.justix-dev.com/")).event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text("§7Click here to open the discord invitation link")))).create());
 						else
 							//noinspection deprecation

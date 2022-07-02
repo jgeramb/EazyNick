@@ -3,7 +3,7 @@ version: '0.0.0'
 author: Justix
 main: com.justixdev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)
-website: https://www.spigotmc.org/resources/51398/
+website: https://github.com/JustixDevelopment/EazyNick
 softdepend: [PlaceholderAPI, CloudNetAPI, ColoredTags, NametagEdit, PermissionsEx, LuckPerms, Datenschutz, Vault, SurvivalGames, AuthMe, TAB, DeluxeChat, ChatControl, Essentials]
 api-version: 1.13
 load: POSTWORLD

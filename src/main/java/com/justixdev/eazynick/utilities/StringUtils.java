@@ -25,7 +25,7 @@ public class StringUtils {
 		String version = EazyNick.getInstance().getVersion();
 
 		// HEX-Color-Support
-		if(version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18")) {
+		if(version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19")) {
 			Matcher matcher = HEX_COLOR_PATTERN.matcher(string);
 			StringBuffer buffer = new StringBuffer(string.length() + 4 * 8);
 

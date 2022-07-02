@@ -19,7 +19,7 @@ public class ScoreboardTeamHandler {
 	
 	private final Player player;
 	private final String nickName, realName;
-	private final ArrayList<Player> receivedPacket;
+	private final List<Player> receivedPacket;
 	private String teamName, prefix, suffix;
 	private Object packet;
 
@@ -32,7 +32,7 @@ public class ScoreboardTeamHandler {
 		this.realName = realName;
 		this.receivedPacket = new ArrayList<>(Bukkit.getOnlinePlayers());
 
-		this.teamName = sortID + rank + player.getUniqueId().toString().substring(0, 14);
+		this.teamName = sortID + rank.substring(0, 14 - String.valueOf(sortID).length()) + player.getName();
 		this.teamName = this.teamName.substring(0, Math.min(teamName.length(), 16));
 
 		this.prefix = (prefix == null) ? "" : prefix;
@@ -42,22 +42,22 @@ public class ScoreboardTeamHandler {
 	public void destroyTeam() {
 		try {
 			String version = eazyNick.getVersion();
-			boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+			boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 			
 			// Create packet instance
 			Constructor<?> constructor = reflectionHelper.getNMSClass(
-					(is17 || is18)
+					(is1_17 || is1_18 || is1_19)
 							? "network.protocol.game.PacketPlayOutScoreboardTeam"
 							: "PacketPlayOutScoreboardTeam"
 			).getDeclaredConstructor(
-					(is17 || is18)
+					(is1_17 || is1_18 || is1_19)
 							? new Class[] { String.class, int.class, Optional.class, Collection.class }
 							: new Class[0]
 			);
 			constructor.setAccessible(true);
 			
 			packet = constructor.newInstance(
-					(is17 || is18)
+					(is1_17 || is1_18 || is1_19)
 							? new Object[] { null, 0, null, new ArrayList<>() }
 							: new Object[0]
 			);
@@ -71,7 +71,7 @@ public class ScoreboardTeamHandler {
 						reflectionHelper.setField(packet, "e", "ALWAYS");
 						reflectionHelper.setField(packet, "i", 1);
 					} catch (Exception ex) {
-						if(is17 || is18) {
+						if(is1_17 || is1_18 || is1_19) {
 							reflectionHelper.setField(packet, "h", 1);
 							reflectionHelper.setField(packet, "i", teamName);
 							
@@ -83,7 +83,7 @@ public class ScoreboardTeamHandler {
 									.newInstance(null, teamName);
 							reflectionHelper.setField(
 									scoreboardTeam,
-									is18
+									(is1_18 || is1_19)
 											? "d"
 											: "e",
 									teamName
@@ -154,24 +154,24 @@ public class ScoreboardTeamHandler {
 		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 		
 		String version = eazyNick.getVersion();
-		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+		boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 		
 		Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
 			try {
 				// Create packet instance
 				Constructor<?> constructor = reflectionHelper.getNMSClass(
-						(is17 || is18)
+						(is1_17 || is1_18 || is1_19)
 								? "network.protocol.game.PacketPlayOutScoreboardTeam"
 								: "PacketPlayOutScoreboardTeam"
 				).getDeclaredConstructor(
-						(is17 || is18)
+						(is1_17 || is1_18 || is1_19)
 								? new Class[] { String.class, int.class, Optional.class, Collection.class }
 								: new Class[0]
 				);
 				constructor.setAccessible(true);
 				
 				packet = constructor.newInstance(
-						(is17 || is18)
+						(is1_17 || is1_18 || is1_19)
 								? new Object[] { null, 0, null, new ArrayList<>() }
 								: new Object[0]
 				);
@@ -210,7 +210,7 @@ public class ScoreboardTeamHandler {
 							reflectionHelper.setField(packet, "g", contents);
 							reflectionHelper.setField(packet, "i", 0);
 						} catch (Exception ex) {
-							String colorName = (is17 || is18) ? "v" : "RESET";
+							String colorName = (is1_17 || is1_18 || is1_19) ? "v" : "RESET";
 							
 							if(prefix.length() > 1) {
 								for (int i = prefix.length() - 1; i >= 0; i--) {
@@ -221,55 +221,55 @@ public class ScoreboardTeamHandler {
 											if((c != 'k') && (c != 'l') && (c != 'm') && (c != 'n') && (c != 'o')) {
 												switch (c) {
 													case '0':
-														colorName = (is17 || is18) ? "a" : "BLACK";
+														colorName = (is1_17 || is1_18 || is1_19) ? "a" : "BLACK";
 														break;
 													case '1':
-														colorName = (is17 || is18) ? "b" : "DARK_BLUE";
+														colorName = (is1_17 || is1_18 || is1_19) ? "b" : "DARK_BLUE";
 														break;
 													case '2':
-														colorName = (is17 || is18) ? "c" : "DARK_GREEN";
+														colorName = (is1_17 || is1_18 || is1_19) ? "c" : "DARK_GREEN";
 														break;
 													case '3':
-														colorName = (is17 || is18) ? "d" : "DARK_AQUA";
+														colorName = (is1_17 || is1_18 || is1_19) ? "d" : "DARK_AQUA";
 														break;
 													case '4':
-														colorName = (is17 || is18) ? "e" : "DARK_RED";
+														colorName = (is1_17 || is1_18 || is1_19) ? "e" : "DARK_RED";
 														break;
 													case '5':
-														colorName = (is17 || is18) ? "f" : "DARK_PURPLE";
+														colorName = (is1_17 || is1_18 || is1_19) ? "f" : "DARK_PURPLE";
 														break;
 													case '6':
-														colorName = (is17 || is18) ? "g" : "GOLD";
+														colorName = (is1_17 || is1_18 || is1_19) ? "g" : "GOLD";
 														break;
 													case '7':
-														colorName = (is17 || is18) ? "h" : "GRAY";
+														colorName = (is1_17 || is1_18 || is1_19) ? "h" : "GRAY";
 														break;
 													case '8':
-														colorName = (is17 || is18) ? "i" : "DARK_GRAY";
+														colorName = (is1_17 || is1_18 || is1_19) ? "i" : "DARK_GRAY";
 														break;
 													case '9':
-														colorName = (is17 || is18) ? "j" : "BLUE";
+														colorName = (is1_17 || is1_18 || is1_19) ? "j" : "BLUE";
 														break;
 													case 'a':
-														colorName = (is17 || is18) ? "k" : "GREEN";
+														colorName = (is1_17 || is1_18 || is1_19) ? "k" : "GREEN";
 														break;
 													case 'b':
-														colorName = (is17 || is18) ? "l" : "AQUA";
+														colorName = (is1_17 || is1_18 || is1_19) ? "l" : "AQUA";
 														break;
 													case 'c':
-														colorName = (is17 || is18) ? "m" : "RED";
+														colorName = (is1_17 || is1_18 || is1_19) ? "m" : "RED";
 														break;
 													case 'd':
-														colorName = (is17 || is18) ? "n" : "LIGHT_PURPLE";
+														colorName = (is1_17 || is1_18 || is1_19) ? "n" : "LIGHT_PURPLE";
 														break;
 													case 'e':
-														colorName = (is17 || is18) ? "o" : "YELLOW";
+														colorName = (is1_17 || is1_18 || is1_19) ? "o" : "YELLOW";
 														break;
 													case 'f':
-														colorName = (is17 || is18) ? "p" : "WHITE";
+														colorName = (is1_17 || is1_18 || is1_19) ? "p" : "WHITE";
 														break;
 													case 'r':
-														colorName = (is17 || is18) ? "v" : "RESET";
+														colorName = (is1_17 || is1_18 || is1_19) ? "v" : "RESET";
 														break;
 													default:
 														break;
@@ -282,7 +282,7 @@ public class ScoreboardTeamHandler {
 								}
 							}
 							
-							if(is17 || is18) {
+							if(is1_17 || is1_18 || is1_19) {
 								reflectionHelper.setField(packet, "h", 0);
 								reflectionHelper.setField(packet, "i", teamName);
 								reflectionHelper.setField(packet, "j", contents);
@@ -292,14 +292,14 @@ public class ScoreboardTeamHandler {
 												reflectionHelper.getNMSClass("world.scores.Scoreboard"),
 												String.class
 										).newInstance(null, teamName);
-								reflectionHelper.setField(scoreboardTeam, is18 ? "d" : "e", teamName);
-								reflectionHelper.setField(scoreboardTeam, is18 ? "g" : "h", getAsIChatBaseComponent(prefix));							
-								reflectionHelper.setField(scoreboardTeam, is18 ? "h" : "i", getAsIChatBaseComponent(suffix));							
-								reflectionHelper.setField(scoreboardTeam, is18 ? "i" : "j", false);							
-								reflectionHelper.setField(scoreboardTeam, is18 ? "j" : "k", false);							
+								reflectionHelper.setField(scoreboardTeam, (is1_18 || is1_19) ? "d" : "e", teamName);
+								reflectionHelper.setField(scoreboardTeam, (is1_18 || is1_19) ? "g" : "h", getAsIChatBaseComponent(prefix));
+								reflectionHelper.setField(scoreboardTeam, (is1_18 || is1_19) ? "h" : "i", getAsIChatBaseComponent(suffix));
+								reflectionHelper.setField(scoreboardTeam, (is1_18 || is1_19) ? "i" : "j", false);
+								reflectionHelper.setField(scoreboardTeam, (is1_18 || is1_19) ? "j" : "k", false);
 								reflectionHelper.setField(
 										scoreboardTeam,
-										is18
+										(is1_18 || is1_19)
 												? "m"
 												: "n",
 										reflectionHelper.getField(reflectionHelper.getNMSClass("EnumChatFormat"), colorName).get(null)
@@ -354,7 +354,7 @@ public class ScoreboardTeamHandler {
 			
 				// Send packet to create team
 				sendPacket(currentPlayer, packet);
-				
+
 				if(!(receivedPacket.contains(currentPlayer)))
 					receivedPacket.add(currentPlayer);
 			} catch (Exception ex) {
@@ -377,12 +377,12 @@ public class ScoreboardTeamHandler {
 		try {
 			// Create IChatBaseComponent from String using ChatSerializer
 			return reflectionHelper.getNMSClass(
-					(version.startsWith("1_17") || version.startsWith("1_18"))
+					(version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
 							? "network.chat.IChatBaseComponent"
 							: "IChatBaseComponent"
 			)
 					.getDeclaredClasses()[0]
-					.getMethod(version.startsWith("1_18") ? "b" : "a", String.class)
+					.getMethod((version.startsWith("1_18") || version.startsWith("1_19")) ? "b" : "a", String.class)
 					.invoke(null, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
 		} catch (Exception ex) {
 			return null;
@@ -391,22 +391,22 @@ public class ScoreboardTeamHandler {
 	
 	private void sendPacket(Player player, Object packet) {
 		String version = eazyNick.getVersion();
-		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+		boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 		
 		try {
 			// Send packet to player
 			Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 			Object playerConnection = entityPlayer.getClass().getField(
-					(is17 || is18)
+					(is1_17 || is1_18 || is1_19)
 							? "b"
 							: "playerConnection"
 			).get(entityPlayer);
 			playerConnection.getClass().getMethod(
-					is18
+					(is1_18 || is1_19)
 							? "a"
 							: "sendPacket",
 					reflectionHelper.getNMSClass(
-							(is17 || is18)
+							(is1_17 || is1_18 || is1_19)
 									? "network.protocol.Packet"
 									: "Packet"
 					)).invoke(playerConnection, packet);

@@ -40,7 +40,7 @@ public class SignGUI implements Listener {
 	@SuppressWarnings("ConstantConditions")
 	public void open(Player player, String line1, String line2, String line3, String line4, EditCompleteListener editCompleteListener) {
 		String version = eazyNick.getVersion();
-		boolean is17 = version.startsWith("1_17"), is18 = version.startsWith("1_18");
+		boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 		Block block = player.getWorld().getBlockAt(player.getLocation().clone().add(0, 250 - player.getLocation().getBlockY(), 0));
 		
 		blocks.put(player, block);
@@ -69,7 +69,7 @@ public class SignGUI implements Listener {
 					.stream()
 					.filter(currentPlayer -> (currentPlayer != player))
 					.forEach(currentPlayer -> {
-				if(is18) {
+				if(is1_18 || is1_19) {
 					currentPlayer.sendBlockChange(block.getLocation(), Material.AIR.createBlockData());
 				} else {
 					try {
@@ -99,7 +99,7 @@ public class SignGUI implements Listener {
 								|| Bukkit.getVersion().contains("1.12.1");
 						Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 						Object playerConnection = entityPlayer.getClass().getField(
-								(is17 || is18)
+								(is1_17 || is1_18 || is1_19)
 										? "b"
 										: "playerConnection"
 						).get(entityPlayer);
@@ -111,7 +111,7 @@ public class SignGUI implements Listener {
 						tileField.setAccessible(true);
 						Object tileSign = tileField.get(sign);
 
-						Field editable = tileSign.getClass().getDeclaredField((is17 || is18) ? "f" : "isEditable");
+						Field editable = tileSign.getClass().getDeclaredField((is1_17 || is1_18 || is1_19) ? "f" : "isEditable");
 						editable.setAccessible(true);
 						editable.set(tileSign, true);
 
@@ -124,7 +124,7 @@ public class SignGUI implements Listener {
 																version.startsWith("1_13")
 																		? "g"
 																		: (
-																				(is17 || is18)
+																				(is1_17 || is1_18 || is1_19)
 																						? "g"
 																						: "h"
 																		)
@@ -134,31 +134,31 @@ public class SignGUI implements Listener {
 						handler.setAccessible(true);
 						handler.set(
 								tileSign,
-								(is17 || is18)
+								(is1_17 || is1_18 || is1_19)
 										? player.getUniqueId()
 										: entityPlayer
 						);
 
 						playerConnection.getClass().getDeclaredMethod(
-								is18
+								(is1_18 || is1_19)
 										? "a" :
 										"sendPacket",
 								reflectionHelper.getNMSClass(
-										(is17 || is18)
+										(is1_17 || is1_18 || is1_19)
 												? "network.protocol.Packet"
 												: "Packet"
 								)).invoke(
 										playerConnection,
 								reflectionHelper.getNMSClass(
-										(is17 || is18)
+										(is1_17 || is1_18 || is1_19)
 												? "network.protocol.game.PacketPlayOutOpenSignEditor"
 												: "PacketPlayOutOpenSignEditor"
 								).getConstructor(reflectionHelper.getNMSClass(
-										(is17 || is18)
+										(is1_17 || is1_18 || is1_19)
 												? "core.BlockPosition"
 												: "BlockPosition"
 								)).newInstance(reflectionHelper.getNMSClass(
-										(is17 || is18)
+										(is1_17 || is1_18 || is1_19)
 												? "core.BlockPosition"
 												: "BlockPosition"
 								).getConstructor(

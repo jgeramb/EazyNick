@@ -107,7 +107,7 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
 				return String.valueOf(
 						Math.round(
 								player.getHealth()
-										+ ((version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18"))
+										+ ((version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
 												? player.getAbsorptionAmount()
 												: (player.hasPotionEffect(PotionEffectType.ABSORPTION)
 														? ((player.getActivePotionEffects()
