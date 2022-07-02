@@ -32,7 +32,6 @@ jobs:
           grep src/main/resources/plugin.yml -e ${{ steps.version.outputs.version }}
           mvn -B package --file pom.xml
           mv target/eazynick-*.jar target/EazyNick.jar
-          cp target/EazyNick.jar target/EazyNick-v${{ steps.version.outputs.version }}.jar
       - uses: actions/upload-artifact@v3
         with:
           name: artifacts
@@ -45,4 +44,4 @@ jobs:
           title: v${{ steps.version.outputs.version }}
           automatic_release_tag: v${{ steps.version.outputs.version }}
           files: |
-            target/EazyNick*.jar
+            target/EazyNick.jar
