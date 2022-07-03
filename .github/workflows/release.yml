@@ -32,11 +32,12 @@ jobs:
           grep src/main/resources/plugin.yml -e ${{ steps.version.outputs.version }}
           mkdir lib
           curl -L https://github.com/PEXPlugins/PermissionsEx/releases/download/STABLE-1.23.4/PermissionsEx-1.23.4.jar -o lib/PermissionsEx.jar
-          curl -L https://github.com/NEZNAMY/TAB/releases/download/3.1.1/TAB.v3.1.1.jar -o lib/Tab.jar
+          curl -L https://github.com/NEZNAMY/TAB/releases/download/3.1.2/TAB.v3.1.2.jar -o lib/TAB.jar
           curl -L https://cdn.getbukkit.org/spigot/spigot-1.7.10-SNAPSHOT-b1657.jar -o lib/spigot-1.7.10.jar
           curl -L https://cdn.getbukkit.org/spigot/spigot-1.8-R0.1-SNAPSHOT-latest.jar -o lib/spigot-1.8.jar
           mvn -B package --file pom.xml
           mv target/eazynick-*.jar target/EazyNick.jar
+
       - uses: actions/upload-artifact@v3
         with:
           name: artifacts

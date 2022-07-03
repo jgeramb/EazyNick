@@ -103,7 +103,7 @@
             <systemPath>${basedir}/lib/TAB.jar</systemPath>
             <groupId>me.neznamy</groupId>
             <artifactId>tab</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <scope>system</scope>
