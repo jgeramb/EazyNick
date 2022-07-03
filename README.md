@@ -1,16 +1,12 @@
 ![Logo](https://media.discordapp.net/attachments/845301622632611880/855464034341879838/EazyNick.png?width=96&height=96)
 # EazyNick
 
----
-
 ## Useful links
 > [Discord](https://discord.justix-dev.com)
 
 > The documentation is currently unavailable
 
 > [Support my work](https://www.paypal.me/JustixDevelopment)
-
----
 
 ## Compiling
 ### Importing the run configuration in IntelliJ IDEA (Mac OS X and Linux only)
@@ -27,8 +23,6 @@ Simply run the configuration, the jar will be saved as `target/EazyNick-vX.X.X-d
 2. Open `target/classes/plugin.yml` and replace `0.0.0` with the current version (located in `.github/.version`)
 3. Run ``mvn -B package --file pom.xml`` (in IntelliJ IDEA: Maven menu --> Lifecycle --> package)
 4. The jar will be saved as `target/eazynick-0.0.0.jar`
-
----
 
 ## Permissions
 ### eazynick.help
@@ -108,8 +102,6 @@ Simply run the configuration, the jar will be saved as `target/EazyNick-vX.X.X-d
 
 ### eazynick.bypass
 > See every player undisguised (if enabled in setup.yml)
-
----
 
 ## License
 EazyNick is licensed under the permissive MIT license. Please see [`LICENSE`](https://github.com/JustixDevelopment/EazyNick/blob/master/LICENSE) for more info.
