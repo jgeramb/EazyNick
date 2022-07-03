@@ -93,28 +93,28 @@
 
         <dependency>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/TAB.v3.1.1.jar</systemPath>
-            <groupId>me.neznamy</groupId>
-            <artifactId>tab</artifactId>
-            <version>3.1.1</version>
-        </dependency>
-        <dependency>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/PermissionsEx-1.23.4.jar</systemPath>
+            <systemPath>${basedir}/lib/PermissionsEx.jar</systemPath>
             <groupId>ru.tehkode</groupId>
             <artifactId>permissions</artifactId>
-            <version>1.23.3</version>
+            <version>1.23.4</version>
         </dependency>
         <dependency>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/spigot-1.7.10-SNAPSHOT-b1657.jar</systemPath>
+            <systemPath>${basedir}/lib/TAB.jar</systemPath>
+            <groupId>me.neznamy</groupId>
+            <artifactId>tab</artifactId>
+            <version>3.1.2</version>
+        </dependency>
+        <dependency>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/spigot-1.7.10.jar</systemPath>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-1.7.10</artifactId>
             <version>1.7.10-SNAPSHOT-b1657</version>
         </dependency>
         <dependency>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/spigot-1.8-R0.1-SNAPSHOT-latest.jar</systemPath>
+            <systemPath>${basedir}/lib/spigot-1.8.jar</systemPath>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-1.8.0</artifactId>
             <version>1.8-R0.1-SNAPSHOT-latest</version>
