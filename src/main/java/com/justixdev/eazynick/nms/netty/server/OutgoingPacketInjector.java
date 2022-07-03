@@ -127,7 +127,7 @@ public class OutgoingPacketInjector {
 		
 		try {
 			//Add new packet handler
-			channel.pipeline().addBefore(
+			channel.pipeline().addAfter(
 					"packet_handler",
 					handlerName,
 					new ChannelDuplexHandler() {
