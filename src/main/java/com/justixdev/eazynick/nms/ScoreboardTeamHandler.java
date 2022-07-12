@@ -32,7 +32,7 @@ public class ScoreboardTeamHandler {
 		this.realName = realName;
 		this.receivedPacket = new ArrayList<>(Bukkit.getOnlinePlayers());
 
-		this.teamName = sortID + rank.substring(0, 14 - String.valueOf(sortID).length()) + player.getName();
+		this.teamName = sortID + rank.substring(0, Math.min(14 - String.valueOf(sortID).length(), rank.length())) + player.getName();
 		this.teamName = this.teamName.substring(0, Math.min(teamName.length(), 16));
 
 		this.prefix = (prefix == null) ? "" : prefix;

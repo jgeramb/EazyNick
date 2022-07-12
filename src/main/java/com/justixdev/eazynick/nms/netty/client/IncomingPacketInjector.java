@@ -65,42 +65,42 @@ public class IncomingPacketInjector {
 
 						@Override
 						public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-							if(packet.getClass().getSimpleName().equals("PacketPlayInUpdateSign")) {
-								if(!(signGUI.getEditCompleteListeners().containsKey(player))) return;
-								//Process SignGUI success
-								Object[] rawLines = (Object[]) reflectionHelper.getField(
-										packet.getClass(),
-										(is1_17 || is1_18 || is1_19)
-												? "c"
-												: "b"
-								).get(packet);
+							try {
+								if (packet.getClass().getSimpleName().equals("PacketPlayInUpdateSign")) {
+									if (!(signGUI.getEditCompleteListeners().containsKey(player))) return;
+									//Process SignGUI success
+									Object[] rawLines = (Object[]) reflectionHelper.getField(
+											packet.getClass(),
+											(is1_17 || is1_18 || is1_19)
+													? "c"
+													: "b"
+									).get(packet);
 
-								Bukkit.getScheduler().runTask(eazyNick, () -> {
-									try {
-										String[] lines = new String[4];
+									Bukkit.getScheduler().runTask(eazyNick, () -> {
+										try {
+											String[] lines = new String[4];
 
-										if(version.startsWith("1_8")) {
-											int i = 0;
+											if (version.startsWith("1_8")) {
+												int i = 0;
 
-											for (Object obj : rawLines) {
-												lines[i] = (String) obj.getClass().getMethod("getText").invoke(obj);
+												for (Object obj : rawLines) {
+													lines[i] = (String) obj.getClass().getMethod("getText").invoke(obj);
 
-												i++;
-											}
-										} else
-											lines = (String[]) rawLines;
+													i++;
+												}
+											} else
+												lines = (String[]) rawLines;
 
-										if (channel.pipeline().get("PacketInjector") != null)
-											channel.pipeline().remove("PacketInjector");
+											if (channel.pipeline().get("PacketInjector") != null)
+												channel.pipeline().remove("PacketInjector");
 
-										signGUI.getEditCompleteListeners().get(player).onEditComplete(new EditCompleteEvent(lines));
-										signGUI.getBlocks().get(player).setType(signGUI.getOldTypes().get(player));
-									} catch (Exception ex) {
-										ex.printStackTrace();
-									}
-								});
-							} else if(packet.getClass().getName().endsWith("PacketPlayInTabComplete")) {
-								try {
+											signGUI.getEditCompleteListeners().get(player).onEditComplete(new EditCompleteEvent(lines));
+											signGUI.getBlocks().get(player).setType(signGUI.getOldTypes().get(player));
+										} catch (Exception ex) {
+											ex.printStackTrace();
+										}
+									});
+								} else if (packet.getClass().getName().endsWith("PacketPlayInTabComplete")) {
 									//Cache input text
 									eazyNick.getUtils().getTextsToComplete().put(
 											player,
@@ -111,9 +111,9 @@ public class IncomingPacketInjector {
 															: "a"
 											).get(packet)
 									);
-								} catch (IllegalArgumentException | IllegalAccessException ex) {
-									ex.printStackTrace();
 								}
+							} catch (Exception ex) {
+								ex.printStackTrace();
 							}
 
 							super.channelRead(ctx, packet);

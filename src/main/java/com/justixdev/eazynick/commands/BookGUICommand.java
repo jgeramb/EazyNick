@@ -244,23 +244,23 @@ public class BookGUICommand implements CommandExecutor {
 
 			textComponents.add(option3);
 
-			TextComponent option4 = new TextComponent(setupYamlFile.getConfiguration().getBoolean("AllowBookGUISkinFromName")
-					? guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Text").replace("%nl%", "\n")
-					: "");
-			option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " SKINFROMNAME"));
+			if(setupYamlFile.getConfiguration().getBoolean("AllowBookGUISkinFromName")) {
+				TextComponent option4 = new TextComponent(guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Text").replace("%nl%", "\n"));
+				option4.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bookgui " + args[0] + " " + args[1] + " SKINFROMNAME"));
 
-			if(is1_17To1_19)
-				option4.setHoverEvent(new HoverEvent(
-						HoverEvent.Action.SHOW_TEXT,
-						Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Hover")))
-				));
-			else
-				option4.setHoverEvent(new HoverEvent(
-						HoverEvent.Action.SHOW_TEXT,
-						TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Hover"))
-				));
+				if (is1_17To1_19)
+					option4.setHoverEvent(new HoverEvent(
+							HoverEvent.Action.SHOW_TEXT,
+							Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Hover")))
+					));
+				else
+					option4.setHoverEvent(new HoverEvent(
+							HoverEvent.Action.SHOW_TEXT,
+							TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.SkinFromName.Hover"))
+					));
 
-			textComponents.add(option4);
+				textComponents.add(option4);
+			}
 
 			if(utils.getLastSkinNames().containsKey(player.getUniqueId())) {
 				TextComponent option5 = new TextComponent(utils.getLastSkinNames().containsKey(player.getUniqueId())
@@ -274,12 +274,12 @@ public class BookGUICommand implements CommandExecutor {
 				));
 
 				if(is1_17To1_19)
-					option4.setHoverEvent(new HoverEvent(
+					option5.setHoverEvent(new HoverEvent(
 							HoverEvent.Action.SHOW_TEXT,
 							Collections.singletonList(new net.md_5.bungee.api.chat.hover.content.Text(guiYamlFile.getConfigString(player, "BookGUI.ReuseSkin.Hover")))
 					));
 				else
-					option4.setHoverEvent(new HoverEvent(
+					option5.setHoverEvent(new HoverEvent(
 							HoverEvent.Action.SHOW_TEXT,
 							TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.ReuseSkin.Hover"))
 					));
