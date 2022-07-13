@@ -502,12 +502,15 @@ public class OutgoingPacketInjector {
 				
 				StringBuilder fullText = new StringBuilder();
 				Method method = iChatBaseComponentClass.getDeclaredMethod(
-						(is1_18 || is1_19)
-								? "b"
-								: (
-										(Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || is1_17)
-												? "getSiblings"
-												: "a"
+						is1_19
+								? "c"
+								: (is1_18
+										? "b"
+										: (
+												(Bukkit.getVersion().contains("1.14.4") || version.startsWith("1_15") || version.startsWith("1_16") || is1_17)
+														? "getSiblings"
+														: "a"
+										)
 								)
 				);
 				method.setAccessible(true);
