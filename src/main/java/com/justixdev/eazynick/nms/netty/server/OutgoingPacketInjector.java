@@ -587,7 +587,7 @@ public class OutgoingPacketInjector {
 			return (version.equals("1_8_R1")
 					? reflectionHelper.getNMSClass("ChatSerializer")
 					: (reflectionHelper.getNMSClass(
-							(version.startsWith("1_17") || version.startsWith("1_18"))
+							(version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
 									? "network.chat.IChatBaseComponent"
 									: "IChatBaseComponent"
 					)).getDeclaredClasses()[0]
