@@ -45,7 +45,7 @@ public class Updater {
 
 			// Check if version is up-to-date
 			if (versionComparisonResult.equals(VersionComparisonResult.UP_TO_DATE) || versionComparisonResult.equals(VersionComparisonResult.DEV)) {
-				Bukkit.getLogger().log(Level.INFO, "No new version available");
+				Bukkit.getLogger().log(Level.INFO, prefix + "No new version available");
 				return false;
 			}
 
@@ -80,7 +80,7 @@ public class Updater {
 					localFileStream.getChannel().transferFrom(fileChannel, 0L, Long.MAX_VALUE);
 					localFileStream.flush();
 				} catch (IOException ex) {
-					Bukkit.getLogger().log(Level.SEVERE, "Could not save file: " + ex.getMessage());
+					Bukkit.getLogger().log(Level.SEVERE, prefix + "Could not save file: " + ex.getMessage());
 					return false;
 				}
 
@@ -88,10 +88,10 @@ public class Updater {
 
 				return true;
 			} catch (IOException ex) {
-				Bukkit.getLogger().log(Level.SEVERE, "Could not download file: " + ex.getMessage());
+				Bukkit.getLogger().log(Level.SEVERE, prefix + "Could not download file: " + ex.getMessage());
 			}
 		} catch (IOException ex) {
-			Bukkit.getLogger().log(Level.SEVERE, "Could not fetch latest version: " + ex.getMessage());
+			Bukkit.getLogger().log(Level.SEVERE, prefix + "Could not fetch latest version: " + ex.getMessage());
 		}
 		
 		return false;
@@ -148,16 +148,16 @@ public class Updater {
 					localFileStream.getChannel().transferFrom(fileChannel, 0L, Long.MAX_VALUE);
 					localFileStream.flush();
 				} catch (IOException ex) {
-					Bukkit.getLogger().log(Level.SEVERE, "Could not save file: " + ex.getMessage());
+					Bukkit.getLogger().log(Level.SEVERE, prefix + "Could not save file: " + ex.getMessage());
 					return;
 				}
 
 				player.sendMessage(prefix + "§aUpdater §8» §7Successfully updated plugin to version §8'§d" + publishedVersion + "§8'§7, please restart/reload your server");
 			} catch (IOException ex) {
-				Bukkit.getLogger().log(Level.SEVERE, "Could not download file: " + ex.getMessage());
+				Bukkit.getLogger().log(Level.SEVERE, prefix + "Could not download file: " + ex.getMessage());
 			}
 		} catch (IOException ex) {
-			Bukkit.getLogger().log(Level.SEVERE, "Could not fetch latest version: " + ex.getMessage());
+			Bukkit.getLogger().log(Level.SEVERE, prefix + "Could not fetch latest version: " + ex.getMessage());
 		}
 	}
 

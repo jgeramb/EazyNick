@@ -37,6 +37,7 @@ public class SetupYamlFile extends YamlFile {
 		configuration.addDefault("AllowSpecialCharactersInCustomName", false);
 		configuration.addDefault("ChangeLuckPermsPrefixAndSufix", false);
 		configuration.addDefault("ChangeGroupAndPrefixAndSuffixInTAB", eazyNick.getUtils().isPluginInstalled("TAB", "NEZNAMY"));
+		configuration.addDefault("ChangeSkinsRestorerSkin", !(Bukkit.spigot().getConfig().getBoolean("settings.bungeecord")) && eazyNick.getUtils().isPluginInstalled("SkinsRestorer"));
 		configuration.addDefault("DisconnectUnnick", true);
 		configuration.addDefault("EnableBypassLobbyModePermission", true);
 		configuration.addDefault("EnableBypassPermission", false);

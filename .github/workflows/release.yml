@@ -1,4 +1,4 @@
-name: Release New version
+name: Release version
 
 on:
   workflow_dispatch:

@@ -935,15 +935,15 @@ public class NickManager extends ReflectionHelper {
 		if(utils.getNickedPlayers().containsKey(uniqueId)) {
 			utils.getNickedPlayers().get(uniqueId).setSkinName(skinName);
 
-			if(utils.isPluginInstalled("SkinsRestorer")) {
+			if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
 				// Update skins restorer data asynchronously
 				new AsyncTask(new AsyncRunnable() {
 					@Override
 					public void run() {
 						try {
-						SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
-						skinsRestorerAPI.setSkin(player.getName(), skinName);
-						skinsRestorerAPI.applySkin(new PlayerWrapper(player), skinName);
+							SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
+							skinsRestorerAPI.setSkin(player.getName(), skinName);
+							skinsRestorerAPI.applySkin(new PlayerWrapper(player), skinName);
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}

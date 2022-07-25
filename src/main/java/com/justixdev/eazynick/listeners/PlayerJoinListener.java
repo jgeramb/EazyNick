@@ -130,7 +130,9 @@ public class PlayerJoinListener implements Listener {
 		
 		try {
 			Object outgoingPacketInjector = eazyNick.getOutgoingPacketInjector();
-			outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
+
+			if(outgoingPacketInjector != null)
+				outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
