@@ -21,6 +21,8 @@ public class MySQL {
 		this.database = database;
 		this.username = username;
 		this.password = password;
+
+		connect();
 	}
 
 	public void connect() {
