@@ -10,6 +10,8 @@ import com.justixdev.eazynick.utilities.*;
 import com.justixdev.eazynick.utilities.AsyncTask.AsyncRunnable;
 import com.justixdev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.nametagedit.plugin.NametagEdit;
 import com.nametagedit.plugin.api.INametagApi;
 import com.nametagedit.plugin.api.data.Nametag;
@@ -20,13 +22,18 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
+import net.skinsrestorer.api.property.GenericProperty;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -248,6 +255,7 @@ public class NickManager extends ReflectionHelper {
 
 	public void updatePlayer() {
 		try {
+			final boolean skinsRestorer = utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin");
 			final Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 			String version = eazyNick.getVersion();
 			boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
@@ -255,7 +263,7 @@ public class NickManager extends ReflectionHelper {
 			Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
 			Array.set(entityPlayerArray, 0, entityPlayer);
 
-			Object worldClient = entityPlayer.getClass().getMethod(is1_19 ? "cD" : (is1_18 ? "cA" : "getWorld")).invoke(entityPlayer),
+			Object worldClient = entityPlayer.getClass().getMethod(Bukkit.getVersion().contains("1.19.2") ? "cC" : (is1_19 ? "cD" : (is1_18 ? "cA" : "getWorld"))).invoke(entityPlayer),
 					worldData = worldClient.getClass().getMethod(
 							(is1_18 || is1_19)
 									? "n_"
@@ -273,8 +281,10 @@ public class NickManager extends ReflectionHelper {
 					if(!(utils.getSoonNickedPlayers().contains(player.getUniqueId()))) {
 						// Destroy entity
 						if(
-								!((utils.isPluginInstalled("ViaRewind") || utils.isPluginInstalled("ViaBackwards") || utils.isPluginInstalled("ProtocolSupport"))
-								&& currentPlayer.equals(player))
+								!(
+										(utils.isPluginInstalled("ViaRewind") || utils.isPluginInstalled("ViaBackwards") || utils.isPluginInstalled("ProtocolSupport"))
+										&& currentPlayer.equals(player)
+								) && !(skinsRestorer)
 						)
 							//noinspection SuspiciousTernaryOperatorInVarargsCall
 							sendPacket(player, currentPlayer, getNMSClass(
@@ -477,6 +487,7 @@ public class NickManager extends ReflectionHelper {
 										|| utils.isPluginInstalled("ViaBackwards")
 										|| utils.isPluginInstalled("ProtocolSupport"))
 								&& setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")
+								&& !(skinsRestorer)
 						) {
 							// Self skin update
 							Object packetRespawnPlayer;
@@ -932,30 +943,9 @@ public class NickManager extends ReflectionHelper {
 		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
 		UUID uniqueId = player.getUniqueId();
 
-		if(utils.getNickedPlayers().containsKey(uniqueId)) {
+		if(utils.getNickedPlayers().containsKey(uniqueId))
 			utils.getNickedPlayers().get(uniqueId).setSkinName(skinName);
-
-			if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
-				// Update skins restorer data asynchronously
-				new AsyncTask(new AsyncRunnable() {
-					@Override
-					public void run() {
-						try {
-							SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
-							skinsRestorerAPI.setSkin(player.getName(), skinName);
-							skinsRestorerAPI.applySkin(new PlayerWrapper(player), skinName);
-						} catch (Exception ex) {
-							ex.printStackTrace();
-						}
-					}
-				}, 300 + (
-						setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay")
-								? (1000 * 2)
-								: 0
-				)).run();
-				return;
-			}
-		} else
+		else
 			utils.getNickedPlayers().put(
 					uniqueId,
 					new NickedPlayerData(
@@ -976,6 +966,77 @@ public class NickManager extends ReflectionHelper {
 							9999
 					)
 			);
+
+		if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
+			// Update skins restorer data
+			try {
+				Plugin skinsRestorer = Bukkit.getPluginManager().getPlugin("SkinsRestorer");
+
+				if (getField(Objects.requireNonNull(skinsRestorer).getClass(), "proxyMode").getBoolean(skinsRestorer)) {
+					if(!(skinName.startsWith("MINESKIN:"))) {
+						try {
+							ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+							DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
+							out.writeUTF("setSkin");
+							out.writeUTF(player.getName());
+							out.writeUTF(skinName);
+
+							player.sendPluginMessage(eazyNick, "sr:messagechannel", byteArrayOutputStream.toByteArray());
+						} catch (IOException ignore) {
+						}
+					}
+				} else {
+					SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
+					Object skinProfile = utils.getNickedPlayers().get(player.getUniqueId()).getSkinProfile();
+					String skinValue = utils.getDefaultSkinValue(), skinSignature = utils.getDefaultSkinSignature();
+
+					if (skinName.startsWith("MINESKIN:")) {
+						//Load skin from mineskin.org
+						MineSkinAPI mineSkinAPI = eazyNick.getMineSkinAPI();
+
+						if (eazyNick.getVersion().startsWith("1_7")) {
+							Optional<?> texturesPropertyOptional = mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]).stream().findAny();
+
+							if (texturesPropertyOptional.isPresent()) {
+								net.minecraft.util.com.mojang.authlib.properties.Property texturesProperty = (net.minecraft.util.com.mojang.authlib.properties.Property) texturesPropertyOptional.get();
+								skinValue = texturesProperty.getValue();
+								skinSignature = texturesProperty.getSignature();
+							}
+						} else {
+							Optional<?> texturesPropertyOptional = mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]).stream().findAny();
+
+							if (texturesPropertyOptional.isPresent()) {
+								Property texturesProperty = (Property) texturesPropertyOptional.get();
+								skinValue = texturesProperty.getValue();
+								skinSignature = texturesProperty.getSignature();
+							}
+						}
+					} else if (eazyNick.getVersion().startsWith("1_7")) {
+						Optional<?> texturesPropertyOptional = ((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().get("textures").stream().findAny();
+
+						if (texturesPropertyOptional.isPresent()) {
+							net.minecraft.util.com.mojang.authlib.properties.Property texturesProperty = (net.minecraft.util.com.mojang.authlib.properties.Property) texturesPropertyOptional.get();
+							skinValue = texturesProperty.getValue();
+							skinSignature = texturesProperty.getSignature();
+						}
+					} else {
+						Optional<?> texturesPropertyOptional = ((GameProfile) skinProfile).getProperties().get("textures").stream().findAny();
+
+						if (texturesPropertyOptional.isPresent()) {
+							Property texturesProperty = (Property) texturesPropertyOptional.get();
+							skinValue = texturesProperty.getValue();
+							skinSignature = texturesProperty.getSignature();
+						}
+					}
+
+					skinsRestorerAPI.setSkinData("custom", new GenericProperty("textures", skinValue, skinSignature), null);
+					skinsRestorerAPI.setSkin(player.getName(), skinName.startsWith("MINESKIN:") ? player.getName() : skinName);
+					skinsRestorerAPI.applySkin(new PlayerWrapper(player));
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 
 		if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
 			String nickName = mysqlNickManager.getNickName(uniqueId);
@@ -1088,8 +1149,13 @@ public class NickManager extends ReflectionHelper {
 			player.setLevel(fakeExperienceLevel);
 		}
 
-		// Update name and tablist and respawn player
-		setName(new StringUtils(nickName).getPureString());
+		if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
+			// Respawn player and update skin
+			changeSkin(skinName);
+		} else {
+			// Respawn player
+			updatePlayer();
+		}
 
 		if(setupYamlFile.getConfiguration().getBoolean("NickActionBarMessage")) {
 			// Show and update action bar frequently
@@ -1180,8 +1246,15 @@ public class NickManager extends ReflectionHelper {
 			player.setCustomName(realName);
 
 		// Respawn player
-		if(respawnPlayer)
-			updatePlayer();
+		if(respawnPlayer) {
+			if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
+				// Respawn player and update skin
+				changeSkin(player.getName());
+			} else {
+				// Respawn player
+				updatePlayer();
+			}
+		}
 
 		new AsyncTask(new AsyncRunnable() {
 

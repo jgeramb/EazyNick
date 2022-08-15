@@ -29,7 +29,7 @@ public class GUIYamlFile extends YamlFile {
 		configuration.addDefault("BookGUI.Page1.Text", "&0Nicknames allow you to play with a different username to not get recognized.%nl%%nl%All rules still apply.%nl%You can still be reported and all name history is stored.%nl%%nl%");
 		configuration.addDefault("BookGUI.Page1.Enabled", true);
 		configuration.addDefault("BookGUI.Page2.Title", "Ranks");
-		configuration.addDefault("BookGUI.Page2.Text", "&0Let's get you set up with your nickname!%nl%First, you'll need to choose which &lRANK%nl%&0you would like to be shown as when nicked.%nl%%nl%");
+		configuration.addDefault("BookGUI.Page2.Text", "&0Let's get you set up%nl%with your nickname!%nl%First, you'll need to%nl%choose which &lRANK%nl%&0you would like to be%nl%shown as when nicked.%nl%%nl%");
 		configuration.addDefault("BookGUI.Page3.Title", "Skin");
 		configuration.addDefault("BookGUI.Page3.Text","&0Awesome! Now, which &lSKIN &0would you like to have while nicked?%nl%%nl%");
 		configuration.addDefault("BookGUI.Page4.Title", "Name");

@@ -81,6 +81,10 @@ public class NickedPlayerData {
 		return (version.startsWith("1_7") ? new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName) : new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName));
 	}
 
+	Object getSkinProfile() {
+		return skinProfile;
+	}
+
 	@SuppressWarnings("ConstantConditions")
 	private void prepareSkinProfile() {
 		new Thread(() -> {
@@ -93,7 +97,7 @@ public class NickedPlayerData {
 			
 			if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
 				skinProfile = version.startsWith("1_7") ? utils.getDefaultGameProfile_1_7() : utils.getDefaultGameProfile();
-				
+
 				try {
 					Object profile = null;
 					
@@ -127,6 +131,8 @@ public class NickedPlayerData {
 						} else
 							utils.sendConsole("§cAn error occured while preparing skin profile§7, §cthis is NOT a plugin error§7!");
 					}
+
+					skinProfile = version.startsWith("1_7") ? utils.getDefaultGameProfile_1_7() : utils.getDefaultGameProfile();
 				}
 			} else {
 				Player player = Bukkit.getPlayer(uniqueId);
@@ -139,8 +145,6 @@ public class NickedPlayerData {
 	
 				}
 			}
-			
-			Thread.currentThread().interrupt();
 		}).start();
 	}
 

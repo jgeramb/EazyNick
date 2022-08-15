@@ -66,6 +66,9 @@ public class OutgoingPacketInjector_1_7 {
 				)).toArray()) {
 					Channel channel = (Channel) field.get(manager);
 
+					if(channel == null) continue;
+					if(channel.pipeline() == null) continue;
+
 					if(channel.pipeline().context("packet_handler") != null) {
 						channels.add(channel);
 

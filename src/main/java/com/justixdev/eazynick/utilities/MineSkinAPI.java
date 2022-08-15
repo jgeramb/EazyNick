@@ -22,9 +22,10 @@ public class MineSkinAPI {
 	// MineSkin API url for receiving skins
 	private static final String URL_FORMAT = "https://api.mineskin.org/get/uuid/%s";
 
-	private final String pluginVersion;
+	private final String pluginName, pluginVersion;
 
-	public MineSkinAPI(String pluginVersion) {
+	public MineSkinAPI(String pluginName, String pluginVersion) {
+		this.pluginName = pluginName;
 		this.pluginVersion = pluginVersion;
 	}
 
@@ -37,7 +38,7 @@ public class MineSkinAPI {
 					URL_FORMAT,
 					id
 			)).openConnection();
-			textureConnection.setRequestProperty("User-Agent", "JustixDevelopment/MineSkinHook " + pluginVersion);
+			textureConnection.setRequestProperty("User-Agent", pluginName + "/MineSkinHook " + pluginVersion);
 			textureConnection.setRequestMethod("GET");
 			textureConnection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
 
@@ -75,7 +76,7 @@ public class MineSkinAPI {
 					URL_FORMAT,
 					id
 			)).openConnection();
-			textureConnection.setRequestProperty("User-Agent", "JustixDevelopment/MineSkinHook " + pluginVersion);
+			textureConnection.setRequestProperty("User-Agent", pluginName + "/MineSkinHook " + pluginVersion);
 			textureConnection.setRequestMethod("GET");
 			textureConnection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
 

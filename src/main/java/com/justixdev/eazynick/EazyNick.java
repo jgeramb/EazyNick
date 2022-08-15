@@ -90,7 +90,7 @@ public class EazyNick extends JavaPlugin {
 		languageYamlFile = configurationFactory.createConfigurationFile(this, LanguageYamlFile.class);
 
 		updater = new Updater(this);
-		mineSkinAPI = new MineSkinAPI(getVersion());
+		mineSkinAPI = new MineSkinAPI(getName(), getVersion());
 		
 		signGUI = new SignGUI(this);
 		nmsBookBuilder = new NMSBookBuilder(this);
@@ -228,6 +228,16 @@ public class EazyNick extends JavaPlugin {
 							new PlaceHolderExpansion(instance).register();
 							
 							utils.sendConsole("§7PlaceholderAPI hooked successfully");
+						}
+
+						if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
+							try {
+								Plugin skinsRestorer = Bukkit.getPluginManager().getPlugin("SkinsRestorer");
+
+								if (reflectionHelper.getField(skinsRestorer.getClass(), "proxyMode").getBoolean(skinsRestorer))
+									Bukkit.getMessenger().registerOutgoingPluginChannel(instance, "sr:messagechannel");
+							} catch (Exception ignore) {
+							}
 						}
 					});
 				}
