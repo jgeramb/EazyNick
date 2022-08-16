@@ -127,13 +127,13 @@ public class UUIDFetcher_1_7 {
 
 				// Parse response
 				JsonArray data = GSON.fromJson(response.toString(), JsonArray.class);
-				JsonObject currentNameData = (JsonObject) data.get(data.size() - 1);
+				String lastName = data.get(data.size() - 1).getAsJsonObject().get("name").getAsString();
 
 				//Cache data
-				UUID_CACHE.put(currentNameData.get("name").getAsString().toLowerCase(), uuid);
-				NAME_CACHE.put(uuid, currentNameData.get("name").getAsString());
+				UUID_CACHE.put(lastName.toLowerCase(), uuid);
+				NAME_CACHE.put(uuid, lastName);
 
-				return currentNameData.get("name").getAsString();
+				return lastName;
 			}
 		} catch (Exception ignore) {
 		}

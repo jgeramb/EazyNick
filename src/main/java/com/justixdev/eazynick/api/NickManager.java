@@ -22,7 +22,6 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
-import net.skinsrestorer.api.property.GenericProperty;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,6 +35,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 @SuppressWarnings({"JavaReflectionInvocation", "unused"})
@@ -94,17 +94,36 @@ public class NickManager extends ReflectionHelper {
 			ex.printStackTrace();
 		}
 	}
+
+	private void updatePlayerListName(Object packetPlayOutPlayerInfoUpdate, Object packetPlayOutPlayerInfoRemove, Object packetPlayOutPlayerInfoAdd, Player currentPlayer, Object playerConnection) throws IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
+		Object networkManager = playerConnection
+				.getClass()
+				.getDeclaredField("networkManager")
+				.get(playerConnection);
+		int version = (int) networkManager
+				.getClass()
+				.getMethod("getVersion")
+				.invoke(networkManager);
+
+		if (version < 28) {
+			//Send packets to remove player from tablist and add it again
+			sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
+			sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
+		} else
+			//Send packet to update tablist name
+			sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoUpdate);
+	}
 	
 	public void setPlayerListName(String name) {
 		String serverVersion = eazyNick.getVersion();
-		
-		if(serverVersion.equals("1_7_R4")) {
+
+		if (serverVersion.equals("1_7_R4")) {
 			try {
 				Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 
 				// Make sure name is not longer than 16 characters
 				name = name.substring(0, Math.min(name.length(), 16));
-				
+
 				// Set listName field of EntityPlayer -> getPlayerListName()
 				Field listNameField = getNMSClass("EntityPlayer").getDeclaredField("listName");
 				listNameField.setAccessible(true);
@@ -126,53 +145,24 @@ public class NickManager extends ReflectionHelper {
 								"addPlayer",
 								getNMSClass("EntityPlayer")
 						).invoke(playOutPlayerInfo, entityPlayer);
-				
-				for(Player currentPlayer : Bukkit.getOnlinePlayers()) {
-					if(!(currentPlayer.canSee(player))) return;
 
-					if(!(currentPlayer.getUniqueId().equals(player.getUniqueId()))) {
-						if(currentPlayer.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) return;
+				for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+					if (!(currentPlayer.canSee(player))) return;
+
+					if (!(currentPlayer.getUniqueId().equals(player.getUniqueId()))) {
+						if (currentPlayer.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
+							return;
 
 						Object playerConenction = getNMSClass("EntityPlayer")
 								.getDeclaredField("playerConnection")
 								.get(currentPlayer.getClass().getMethod("getHandle").invoke(currentPlayer));
-						Object networkManager = playerConenction
-								.getClass()
-								.getDeclaredField("networkManager")
-								.get(playerConenction);
-						int version = (int) networkManager
-								.getClass()
-								.getMethod("getVersion")
-								.invoke(networkManager);
-
-						if (version < 28) {
-							// Send packets to remove player from tablist and add it again
-							sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
-							sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
-						} else
-							// Send packet to update tablist name
-							sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoUpdate);
-					} else if(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")) {
+						updatePlayerListName(packetPlayOutPlayerInfoUpdate, packetPlayOutPlayerInfoRemove, packetPlayOutPlayerInfoAdd, currentPlayer, playerConenction);
+					} else if (setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")) {
 						Object playerConenction = entityPlayer
 								.getClass()
 								.getDeclaredField("playerConnection")
 								.get(entityPlayer);
-						Object networkManager = playerConenction
-								.getClass()
-								.getDeclaredField("networkManager")
-								.get(playerConenction);
-						int version = (int) networkManager
-								.getClass()
-								.getMethod("getVersion")
-								.invoke(networkManager);
-
-						if (version < 28) {
-							//Send packets to remove player from tablist and add it again
-							sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoRemove);
-							sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoAdd);
-						} else
-							//Send packet to update tablist name
-							sendPacketNMS(currentPlayer, packetPlayOutPlayerInfoUpdate);
+						updatePlayerListName(packetPlayOutPlayerInfoUpdate, packetPlayOutPlayerInfoRemove, packetPlayOutPlayerInfoAdd, currentPlayer, playerConenction);
 					}
 				}
 			} catch (Exception ex) {
@@ -188,9 +178,9 @@ public class NickManager extends ReflectionHelper {
 							is1_17To1_19
 									? "network.protocol.game.PacketPlayOutPlayerInfo"
 									: "PacketPlayOutPlayerInfo"
-							),
-							"EnumPlayerInfoAction"
-					)
+					),
+					"EnumPlayerInfoAction"
+			)
 			).ifPresent(enumPlayerInfoActionClass -> {
 				try {
 					Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
@@ -214,14 +204,14 @@ public class NickManager extends ReflectionHelper {
 									entityPlayer,
 									utils.isVersion13OrLater()
 											? craftChatMessage
-													.getMethod("fromStringOrNull", String.class)
-													.invoke(craftChatMessage, finalName)
+											.getMethod("fromStringOrNull", String.class)
+											.invoke(craftChatMessage, finalName)
 											: ((Object[]) craftChatMessage
-													.getMethod("fromString", String.class)
-													.invoke(craftChatMessage, finalName))[0]
+											.getMethod("fromString", String.class)
+											.invoke(craftChatMessage, finalName))[0]
 							);
 
-							for(Player currentPlayer : Bukkit.getOnlinePlayers())
+							for (Player currentPlayer : Bukkit.getOnlinePlayers())
 								// Send packet to update tablist name
 								//noinspection JavaReflectionInvocation
 								sendPacket(
@@ -1029,7 +1019,7 @@ public class NickManager extends ReflectionHelper {
 						}
 					}
 
-					skinsRestorerAPI.setSkinData("custom", new GenericProperty("textures", skinValue, skinSignature), null);
+					skinsRestorerAPI.setSkinData("custom", new net.skinsrestorer.api.property.GenericProperty("textures", skinValue, skinSignature));
 					skinsRestorerAPI.setSkin(player.getName(), skinName.startsWith("MINESKIN:") ? player.getName() : skinName);
 					skinsRestorerAPI.applySkin(new PlayerWrapper(player));
 				}
@@ -1426,19 +1416,7 @@ public class NickManager extends ReflectionHelper {
 		return player.getName();
 	}
 
-	public String getChatPrefix() {
-		return utils.getNickedPlayers().containsKey(player.getUniqueId())
-				? utils.getNickedPlayers().get(player.getUniqueId()).getChatPrefix()
-				: (
-						(utils.isPluginInstalled("Vault") && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes"))
-								? Objects.requireNonNull(Bukkit.getServer().getServicesManager().getRegistration(Chat.class)).getProvider().getPlayerPrefix(player)
-								: "");
-	}
-
-	public void setChatPrefix(String chatPrefix) {
-		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
-			utils.getNickedPlayers().get(player.getUniqueId()).setChatPrefix(chatPrefix);
-
+	private void updateChatTab() {
 		if(eazyNick.getVersion().equals("1_7_R4")) {
 			String nameFormatChat = getChatPrefix() + getNickName() + getChatSuffix();
 			String nameFormatTab = getTabPrefix() + getNickName() + getTabSuffix();
@@ -1454,6 +1432,22 @@ public class NickManager extends ReflectionHelper {
 			player.setDisplayName(getChatPrefix() + getNickName() + getChatSuffix());
 			setPlayerListName(getTabPrefix() + getNickName() + getTabSuffix());
 		}
+	}
+
+	public String getChatPrefix() {
+		return utils.getNickedPlayers().containsKey(player.getUniqueId())
+				? utils.getNickedPlayers().get(player.getUniqueId()).getChatPrefix()
+				: (
+						(utils.isPluginInstalled("Vault") && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingVaultPrefixesAndSuffixes"))
+								? Objects.requireNonNull(Bukkit.getServer().getServicesManager().getRegistration(Chat.class)).getProvider().getPlayerPrefix(player)
+								: "");
+	}
+
+	public void setChatPrefix(String chatPrefix) {
+		if (utils.getNickedPlayers().containsKey(player.getUniqueId()))
+			utils.getNickedPlayers().get(player.getUniqueId()).setChatPrefix(chatPrefix);
+
+		updateChatTab();
 	}
 
 	public String getChatSuffix() {
@@ -1469,21 +1463,7 @@ public class NickManager extends ReflectionHelper {
 		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
 			utils.getNickedPlayers().get(player.getUniqueId()).setChatSuffix(chatSuffix);
 
-		if(eazyNick.getVersion().equals("1_7_R4")) {
-			String nameFormatChat = getChatPrefix() + getNickName() + getChatSuffix();
-			String nameFormatTab = getTabPrefix() + getNickName() + getTabSuffix();
-
-			if(nameFormatTab.length() <= 16) {
-				player.setDisplayName(nameFormatChat);
-				setPlayerListName(nameFormatTab);
-			} else {
-				player.setDisplayName(nameFormatChat.substring(0, 16));
-				setPlayerListName(getNickName());
-			}
-		} else {
-			player.setDisplayName(getChatPrefix() + getNickName() + getChatSuffix());
-			setPlayerListName(getTabPrefix() + getNickName() + getTabSuffix());
-		}
+		updateChatTab();
 	}
 
 	public String getTabPrefix() {
@@ -1498,21 +1478,7 @@ public class NickManager extends ReflectionHelper {
 		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
 			utils.getNickedPlayers().get(player.getUniqueId()).setTabPrefix(tabPrefix);
 
-		if(eazyNick.getVersion().equals("1_7_R4")) {
-			String nameFormatChat = getChatPrefix() + getNickName() + getChatSuffix();
-			String nameFormatTab = getTabPrefix() + getNickName() + getTabSuffix();
-
-			if(nameFormatTab.length() <= 16) {
-				player.setDisplayName(nameFormatChat);
-				setPlayerListName(nameFormatTab);
-			} else {
-				player.setDisplayName(nameFormatChat.substring(0, 16));
-				setPlayerListName(getNickName());
-			}
-		} else {
-			player.setDisplayName(getChatPrefix() + getNickName() + getChatSuffix());
-			setPlayerListName(getTabPrefix() + getNickName() + getTabSuffix());
-		}
+		updateChatTab();
 	}
 
 	public String getTabSuffix() {
@@ -1527,21 +1493,7 @@ public class NickManager extends ReflectionHelper {
 		if(utils.getNickedPlayers().containsKey(player.getUniqueId()))
 			utils.getNickedPlayers().get(player.getUniqueId()).setTabSuffix(tabSuffix);
 
-		if(eazyNick.getVersion().equals("1_7_R4")) {
-			String nameFormatChat = getChatPrefix() + getNickName() + getChatSuffix();
-			String nameFormatTab = getTabPrefix() + getNickName() + getTabSuffix();
-
-			if(nameFormatTab.length() <= 16) {
-				player.setDisplayName(nameFormatChat);
-				setPlayerListName(nameFormatTab);
-			} else {
-				player.setDisplayName(nameFormatChat.substring(0, 16));
-				setPlayerListName(getNickName());
-			}
-		} else {
-			player.setDisplayName(getChatPrefix() + getNickName() + getChatSuffix());
-			setPlayerListName(getTabPrefix() + getNickName() + getTabSuffix());
-		}
+		updateChatTab();
 	}
 
 	public String getTagPrefix() {
