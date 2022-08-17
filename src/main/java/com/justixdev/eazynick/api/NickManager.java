@@ -1019,7 +1019,7 @@ public class NickManager extends ReflectionHelper {
 						}
 					}
 
-					skinsRestorerAPI.setSkinData("custom", new net.skinsrestorer.api.property.GenericProperty("textures", skinValue, skinSignature));
+					skinsRestorerAPI.getClass().getMethod("setSkinData", String.class, Class.forName("net.skinsrestorer.api.property.IProperty")).invoke("custom", Class.forName("net.skinsrestorer.api.property.GenericProperty").getConstructor(String.class, String.class, String.class).newInstance("textures", skinValue, skinSignature));
 					skinsRestorerAPI.setSkin(player.getName(), skinName.startsWith("MINESKIN:") ? player.getName() : skinName);
 					skinsRestorerAPI.applySkin(new PlayerWrapper(player));
 				}
