@@ -212,7 +212,7 @@ public class EazyNick extends JavaPlugin {
 					}
 
 					// Check for plugin updates
-					if (updater.checkForUpdates()) {
+					if (updater.checkForUpdates() && setupYamlFile.getConfiguration().getBoolean("AutoUpdater")) {
 						Bukkit.getScheduler().runTask(instance, () -> pluginManager.disablePlugin(instance));
 						return;
 					}
