@@ -150,11 +150,11 @@ public class GUIYamlFile extends YamlFile {
 
 		//Rank-Formats
 		configuration.addDefault("Settings.NickFormat.Rank1.ChatPrefix", "&7");
-		configuration.addDefault("Settings.NickFormat.Rank1.ChatSuffix", "&7");
+		configuration.addDefault("Settings.NickFormat.Rank1.ChatSuffix", "&r");
 		configuration.addDefault("Settings.NickFormat.Rank1.TabPrefix", "&7");
-		configuration.addDefault("Settings.NickFormat.Rank1.TabSuffix", "&7");
+		configuration.addDefault("Settings.NickFormat.Rank1.TabSuffix", "&r");
 		configuration.addDefault("Settings.NickFormat.Rank1.TagPrefix", "&7");
-		configuration.addDefault("Settings.NickFormat.Rank1.TagSuffix", "&7");
+		configuration.addDefault("Settings.NickFormat.Rank1.TagSuffix", "&r");
 		configuration.addDefault("Settings.NickFormat.Rank1.SortID", 9997);
 		configuration.addDefault("Settings.NickFormat.Rank1.GroupName", "Default");
 		
