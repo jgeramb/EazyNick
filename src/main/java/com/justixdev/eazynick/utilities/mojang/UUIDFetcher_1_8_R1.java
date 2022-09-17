@@ -2,7 +2,6 @@ package com.justixdev.eazynick.utilities.mojang;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.justixdev.eazynick.EazyNick;
 import com.justixdev.eazynick.utilities.Utils;
@@ -22,10 +21,6 @@ public class UUIDFetcher_1_8_R1 {
 	private static final Map<UUID, String> NAME_CACHE = new HashMap<>();
 
 	public UUID getUUID(String name) {
-		return getUUIDAt(name, System.currentTimeMillis());
-	}
-
-	public UUID getUUIDAt(String name, long timestamp) {
 		EazyNick eazyNick = EazyNick.getInstance();
 		Utils utils = eazyNick.getUtils();
 
@@ -37,11 +32,10 @@ public class UUIDFetcher_1_8_R1 {
 
 		try {
 			// Open api connection
-			String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s?at=%d";
+			String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s";
 			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(
 					UUID_URL,
-					name,
-					timestamp / 1000
+					name
 			)).openConnection();
 			connection.setReadTimeout(5000);
 
@@ -103,14 +97,14 @@ public class UUIDFetcher_1_8_R1 {
 		return null;
 	}
 
-	public String getName(String name, UUID uuid) {
+	public String getName(String fallback, UUID uuid) {
 		// Check for cached name
 		if (NAME_CACHE.containsKey(uuid))
 			return NAME_CACHE.get(uuid);
 
 		try {
 			// Open api connection
-			String NAME_URL = "https://api.mojang.com/user/profiles/%s/names";
+			String NAME_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s";
 			HttpURLConnection connection = (HttpURLConnection) new URL(String.format(
 					NAME_URL,
 					UUIDTypeAdapter.fromUUID(uuid)
@@ -126,19 +120,18 @@ public class UUIDFetcher_1_8_R1 {
 					response.append(line);
 
 				// Parse response
-				JsonArray data = GSON.fromJson(response.toString(), JsonArray.class);
-				String lastName = data.get(data.size() - 1).getAsJsonObject().get("name").getAsString();
+				String name = GSON.fromJson(response.toString(), JsonObject.class).get("name").getAsString();
 
 				//Cache data
-				UUID_CACHE.put(lastName.toLowerCase(), uuid);
-				NAME_CACHE.put(uuid, lastName);
+				UUID_CACHE.put(name.toLowerCase(), uuid);
+				NAME_CACHE.put(uuid, name);
 
-				return lastName;
+				return name;
 			}
 		} catch (Exception ignore) {
 		}
 
-		return name;
+		return fallback;
 	}
 
 }
