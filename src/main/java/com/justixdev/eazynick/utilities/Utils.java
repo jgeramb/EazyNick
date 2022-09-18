@@ -166,7 +166,7 @@ public class Utils {
 	
 	// Send a message to the console including the plugin prefix
 	public void sendConsole(String msg) {
-		if((msg != null) && !(msg.isEmpty()))
+		if(msg != null)
 			Bukkit.getConsoleSender().sendMessage(prefix + msg);
 	}
 

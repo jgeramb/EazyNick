@@ -159,7 +159,7 @@ public class BookGUICommand implements CommandExecutor {
 								TextComponent.fromLegacyText(guiYamlFile.getConfigString(player, "BookGUI.Rank.Hover").replace("%rank%", rank))
 						));
 
-					if(textComponentsOfFirstPage.size() < 13)
+					if(textComponentsOfFirstPage.size() < 14)
 						textComponentsOfFirstPage.add(textComponent);
 					else
 						textComponentsOfSecondPage.add(textComponent);

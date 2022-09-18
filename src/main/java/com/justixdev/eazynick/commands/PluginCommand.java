@@ -33,18 +33,18 @@ public class PluginCommand implements CommandExecutor {
 		PluginDescriptionFile desc = eazyNick.getDescription();
 
 		if(!(sender.hasPermission("eazynick.help"))) {
-			sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+			sender.sendMessage(prefix + "§7§m-----§r§8 [ §5" + desc.getName() + " §8] §7§m-----§r");
 			sender.sendMessage(prefix);
 			sender.sendMessage(prefix + "§7Version§8: §a" + desc.getVersion());
 			sender.sendMessage(prefix + "§7Authors§8: §a" + desc.getAuthors().toString().replace("[", "").replace("]", ""));
 			sender.sendMessage(prefix + "§7Resource page§8: §a" + desc.getWebsite() + " §7or §ahttps://www.justix-dev.de/go/project?id=1");
 			sender.sendMessage(prefix);
-			sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+			sender.sendMessage(prefix + "§7§m-----§r§8 [ §5" + desc.getName() + " §8] §7§m-----§r");
 			return true;
 		}
 
 		if((args.length == 0) || args[0].equalsIgnoreCase("1")) {
-			sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+			sender.sendMessage(prefix + "§7§m-----§r§8 [ §5" + desc.getName() + " §8] §7§m-----§r");
 			sender.sendMessage(prefix);
 			sender.sendMessage(prefix + "§7/eazynick support §8» §aSupport tutorial");
 			sender.sendMessage(prefix + "§7/nickupdatecheck §8» §aUpdate check");
@@ -57,10 +57,10 @@ public class PluginCommand implements CommandExecutor {
 			sender.sendMessage(prefix);
 			sender.sendMessage(prefix + "§7More help§8: §a/eazynick 2");
 			sender.sendMessage(prefix);
-			sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+			sender.sendMessage(prefix + "§7§m-----§r§8 [ §5" + desc.getName() + " §8] §7§m-----§r");
 		} else {
 			if(args[0].equalsIgnoreCase("2")) {
-				sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+				sender.sendMessage(prefix + "§7§m-----§r§8 [ §5" + desc.getName() + " §8] §7§m-----§r");
 				sender.sendMessage(prefix);
 				sender.sendMessage(prefix + "§7/nickother [player] §8» §aRandom nick for stated player");
 				sender.sendMessage(prefix + "§7/nickother [player] [name] §8» §aStated nick for stated player");
@@ -73,9 +73,9 @@ public class PluginCommand implements CommandExecutor {
 				sender.sendMessage(prefix);
 				sender.sendMessage(prefix + "§7More help§8: §a/eazynick 3");
 				sender.sendMessage(prefix);
-				sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+				sender.sendMessage(prefix + "§7§m-----§r§8 [ §5" + desc.getName() + " §8] §7§m-----§r");
 			} else if(args[0].equalsIgnoreCase("3")) {
-				sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+				sender.sendMessage(prefix + "§7§m-----§r§8 [ §5" + desc.getName() + " §8] §7§m-----§r");
 				sender.sendMessage(prefix);
 				sender.sendMessage(prefix + "§7/changeskin §8» §aRandom skin");
 				sender.sendMessage(prefix + "§7/changeskin [name] §8» §aStated skin");
@@ -87,13 +87,13 @@ public class PluginCommand implements CommandExecutor {
 				sender.sendMessage(prefix);
 				sender.sendMessage(prefix + "§7/eazynick [1-3] §8» §aPlugin help");
 				sender.sendMessage(prefix);
-				sender.sendMessage(prefix + "§7§m-----§8 [ §5" + desc.getName() + " §8] §7§m-----");
+				sender.sendMessage(prefix + "§7§m-----§r§8 [ §5" + desc.getName() + " §8] §7§m-----§r");
 			} else if(args[0].equalsIgnoreCase("debug") && sender.hasPermission("eazynick.debug")) {
 				if(args.length >= 2) {
 					Player targetPlayer = Bukkit.getPlayer(args[1]);
 
 					if(targetPlayer != null) {
-						sender.sendMessage(prefix + "§7§m-----§8 [ §5Debug Info §8] §7§m-----");
+						sender.sendMessage(prefix + "§7§m-----§r§8 [ §5Debug Info §8] §7§m-----§r");
 						sender.sendMessage(prefix);
 						sender.sendMessage(prefix + "§5§lPlayer details");
 
@@ -120,7 +120,7 @@ public class PluginCommand implements CommandExecutor {
 							sender.sendMessage(prefix + "§8┗  §7Nicked §8» §cNo");
 
 						sender.sendMessage(prefix);
-						sender.sendMessage(prefix + "§7§m-----§8 [ §5Debug Info §8] §7§m-----");
+						sender.sendMessage(prefix + "§7§m-----§r§8 [ §5Debug Info §8] §7§m-----§r");
 					} else
 						languageYamlFile.sendMessage(sender, languageYamlFile.getConfigString(null, "Messages.PlayerNotFound").replace("%prefix%", prefix));
 				} else
@@ -137,7 +137,7 @@ public class PluginCommand implements CommandExecutor {
 				} else {
 					utils.setSupportMode(true);
 
-					sender.sendMessage(prefix + "§7§m-----§8 [ §5EazyNick Support §8] §7§m-----");
+					sender.sendMessage(prefix + "§7§m-----§r§8 [ §5EazyNick Support §8] §7§m-----§r");
 					sender.sendMessage(prefix);
 
 					if(sender instanceof Player) {
@@ -172,7 +172,7 @@ public class PluginCommand implements CommandExecutor {
 
 					sender.sendMessage(prefix + "§8┗ §7Plugins §8» §a" + plugins);
 					sender.sendMessage(prefix);
-					sender.sendMessage(prefix + "§7§m-----§8 [ §5EazyNick Support §8] §7§m-----");
+					sender.sendMessage(prefix + "§7§m-----§r§8 [ §5EazyNick Support §8] §7§m-----§r");
 				}
 			} else
 				sender.sendMessage(prefix + "§cPage §a" + args[0] + " §ccould not be found (available: 1, 2, 3)");

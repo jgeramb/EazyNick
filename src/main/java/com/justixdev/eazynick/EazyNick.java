@@ -145,12 +145,12 @@ public class EazyNick extends JavaPlugin {
 		if (setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
 			mysql.disconnect();
 
-		utils.sendConsole("§8§m----------§8 [ §5§l" + getName() + " §8] §m----------");
+		utils.sendConsole("§8§m----------§r§8 [ §5§l" + getName() + "§r §8] §m----------§r");
 		utils.sendConsole("");
 		utils.sendConsole("§7Plugin by§8: §a" + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
 		utils.sendConsole("§7Version§8: §a" + getDescription().getVersion());
 		utils.sendConsole("");
-		utils.sendConsole("§8§m----------§8 [ §5§l" + getName() + " §8] §m----------");
+		utils.sendConsole("§8§m----------§r§8 [ §5§l" + getName() + "§r §8] §m----------§r");
 	}
 
 	@SuppressWarnings("ConstantConditions")
@@ -158,7 +158,7 @@ public class EazyNick extends JavaPlugin {
 		PluginManager pluginManager = Bukkit.getPluginManager();
 
 		utils.reloadConfigs();
-		utils.sendConsole("§8§m----------§8 [ §5§l" + getName() + " §8] §m----------");
+		utils.sendConsole("§8§m----------§r§8 [ §5§l" + getName() + "§r §8] §m----------§r");
 		utils.sendConsole("");
 
 		int versionNumber = Integer.parseInt(version.split("_")[1]);
@@ -374,7 +374,7 @@ public class EazyNick extends JavaPlugin {
 		}
 
 		utils.sendConsole("");
-		utils.sendConsole("§8§m----------§8 [ §5§l" + getName() + " §8] §m----------");
+		utils.sendConsole("§8§m----------§r§8 [ §5§l" + getName() + "§r §8] §m----------§r");
 
 		if (isCancelled)
 			pluginManager.disablePlugin(this);

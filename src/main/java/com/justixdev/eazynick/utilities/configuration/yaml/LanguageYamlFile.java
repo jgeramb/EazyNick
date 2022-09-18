@@ -24,7 +24,7 @@ public class LanguageYamlFile extends YamlFile {
 			configuration.addDefault("NickItem.BungeeCord.DisplayName.Enabled", "&aAutomatischer Nickname &7(Rechtsklick)");
 			configuration.addDefault("NickItem.BungeeCord.DisplayName.Disabled", "&cAutomatischer Nickname &7(Rechtsklick)");
 	
-			configuration.addDefault("Messages.Prefix", "&5&lNICK &8┃ ");
+			configuration.addDefault("Messages.Prefix", "&5&lNICK&r &8┃ ");
 			configuration.addDefault("Messages.Nick", "%prefix%&7Du spielst als&8: &a%name%");
 			configuration.addDefault("Messages.Unnick", "%prefix%&7Dein Nickname wurde entfernt");
 			configuration.addDefault("Messages.Name", "%prefix%&7Aktueller Nickname&8: &a%name%");
@@ -78,7 +78,7 @@ public class LanguageYamlFile extends YamlFile {
 			configuration.addDefault("NickItem.BungeeCord.DisplayName.Enabled", "&aAutomatic Nickname &7(rightclick)");
 			configuration.addDefault("NickItem.BungeeCord.DisplayName.Disabled", "&cAutomatic Nickname &7(rightclick)");
 			
-			configuration.addDefault("Messages.Prefix", "&5&lNICK &8┃ ");
+			configuration.addDefault("Messages.Prefix", "&5&lNICK&r &8┃ ");
 			configuration.addDefault("Messages.Nick", "%prefix%&7You play as&8: &a%name%");
 			configuration.addDefault("Messages.Unnick", "%prefix%&7Your nickname was removed");
 			configuration.addDefault("Messages.Name", "%prefix%&7Current nickname&8: &a%name%");

@@ -242,6 +242,7 @@ public class NickManager extends ReflectionHelper {
 
 	public void updatePlayer() {
 		try {
+			final Location playerLocation = player.getLocation().clone();
 			final boolean skinsRestorer = utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin");
 			final Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 			String version = eazyNick.getVersion();
@@ -431,7 +432,7 @@ public class NickManager extends ReflectionHelper {
 						else {
 							packetHeadRotation = getNMSClass("PacketPlayOutEntityHeadRotation").getDeclaredConstructor().newInstance();
 							setField(packetHeadRotation, "a", player.getEntityId());
-							setField(packetHeadRotation, "b", (byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)));
+							setField(packetHeadRotation, "b", (byte) ((int) (playerLocation.getYaw() * 256.0F / 360.0F)));
 						}
 
 						Class<?> packetPlayOutEntityLook = (version.equals("1_7_R4") || version.equals("1_8_R1")) ? getNMSClass("PacketPlayOutEntityLook") : null;
@@ -457,8 +458,8 @@ public class NickManager extends ReflectionHelper {
 											boolean.class
 									).newInstance(
 											player.getEntityId(),
-											(byte) ((int) (player.getLocation().getYaw() * 256.0F / 360.0F)),
-											(byte) ((int) (player.getLocation().getPitch() * 256.0F / 360.0F)),
+											(byte) ((int) (playerLocation.getYaw() * 256.0F / 360.0F)),
+											(byte) ((int) (playerLocation.getPitch() * 256.0F / 360.0F)),
 											true
 									), players);
 						}
@@ -775,7 +776,7 @@ public class NickManager extends ReflectionHelper {
 											: "playerConnection"
 							).get(entityPlayer);
 
-							boolean teleportFar = is1_17 || version.equals("1_18_R1") || is1_19;
+							boolean teleportFar = is1_17 || is1_18 || is1_19;
 
 							Bukkit.getScheduler().runTask(eazyNick, () -> {
 								try {
@@ -785,14 +786,14 @@ public class NickManager extends ReflectionHelper {
 													playerConnection,
 													new Location(
 															player.getWorld(),
-															player.getLocation().getX()
+															playerLocation.getX()
 																	+ (teleportFar ? 100 : 0),
-															player.getLocation().getY()
+															playerLocation.getY()
 																	+ (teleportFar ? 100.25 : 0.25),
-															player.getLocation().getZ()
+															playerLocation.getZ()
 																	+ (teleportFar ? 100 : 0),
-															player.getLocation().getYaw(),
-															player.getLocation().getPitch()
+															playerLocation.getYaw(),
+															playerLocation.getPitch()
 													)
 											);
 								} catch (Exception ex) {
@@ -813,11 +814,11 @@ public class NickManager extends ReflectionHelper {
 																playerConnection,
 																new Location(
 																		player.getWorld(),
-																		player.getLocation().getX() - 100,
-																		player.getLocation().getY() - 100,
-																		player.getLocation().getZ() - 100,
-																		player.getLocation().getYaw(),
-																		player.getLocation().getPitch()
+																		playerLocation.getX(),
+																		playerLocation.getY() + 0.25,
+																		playerLocation.getZ(),
+																		playerLocation.getYaw(),
+																		playerLocation.getPitch()
 																)
 														);
 											} catch (Exception ex) {
