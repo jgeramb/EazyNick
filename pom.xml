@@ -25,7 +25,8 @@
             <id>placeholder-api</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
-        <!--<repository>
+        <!-- Currently unavailable
+        <repository>
             <id>nametagedit</id>
             <url>https://ci.nametagedit.com/plugin/repository/everything/</url>
         </repository>-->
@@ -61,14 +62,12 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.81.Final</version>
         </dependency>
+        <!-- Currently unavailable
         <dependency>
             <groupId>com.nametagedit</groupId>
             <artifactId>nametagedit</artifactId>
             <version>4.5.11</version>
-            <!--<scope>provided</scope>-->
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/NametagEdit.jar</systemPath>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>de.dytanic.cloudnet</groupId>
             <artifactId>cloudnet-api-bridge</artifactId>
