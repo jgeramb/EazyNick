@@ -1156,7 +1156,7 @@ public class NickManager extends ReflectionHelper {
 					if(eazyNick.isEnabled()
 							&& utils.getNickedPlayers().containsKey(player.getUniqueId())
 							&& player.isOnline()
-							&& !(utils.getWorldsWithDisabledActionBar().contains(player.getWorld().getName().toUpperCase()))) {
+							&& utils.getWorldsWithDisabledActionBar().stream().noneMatch(world -> world.equalsIgnoreCase(player.getWorld().getName()))) {
 						NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(player.getUniqueId());
 
 						actionBarUtils.sendActionBar(
@@ -1352,7 +1352,7 @@ public class NickManager extends ReflectionHelper {
 				boolean replaceInDisplayName = (oldDisplayName != null) && oldDisplayName.equals("NONE"),
 						replaceInPlayerListName = (oldPlayerListName != null) && oldPlayerListName.equals("NONE");
 
-				if(!(utils.getWorldsWithDisabledPrefixAndSuffix().contains(player.getWorld().getName().toUpperCase()))
+				if(utils.getWorldsWithDisabledPrefixAndSuffix().stream().noneMatch(world -> world.equalsIgnoreCase(player.getWorld().getName()))
 						|| replaceInDisplayName
 						|| replaceInPlayerListName
 				) {

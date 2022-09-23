@@ -87,7 +87,7 @@ public class NMSBookUtils extends ReflectionHelper {
 										nmsItemStack,
 										entityPlayer
 												.getClass()
-												.getMethod(is1_19 ? "cU" : (is1_18 ? "cQ" : "getCommandListener"))
+												.getMethod(Bukkit.getVersion().contains("1.19.2") ? "cT" : (is1_19 ? "cU" : (is1_18 ? "cQ" : "getCommandListener")))
 												.invoke(entityPlayer), entityPlayer)
 								) {
 									Object activeContainer = entityPlayer

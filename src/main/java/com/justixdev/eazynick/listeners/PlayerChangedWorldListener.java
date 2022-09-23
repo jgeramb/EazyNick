@@ -19,8 +19,8 @@ public class PlayerChangedWorldListener implements Listener {
 		
 		Player player = event.getPlayer();
 		NickManager api = new NickManager(player);
-		
-		if (!(utils.getWorldBlackList().contains(player.getWorld().getName().toUpperCase()))) {
+
+		if(utils.getWorldBlackList().stream().noneMatch(world -> world.equalsIgnoreCase(player.getWorld().getName()))) {
 			if (setupYamlFile.getConfiguration().getBoolean("NickOnWorldChange")
 					&& utils.getNickOnWorldChangePlayers().contains(player.getUniqueId())
 					&& !(api.isNicked()))

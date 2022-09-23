@@ -43,7 +43,7 @@ public class AsyncPlayerChatListener implements Listener {
 
 		utils.setLastChatMessage(event.getMessage());
 		
-		if (!(setupYamlFile.getConfiguration().getBoolean("ReplaceNickedChatFormat")) || event.isCancelled()) return;
+		if (!(setupYamlFile.getConfiguration().getBoolean("ReplaceNickedChatFormat")) || utils.getWorldsWithDisabledPrefixAndSuffix().stream().anyMatch(world -> world.equalsIgnoreCase(player.getWorld().getName())) || event.isCancelled()) return;
 
 		NickManager api = new NickManager(player);
 

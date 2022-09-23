@@ -310,7 +310,7 @@ public class EazyNick extends JavaPlugin {
 										prefix = mysqlPlayerDataManager.getChatPrefix(currentNickedPlayer.getUniqueId()),
 										suffix = mysqlPlayerDataManager.getChatSuffix(currentNickedPlayer.getUniqueId());
 
-								if(!(utils.getWorldsWithDisabledActionBar().contains(currentNickedPlayer.getWorld().getName().toUpperCase())))
+								if(utils.getWorldsWithDisabledActionBar().stream().noneMatch(world -> world.equalsIgnoreCase(currentNickedPlayer.getWorld().getName())))
 									actionBarUtils.sendActionBar(
 											currentNickedPlayer,
 											languageYamlFile.getConfigString(currentNickedPlayer,

@@ -32,7 +32,7 @@ public class PlayerNickListener implements Listener {
 
 		Player player = event.getPlayer();
 		NickManager api = new NickManager(player);
-		boolean changePrefixAndSuffix = !(utils.getWorldsWithDisabledPrefixAndSuffix().contains(player.getWorld().getName().toUpperCase()));
+		boolean changePrefixAndSuffix = utils.getWorldsWithDisabledPrefixAndSuffix().stream().noneMatch(world -> world.equalsIgnoreCase(player.getWorld().getName()));
 		String realName = player.getName(),
 				nickName = event.getNickName(),
 				skinName = event.getSkinName(),
