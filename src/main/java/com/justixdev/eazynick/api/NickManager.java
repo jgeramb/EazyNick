@@ -976,6 +976,10 @@ public class NickManager extends ReflectionHelper {
 				} else {
 					SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
 					Object skinProfile = utils.getNickedPlayers().get(player.getUniqueId()).getSkinProfile();
+
+					if(skinProfile == null)
+						return;
+
 					String skinValue = utils.getDefaultSkinValue(), skinSignature = utils.getDefaultSkinSignature();
 
 					if (skinName.startsWith("MINESKIN:")) {
@@ -1138,8 +1142,17 @@ public class NickManager extends ReflectionHelper {
 		}
 
 		if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
-			// Respawn player and update skin
-			changeSkin(skinName);
+			new Thread(() -> {
+				long terminateMillis = System.currentTimeMillis() + 1500;
+
+				//noinspection StatementWithEmptyBody
+				while((System.currentTimeMillis() < terminateMillis) || (utils.getNickedPlayers().get(player.getUniqueId()).getSkinProfile() == null));
+
+				if(utils.getNickedPlayers().get(player.getUniqueId()).getSkinProfile() == null) {
+					// Respawn player and update skin
+					changeSkin(skinName);
+				}
+			}).start();
 		} else {
 			// Respawn player
 			updatePlayer();
