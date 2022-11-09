@@ -272,13 +272,11 @@ public class OutgoingPacketInjector {
 																? utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName()
 																: currentPlayer.getName();
 
-														name = name.toLowerCase();
-
-														if(buffer.isEmpty() || name.startsWith(buffer)) {
+														if(buffer.isEmpty() || name.toLowerCase().startsWith(buffer)) {
 															int matchingChars = 0;
 
 															for (int i = 0; i < buffer.length(); i++) {
-																if(name.charAt(i) == buffer.charAt(i))
+																if(name.toLowerCase().charAt(i) == buffer.charAt(i))
 																	matchingChars++;
 																else
 																	break;
