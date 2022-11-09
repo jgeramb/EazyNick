@@ -12,33 +12,33 @@ import org.jetbrains.annotations.NotNull;
 
 public class FixSkinCommand implements CommandExecutor {
 
-	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		Utils utils = eazyNick.getUtils();
-		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        EazyNick eazyNick = EazyNick.getInstance();
+        Utils utils = eazyNick.getUtils();
+        LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 
-		if(!(sender instanceof Player)) {
-			utils.sendConsole(utils.getNotPlayer());
-			return true;
-		}
+        if(!(sender instanceof Player)) {
+            utils.sendConsole(utils.getNotPlayer());
+            return true;
+        }
 
-		Player player = (Player) sender;
+        Player player = (Player) sender;
 
-		if(!(player.hasPermission("eazynick.skin.fix"))) {
-			languageYamlFile.sendMessage(player, utils.getNoPerm());
-			return true;
-		}
+        if(!(player.hasPermission("eazynick.skin.fix"))) {
+            languageYamlFile.sendMessage(player, utils.getNoPerm());
+            return true;
+        }
 
-		new NickManager(player).updatePlayer();
+        new NickManager(player).updatePlayer();
 
-		languageYamlFile.sendMessage(
-				player,
-				languageYamlFile.getConfigString(player, "Messages.FixSkin")
-						.replace("%prefix%", utils.getPrefix())
-		);
-		
-		return true;
-	}
-	
+        languageYamlFile.sendMessage(
+                player,
+                languageYamlFile.getConfigString(player, "Messages.FixSkin")
+                        .replace("%prefix%", utils.getPrefix())
+        );
+
+        return true;
+    }
+
 }

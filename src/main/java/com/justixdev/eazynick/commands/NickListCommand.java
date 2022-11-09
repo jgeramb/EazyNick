@@ -17,52 +17,52 @@ import org.jetbrains.annotations.NotNull;
 
 public class NickListCommand implements CommandExecutor {
 
-	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		Utils utils = eazyNick.getUtils();
-		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
-		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-		MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
-		MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        EazyNick eazyNick = EazyNick.getInstance();
+        Utils utils = eazyNick.getUtils();
+        SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
+        LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+        MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
+        MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
 
-		if(!(sender instanceof Player)) {
-			utils.sendConsole(utils.getNotPlayer());
-			return true;
-		}
+        if(!(sender instanceof Player)) {
+            utils.sendConsole(utils.getNotPlayer());
+            return true;
+        }
 
-		String prefix = utils.getPrefix();
-		Player player = (Player) sender;
+        String prefix = utils.getPrefix();
+        Player player = (Player) sender;
 
-		if(new NickManager(player).isNicked()) {
-			if(player.hasPermission("eazynick.nick.reset"))
-				Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
-		} else if((mysqlNickManager != null)
-				&& mysqlNickManager.isPlayerNicked(player.getUniqueId())
-				&& setupYamlFile.getConfiguration().getBoolean("LobbyMode")
-				&& setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
-			mysqlNickManager.removePlayer(player.getUniqueId());
-			mysqlPlayerDataManager.removeData(player.getUniqueId());
+        if(new NickManager(player).isNicked()) {
+            if(player.hasPermission("eazynick.nick.reset"))
+                Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(player));
+        } else if((mysqlNickManager != null)
+                && mysqlNickManager.isPlayerNicked(player.getUniqueId())
+                && setupYamlFile.getConfiguration().getBoolean("LobbyMode")
+                && setupYamlFile.getConfiguration().getBoolean("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled")) {
+            mysqlNickManager.removePlayer(player.getUniqueId());
+            mysqlPlayerDataManager.removeData(player.getUniqueId());
 
-			languageYamlFile.sendMessage(
-					player,
-					languageYamlFile.getConfigString(player, "Messages.Unnick")
-							.replace("%prefix%", prefix)
-			);
-		} else if(player.hasPermission("eazynick.gui.list")) {
-			if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds")
-					.contains(player.getWorld().getName())))
-				eazyNick.getGUIManager().openNickList(player, 0);
-			else
-				languageYamlFile.sendMessage(
-						player,
-						languageYamlFile.getConfigString(player, "Messages.DisabledWorld")
-								.replace("%prefix%", prefix)
-				);
-		} else
-			languageYamlFile.sendMessage(player, utils.getNoPerm());
-		
-		return true;
-	}
+            languageYamlFile.sendMessage(
+                    player,
+                    languageYamlFile.getConfigString(player, "Messages.Unnick")
+                            .replace("%prefix%", prefix)
+            );
+        } else if(player.hasPermission("eazynick.gui.list")) {
+            if(!(setupYamlFile.getConfiguration().getStringList("DisabledNickWorlds")
+                    .contains(player.getWorld().getName())))
+                eazyNick.getGUIManager().openNickList(player, 0);
+            else
+                languageYamlFile.sendMessage(
+                        player,
+                        languageYamlFile.getConfigString(player, "Messages.DisabledWorld")
+                                .replace("%prefix%", prefix)
+                );
+        } else
+            languageYamlFile.sendMessage(player, utils.getNoPerm());
+
+        return true;
+    }
 
 }

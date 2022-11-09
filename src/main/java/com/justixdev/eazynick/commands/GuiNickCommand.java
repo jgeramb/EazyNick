@@ -11,31 +11,31 @@ import org.jetbrains.annotations.NotNull;
 
 public class GuiNickCommand implements CommandExecutor {
 
-	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		Utils utils = eazyNick.getUtils();
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        EazyNick eazyNick = EazyNick.getInstance();
+        Utils utils = eazyNick.getUtils();
 
-		if(!(sender instanceof Player)) {
-			utils.sendConsole(utils.getNotPlayer());
-			return true;
-		}
-		
-		Player player = (Player) sender;
+        if(!(sender instanceof Player)) {
+            utils.sendConsole(utils.getNotPlayer());
+            return true;
+        }
 
-		if(!(player.hasPermission("eazynick.nick.random")
-				|| player.hasPermission("eazynick.nick.custom"))) {
-			eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
-			return true;
-		}
+        Player player = (Player) sender;
 
-		NickManager api = new NickManager(player);
+        if(!(player.hasPermission("eazynick.nick.random")
+                || player.hasPermission("eazynick.nick.custom"))) {
+            eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
+            return true;
+        }
 
-		if(api.isNicked() || (args.length < 3)) return true;
+        NickManager api = new NickManager(player);
 
-		utils.performRankedNick(player, args[0], args[1], args[2]);
-		
-		return true;
-	}
+        if(api.isNicked() || (args.length < 3)) return true;
+
+        utils.performRankedNick(player, args[0], args[1], args[2]);
+
+        return true;
+    }
 
 }

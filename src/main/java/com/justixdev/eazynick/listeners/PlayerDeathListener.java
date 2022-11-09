@@ -12,29 +12,29 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class PlayerDeathListener implements Listener {
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerDeath(PlayerDeathEvent event) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
-		
-		Player player = event.getEntity();
-		String deathMessage = ((event.getDeathMessage() == null) || event.getDeathMessage().isEmpty())
-				? null
-				: event.getDeathMessage();
-		NickManager api = new NickManager(player);
-			
-		if(api.isNicked()
-				&& (deathMessage != null)
-				&& !(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))) {
-			event.setDeathMessage(null);
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        EazyNick eazyNick = EazyNick.getInstance();
+        SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 
-			for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-				if (currentPlayer != player)
-					currentPlayer.sendMessage(deathMessage);
-				else
-					currentPlayer.sendMessage(deathMessage.replace(api.getNickFormat(), api.getOldDisplayName()));
-			}
-		}
-	}
+        Player player = event.getEntity();
+        String deathMessage = ((event.getDeathMessage() == null) || event.getDeathMessage().isEmpty())
+                ? null
+                : event.getDeathMessage();
+        NickManager api = new NickManager(player);
+
+        if(api.isNicked()
+                && (deathMessage != null)
+                && !(setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))) {
+            event.setDeathMessage(null);
+
+            for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+                if (currentPlayer != player)
+                    currentPlayer.sendMessage(deathMessage);
+                else
+                    currentPlayer.sendMessage(deathMessage.replace(api.getNickFormat(), api.getOldDisplayName()));
+            }
+        }
+    }
 
 }

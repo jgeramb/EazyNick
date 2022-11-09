@@ -8,59 +8,59 @@ import java.util.regex.Pattern;
 
 public class StringUtils {
 
-	private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("&#([A-Fa-f\\d]{3,6})");
-	private static final char COLOR_CHAR = ChatColor.COLOR_CHAR;
+    private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("&#([A-Fa-f\\d]{3,6})");
+    private static final char COLOR_CHAR = ChatColor.COLOR_CHAR;
 
-	private String string;
-	
-	public StringUtils(String string) {
-		this.string = string;
-	}
+    private String string;
 
-	public String getPureString() {
-		return ChatColor.stripColor(getColoredString());
-	}
+    public StringUtils(String string) {
+        this.string = string;
+    }
 
-	public String getColoredString() {
-		String version = EazyNick.getInstance().getVersion();
+    public String getPureString() {
+        return ChatColor.stripColor(getColoredString());
+    }
 
-		// HEX-Color-Support
-		if(version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19")) {
-			Matcher matcher = HEX_COLOR_PATTERN.matcher(string);
-			StringBuffer buffer = new StringBuffer(string.length() + 4 * 8);
+    public String getColoredString() {
+        String version = EazyNick.getInstance().getVersion();
 
-			while (matcher.find()) {
-				String group = matcher.group(1);
+        // HEX-Color-Support
+        if(version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19")) {
+            Matcher matcher = HEX_COLOR_PATTERN.matcher(string);
+            StringBuffer buffer = new StringBuffer(string.length() + 4 * 8);
 
-				// Convert for example #fff to #ffffff
-				if(group.length() == 3)
-					matcher.appendReplacement(
-							buffer,
-							COLOR_CHAR + "x"
-									+ COLOR_CHAR + group.charAt(0)
-									+ COLOR_CHAR + group.charAt(0)
-									+ COLOR_CHAR + group.charAt(1)
-									+ COLOR_CHAR + group.charAt(1)
-									+ COLOR_CHAR + group.charAt(2)
-									+ COLOR_CHAR + group.charAt(2)
-					);
-				else
-					matcher.appendReplacement(
-							buffer,
-							COLOR_CHAR + "x"
-									+ COLOR_CHAR + group.charAt(0)
-									+ COLOR_CHAR + group.charAt(1)
-									+ COLOR_CHAR + group.charAt(2)
-									+ COLOR_CHAR + group.charAt(3)
-									+ COLOR_CHAR + group.charAt(4)
-									+ COLOR_CHAR + group.charAt(5)
-					);
-			}
+            while (matcher.find()) {
+                String group = matcher.group(1);
 
-			string = matcher.appendTail(buffer).toString();
-		}
+                // Convert for example #fff to #ffffff
+                if(group.length() == 3)
+                    matcher.appendReplacement(
+                            buffer,
+                            COLOR_CHAR + "x"
+                                    + COLOR_CHAR + group.charAt(0)
+                                    + COLOR_CHAR + group.charAt(0)
+                                    + COLOR_CHAR + group.charAt(1)
+                                    + COLOR_CHAR + group.charAt(1)
+                                    + COLOR_CHAR + group.charAt(2)
+                                    + COLOR_CHAR + group.charAt(2)
+                    );
+                else
+                    matcher.appendReplacement(
+                            buffer,
+                            COLOR_CHAR + "x"
+                                    + COLOR_CHAR + group.charAt(0)
+                                    + COLOR_CHAR + group.charAt(1)
+                                    + COLOR_CHAR + group.charAt(2)
+                                    + COLOR_CHAR + group.charAt(3)
+                                    + COLOR_CHAR + group.charAt(4)
+                                    + COLOR_CHAR + group.charAt(5)
+                    );
+            }
 
-		return ChatColor.translateAlternateColorCodes('&', string);
-	}
-	
+            string = matcher.appendTail(buffer).toString();
+        }
+
+        return ChatColor.translateAlternateColorCodes('&', string);
+    }
+
 }

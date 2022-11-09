@@ -10,27 +10,27 @@ import org.jetbrains.annotations.NotNull;
 
 public class ToggleBungeeNickCommand implements CommandExecutor {
 
-	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		Utils utils = eazyNick.getUtils();
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        EazyNick eazyNick = EazyNick.getInstance();
+        Utils utils = eazyNick.getUtils();
 
-		if(!(sender instanceof Player)) {
-			utils.sendConsole(utils.getNotPlayer());
-			return true;
-		}
+        if(!(sender instanceof Player)) {
+            utils.sendConsole(utils.getNotPlayer());
+            return true;
+        }
 
-		Player player = (Player) sender;
+        Player player = (Player) sender;
 
-		if(!(player.hasPermission("eazynick.nick.random") && player.hasPermission("eazynick.item"))) {
-			eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
-			return true;
-		}
+        if(!(player.hasPermission("eazynick.nick.random") && player.hasPermission("eazynick.item"))) {
+            eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
+            return true;
+        }
 
-		if (eazyNick.getSetupYamlFile().getConfiguration().getBoolean("BungeeCord"))
-			utils.toggleBungeeNick(player);
-		
-		return true;
-	}
-	
+        if (eazyNick.getSetupYamlFile().getConfiguration().getBoolean("BungeeCord"))
+            utils.toggleBungeeNick(player);
+
+        return true;
+    }
+
 }

@@ -8,9 +8,9 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 
 public class InventoryCloseListener implements Listener {
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onInventoryClose(InventoryCloseEvent event) {
-		EazyNick.getInstance().getUtils().getNickNameListPages().remove(event.getPlayer().getUniqueId());
-	}
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInventoryClose(InventoryCloseEvent event) {
+        EazyNick.getInstance().getUtils().getNickNameListPages().remove(event.getPlayer().getUniqueId());
+    }
 
 }

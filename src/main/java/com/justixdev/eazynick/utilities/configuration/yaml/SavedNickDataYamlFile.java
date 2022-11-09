@@ -4,17 +4,17 @@ import com.justixdev.eazynick.EazyNick;
 
 public class SavedNickDataYamlFile extends YamlFile {
 
-	public SavedNickDataYamlFile(EazyNick eazyNick) {
-		super(eazyNick, "", "savedNickData");
-	}
+    public SavedNickDataYamlFile(EazyNick eazyNick) {
+        super(eazyNick, "", "savedNickData");
+    }
 
-	@Override
-	public void initConfiguration() {
-		setDefaults();
-	}
+    @Override
+    public void initConfiguration() {
+        setDefaults();
+    }
 
-	@Override
-	public void setDefaults() {
-	}
-	
+    @Override
+    public void setDefaults() {
+    }
+
 }

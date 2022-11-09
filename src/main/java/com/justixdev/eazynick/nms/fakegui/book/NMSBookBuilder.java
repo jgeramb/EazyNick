@@ -11,67 +11,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NMSBookBuilder {
-	
-	private final EazyNick eazyNick;
-	private final ReflectionHelper reflectionHelper;
-	
-	public NMSBookBuilder(EazyNick eazyNick) {
-		this.eazyNick = eazyNick;
-		this.reflectionHelper = eazyNick.getReflectionHelper();
-	}
-	
-	@SuppressWarnings("unchecked")
-	public ItemStack create(String title, BookPage... bookPages) {
-		ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK);
-		BookMeta bookMeta = (BookMeta) itemStack.getItemMeta();
 
-		if (bookMeta != null) {
-			bookMeta.setTitle(title);
-			bookMeta.setAuthor(eazyNick.getDescription().getName());
+    private final EazyNick eazyNick;
+    private final ReflectionHelper reflectionHelper;
 
-			try {
-				String version = eazyNick.getVersion();
-				Class<?> craftChatMessage = reflectionHelper.getCraftClass("util.CraftChatMessage");
-				Field pagesField = reflectionHelper.getField(
-						reflectionHelper.getCraftClass("inventory.CraftMetaBook"),
-						"pages"
-				);
-				List<Object> list = (List<Object>) pagesField.get(bookMeta);
+    public NMSBookBuilder(EazyNick eazyNick) {
+        this.eazyNick = eazyNick;
+        this.reflectionHelper = eazyNick.getReflectionHelper();
+    }
 
-				if (list == null) {
-					pagesField.set(bookMeta, new ArrayList<>());
+    @SuppressWarnings("unchecked")
+    public ItemStack create(String title, BookPage... bookPages) {
+        ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK);
+        BookMeta bookMeta = (BookMeta) itemStack.getItemMeta();
 
-					list = (List<Object>) pagesField.get(bookMeta);
-				}
+        if (bookMeta != null) {
+            bookMeta.setTitle(title);
+            bookMeta.setAuthor(eazyNick.getDescription().getName());
 
-				for (BookPage bookPage : bookPages) {
-					if (!((bookPage == null) || bookPage.isEmpty()))
-						list.add(
-								(version.equals("1_16_R3") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
-										? craftChatMessage.getMethod(
-												"toJSON",
-												reflectionHelper.getNMSClass(
-														(version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
-																? "network.chat.IChatBaseComponent"
-																: "IChatBaseComponent"
-												)
-										).invoke(
-												null,
-												craftChatMessage
-														.getMethod("fromJSON", String.class)
-														.invoke(null, bookPage.getAsString())
-										)
-										: bookPage.getAsIChatBaseComponent()
-						);
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+            try {
+                String version = eazyNick.getVersion();
+                Class<?> craftChatMessage = reflectionHelper.getCraftClass("util.CraftChatMessage");
+                Field pagesField = reflectionHelper.getField(
+                        reflectionHelper.getCraftClass("inventory.CraftMetaBook"),
+                        "pages"
+                );
+                List<Object> list = (List<Object>) pagesField.get(bookMeta);
 
-			itemStack.setItemMeta(bookMeta);
-		}
-		
-		return itemStack;
-	}
-	
+                if (list == null) {
+                    pagesField.set(bookMeta, new ArrayList<>());
+
+                    list = (List<Object>) pagesField.get(bookMeta);
+                }
+
+                for (BookPage bookPage : bookPages) {
+                    if (!((bookPage == null) || bookPage.isEmpty()))
+                        list.add(
+                                (version.equals("1_16_R3") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
+                                        ? craftChatMessage.getMethod(
+                                        "toJSON",
+                                        reflectionHelper.getNMSClass(
+                                                (version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
+                                                        ? "network.chat.IChatBaseComponent"
+                                                        : "IChatBaseComponent"
+                                        )
+                                ).invoke(
+                                        null,
+                                        craftChatMessage
+                                                .getMethod("fromJSON", String.class)
+                                                .invoke(null, bookPage.getAsString())
+                                )
+                                        : bookPage.getAsIChatBaseComponent()
+                        );
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            itemStack.setItemMeta(bookMeta);
+        }
+
+        return itemStack;
+    }
+
 }

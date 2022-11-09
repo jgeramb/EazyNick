@@ -10,14 +10,14 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class PlayerRespawnListener implements Listener {
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		Player player = event.getPlayer();
-		NickManager api = new NickManager(player);
-		
-		if(api.isNicked()
-				&& !(EazyNick.getInstance().getSetupYamlFile().getConfiguration().getBoolean("KeepNickOnDeath")))
-			api.unnickPlayerWithoutRemovingMySQL(false, true);
-	}
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        NickManager api = new NickManager(player);
+
+        if(api.isNicked()
+                && !(EazyNick.getInstance().getSetupYamlFile().getConfiguration().getBoolean("KeepNickOnDeath")))
+            api.unnickPlayerWithoutRemovingMySQL(false, true);
+    }
 
 }

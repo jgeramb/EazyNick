@@ -7,16 +7,16 @@ import org.bukkit.event.server.ServerListPingEvent;
 
 public class ServerListPingListener implements Listener {
 
-	@EventHandler
-	public void onServerListPing(ServerListPingEvent event) {
-		try {
-			Object outgoingPacketInjector = EazyNick.getInstance().getOutgoingPacketInjector();
+    @EventHandler
+    public void onServerListPing(ServerListPingEvent event) {
+        try {
+            Object outgoingPacketInjector = EazyNick.getInstance().getOutgoingPacketInjector();
 
-			if(outgoingPacketInjector != null)
-				outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-	
+            if(outgoingPacketInjector != null)
+                outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }

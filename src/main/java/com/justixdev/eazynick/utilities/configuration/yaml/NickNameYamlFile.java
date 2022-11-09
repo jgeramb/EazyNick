@@ -11,17 +11,17 @@ import java.util.stream.Collectors;
 
 public class NickNameYamlFile extends YamlFile {
 
-	public NickNameYamlFile(EazyNick eazyNick) {
-		super(eazyNick, "", "nickNames");
-	}
+    public NickNameYamlFile(EazyNick eazyNick) {
+        super(eazyNick, "", "nickNames");
+    }
 
-	@Override
-	public void setDefaults() {
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/nickNames.txt"))))) {
-			configuration.addDefault("NickNames", reader.lines().collect(Collectors.toList()));
-		} catch (Exception ex) {
-			Bukkit.getLogger().log(Level.SEVERE, "Could not load nicknames: " + ex.getMessage());
-		}
-	}
-	
+    @Override
+    public void setDefaults() {
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/nickNames.txt"))))) {
+            configuration.addDefault("NickNames", reader.lines().collect(Collectors.toList()));
+        } catch (Exception ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Could not load nicknames: " + ex.getMessage());
+        }
+    }
+
 }

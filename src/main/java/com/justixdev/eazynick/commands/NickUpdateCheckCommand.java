@@ -10,26 +10,26 @@ import org.jetbrains.annotations.NotNull;
 
 public class NickUpdateCheckCommand implements CommandExecutor {
 
-	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		Utils utils = eazyNick.getUtils();
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        EazyNick eazyNick = EazyNick.getInstance();
+        Utils utils = eazyNick.getUtils();
 
-		if(!(sender instanceof Player)) {
-			utils.sendConsole(utils.getNotPlayer());
-			return true;
-		}
+        if(!(sender instanceof Player)) {
+            utils.sendConsole(utils.getNotPlayer());
+            return true;
+        }
 
-		Player player = (Player) sender;
+        Player player = (Player) sender;
 
-		if(!(player.hasPermission("eazynick.updatecheck"))) {
-			eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
-			return true;
-		}
+        if(!(player.hasPermission("eazynick.updatecheck"))) {
+            eazyNick.getLanguageYamlFile().sendMessage(player, utils.getNoPerm());
+            return true;
+        }
 
-		eazyNick.getUpdater().checkForUpdates(player);
-		
-		return true;
-	}
+        eazyNick.getUpdater().checkForUpdates(player);
+
+        return true;
+    }
 
 }

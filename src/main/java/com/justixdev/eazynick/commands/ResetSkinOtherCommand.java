@@ -13,45 +13,45 @@ import org.jetbrains.annotations.NotNull;
 
 public class ResetSkinOtherCommand implements CommandExecutor {
 
-	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-		EazyNick eazyNick = EazyNick.getInstance();
-		Utils utils = eazyNick.getUtils();
-		LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        EazyNick eazyNick = EazyNick.getInstance();
+        Utils utils = eazyNick.getUtils();
+        LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
 
-		if(!(sender instanceof Player)) {
-			utils.sendConsole(utils.getNotPlayer());
-			return true;
-		}
+        if(!(sender instanceof Player)) {
+            utils.sendConsole(utils.getNotPlayer());
+            return true;
+        }
 
-		String prefix = utils.getPrefix();
-		
-		Player player = (Player) sender;
+        String prefix = utils.getPrefix();
 
-		if(!(player.hasPermission("eazynick.other.skin.reset"))) {
-			languageYamlFile.sendMessage(player, utils.getNoPerm());
-			return true;
-		}
+        Player player = (Player) sender;
 
-		if(args.length < 1) return true;
+        if(!(player.hasPermission("eazynick.other.skin.reset"))) {
+            languageYamlFile.sendMessage(player, utils.getNoPerm());
+            return true;
+        }
 
-		Player targetPlayer = Bukkit.getPlayer(args[0]);
+        if(args.length < 1) return true;
 
-		if(targetPlayer == null) {
-			languageYamlFile.sendMessage(
-					player,
-					languageYamlFile.getConfigString(player, "Messages.PlayerNotFound")
-							.replace("%prefix%", prefix)
-			);
-			return true;
-		}
+        Player targetPlayer = Bukkit.getPlayer(args[0]);
 
-		NickManager api = new NickManager(targetPlayer);
-		api.changeSkin(api.getRealName());
+        if(targetPlayer == null) {
+            languageYamlFile.sendMessage(
+                    player,
+                    languageYamlFile.getConfigString(player, "Messages.PlayerNotFound")
+                            .replace("%prefix%", prefix)
+            );
+            return true;
+        }
 
-		languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Other.ResetSkin").replace("%playerName%", targetPlayer.getName()).replace("%playername%", targetPlayer.getName()).replace("%prefix%", utils.getPrefix()));
+        NickManager api = new NickManager(targetPlayer);
+        api.changeSkin(api.getRealName());
 
-		return true;
-	}
-	
+        languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.Other.ResetSkin").replace("%playerName%", targetPlayer.getName()).replace("%playername%", targetPlayer.getName()).replace("%prefix%", utils.getPrefix()));
+
+        return true;
+    }
+
 }
