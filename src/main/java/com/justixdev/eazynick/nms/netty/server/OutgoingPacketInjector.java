@@ -217,55 +217,140 @@ public class OutgoingPacketInjector {
 									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
 										if(!(player.hasPermission("eazynick.bypass")
 												&& setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
-												&& !(utils.isVersion13OrLater())
 										) {
-											String textToComplete = utils.getTextsToComplete().get(player);
+											if(utils.isVersion13OrLater()) {
+												Object suggestions = reflectionHelper.getField(msg.getClass(), "b").get(msg);
+												Object suggestionsRange = suggestions.getClass().getMethod("getRange").invoke(suggestions);
+												int suggestionsStart = (int) suggestionsRange.getClass().getMethod("getStart").invoke(suggestionsRange);
+												ArrayList<Object> suggestionsList = new ArrayList<>((List<Object>) suggestions.getClass().getMethod("getList").invoke(suggestions));
+												Map<Object, String> texts = new HashMap<>();
+												String buffer = null;
+												boolean modified = false;
 
-											if(textToComplete != null) {
-												String[] splitTextToComplete = textToComplete.trim().split(" ");
+												for(Object suggestion : suggestionsList) {
+													try {
+														String text = (String) suggestion.getClass().getMethod("getText").invoke(suggestion);
+														Object range = suggestion.getClass().getMethod("getRange").invoke(suggestion);
 
-												if(!(textToComplete.startsWith("/")) || (splitTextToComplete.length > 1)) {
-													List<String> playerNames = new ArrayList<>();
+														buffer = text.substring(0, (int) range.getClass().getMethod("getEnd").invoke(range) - (int) range.getClass().getMethod("getStart").invoke(range));
 
-													if(splitTextToComplete.length < 2)
-														textToComplete = "";
+														texts.put(suggestion, text);
+													} catch (IllegalAccessException ex) {
+														ex.printStackTrace();
+													}
+												}
+
+												List<String> playerNames = new ArrayList<>();
+
+												Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
+													if(utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())) {
+														String nickName = utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName();
+
+														if(texts.values().stream().anyMatch(nickName::equalsIgnoreCase)) {
+															playerNames.add(nickName);
+															return;
+														}
+													}
+
+													String name = currentPlayer.getName();
+
+													if(texts.values().stream().anyMatch(name::equalsIgnoreCase))
+														playerNames.add(name);
+												});
+
+												if(!(playerNames.isEmpty()) || (buffer == null) || texts.containsKey("@p")) {
+													// Player names are in the suggestions
+													suggestionsList.removeIf(suggestion -> playerNames.stream().anyMatch(playerName -> playerName.equalsIgnoreCase(texts.get(suggestion))));
+
+													if(buffer != null)
+														buffer = buffer.toLowerCase();
 													else
-														textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
+														buffer = "";
 
-													//Collect nicknames
-													Bukkit.getOnlinePlayers()
-															.stream()
-															.filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked()))
-															.forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+													for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+														String name = utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())
+																? utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName()
+																: currentPlayer.getName();
 
-													utils.getNickedPlayers()
-															.values()
-															.forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
+														name = name.toLowerCase();
 
-													//Process completions
-													List<String> newCompletions = new ArrayList<>(Arrays.asList((String[]) reflectionHelper.getField(
-															msg.getClass(),
-															"a"
-													).get(msg)));
-													newCompletions.removeIf(currentCompletion -> Bukkit.getOnlinePlayers()
-															.stream()
-															.anyMatch(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion))
-													);
-													newCompletions.addAll(StringUtil.copyPartialMatches(
-															textToComplete,
-															playerNames,
-															new ArrayList<>()
-													));
+														if(buffer.isEmpty() || name.startsWith(buffer)) {
+															int matchingChars = 0;
 
-													//Sort completions alphabetically
-													Collections.sort(newCompletions);
+															for (int i = 0; i < buffer.length(); i++) {
+																if(name.charAt(i) == buffer.charAt(i))
+																	matchingChars++;
+																else
+																	break;
+															}
 
-													//Replace completions
-													reflectionHelper.setField(
-															msg,
-															"a",
-															newCompletions.toArray(new String[0])
-													);
+															Class<?> stringRangeClass = Class.forName("com.mojang.brigadier.context.StringRange");
+															Object suggestion = Class.forName("com.mojang.brigadier.suggestion.Suggestion").getConstructor(stringRangeClass, String.class).newInstance(stringRangeClass.getConstructor(int.class, int.class).newInstance(suggestionsStart, suggestionsStart + matchingChars), name);
+
+															suggestionsList.add(suggestion);
+														}
+
+														modified = true;
+													}
+												}
+
+												if(modified) {
+													StringBuilder command = new StringBuilder();
+
+													for (int i = 1; i <= (suggestionsStart - 2 /* slash & space */); i++)
+														command.append("?");
+
+													reflectionHelper.setField(msg, "b", Class.forName("com.mojang.brigadier.suggestion.Suggestions").getMethod("create", String.class, Collection.class).invoke(null, "/" + command + " " + buffer, suggestionsList));
+												}
+											} else {
+												String textToComplete = utils.getTextsToComplete().get(player);
+
+												if(textToComplete != null) {
+													String[] splitTextToComplete = textToComplete.trim().split(" ");
+
+													if(!(textToComplete.startsWith("/")) || (splitTextToComplete.length > 1)) {
+														List<String> playerNames = new ArrayList<>();
+
+														if(splitTextToComplete.length < 2)
+															textToComplete = "";
+														else
+															textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
+
+														//Collect nicknames
+														Bukkit.getOnlinePlayers()
+																.stream()
+																.filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked()))
+																.forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+
+														utils.getNickedPlayers()
+																.values()
+																.forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
+
+														//Process completions
+														List<String> newCompletions = new ArrayList<>(Arrays.asList((String[]) reflectionHelper.getField(
+																msg.getClass(),
+																"a"
+														).get(msg)));
+														newCompletions.removeIf(currentCompletion -> Bukkit.getOnlinePlayers()
+																.stream()
+																.anyMatch(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion))
+														);
+														newCompletions.addAll(StringUtil.copyPartialMatches(
+																textToComplete,
+																playerNames,
+																new ArrayList<>()
+														));
+
+														//Sort completions alphabetically
+														Collections.sort(newCompletions);
+
+														//Replace completions
+														reflectionHelper.setField(
+																msg,
+																"a",
+																newCompletions.toArray(new String[0])
+														);
+													}
 												}
 											}
 										}
@@ -285,6 +370,20 @@ public class OutgoingPacketInjector {
 										//Overwrite chat message
 										if(editedComponent != null)
 											reflectionHelper.setField(msg, "a", editedComponent);
+
+										super.write(ctx, msg, promise);
+									} else if (msg.getClass().getSimpleName().equals("ClientboundSystemChatPacket")
+											&& setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
+										// Get content
+										String content = (String) reflectionHelper.getField(msg.getClass(), "content").get(msg);
+
+										// Replace names
+										Object editedComponent = replaceNames(deserialize(content), true);
+
+										// Overwrite chat message
+										if (editedComponent != null)
+											//noinspection JavaReflectionInvocation
+											msg = msg.getClass().getConstructor(Class.forName("net.minecraft.network.chat.IChatBaseComponent"), boolean.class).newInstance(editedComponent, msg.getClass().getMethod("c").invoke(msg));
 
 										super.write(ctx, msg, promise);
 									} else if(msg.getClass().getSimpleName().equals("PacketPlayOutScoreboardObjective")) {
@@ -493,7 +592,7 @@ public class OutgoingPacketInjector {
 		String version = eazyNick.getVersion();
 		boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
 		Object editedComponent = iChatBaseComponent;
-		
+
 		try {
 			if(iChatBaseComponent != null) {
 				//Collect raw text from message
@@ -532,7 +631,7 @@ public class OutgoingPacketInjector {
 						}
 					}
 				}
-				
+
 				//Replace real names with nicknames
 				if(!(
 						(
@@ -553,7 +652,7 @@ public class OutgoingPacketInjector {
 								json = json.replace(name, nickedPlayerData.getNickName());
 						}
 					}
-					
+
 					editedComponent = deserialize(json);
 				}
 			}

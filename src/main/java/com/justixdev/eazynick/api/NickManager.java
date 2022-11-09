@@ -776,7 +776,7 @@ public class NickManager extends ReflectionHelper {
 											: "playerConnection"
 							).get(entityPlayer);
 
-							boolean teleportFar = is1_17 || is1_18 || is1_19;
+							boolean teleportFar = is1_17 || is1_18;
 
 							Bukkit.getScheduler().runTask(eazyNick, () -> {
 								try {
