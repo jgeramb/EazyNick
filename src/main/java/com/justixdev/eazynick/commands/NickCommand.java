@@ -191,16 +191,17 @@ public class NickCommand implements CommandExecutor {
                     return true;
                 }
 
-                utils.performNick(
-                        player,
-                        ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4")
-                                        ? eazyNick.getUUIDFetcher_1_7().getName(nameWithoutColors, eazyNick.getUUIDFetcher_1_7().getUUID(nameWithoutColors))
-                                        : (eazyNick.getVersion().equals("1_8_R1")
-                                        ? eazyNick.getUUIDFetcher_1_8_R1().getName(nameWithoutColors, eazyNick.getUUIDFetcher_1_8_R1().getUUID(nameWithoutColors))
-                                        : eazyNick.getUUIDFetcher().getName(nameWithoutColors, eazyNick.getUUIDFetcher().getUUID(nameWithoutColors))
-                                )
-                        )
-                );
+                new Thread(() -> {
+                    String coloredName = ChatColor.translateAlternateColorCodes('&', eazyNick.getVersion().equals("1_7_R4")
+                                    ? eazyNick.getUUIDFetcher_1_7().getName(nameWithoutColors, eazyNick.getUUIDFetcher_1_7().getUUID(nameWithoutColors))
+                                    : (eazyNick.getVersion().equals("1_8_R1")
+                                    ? eazyNick.getUUIDFetcher_1_8_R1().getName(nameWithoutColors, eazyNick.getUUIDFetcher_1_8_R1().getUUID(nameWithoutColors))
+                                    : eazyNick.getUUIDFetcher().getName(nameWithoutColors, eazyNick.getUUIDFetcher().getUUID(nameWithoutColors))
+                            )
+                    );
+
+                    Bukkit.getScheduler().runTask(eazyNick, () -> utils.performNick(player, coloredName));
+                }).start();
             } else
                 languageYamlFile.sendMessage(player, utils.getNoPerm());
         } else

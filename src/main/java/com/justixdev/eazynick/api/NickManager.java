@@ -955,39 +955,57 @@ public class NickManager extends ReflectionHelper {
                     )
             );
 
-        if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
-            // Update skins restorer data
-            try {
-                Plugin skinsRestorer = Bukkit.getPluginManager().getPlugin("SkinsRestorer");
+        new Thread(() -> {
+            if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
+                // Update skins restorer data
+                try {
+                    Plugin skinsRestorer = Bukkit.getPluginManager().getPlugin("SkinsRestorer");
 
-                if (getField(Objects.requireNonNull(skinsRestorer).getClass(), "proxyMode").getBoolean(skinsRestorer)) {
-                    if(!(skinName.startsWith("MINESKIN:"))) {
-                        try {
-                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                            DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
-                            out.writeUTF("setSkin");
-                            out.writeUTF(player.getName());
-                            out.writeUTF(skinName);
+                    if (getField(Objects.requireNonNull(skinsRestorer).getClass(), "proxyMode").getBoolean(skinsRestorer)) {
+                        if(!(skinName.startsWith("MINESKIN:"))) {
+                            try {
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
+                                out.writeUTF("setSkin");
+                                out.writeUTF(player.getName());
+                                out.writeUTF(skinName);
 
-                            player.sendPluginMessage(eazyNick, "sr:messagechannel", byteArrayOutputStream.toByteArray());
-                        } catch (IOException ignore) {
+                                player.sendPluginMessage(eazyNick, "sr:messagechannel", byteArrayOutputStream.toByteArray());
+                            } catch (IOException ignore) {
+                            }
                         }
-                    }
-                } else {
-                    SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
-                    Object skinProfile = utils.getNickedPlayers().get(player.getUniqueId()).getSkinProfile();
+                    } else {
+                        SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
+                        Object skinProfile = utils.getNickedPlayers().get(player.getUniqueId()).getSkinProfile();
 
-                    if(skinProfile == null)
-                        return;
+                        if(skinProfile == null)
+                            return;
 
-                    String skinValue = utils.getDefaultSkinValue(), skinSignature = utils.getDefaultSkinSignature();
+                        String skinValue = utils.getDefaultSkinValue(), skinSignature = utils.getDefaultSkinSignature();
 
-                    if (skinName.startsWith("MINESKIN:")) {
-                        //Load skin from mineskin.org
-                        MineSkinAPI mineSkinAPI = eazyNick.getMineSkinAPI();
+                        if (skinName.startsWith("MINESKIN:")) {
+                            //Load skin from mineskin.org
+                            MineSkinAPI mineSkinAPI = eazyNick.getMineSkinAPI();
 
-                        if (eazyNick.getVersion().startsWith("1_7")) {
-                            Optional<?> texturesPropertyOptional = mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]).stream().findAny();
+                            if (eazyNick.getVersion().startsWith("1_7")) {
+                                Optional<?> texturesPropertyOptional = mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]).stream().findAny();
+
+                                if (texturesPropertyOptional.isPresent()) {
+                                    net.minecraft.util.com.mojang.authlib.properties.Property texturesProperty = (net.minecraft.util.com.mojang.authlib.properties.Property) texturesPropertyOptional.get();
+                                    skinValue = texturesProperty.getValue();
+                                    skinSignature = texturesProperty.getSignature();
+                                }
+                            } else {
+                                Optional<?> texturesPropertyOptional = mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]).stream().findAny();
+
+                                if (texturesPropertyOptional.isPresent()) {
+                                    Property texturesProperty = (Property) texturesPropertyOptional.get();
+                                    skinValue = texturesProperty.getValue();
+                                    skinSignature = texturesProperty.getSignature();
+                                }
+                            }
+                        } else if (eazyNick.getVersion().startsWith("1_7")) {
+                            Optional<?> texturesPropertyOptional = ((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().get("textures").stream().findAny();
 
                             if (texturesPropertyOptional.isPresent()) {
                                 net.minecraft.util.com.mojang.authlib.properties.Property texturesProperty = (net.minecraft.util.com.mojang.authlib.properties.Property) texturesPropertyOptional.get();
@@ -995,7 +1013,7 @@ public class NickManager extends ReflectionHelper {
                                 skinSignature = texturesProperty.getSignature();
                             }
                         } else {
-                            Optional<?> texturesPropertyOptional = mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]).stream().findAny();
+                            Optional<?> texturesPropertyOptional = ((GameProfile) skinProfile).getProperties().get("textures").stream().findAny();
 
                             if (texturesPropertyOptional.isPresent()) {
                                 Property texturesProperty = (Property) texturesPropertyOptional.get();
@@ -1003,45 +1021,30 @@ public class NickManager extends ReflectionHelper {
                                 skinSignature = texturesProperty.getSignature();
                             }
                         }
-                    } else if (eazyNick.getVersion().startsWith("1_7")) {
-                        Optional<?> texturesPropertyOptional = ((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().get("textures").stream().findAny();
 
-                        if (texturesPropertyOptional.isPresent()) {
-                            net.minecraft.util.com.mojang.authlib.properties.Property texturesProperty = (net.minecraft.util.com.mojang.authlib.properties.Property) texturesPropertyOptional.get();
-                            skinValue = texturesProperty.getValue();
-                            skinSignature = texturesProperty.getSignature();
-                        }
-                    } else {
-                        Optional<?> texturesPropertyOptional = ((GameProfile) skinProfile).getProperties().get("textures").stream().findAny();
-
-                        if (texturesPropertyOptional.isPresent()) {
-                            Property texturesProperty = (Property) texturesPropertyOptional.get();
-                            skinValue = texturesProperty.getValue();
-                            skinSignature = texturesProperty.getSignature();
-                        }
+                        skinsRestorerAPI.getClass().getMethod("setSkinData", String.class, Class.forName("net.skinsrestorer.api.property.IProperty")).invoke("custom", Class.forName("net.skinsrestorer.api.property.GenericProperty").getConstructor(String.class, String.class, String.class).newInstance("textures", skinValue, skinSignature));
+                        skinsRestorerAPI.setSkin(player.getName(), skinName.startsWith("MINESKIN:") ? player.getName() : skinName);
+                        skinsRestorerAPI.applySkin(new PlayerWrapper(player));
                     }
-
-                    skinsRestorerAPI.getClass().getMethod("setSkinData", String.class, Class.forName("net.skinsrestorer.api.property.IProperty")).invoke("custom", Class.forName("net.skinsrestorer.api.property.GenericProperty").getConstructor(String.class, String.class, String.class).newInstance("textures", skinValue, skinSignature));
-                    skinsRestorerAPI.setSkin(player.getName(), skinName.startsWith("MINESKIN:") ? player.getName() : skinName);
-                    skinsRestorerAPI.applySkin(new PlayerWrapper(player));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
-        }
 
-        if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
-            String nickName = mysqlNickManager.getNickName(uniqueId);
+            if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
+                String nickName = mysqlNickManager.getNickName(uniqueId);
 
-            if((nickName == null) || !(nickName.equals("NaN"))) {
-                mysqlNickManager.removePlayer(uniqueId);
-                mysqlNickManager.addPlayer(uniqueId, nickName, skinName);
-            } else
-                mysqlNickManager.addPlayer(uniqueId, player.getName(), skinName);
-        }
+                if((nickName == null) || !(nickName.equals("NaN"))) {
+                    mysqlNickManager.removePlayer(uniqueId);
+                    mysqlNickManager.addPlayer(uniqueId, nickName, skinName);
+                } else
+                    mysqlNickManager.addPlayer(uniqueId, player.getName(), skinName);
+            }
 
-        // Respawn player and update tablist
-        updatePlayer();
+            // Respawn player and update tablist
+            Bukkit.getScheduler().runTask(eazyNick, this::updatePlayer);
+        }).start();
+
     }
 
     public void changeSkinToMineSkinId(String mineSkinId) {

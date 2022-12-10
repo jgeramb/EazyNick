@@ -300,50 +300,47 @@ public class OutgoingPacketInjector {
 
                                                 if(textToComplete != null) {
                                                     String[] splitTextToComplete = textToComplete.trim().split(" ");
+                                                    List<String> playerNames = new ArrayList<>();
 
-                                                    if(!(textToComplete.startsWith("/")) || (splitTextToComplete.length > 1)) {
-                                                        List<String> playerNames = new ArrayList<>();
+                                                    if(splitTextToComplete.length < 2)
+                                                        textToComplete = "";
+                                                    else
+                                                        textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
 
-                                                        if(splitTextToComplete.length < 2)
-                                                            textToComplete = "";
-                                                        else
-                                                            textToComplete = splitTextToComplete[splitTextToComplete.length - 1];
+                                                    //Collect nicknames
+                                                    Bukkit.getOnlinePlayers()
+                                                            .stream()
+                                                            .filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked()))
+                                                            .forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
 
-                                                        //Collect nicknames
-                                                        Bukkit.getOnlinePlayers()
-                                                                .stream()
-                                                                .filter(currentPlayer -> !(new NickManager(currentPlayer).isNicked()))
-                                                                .forEach(currentPlayer -> playerNames.add(currentPlayer.getName()));
+                                                    utils.getNickedPlayers()
+                                                            .values()
+                                                            .forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
 
-                                                        utils.getNickedPlayers()
-                                                                .values()
-                                                                .forEach(currentNickedPlayerData -> playerNames.add(currentNickedPlayerData.getNickName()));
+                                                    //Process completions
+                                                    List<String> newCompletions = new ArrayList<>(Arrays.asList((String[]) reflectionHelper.getField(
+                                                            msg.getClass(),
+                                                            "a"
+                                                    ).get(msg)));
+                                                    newCompletions.removeIf(currentCompletion -> Bukkit.getOnlinePlayers()
+                                                            .stream()
+                                                            .anyMatch(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion))
+                                                    );
+                                                    newCompletions.addAll(StringUtil.copyPartialMatches(
+                                                            textToComplete,
+                                                            playerNames,
+                                                            new ArrayList<>()
+                                                    ));
 
-                                                        //Process completions
-                                                        List<String> newCompletions = new ArrayList<>(Arrays.asList((String[]) reflectionHelper.getField(
-                                                                msg.getClass(),
-                                                                "a"
-                                                        ).get(msg)));
-                                                        newCompletions.removeIf(currentCompletion -> Bukkit.getOnlinePlayers()
-                                                                .stream()
-                                                                .anyMatch(currentPlayer -> currentPlayer.getName().equalsIgnoreCase(currentCompletion))
-                                                        );
-                                                        newCompletions.addAll(StringUtil.copyPartialMatches(
-                                                                textToComplete,
-                                                                playerNames,
-                                                                new ArrayList<>()
-                                                        ));
+                                                    //Sort completions alphabetically
+                                                    Collections.sort(newCompletions);
 
-                                                        //Sort completions alphabetically
-                                                        Collections.sort(newCompletions);
-
-                                                        //Replace completions
-                                                        reflectionHelper.setField(
-                                                                msg,
-                                                                "a",
-                                                                newCompletions.toArray(new String[0])
-                                                        );
-                                                    }
+                                                    //Replace completions
+                                                    reflectionHelper.setField(
+                                                            msg,
+                                                            "a",
+                                                            newCompletions.toArray(new String[0])
+                                                    );
                                                 }
                                             }
                                         }
@@ -351,7 +348,7 @@ public class OutgoingPacketInjector {
                                         super.write(ctx, msg, promise);
                                     } else if (msg.getClass().getSimpleName().equals("PacketPlayOutChat")
                                             && setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
-                                        //Get chat message from packet and replace names
+                                        // Get chat message from packet and replace names
                                         Object editedComponent = replaceNames(
                                                 reflectionHelper.getField(
                                                         msg.getClass(),
@@ -360,7 +357,7 @@ public class OutgoingPacketInjector {
                                                 true
                                         );
 
-                                        //Overwrite chat message
+                                        // Overwrite chat message
                                         if(editedComponent != null)
                                             reflectionHelper.setField(msg, "a", editedComponent);
 
@@ -584,7 +581,7 @@ public class OutgoingPacketInjector {
 
         String version = eazyNick.getVersion();
         boolean is1_17 = version.startsWith("1_17"), is1_18 = version.startsWith("1_18"), is1_19 = version.startsWith("1_19");
-        Object editedComponent = iChatBaseComponent;
+        Object editedComponent = null;
 
         try {
             if(iChatBaseComponent != null) {
@@ -611,7 +608,8 @@ public class OutgoingPacketInjector {
                 method.setAccessible(true);
 
                 for (Object partlyIChatBaseComponent : ((List<Object>) method.invoke(iChatBaseComponent))) {
-                    if(partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")) {
+                    if (partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")
+                            || partlyIChatBaseComponent.getClass().getSimpleName().equals("IChatMutableComponent")) {
                         String[] json = serialize(partlyIChatBaseComponent)
                                 .replace("\"", "")
                                 .replace("{", "")
@@ -619,14 +617,14 @@ public class OutgoingPacketInjector {
                                 .split(",");
 
                         for (String s : json) {
-                            if(s.startsWith("text:"))
+                            if (s.startsWith("text:"))
                                 fullText.append(s.replaceFirst("text:", ""));
                         }
                     }
                 }
 
                 //Replace real names with nicknames
-                if(!(
+                if (!(
                         (
                                 fullText.toString().contains(ChatColor.stripColor(utils.getLastChatMessage()))
                                         && isChatPacket
@@ -638,10 +636,10 @@ public class OutgoingPacketInjector {
                     for (NickedPlayerData nickedPlayerData : utils.getNickedPlayers().values()) {
                         Player targetPlayer = Bukkit.getPlayer(nickedPlayerData.getUniqueId());
 
-                        if(targetPlayer != null) {
+                        if (targetPlayer != null) {
                             String name = targetPlayer.getName();
 
-                            if(json.contains(name))
+                            if (json.contains(name))
                                 json = json.replace(name, nickedPlayerData.getNickName());
                         }
                     }
@@ -649,8 +647,7 @@ public class OutgoingPacketInjector {
                     editedComponent = deserialize(json);
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception ignore) {
         }
 
         return editedComponent;

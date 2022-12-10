@@ -424,61 +424,72 @@ public class Utils {
                 nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
             }
         } else {
-            PlayerNickEvent playerNickEvent = new PlayerNickEvent(
-                    player,
-                    name,
-                    skinName,
-                    setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
-                            ? (
-                            eazyNick.getVersion().startsWith("1_7")
-                                    ? eazyNick.getUUIDFetcher_1_7().getUUID(name)
-                                    : (
-                                    eazyNick.getVersion().equals("1_8_R1")
-                                            ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)
-                                            : eazyNick.getUUIDFetcher().getUUID(name)
-                            )
-                    )
-                            : player.getUniqueId(),
-                    chatPrefix,
-                    chatSuffix,
-                    tabPrefix,
-                    tabSuffix,
-                    tagPrefix,
-                    tagSuffix,
-                    false,
-                    false,
-                    sortID,
-                    groupName
-            );
+            final String finalChatPrefix = chatPrefix,
+                    finalChatSuffix = chatSuffix,
+                    finalTabPrefix = tabPrefix,
+                    finalTabSuffix = tabSuffix,
+                    finalTagPrefix = tagPrefix,
+                    finalTagSuffix = tagSuffix,
+                    finalGroupName = groupName;
+            final int finalSortID = sortID;
 
-            Bukkit.getPluginManager().callEvent(playerNickEvent);
+            new Thread(() -> {
+                UUID uniqueId = setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
+                        ? (
+                        eazyNick.getVersion().startsWith("1_7")
+                                ? eazyNick.getUUIDFetcher_1_7().getUUID(name)
+                                : (
+                                eazyNick.getVersion().equals("1_8_R1")
+                                        ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)
+                                        : eazyNick.getUUIDFetcher().getUUID(name)))
+                        : player.getUniqueId();
 
-            if(!(playerNickEvent.isCancelled())) {
-                String finalChatPrefix = chatPrefix, finalChatSuffix = chatSuffix;
+                Bukkit.getScheduler().runTask(eazyNick, () -> {
+                    PlayerNickEvent playerNickEvent = new PlayerNickEvent(
+                            player,
+                            name,
+                            skinName,
+                            uniqueId,
+                            finalChatPrefix,
+                            finalChatSuffix,
+                            finalTabPrefix,
+                            finalTabSuffix,
+                            finalTagPrefix,
+                            finalTagSuffix,
+                            false,
+                            false,
+                            finalSortID,
+                            finalGroupName
+                    );
 
-                new AsyncTask(new AsyncRunnable() {
+                    Bukkit.getPluginManager().callEvent(playerNickEvent);
 
-                    @Override
-                    public void run() {
-                        Bukkit.getScheduler().runTask(eazyNick, () -> {
-                            if(guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled")
-                                    && !(eazyNick.getVersion().equals("1_7_R4"))) {
-                                ArrayList<TextComponent> textComponents = new ArrayList<>();
+                    if (!(playerNickEvent.isCancelled())) {
+                        new AsyncTask(new AsyncRunnable() {
 
-                                Arrays.asList(guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer")
-                                                .replace("%name%", finalChatPrefix + name + finalChatSuffix)
-                                                .split("%nl%"))
-                                        .forEach(s -> textComponents.add(new TextComponent(s + "\n")));
+                            @Override
+                            public void run() {
+                                Bukkit.getScheduler().runTask(eazyNick, () -> {
+                                    if (guiYamlFile.getConfiguration().getBoolean("BookGUI.Page6.Enabled")
+                                            && !(eazyNick.getVersion().equals("1_7_R4"))) {
+                                        ArrayList<TextComponent> textComponents = new ArrayList<>();
 
-                                nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
+                                        Arrays.asList(guiYamlFile.getConfigString(player, "BookGUI.Page6.Text.SingleServer")
+                                                        .replace("%name%", finalChatPrefix + name + finalChatSuffix)
+                                                        .split("%nl%"))
+                                                .forEach(s -> textComponents.add(new TextComponent(s + "\n")));
+
+                                        nmsBookUtils.open(player, nmsBookBuilder.create("Done", new BookPage(textComponents)));
+                                    }
+                                });
                             }
-                        });
+                        }, 400 + (
+                                setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay")
+                                        ? 2000 : 0
+                        )).run();
                     }
-                }, 400 + (
-                        setupYamlFile.getConfiguration().getBoolean("RandomDisguiseDelay")
-                                ? 2000 : 0
-                )).run();
-            }
+                });
+            }).start();
         }
     }
 
@@ -560,38 +571,45 @@ public class Utils {
                 : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
         );
 
-        Bukkit.getPluginManager().callEvent(
-                new PlayerNickEvent(
-                        player,
-                        nameWithoutColors,
-                        setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI")
-                                ? ("MINESKIN:" + getRandomStringFromList(mineSkinUUIDs))
-                                : nameWithoutColors,
-                        setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
-                                ? (
-                                eazyNick.getVersion().startsWith("1_7")
-                                        ? eazyNick.getUUIDFetcher_1_7().getUUID(name)
-                                        : (
-                                        eazyNick.getVersion().equals("1_8_R1")
-                                                ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)
-                                                : eazyNick.getUUIDFetcher().getUUID(name)))
-                                : player.getUniqueId(),
-                        chatPrefix,
-                        chatSuffix,
-                        tabPrefix,
-                        tabSuffix,
-                        tagPrefix,
-                        tagSuffix,
-                        false,
-                        false,
-                        serverFull
-                                ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID")
-                                : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.SortID"),
-                        serverFull
-                                ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName")
-                                : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
-                )
-        );
+        final String finalChatPrefix = chatPrefix;
+        final String finalChatSuffix = chatSuffix;
+
+        new Thread(() -> {
+            UUID uniqueId = setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
+                    ? (
+                    eazyNick.getVersion().startsWith("1_7")
+                            ? eazyNick.getUUIDFetcher_1_7().getUUID(name)
+                            : (
+                            eazyNick.getVersion().equals("1_8_R1")
+                                    ? eazyNick.getUUIDFetcher_1_8_R1().getUUID(name)
+                                    : eazyNick.getUUIDFetcher().getUUID(name)))
+                    : player.getUniqueId();
+
+            Bukkit.getScheduler().runTask(eazyNick, () -> Bukkit.getPluginManager().callEvent(
+                    new PlayerNickEvent(
+                            player,
+                            nameWithoutColors,
+                            setupYamlFile.getConfiguration().getBoolean("UseMineSkinAPI")
+                                    ? ("MINESKIN:" + getRandomStringFromList(mineSkinUUIDs))
+                                    : nameWithoutColors,
+                            uniqueId,
+                            finalChatPrefix,
+                            finalChatSuffix,
+                            tabPrefix,
+                            tabSuffix,
+                            tagPrefix,
+                            tagSuffix,
+                            false,
+                            false,
+                            serverFull
+                                    ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID")
+                                    : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.SortID"),
+                            serverFull
+                                    ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName")
+                                    : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
+                    )
+            ));
+        }).start();
     }
 
     public void performReNick(Player player) {
@@ -720,8 +738,7 @@ public class Utils {
                                 );
                             } else
                                 // Nick player using MySQL data
-                                Bukkit.getPluginManager().callEvent(
-                                        new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), spoofedUniqueId, mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()), mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTagSuffix(player.getUniqueId()), true, false, 9999, mysqlPlayerDataManager.getGroupName(player.getUniqueId())));
+                                Bukkit.getPluginManager().callEvent(new PlayerNickEvent(player, name, mysqlNickManager.getSkinName(player.getUniqueId()), spoofedUniqueId, mysqlPlayerDataManager.getChatPrefix(player.getUniqueId()), mysqlPlayerDataManager.getChatSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTabPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTabSuffix(player.getUniqueId()), mysqlPlayerDataManager.getTagPrefix(player.getUniqueId()), mysqlPlayerDataManager.getTagSuffix(player.getUniqueId()), true, false, 9999, mysqlPlayerDataManager.getGroupName(player.getUniqueId())));
                         } else {
                             // Import data from 'setup.yml'
                             boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();

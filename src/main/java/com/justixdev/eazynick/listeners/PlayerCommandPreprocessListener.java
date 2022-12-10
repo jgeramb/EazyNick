@@ -22,7 +22,7 @@ public class PlayerCommandPreprocessListener implements Listener {
         String[] args = msg.toString().trim().split(" ");
         boolean allowRealName = setupYamlFile.getConfiguration().getBoolean("AllowRealNamesInCommands");
 
-        if(utils.getReplaceNameInCommandBlackList().stream().noneMatch(command -> args[0].equalsIgnoreCase("/" + command))) {
+        if(utils.getReplaceNameInCommandBlackList().stream().noneMatch(command -> args[0].equalsIgnoreCase("/" + command)) && (EazyNick.getInstance().getCommand(args[0].substring(1)) == null)) {
             utils.getNickedPlayers().values().forEach(nickedPlayerData -> {
                 for (int i = 0; i < args.length; i++) {
                     if(args[i].equalsIgnoreCase(nickedPlayerData.getNickName()))
