@@ -12,6 +12,9 @@ import com.justixdev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.nametagedit.plugin.NametagEdit;
+import com.nametagedit.plugin.api.INametagApi;
+import com.nametagedit.plugin.api.data.Nametag;
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
 import de.dytanic.cloudnet.lib.player.permission.PermissionEntity;
@@ -1332,7 +1335,6 @@ public class NickManager extends ReflectionHelper {
             }
         }
 
-		/* Maven Repository currently unavailable
 		// Reset NametagEdit prefix and suffix synchronously
 		Bukkit.getScheduler().runTask(eazyNick, () -> {
 			if(utils.isPluginInstalled("NametagEdit")) {
@@ -1354,7 +1356,7 @@ public class NickManager extends ReflectionHelper {
 					utils.getNametagEditSuffixes().remove(player.getUniqueId());
 				}
 			}
-		});*/
+		});
 
         // Reset chat and tablist name
         new AsyncTask(new AsyncRunnable() {
@@ -1681,7 +1683,6 @@ public class NickManager extends ReflectionHelper {
                 tmpTagSuffix = PlaceholderAPI.setPlaceholders(player, tmpTagSuffix);
             }
 
-			/* Maven Repository currently unavailable
 			// Update NametagEdit prefix and suffix synchronously
 			if (utils.isPluginInstalled("NametagEdit")) {
 				utils.getNametagEditPrefixes().remove(player.getUniqueId());
@@ -1696,7 +1697,7 @@ public class NickManager extends ReflectionHelper {
 				nametagEditAPI.setPrefix(player, tmpTagPrefix);
 				nametagEditAPI.setSuffix(player, tmpTagSuffix);
 				nametagEditAPI.reloadNametag(player);
-			}*/
+			}
 
             // Update CloudNet v2 prefix and suffix
             if (utils.isPluginInstalled("CloudNetAPI")) {
