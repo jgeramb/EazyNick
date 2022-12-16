@@ -26,10 +26,6 @@
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>nametagedit</id>
-            <url>https://ci.nametagedit.com/plugin/repository/everything/</url>
-        </repository>
-        <repository>
             <id>releases</id>
             <url>https://repo.cloudnetservice.eu/repository/releases/</url>
         </repository>
@@ -66,11 +62,6 @@
             <version>4.1.85.Final</version>
         </dependency>
         <dependency>
-            <groupId>com.nametagedit</groupId>
-            <artifactId>nametagedit</artifactId>
-            <version>4.5.11</version>
-        </dependency>
-        <dependency>
             <groupId>de.dytanic.cloudnet</groupId>
             <artifactId>cloudnet-api-bridge</artifactId>
             <version>2.1.17</version>
@@ -100,6 +91,13 @@
             <version>3.1.5</version>
         </dependency>
 
+        <dependency>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/NametagEdit.jar</systemPath>
+            <groupId>com.nametagedit</groupId>
+            <artifactId>nametagedit</artifactId>
+            <version>4.5.11</version>
+        </dependency>
         <dependency>
             <scope>system</scope>
             <systemPath>${basedir}/lib/PermissionsEx.jar</systemPath>
