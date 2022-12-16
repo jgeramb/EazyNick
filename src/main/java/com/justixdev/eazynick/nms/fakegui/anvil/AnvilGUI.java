@@ -151,9 +151,9 @@ public class AnvilGUI {
                                             ? "world.entity.player.EntityHuman"
                                             : "EntityHuman"
                             ),
-                            ((is1_18 || is1_19) && !(version.equals("1_18_R2")))
+                            ((is1_18 || is1_19) && !(version.equals("1_18_R2") || Bukkit.getVersion().contains("1.19.3")))
                                     ? "cp"
-                                    : ((is1_17 || is1_18)
+                                    : ((is1_17 || is1_18 || is1_19)
                                     ? "co"
                                     : "inventory"
                             )

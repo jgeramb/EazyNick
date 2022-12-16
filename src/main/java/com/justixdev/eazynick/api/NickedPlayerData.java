@@ -5,6 +5,7 @@ import com.justixdev.eazynick.utilities.MineSkinAPI;
 import com.justixdev.eazynick.utilities.Utils;
 import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.PropertyMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -54,22 +55,24 @@ public class NickedPlayerData {
             //Create and return new game profile
             if(version.startsWith("1_7")) {
                 net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, changeNameTag ? nickName : realName);
-                gameProfile.getProperties().removeAll("textures");
+                net.minecraft.util.com.mojang.authlib.properties.PropertyMap properties = gameProfile.getProperties();
+                properties.removeAll("textures");
 
                 if(skinProfile == null)
                     skinProfile = eazyNick.getUtils().getDefaultGameProfile_1_7();
 
-                gameProfile.getProperties().putAll("textures", ((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().get("textures"));
+                properties.putAll("textures", ((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().get("textures"));
 
                 return gameProfile;
             } else {
                 GameProfile gameProfile = new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, changeNameTag ? nickName : realName);
-                gameProfile.getProperties().removeAll("textures");
+                PropertyMap properties = gameProfile.getProperties();
+                properties.removeAll("textures");
 
                 if(skinProfile == null)
                     skinProfile = eazyNick.getUtils().getDefaultGameProfile();
 
-                gameProfile.getProperties().putAll("textures", ((GameProfile) skinProfile).getProperties().get("textures"));
+                properties.putAll("textures", ((GameProfile) skinProfile).getProperties().get("textures"));
 
                 return gameProfile;
             }

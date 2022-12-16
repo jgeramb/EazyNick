@@ -21,6 +21,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class OutgoingPacketInjector {
 
@@ -66,7 +68,7 @@ public class OutgoingPacketInjector {
                 for(Object manager : Collections.synchronizedList((List<?>) getNetworkManagerList(
                         minecraftServer.getClass().getMethod(
                                 (is1_18 || is1_19)
-                                        ? "ad"
+                                        ? (Bukkit.getVersion().contains("1.19.3") ? "ac": "ad")
                                         : "getServerConnection"
                         ).invoke(minecraftServer)
                 )).toArray()) {
@@ -148,9 +150,9 @@ public class OutgoingPacketInjector {
                                     return (ip.equals("127.0.0.1")
                                             ? (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
                                             : (
-                                            currentInetSocketAddress.getAddress().getHostAddress().equals(ip)
-                                                    && (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
-                                    )
+                                                currentInetSocketAddress.getAddress().getHostAddress().equals(ip)
+                                                && (currentInetSocketAddress.getPort() == inetSocketAddress.getPort())
+                                            )
                                     );
 
                                 return false;
@@ -165,7 +167,7 @@ public class OutgoingPacketInjector {
 
                                         if(!(utils.getSoonNickedPlayers().contains(uuid))) {
                                             if(utils.getNickedPlayers().containsKey(uuid))
-                                                //Replace uuid with fake uuid (spoofed uuid)
+                                                // Replace uuid with fake uuid (spoofed uuid)
                                                 reflectionHelper.setField(
                                                         msg,
                                                         "b",
@@ -176,24 +178,109 @@ public class OutgoingPacketInjector {
 
                                             super.write(ctx, msg, promise);
                                         }
+                                    } else if(msg.getClass().getSimpleName().equals("ClientboundPlayerInfoRemovePacket")) {
+                                        List<UUID> a = (List<UUID>) reflectionHelper.getField(msg.getClass(), "a").get(msg);
+
+                                        if(a.stream().noneMatch(uuid -> player.getUniqueId().equals(uuid))) {
+                                            if (utils.getNickedPlayers().keySet().stream().anyMatch(uuid -> a.stream().anyMatch(uuid::equals))) {
+                                                if (player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
+                                                    return;
+
+                                                final UUID bypassUniqueId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+                                                if(a.contains(bypassUniqueId))
+                                                    super.write(ctx, msg.getClass().getConstructor(List.class).newInstance(a.stream().filter(uuid -> !(bypassUniqueId.equals(uuid))).collect(Collectors.toList())), promise);
+                                                else {
+                                                    ArrayList<UUID> playersToRemove = a.stream().filter(uuid -> !(utils.getNickedPlayers().containsKey(uuid))).collect(Collectors.toCollection(ArrayList::new));
+
+                                                    a.stream().filter(uuid -> utils.getNickedPlayers().containsKey(uuid)).forEach(uuid -> playersToRemove.add(utils.getNickedPlayers().get(uuid).getSpoofedUniqueId()));
+
+                                                    super.write(ctx, msg.getClass().getConstructor(List.class).newInstance(playersToRemove), promise);
+                                                    return;
+                                                }
+                                            }
+                                        }
+
+                                        super.write(ctx, msg, promise);
+                                    } else if(msg.getClass().getSimpleName().equals("ClientboundPlayerInfoUpdatePacket")) {
+                                        Object b = reflectionHelper.getField(msg.getClass(), "b").get(msg);
+
+                                        if(b != null) {
+                                            ArrayList<Object> dataToUpdate = new ArrayList<>();
+
+                                            for (Object playerInfoData : (List<Object>) b) {
+                                                Object gameProfile = reflectionHelper.getField(playerInfoData.getClass(), "b").get(playerInfoData);
+                                                UUID uuid = (UUID) gameProfile.getClass().getMethod("getId").invoke(gameProfile);
+                                                Object entityPlayer = player.getClass().getMethod("getHandle").invoke(Bukkit.getPlayer(uuid));
+                                                EnumSet<? extends Enum> actions = ((EnumSet<? extends Enum>) reflectionHelper.getField(
+                                                        msg.getClass(),
+                                                        "a"
+                                                ).get(msg));
+
+                                                if(utils.getSoonNickedPlayers().contains(uuid) && actions.stream().anyMatch(action -> action.name().equals("ADD_PLAYER")))
+                                                    return;
+
+                                                if(utils.getNickedPlayers().containsKey(uuid) && !(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+                                                    Object playerInteractManager = reflectionHelper.getField(entityPlayer.getClass(), "d").get(entityPlayer);
+                                                    NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uuid);
+
+                                                    dataToUpdate.add(playerInfoData
+                                                            .getClass()
+                                                            .getConstructor(UUID.class, gameProfile.getClass(), boolean.class, int.class, reflectionHelper.getNMSClass("world.level.EnumGamemode"), reflectionHelper.getNMSClass("network.chat.IChatBaseComponent"), reflectionHelper.getNMSClass("network.chat.RemoteChatSession").getDeclaredClasses()[0])
+                                                            .newInstance(
+                                                                    uuid.equals(player.getUniqueId()) ? uuid : nickedPlayerData.getSpoofedUniqueId(),
+                                                                    nickedPlayerData.getFakeGameProfile(
+                                                                            !(uuid.equals(player.getUniqueId()))
+                                                                                    && setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
+                                                                    ),
+                                                                    true,
+                                                                    reflectionHelper.getField(entityPlayer.getClass(), "e").get(entityPlayer),
+                                                                    playerInteractManager.getClass().getMethod("b").invoke(playerInteractManager),
+                                                                    entityPlayer.getClass().getMethod("K").invoke(entityPlayer),
+                                                                    actions.stream().anyMatch(action -> action.name().equals("INITIALIZE_CHAT")) ? null : reflectionHelper.getNMSClass("SystemUtils")
+                                                                            .getMethod("a", Object.class, Function.class)
+                                                                            .invoke(
+                                                                                    null,
+                                                                                    entityPlayer.getClass().getMethod("Y").invoke(entityPlayer),
+                                                                                    (Function<Object, Object>) (chatSession) -> {
+                                                                                        try {
+                                                                                            return reflectionHelper.getNMSClass("network.chat.RemoteChatSession").getMethod("b").invoke(chatSession);
+                                                                                        } catch (Exception ignore) {
+                                                                                        }
+
+                                                                                        return null;
+                                                                                    }
+                                                                            )
+
+                                                            )
+                                                    );
+                                                } else
+                                                    dataToUpdate.add(playerInfoData);
+                                            }
+
+                                            reflectionHelper.setField(msg, "b", dataToUpdate);
+                                        }
+
+                                        super.write(ctx, msg, promise);
                                     } else if(msg.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
                                         Object b = reflectionHelper.getField(msg.getClass(), "b").get(msg);
 
                                         if(b != null) {
                                             for (Object playerInfoData : ((List<?>) b)) {
-                                                UUID uuid = ((GameProfile) reflectionHelper.getField(
+                                                Object gameProfile = reflectionHelper.getField(
                                                         playerInfoData.getClass(),
                                                         (is1_17 || is1_18 || is1_19)
                                                                 ? "c"
                                                                 : "d"
-                                                ).get(playerInfoData)).getId();
+                                                ).get(playerInfoData);
+                                                UUID uuid = (UUID) gameProfile.getClass().getMethod("getId").invoke(gameProfile);
 
                                                 if(utils.getSoonNickedPlayers().contains(uuid)
                                                         && setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")
                                                         && reflectionHelper.getField(
-                                                        msg.getClass(),
-                                                        "a"
-                                                ).get(msg).toString().endsWith("ADD_PLAYER")
+                                                                msg.getClass(),
+                                                                "a"
+                                                        ).get(msg).toString().endsWith("ADD_PLAYER")
                                                 )
                                                     return;
 

@@ -4,6 +4,7 @@ import com.justixdev.eazynick.EazyNick;
 import com.justixdev.eazynick.api.NickManager;
 import com.justixdev.eazynick.api.NickedPlayerData;
 import com.justixdev.eazynick.api.PlayerNickEvent;
+import com.justixdev.eazynick.nms.ReflectionHelper;
 import com.justixdev.eazynick.nms.netty.client.IncomingPacketInjector;
 import com.justixdev.eazynick.nms.netty.client.IncomingPacketInjector_1_7;
 import com.justixdev.eazynick.sql.MySQLNickManager;
@@ -23,7 +24,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerJoinListener implements Listener {
 
@@ -149,6 +150,21 @@ public class PlayerJoinListener implements Listener {
             @SuppressWarnings("ConstantConditions")
             @Override
             public void run() {
+                try {
+                    ArrayList<UUID> playersToRemove = new ArrayList<>(utils.getNickedPlayers().keySet());
+                    playersToRemove.add(0, UUID.fromString("00000000-0000-0000-0000-000000000000"));
+
+                    ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
+                    reflectionHelper.sendPacketNMS(
+                            player,
+                            reflectionHelper.getNMSClass("network.protocol.game.ClientboundPlayerInfoRemovePacket")
+                                    .getConstructor(List.class)
+                                    .newInstance(playersToRemove)
+                    );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
                 if(!(isAPIMode)) {
                     Bukkit.getScheduler().runTask(eazyNick, () -> {
                         if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {

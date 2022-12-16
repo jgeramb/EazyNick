@@ -1,6 +1,7 @@
 package com.justixdev.eazynick.nms;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -72,6 +73,25 @@ public class ReflectionHelper {
 
     public String getVersion() {
         return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    }
+
+    public void sendPacketNMS(Player player, Object packet) {
+        try {
+            // Send packet to player connection
+            boolean is1_17 = getVersion().startsWith("v1_17"), is1_18 = getVersion().startsWith("v1_18"), is1_19 = getVersion().startsWith("v1_19");
+            Object handle = player.getClass().getMethod("getHandle").invoke(player);
+            Object playerConnection = handle.getClass().getDeclaredField((is1_17 || is1_18 || is1_19) ? "b" : "playerConnection").get(handle);
+            playerConnection.getClass().getMethod(
+                    (is1_18 || is1_19)
+                            ? "a"
+                            : "sendPacket",
+                    getNMSClass((is1_17 || is1_18 || is1_19)
+                            ? "network.protocol.Packet"
+                            : "Packet")
+            ).invoke(playerConnection, packet);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /* Debug Functions */

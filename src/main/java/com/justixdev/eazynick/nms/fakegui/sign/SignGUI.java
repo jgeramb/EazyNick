@@ -111,25 +111,23 @@ public class SignGUI implements Listener {
                         tileField.setAccessible(true);
                         Object tileSign = tileField.get(sign);
 
-                        Field editable = tileSign.getClass().getDeclaredField((is1_17 || is1_18 || is1_19) ? "f" : "isEditable");
+                        Field editable = tileSign.getClass().getDeclaredField(Bukkit.getVersion().contains("1.19.3") ? "h" : ((is1_17 || is1_18 || is1_19) ? "f" : "isEditable"));
                         editable.setAccessible(true);
                         editable.set(tileSign, true);
 
                         Field handler = tileSign.getClass().getDeclaredField(
                                 (version.startsWith("1_15") || version.startsWith("1_16"))
-                                        ? "c" : (
-                                        version.startsWith("1_14")
+                                        ? "c"
+                                        : (version.startsWith("1_14")
                                                 ? "j"
-                                                : (
-                                                version.startsWith("1_13")
-                                                        ? "g"
-                                                        : (
-                                                        (is1_17 || is1_18 || is1_19)
+                                                : (Bukkit.getVersion().contains("1.19.3")
+                                                        ? "i"
+                                                        : ((version.startsWith("1_13") || is1_17 || is1_18 || is1_19)
                                                                 ? "g"
                                                                 : "h"
+                                                        )
                                                 )
                                         )
-                                )
                         );
                         handler.setAccessible(true);
                         handler.set(

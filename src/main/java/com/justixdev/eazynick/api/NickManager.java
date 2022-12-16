@@ -76,25 +76,6 @@ public class NickManager extends ReflectionHelper {
                 .forEach(currentPlayer -> sendPacketNMS(currentPlayer, packet));
     }
 
-    private void sendPacketNMS(Player player, Object packet) {
-        try {
-            // Send packet to player connection
-            boolean is1_17 = eazyNick.getVersion().startsWith("1_17"), is1_18 = eazyNick.getVersion().startsWith("1_18"), is1_19 = eazyNick.getVersion().startsWith("1_19");
-            Object handle = player.getClass().getMethod("getHandle").invoke(player);
-            Object playerConnection = handle.getClass().getDeclaredField((is1_17 || is1_18 || is1_19) ? "b" : "playerConnection").get(handle);
-            playerConnection.getClass().getMethod(
-                    (is1_18 || is1_19)
-                            ? "a"
-                            : "sendPacket",
-                    getNMSClass((is1_17 || is1_18 || is1_19)
-                            ? "network.protocol.Packet"
-                            : "Packet")
-            ).invoke(playerConnection, packet);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
     private void updatePlayerListName(Object packetPlayOutPlayerInfoUpdate, Object packetPlayOutPlayerInfoRemove, Object packetPlayOutPlayerInfoAdd, Player currentPlayer, Object playerConnection) throws IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
         Object networkManager = playerConnection
                 .getClass()
@@ -175,9 +156,11 @@ public class NickManager extends ReflectionHelper {
             (serverVersion.equals("1_8_R1")
                     ? Optional.of(getNMSClass("EnumPlayerInfoAction"))
                     : getSubClass(getNMSClass(
-                            is1_17To1_19
-                                    ? "network.protocol.game.PacketPlayOutPlayerInfo"
-                                    : "PacketPlayOutPlayerInfo"
+                            Bukkit.getVersion().contains("1.19.3")
+                                    ? "network.protocol.game.ClientboundPlayerInfoUpdatePacket"
+                                    : (is1_17To1_19
+                                            ? "network.protocol.game.PacketPlayOutPlayerInfo"
+                                            : "PacketPlayOutPlayerInfo")
                     ),
                     "EnumPlayerInfoAction"
             )
@@ -204,11 +187,11 @@ public class NickManager extends ReflectionHelper {
                                     entityPlayer,
                                     utils.isVersion13OrLater()
                                             ? craftChatMessage
-                                            .getMethod("fromStringOrNull", String.class)
-                                            .invoke(craftChatMessage, finalName)
+                                                    .getMethod("fromStringOrNull", String.class)
+                                                    .invoke(null, finalName)
                                             : ((Object[]) craftChatMessage
-                                            .getMethod("fromString", String.class)
-                                            .invoke(craftChatMessage, finalName))[0]
+                                                    .getMethod("fromString", String.class)
+                                                    .invoke(null, finalName))[0]
                             );
 
                             for (Player currentPlayer : Bukkit.getOnlinePlayers())
@@ -218,9 +201,11 @@ public class NickManager extends ReflectionHelper {
                                         player,
                                         currentPlayer,
                                         getNMSClass(
-                                                is1_17To1_19
-                                                        ? "network.protocol.game.PacketPlayOutPlayerInfo"
-                                                        : "PacketPlayOutPlayerInfo"
+                                                Bukkit.getVersion().contains("1.19.3")
+                                                        ? "network.protocol.game.ClientboundPlayerInfoUpdatePacket"
+                                                        : (is1_17To1_19
+                                                                ? "network.protocol.game.PacketPlayOutPlayerInfo"
+                                                                : "PacketPlayOutPlayerInfo")
                                         ).getConstructor(
                                                 enumPlayerInfoActionClass,
                                                 entityPlayerArray.getClass()
@@ -254,10 +239,10 @@ public class NickManager extends ReflectionHelper {
             Object entityPlayerArray = Array.newInstance(entityPlayer.getClass(), 1);
             Array.set(entityPlayerArray, 0, entityPlayer);
 
-            Object worldClient = entityPlayer.getClass().getMethod(Bukkit.getVersion().contains("1.19.2") ? "cC" : (is1_19 ? "cD" : (is1_18 ? "cA" : "getWorld"))).invoke(entityPlayer),
+            Object worldClient = entityPlayer.getClass().getMethod(Bukkit.getVersion().contains("1.19.3") ? "cH" : (Bukkit.getVersion().contains("1.19.2") ? "cC" : (is1_19 ? "cD" : (is1_18 ? "cA" : "getWorld")))).invoke(entityPlayer),
                     worldData = worldClient.getClass().getMethod(
                             (is1_18 || is1_19)
-                                    ? "n_"
+                                    ? (Bukkit.getVersion().contains("1.19.3") ? "o_" : "n_")
                                     : "getWorldData"
                     ).invoke(worldClient),
                     interactManager = entityPlayer.getClass()
@@ -303,25 +288,28 @@ public class NickManager extends ReflectionHelper {
                             packetPlayOutPlayerInfoRemove = playOutPlayerInfo
                                     .getMethod("removePlayer", getNMSClass("EntityPlayer"))
                                     .invoke(playOutPlayerInfo, entityPlayer);
+                        } else if(Bukkit.getVersion().contains("1.19.3")) {
+                            packetPlayOutPlayerInfoRemove = getNMSClass("network.protocol.game.ClientboundPlayerInfoRemovePacket")
+                                    .getConstructor(List.class)
+                                    .newInstance(Collections.singletonList(player.getUniqueId()));
                         } else {
                             Optional<Class<?>> enumPlayerInfoActionClass = (version.equals("1_8_R1")
                                     ? Optional.of(getNMSClass("EnumPlayerInfoAction"))
                                     : getSubClass(
-                                    getNMSClass(
-                                            (is1_17 || is1_18 || is1_19)
-                                                    ? "network.protocol.game.PacketPlayOutPlayerInfo"
-                                                    : "PacketPlayOutPlayerInfo"
-                                    ),
-                                    "EnumPlayerInfoAction"
-                            )
+                                            getNMSClass(
+                                                    (is1_17 || is1_18 || is1_19)
+                                                            ? "network.protocol.game.PacketPlayOutPlayerInfo"
+                                                            : "PacketPlayOutPlayerInfo"
+                                            ),
+                                            "EnumPlayerInfoAction"
+                                    )
                             );
 
                             if(enumPlayerInfoActionClass.isPresent())
                                 //noinspection JavaReflectionInvocation
-                                packetPlayOutPlayerInfoRemove = getNMSClass(
-                                        (is1_17 || is1_18 || is1_19)
-                                                ? "network.protocol.game.PacketPlayOutPlayerInfo"
-                                                : "PacketPlayOutPlayerInfo"
+                                packetPlayOutPlayerInfoRemove = getNMSClass((is1_17 || is1_18 || is1_19)
+                                        ? "network.protocol.game.PacketPlayOutPlayerInfo"
+                                        : "PacketPlayOutPlayerInfo"
                                 ).getConstructor(
                                         enumPlayerInfoActionClass.get(),
                                         entityPlayerArray.getClass()
@@ -360,6 +348,20 @@ public class NickManager extends ReflectionHelper {
                                 try {
                                     // Add player to tablist
                                     Object packetPlayOutPlayerInfoAdd = null;
+                                    Optional<Class<?>> enumPlayerInfoActionClass =
+                                            (version.equals("1_8_R1")
+                                                    ? Optional.of(getNMSClass("EnumPlayerInfoAction"))
+                                                    : Bukkit.getVersion().contains("1.19.3")
+                                                            ? getSubClass(getNMSClass("network.protocol.game.ClientboundPlayerInfoUpdatePacket"), "a")
+                                                            : getSubClass(
+                                                            getNMSClass(
+                                                                    (is1_17 || is1_18 || is1_19)
+                                                                            ? "network.protocol.game.PacketPlayOutPlayerInfo"
+                                                                            : "PacketPlayOutPlayerInfo"
+                                                            ),
+                                                            "EnumPlayerInfoAction"
+                                                    )
+                                            );
 
                                     if(version.equals("1_7_R4")) {
                                         Class<?> playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo");
@@ -367,58 +369,69 @@ public class NickManager extends ReflectionHelper {
                                         packetPlayOutPlayerInfoAdd = playOutPlayerInfo
                                                 .getMethod("addPlayer", getNMSClass("EntityPlayer"))
                                                 .invoke(playOutPlayerInfo, entityPlayer);
-                                    } else {
-                                        Optional<Class<?>> enumPlayerInfoActionClass =
-                                                (version.equals("1_8_R1")
-                                                        ? Optional.of(getNMSClass("EnumPlayerInfoAction"))
-                                                        : getSubClass(
-                                                        getNMSClass(
-                                                                (is1_17 || is1_18 || is1_19)
-                                                                        ? "network.protocol.game.PacketPlayOutPlayerInfo"
-                                                                        : "PacketPlayOutPlayerInfo"
-                                                        ),
-                                                        "EnumPlayerInfoAction"
-                                                )
-                                                );
+                                    } else if(enumPlayerInfoActionClass.isPresent()) {
+                                        Object enumPlayerInfoAction = enumPlayerInfoActionClass
+                                                .get()
+                                                .getDeclaredField(
+                                                        (is1_17 || is1_18 || is1_19)
+                                                                ? "a"
+                                                                : "ADD_PLAYER"
+                                                ).get(enumPlayerInfoActionClass);
 
-                                        if(enumPlayerInfoActionClass.isPresent())
-                                            packetPlayOutPlayerInfoAdd = getNMSClass(
-                                                    (is1_17 || is1_18 || is1_19)
-                                                            ? "network.protocol.game.PacketPlayOutPlayerInfo"
-                                                            : "PacketPlayOutPlayerInfo"
-                                            ).getConstructor(
-                                                    enumPlayerInfoActionClass.get(),
-                                                    entityPlayerArray.getClass()
-                                            ).newInstance(
-                                                    enumPlayerInfoActionClass.get().getDeclaredField(
-                                                            (is1_17 || is1_18 || is1_19)
-                                                                    ? "a"
-                                                                    : "ADD_PLAYER"
-                                                    ).get(enumPlayerInfoActionClass),
-                                                    entityPlayerArray
-                                            );
+                                        packetPlayOutPlayerInfoAdd = getNMSClass(
+                                                Bukkit.getVersion().contains("1.19.3")
+                                                        ? "network.protocol.game.ClientboundPlayerInfoUpdatePacket"
+                                                        : ((is1_17 || is1_18 || is1_19)
+                                                                ? "network.protocol.game.PacketPlayOutPlayerInfo"
+                                                                : "PacketPlayOutPlayerInfo")
+                                        ).getConstructor(
+                                                enumPlayerInfoActionClass.get(),
+                                                Bukkit.getVersion().contains("1.19.3") ? entityPlayer.getClass() : entityPlayerArray.getClass()
+                                        ).newInstance(
+                                                enumPlayerInfoAction,
+                                                Bukkit.getVersion().contains("1.19.3") ? entityPlayer : entityPlayerArray
+                                        );
                                     }
 
-                                    if(packetPlayOutPlayerInfoAdd != null)
+                                    if(packetPlayOutPlayerInfoAdd != null) {
                                         sendPacket(player, currentPlayer, packetPlayOutPlayerInfoAdd);
+
+                                        if(Bukkit.getVersion().contains("1.19.3") && enumPlayerInfoActionClass.isPresent()) {
+                                            sendPacket(
+                                                    player,
+                                                    currentPlayer,
+                                                    getNMSClass("network.protocol.game.ClientboundPlayerInfoUpdatePacket")
+                                                            .getConstructor(
+                                                                    enumPlayerInfoActionClass.get(),
+                                                                    entityPlayer.getClass()
+                                                            ).newInstance(
+                                                                    enumPlayerInfoActionClass
+                                                                            .get()
+                                                                            .getDeclaredField("d")
+                                                                            .get(enumPlayerInfoActionClass),
+                                                                    entityPlayer
+                                                            )
+                                            );
+                                        }
+                                    }
                                 } catch(Exception ex) {
                                     ex.printStackTrace();
                                 }
                             });
-                        }
 
-                        // Spawn player
-                        sendPacketExceptSelf(
-                                player,
-                                getNMSClass(
-                                        (is1_17 || is1_18 || is1_19)
-                                                ? "network.protocol.game.PacketPlayOutNamedEntitySpawn"
-                                                : "PacketPlayOutNamedEntitySpawn"
-                                ).getConstructor(getNMSClass(
-                                        (is1_17 || is1_18 || is1_19)
-                                                ? "world.entity.player.EntityHuman"
-                                                : "EntityHuman"
-                                )).newInstance(entityPlayer), players);
+                            // Spawn player
+                            sendPacketExceptSelf(
+                                    player,
+                                    getNMSClass(
+                                            (is1_17 || is1_18 || is1_19)
+                                                    ? "network.protocol.game.PacketPlayOutNamedEntitySpawn"
+                                                    : "PacketPlayOutNamedEntitySpawn"
+                                    ).getConstructor(getNMSClass(
+                                            (is1_17 || is1_18 || is1_19)
+                                                    ? "world.entity.player.EntityHuman"
+                                                    : "EntityHuman"
+                                    )).newInstance(entityPlayer), players);
+                        }
 
                         // Fix head and body rotation (Yaw + Pitch)
                         Object packetHeadRotation;
@@ -483,7 +496,35 @@ public class NickManager extends ReflectionHelper {
                             // Self skin update
                             Object packetRespawnPlayer;
 
-                            if(is1_19) {
+                            if(Bukkit.getVersion().contains("1.19.3")) {
+                                Object worldServer = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
+                                Class<?> enumGameMode = getNMSClass("world.level.EnumGamemode");
+
+                                packetRespawnPlayer = getNMSClass("network.protocol.game.PacketPlayOutRespawn")
+                                        .getConstructor(
+                                                getNMSClass("resources.ResourceKey"),
+                                                getNMSClass("resources.ResourceKey"),
+                                                long.class,
+                                                enumGameMode,
+                                                enumGameMode,
+                                                boolean.class,
+                                                boolean.class,
+                                                byte.class,
+                                                Optional.class
+                                        ).newInstance(
+                                                worldServer.getClass().getMethod("aa").invoke(worldServer),
+                                                worldServer.getClass().getMethod("ac").invoke(worldServer),
+                                                getNMSClass("world.level.biome.BiomeManager")
+                                                        .getMethod("a", long.class)
+                                                        .invoke(null, player.getWorld().getSeed()),
+                                                interactManager.getClass().getMethod("b").invoke(interactManager),
+                                                interactManager.getClass().getMethod("c").invoke(interactManager),
+                                                worldServer.getClass().getMethod("af").invoke(worldServer),
+                                                worldServer.getClass().getMethod("A").invoke(worldServer),
+                                                (byte) 3, // keep all data
+                                                entityPlayer.getClass().getMethod("gd").invoke(entityPlayer)
+                                        );
+                            } else if(is1_19) {
                                 Object worldServer = player.getWorld().getClass().getMethod("getHandle").invoke(player.getWorld());
                                 Class<?> enumGameMode = getNMSClass("world.level.EnumGamemode");
 
@@ -656,7 +697,6 @@ public class NickManager extends ReflectionHelper {
                                             .getMethod("getWorldType")
                                             .invoke(player.getWorld());
 
-                                    //noinspection UnstableApiUsage
                                     packetRespawnPlayer = getNMSClass("PacketPlayOutRespawn")
                                             .getConstructor(
                                                     dimensionManager,
