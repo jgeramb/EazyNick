@@ -150,19 +150,21 @@ public class PlayerJoinListener implements Listener {
             @SuppressWarnings("ConstantConditions")
             @Override
             public void run() {
-                try {
-                    ArrayList<UUID> playersToRemove = new ArrayList<>(utils.getNickedPlayers().keySet());
-                    playersToRemove.add(0, UUID.fromString("00000000-0000-0000-0000-000000000000"));
+                if(Bukkit.getVersion().contains("1.19.3")) {
+                    try {
+                        ArrayList<UUID> playersToRemove = new ArrayList<>(utils.getNickedPlayers().keySet());
+                        playersToRemove.add(0, UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-                    ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
-                    reflectionHelper.sendPacketNMS(
-                            player,
-                            reflectionHelper.getNMSClass("network.protocol.game.ClientboundPlayerInfoRemovePacket")
-                                    .getConstructor(List.class)
-                                    .newInstance(playersToRemove)
-                    );
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                        ReflectionHelper reflectionHelper = eazyNick.getReflectionHelper();
+                        reflectionHelper.sendPacketNMS(
+                                player,
+                                reflectionHelper.getNMSClass("network.protocol.game.ClientboundPlayerInfoRemovePacket")
+                                        .getConstructor(List.class)
+                                        .newInstance(playersToRemove)
+                        );
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
 
                 if(!(isAPIMode)) {
