@@ -211,7 +211,8 @@ public class OutgoingPacketInjector {
                                             for (Object playerInfoData : (List<Object>) b) {
                                                 Object gameProfile = reflectionHelper.getField(playerInfoData.getClass(), "b").get(playerInfoData);
                                                 UUID uuid = (UUID) gameProfile.getClass().getMethod("getId").invoke(gameProfile);
-                                                Object entityPlayer = player.getClass().getMethod("getHandle").invoke(Bukkit.getPlayer(uuid));
+                                                Player infoPlayer = Bukkit.getPlayer(uuid);
+
                                                 EnumSet<? extends Enum> actions = ((EnumSet<? extends Enum>) reflectionHelper.getField(
                                                         msg.getClass(),
                                                         "a"
@@ -220,7 +221,8 @@ public class OutgoingPacketInjector {
                                                 if(utils.getSoonNickedPlayers().contains(uuid) && actions.stream().anyMatch(action -> action.name().equals("ADD_PLAYER")))
                                                     return;
 
-                                                if(utils.getNickedPlayers().containsKey(uuid) && !(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+                                                if((infoPlayer != null) && utils.getNickedPlayers().containsKey(uuid) && !(player.hasPermission("eazynick.bypass") && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+                                                    Object entityPlayer = player.getClass().getMethod("getHandle").invoke(infoPlayer);
                                                     Object playerInteractManager = reflectionHelper.getField(entityPlayer.getClass(), "d").get(entityPlayer);
                                                     NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uuid);
 
