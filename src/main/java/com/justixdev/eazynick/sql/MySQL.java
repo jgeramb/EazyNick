@@ -79,7 +79,7 @@ public class MySQL {
 
             LOGGER.info(PREFIX + "Connection to database closed successfully!");
         } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, PREFIX + "Could not close Connection to database!");
+            LOGGER.log(Level.WARNING, PREFIX + "Could not close connection to database!");
         }
     }
 

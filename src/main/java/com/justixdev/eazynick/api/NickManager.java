@@ -1419,11 +1419,14 @@ public class NickManager extends ReflectionHelper {
                                     ? player.getDisplayName().replace(nickName, player.getName())
                                     : oldDisplayName
                     );
-                    setPlayerListName(
-                            replaceInPlayerListName
-                                    ? player.getPlayerListName().replace(nickName, player.getName())
-                                    : oldDisplayName
-                    );
+
+                    if(!(utils.isPluginInstalled("LuckTab"))) {
+                        setPlayerListName(
+                                replaceInPlayerListName
+                                        ? player.getPlayerListName().replace(nickName, player.getName())
+                                        : oldDisplayName
+                        );
+                    }
                 }
 
                 if(utils.getOldExperienceLevels().containsKey(player.getUniqueId())) {
@@ -1682,7 +1685,7 @@ public class NickManager extends ReflectionHelper {
                         if(!(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.PlayerListName"))) return;
 
                         // Update tablist name
-                        if(!(tabGroupPrefixSuffixChange)) {
+                        if(!(tabGroupPrefixSuffixChange || utils.isPluginInstalled("LuckTab"))) {
                             String tmpTabPrefix = finalTabPrefix,
                                     tmpTabSuffix = finalTabSuffix;
 
