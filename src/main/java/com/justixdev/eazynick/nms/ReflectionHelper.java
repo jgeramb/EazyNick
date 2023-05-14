@@ -9,9 +9,11 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+@SuppressWarnings("unused")
 public class ReflectionHelper {
 
     public static final String NMS_VERSION = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    public static final boolean VERSION_13_OR_LATER = Integer.parseInt(NMS_VERSION.split("_")[1]) > 12;
     private static final Map<String, Class<?>> CLASS_CACHE = new HashMap<>();
 
     public static Object toArray(Object... objects) {

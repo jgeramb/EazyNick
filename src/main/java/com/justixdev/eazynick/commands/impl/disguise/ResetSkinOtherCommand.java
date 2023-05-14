@@ -10,7 +10,6 @@ import com.justixdev.eazynick.commands.parameters.ParameterCombination;
 import com.justixdev.eazynick.commands.parameters.ParameterType;
 import com.justixdev.eazynick.utilities.Utils;
 import com.justixdev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
-import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

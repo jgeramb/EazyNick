@@ -248,7 +248,7 @@ public class EazyNick extends JavaPlugin {
                             : "no"
             ));
 
-            this.printLogo();
+            this.printBanner();
         };
 
         // Fix essentials '/nick' command bug
@@ -278,10 +278,10 @@ public class EazyNick extends JavaPlugin {
         if (this.setupYamlFile.getConfiguration().getBoolean("BungeeCord"))
             this.mysql.disconnect();
 
-        this.printLogo();
+        this.printBanner();
     }
 
-    private void printLogo() {
+    private void printBanner() {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
         console.sendMessage("");
 

@@ -14,6 +14,7 @@ import com.justixdev.eazynick.utilities.configuration.yaml.LanguageYamlFile;
 import com.justixdev.eazynick.utilities.configuration.yaml.SavedNickDataYamlFile;
 import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,8 +22,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static com.justixdev.eazynick.nms.ReflectionHelper.*;
@@ -63,15 +62,17 @@ public class PlayerJoinListener implements Listener {
 
                 if(setupYamlFile.getConfiguration().getBoolean("BungeeCord")
                         && (!setupYamlFile.getConfiguration().getBoolean("LobbyMode")
-                        || (player.hasPermission("eazynick.bypasslobbymode")
-                                && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) && mysqlNickManager.isNicked(uniqueId))
+                                || (player.hasPermission("eazynick.bypasslobbymode")
+                                        && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission")))
+                        && mysqlNickManager.isNicked(uniqueId))
                     message = message
                             .replace("%name%", mysqlNickManager.getNickName(uniqueId))
                             .replace(
                                     "%displayName%",
                                     mysqlPlayerDataManager.getChatPrefix(uniqueId)
                                             + mysqlNickManager.getNickName(uniqueId)
-                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId));
+                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId)
+                            );
                 else if(utils.getLastNickData().containsKey(uniqueId)) {
                     NickedPlayerData nickedPlayerData = utils.getLastNickData().get(uniqueId);
 
@@ -90,7 +91,8 @@ public class PlayerJoinListener implements Listener {
                                     "%displayName%",
                                     savedNickDataYamlFile.getConfigString(uniqueIdString + ".chat_prefix")
                                             + savedNickDataYamlFile.getConfigString(player, uniqueIdString + ".nick_name")
-                                            + savedNickDataYamlFile.getConfigString(player, uniqueIdString + ".chat_suffix"));
+                                            + savedNickDataYamlFile.getConfigString(player, uniqueIdString + ".chat_suffix")
+                            );
 
                 event.setJoinMessage(message);
             } else if (!((event.getJoinMessage() == null) || event.getJoinMessage().isEmpty())) {
@@ -108,9 +110,8 @@ public class PlayerJoinListener implements Listener {
                     if (event.getJoinMessage().contains("formerly known as"))
                         event.setJoinMessage("§e" + player.getName() + " joined the game");
 
-                    event.setJoinMessage(
-                            event.getJoinMessage()
-                                    .replace(player.getName(), utils.getLastNickData().get(uniqueId).getNickName()));
+                    event.setJoinMessage(event.getJoinMessage()
+                            .replace(player.getName(), utils.getLastNickData().get(uniqueId).getNickName()));
                 } else if (setupYamlFile.getConfiguration().getBoolean("SaveLocalNickData")
                         && savedNickDataYamlFile.getConfiguration().contains(uniqueIdString)) {
                     if (event.getJoinMessage().contains("formerly known as"))
@@ -127,18 +128,59 @@ public class PlayerJoinListener implements Listener {
             @SuppressWarnings("ConstantConditions")
             @Override
             public void run() {
-                if(NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")) {
+                if(NMS_VERSION.equals("v1_19_R3")
+                        && !(player.hasPermission("eazynick.bypass")
+                                && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
                     try {
-                        ArrayList<UUID> playersToRemove = new ArrayList<>(utils.getNickedPlayers().keySet());
-                        // bypass unique id
-                        playersToRemove.add(0, UUID.fromString("00000000-0000-0000-0000-000000000000"));
+                        for(UUID uuid : utils.getNickedPlayers().keySet()) {
+                            Player nickedPlayer = Bukkit.getPlayer(uuid);
 
-                        sendPacketNMS(
-                                player,
-                                newInstance(
-                                        getNMSClass("network.protocol.game.ClientboundPlayerInfoRemovePacket"),
-                                        types(List.class),
-                                        playersToRemove));
+                            if(nickedPlayer == null)
+                                continue;
+
+                            Object entityPlayer = invoke(nickedPlayer, "getHandle");
+                            Location playerLocation = nickedPlayer.getLocation();
+
+                            sendPacketNMS(
+                                    player,
+                                    newInstance(
+                                            getNMSClass("network.protocol.game.PacketPlayOutNamedEntitySpawn"),
+                                            types(getNMSClass("world.entity.player.EntityHuman")),
+                                            entityPlayer
+                                    )
+                            );
+                            sendPacketNMS(
+                                    player,
+                                    newInstance(
+                                            getSubClass(
+                                                    getNMSClass("network.protocol.game.PacketPlayOutEntity"),
+                                                    "PacketPlayOutEntityLook"
+                                            ),
+                                            types(
+                                                    int.class,
+                                                    byte.class,
+                                                    byte.class,
+                                                    boolean.class
+                                            ),
+                                            nickedPlayer.getEntityId(),
+                                            (byte) ((int) (playerLocation.getYaw() * 256.0F / 360.0F)),
+                                            (byte) ((int) (playerLocation.getPitch() * 256.0F / 360.0F)),
+                                            true
+                                    )
+                            );
+                            sendPacketNMS(
+                                    player,
+                                    newInstance(
+                                            getNMSClass("network.protocol.game.PacketPlayOutEntityHeadRotation"),
+                                            types(
+                                                    getNMSClass("world.entity.Entity"),
+                                                    byte.class
+                                            ),
+                                            entityPlayer,
+                                            (byte) ((int) (playerLocation.getYaw() * 256.0F / 360.0F))
+                                    )
+                            );
+                        }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -175,25 +217,25 @@ public class PlayerJoinListener implements Listener {
                                     if (!mysqlNickManager.isNicked(uniqueId))
                                         player.getInventory().setItem(
                                                 setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1,
-                                                new ItemBuilder(
-                                                        Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")),
+                                                new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Disabled")),
                                                         setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Disabled"),
                                                         setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Disabled"))
                                                         .setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled"))
                                                         .setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n"))
                                                         .setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled"))
-                                                        .build());
+                                                        .build()
+                                        );
                                     else
                                         player.getInventory().setItem(
                                                 setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1,
-                                                new ItemBuilder(
-                                                        Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")),
+                                                new ItemBuilder(Material.getMaterial(setupYamlFile.getConfiguration().getString("NickItem.ItemType.Enabled")),
                                                         setupYamlFile.getConfiguration().getInt("NickItem.ItemAmount.Enabled"),
                                                         setupYamlFile.getConfiguration().getInt("NickItem.MetaData.Enabled"))
                                                         .setDisplayName(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled"))
                                                         .setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Enabled").split("&n"))
                                                         .setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Enabled"))
-                                                        .build());
+                                                        .build()
+                                        );
                                 }
                             }
                         } else {
@@ -208,7 +250,8 @@ public class PlayerJoinListener implements Listener {
                                                         .setDisplayName(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled"))
                                                         .setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n"))
                                                         .setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled"))
-                                                        .build());
+                                                        .build()
+                                        );
                                     else
                                         player.getInventory().setItem(
                                                 setupYamlFile.getConfiguration().getInt("NickItem.Slot") - 1,
@@ -218,7 +261,8 @@ public class PlayerJoinListener implements Listener {
                                                         .setDisplayName(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Disabled"))
                                                         .setLore(languageYamlFile.getConfigString(player, "NickItem.ItemLore.Disabled").split("&n"))
                                                         .setEnchanted(setupYamlFile.getConfiguration().getBoolean("NickItem.Enchanted.Disabled"))
-                                                        .build());
+                                                        .build()
+                                        );
                                 }
                             }
 
@@ -240,7 +284,8 @@ public class PlayerJoinListener implements Listener {
                                             false,
                                             true,
                                             nickedPlayerData.getSortID(),
-                                            nickedPlayerData.getGroupName()));
+                                            nickedPlayerData.getGroupName()
+                                    ));
                                 } else if(setupYamlFile.getConfiguration().getBoolean("SaveLocalNickData")
                                         && savedNickDataYamlFile.getConfiguration().contains(uniqueIdString))
                                     Bukkit.getPluginManager().callEvent(new PlayerNickEvent(
@@ -257,7 +302,8 @@ public class PlayerJoinListener implements Listener {
                                             false,
                                             true,
                                             savedNickDataYamlFile.getConfiguration().getInt(uniqueIdString + ".sort_id"),
-                                            savedNickDataYamlFile.getConfigString(uniqueIdString + ".group_name")));
+                                            savedNickDataYamlFile.getConfigString(uniqueIdString + ".group_name")
+                                    ));
                             }
                         }
 
@@ -268,7 +314,7 @@ public class PlayerJoinListener implements Listener {
                     });
                 }
             }
-        }, 50L * 7).run();
+        }, 350L).run();
     }
 
 }

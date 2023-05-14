@@ -161,11 +161,6 @@ public class Utils {
             Bukkit.getConsoleSender().sendMessage(this.prefix + msg);
     }
 
-    // Check if version is newer than 1.12.2
-    public boolean isVersion13OrLater() {
-        return (Integer.parseInt(NMS_VERSION.split("_")[1]) > 12);
-    }
-
     // Returns the online player count
     public int getOnlinePlayerCount() {
         return Bukkit.getOnlinePlayers().size();

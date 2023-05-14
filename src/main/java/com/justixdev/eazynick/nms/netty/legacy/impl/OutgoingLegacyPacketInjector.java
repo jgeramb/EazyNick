@@ -9,8 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import static com.justixdev.eazynick.nms.ReflectionHelper.*;
 import static com.justixdev.eazynick.nms.netty.NMSPacketHelper.replaceTabCompletions;
@@ -25,125 +27,103 @@ public class OutgoingLegacyPacketInjector extends LegacyPlayerPacketInjector {
     @Override
     public Object onPacketSend(Object packet) {
         try {
-            if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
-                UUID uuid = ((GameProfile) Objects.requireNonNull(getField(packet.getClass(), "b")).get(packet)).getId();
+            switch (packet.getClass().getSimpleName()) {
+                case "PacketPlayOutNamedEntitySpawn":
+                    UUID uniqueIdToSpawn = ((GameProfile) Objects.requireNonNull(getField(packet.getClass(), "b")).get(packet)).getId();
 
-                if(!this.utils.getSoonNickedPlayers().contains(uuid)) {
-                    if(this.utils.getNickedPlayers().containsKey(uuid)) {
-                        // Replace game profile with fake game profile (nicked player profile)
-                        setField(
-                                packet,
-                                "b",
-                                this.utils.getNickedPlayers().get(uuid).getFakeGameProfile(false)
-                        );
+                    if(!this.utils.getSoonNickedPlayers().contains(uniqueIdToSpawn)) {
+                        if(this.utils.getNickedPlayers().containsKey(uniqueIdToSpawn)) {
+                            // Replace game profile with fake game profile (nicked player profile)
+                            setField(
+                                    packet,
+                                    "b",
+                                    this.utils.getNickedPlayers().get(uniqueIdToSpawn).getFakeGameProfile(false)
+                            );
+                        }
                     }
-                }
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
-                Object playerObject = Objects.requireNonNull(getField(packet.getClass(), "player")).get(packet);
+                    break;
+                case "PacketPlayOutPlayerInfo":
+                    Object playerObject = Objects.requireNonNull(getField(packet.getClass(), "player")).get(packet);
 
-                if(playerObject != null) {
-                    UUID uuid = ((GameProfile) playerObject).getId();
+                    if(playerObject != null) {
+                        UUID uniqueIdToUpdate = ((GameProfile) playerObject).getId();
 
-                    if(this.utils.getSoonNickedPlayers().contains(uuid)
-                            && this.setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")
-                            && ((int) getFieldValue(packet, "action") == 0))
-                        return null;
+                        if(this.utils.getSoonNickedPlayers().contains(uniqueIdToUpdate)
+                                && this.setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")
+                                && ((int) getFieldValue(packet, "action") == 0))
+                            return null;
 
-                    if(this.utils.getNickedPlayers().containsKey(uuid)) {
-                        // Replace game profile with fake game profile (nicked player profile)
-                        NickedPlayerData nickedPlayerData = this.utils.getNickedPlayers().get(uuid);
+                        if(this.utils.getNickedPlayers().containsKey(uniqueIdToUpdate)) {
+                            // Replace game profile with fake game profile (nicked player profile)
+                            NickedPlayerData nickedPlayerData = this.utils.getNickedPlayers().get(uniqueIdToUpdate);
 
-                        setField(
-                                packet,
-                                "player",
-                                nickedPlayerData.getFakeGameProfile(false)
-                        );
-                        setField(
-                                packet,
-                                "username",
-                                nickedPlayerData.getNickName()
-                        );
+                            setField(
+                                    packet,
+                                    "player",
+                                    nickedPlayerData.getFakeGameProfile(false)
+                            );
+                            setField(
+                                    packet,
+                                    "username",
+                                    nickedPlayerData.getNickName()
+                            );
+                        }
                     }
-                }
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
-                setField(
-                        packet,
-                        "a",
-                        replaceTabCompletions(this.player, (String[]) getFieldValue(packet, "a"))
-                );
-            } else if (packet.getClass().getSimpleName().equals("PacketPlayOutChat")
-                    && this.setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
-                // Get chat message from packet and replace names
-                Object editedComponent = this.replaceNames(getFieldValue(packet, "a"));
-
-                // Overwrite chat message
-                if(editedComponent != null)
-                    setField(packet, "a", editedComponent);
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutScoreboardObjective")) {
-                String name = (String) getFieldValue(packet, "b");
-
-                if(name != null) {
-                    setField(
-                            packet,
-                            "b",
-                            this.utils.getNickedPlayers()
-                                    .values()
-                                    .stream()
-                                    .filter(nickedPlayerData -> name.contains(nickedPlayerData.getRealName()))
-                                    .findFirst()
-                                    .map(nickedPlayerData -> name.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName()))
-                                    .orElse(name)
-                    );
-                }
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutScoreboardScore")) {
-                // Replace name
-                String name = (String) getFieldValue(packet, "a");
-
-                if(name != null) {
+                    break;
+                case "PacketPlayOutTabComplete":
                     setField(
                             packet,
                             "a",
-                            this.utils.getNickedPlayers()
-                                    .values()
-                                    .stream()
-                                    .filter(nickedPlayerData -> name.contains(nickedPlayerData.getRealName()))
-                                    .findFirst()
-                                    .map(nickedPlayerData -> name.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName()))
-                                    .orElse(name)
+                            replaceTabCompletions(this.player, (String[]) getFieldValue(packet, "a"))
                     );
-                }
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
-                if(!(this.player.hasPermission("eazynick.bypass") && this.setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
-                        && !(this.utils.isPluginInstalled("TAB", "NEZNAMY")
-                        && this.setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB"))
-                        && this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
-                    Object contentsList = getFieldValue(packet, "e");
+                    break;
+                case "PacketPlayOutChat":
+                    if(this.setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
+                        // Get chat message from packet and replace names
+                        Object editedComponent = this.replaceNames(getFieldValue(packet, "a"));
 
-                    if(contentsList != null) {
-                        List<String> contents = new ArrayList<>((List<String>) contentsList);
+                        // Overwrite chat message
+                        if (editedComponent != null)
+                            setField(packet, "a", editedComponent);
+                    }
+                    break;
+                case "PacketPlayOutScoreboardObjective":
+                    String objectivePlayerName = (String) getFieldValue(packet, "b");
 
+                    if(objectivePlayerName != null) {
                         setField(
                                 packet,
-                                "e",
-                                contents
+                                "b",
+                                this.utils.getNickedPlayers()
+                                        .values()
                                         .stream()
-                                        .map(name ->
-                                                this.utils.getNickedPlayers()
-                                                        .values()
-                                                        .stream()
-                                                        .filter(nickedPlayerData -> name.contains(nickedPlayerData.getRealName()))
-                                                        .findFirst()
-                                                        .map(nickedPlayerData -> {
-                                                            if(contents.stream().noneMatch(name2 -> name2.contains(nickedPlayerData.getNickName())))
-                                                                return name.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName());
-
-                                                            return null;
-                                                        }).orElse(null))
-                                        .filter(Objects::nonNull)
-                                        .collect(Collectors.toList())
+                                        .filter(nickedPlayerData -> objectivePlayerName.contains(nickedPlayerData.getRealName()))
+                                        .findFirst()
+                                        .map(nickedPlayerData -> objectivePlayerName.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName()))
+                                        .orElse(objectivePlayerName)
                         );
                     }
-                }
+                    break;
+                case "PacketPlayOutScoreboardScore":
+                    // Replace name
+                    String playerName = (String) getFieldValue(packet, "a");
+
+                    if(playerName != null) {
+                        setField(
+                                packet,
+                                "a",
+                                this.utils.getNickedPlayers()
+                                        .values()
+                                        .stream()
+                                        .filter(nickedPlayerData -> playerName.contains(nickedPlayerData.getRealName()))
+                                        .findFirst()
+                                        .map(nickedPlayerData -> playerName.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName()))
+                                        .orElse(playerName)
+                        );
+                    }
+                    break;
+                default:
+                    break;
             }
         } catch (Exception ex) {
             ex.printStackTrace();

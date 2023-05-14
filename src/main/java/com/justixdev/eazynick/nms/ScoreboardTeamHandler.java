@@ -56,40 +56,44 @@ public class ScoreboardTeamHandler {
             this.packet = this.newPacket();
 
             // Set packet fields
-            if(this.eazyNick.getUtils().isVersion13OrLater()) {
-                try {
-                    setField(this.packet, "a", this.teamName);
-                    setField(this.packet, "b", this.getAsIChatBaseComponent(this.teamName));
-                    setField(this.packet, "e", "ALWAYS");
-                    setField(this.packet, "i", 1);
-                } catch (Exception ex) {
-                    if(is1_17 || is1_18 || is1_19) {
-                        setField(this.packet, "h", 1);
-                        setField(this.packet, "i", this.teamName);
+            if(VERSION_13_OR_LATER) {
+                if(is1_17 || is1_18 || is1_19) {
+                    setField(this.packet, "h", 1);
+                    setField(this.packet, "i", this.teamName);
 
-                        Object scoreboardTeam = newInstance(
-                                getNMSClass("world.scores.ScoreboardTeam"),
-                                new Class<?>[]{
-                                        getNMSClass("world.scores.Scoreboard"),
-                                        String.class
-                                },
-                                null,
-                                this.teamName
-                        );
-                        setField(
-                                scoreboardTeam,
-                                (is1_18 || is1_19)
-                                        ? "d"
-                                        : "e",
-                                this.teamName
-                        );
+                    Object scoreboardTeam = newInstance(
+                            getNMSClass("world.scores.ScoreboardTeam"),
+                            types(
+                                    getNMSClass("world.scores.Scoreboard"),
+                                    String.class
+                            ),
+                            null,
+                            this.teamName
+                    );
+                    setField(
+                            scoreboardTeam,
+                            is1_18 || is1_19
+                                    ? "d"
+                                    : "e",
+                            this.teamName
+                    );
 
-                        setField(
-                                this.packet,
-                                "k",
-                                newInstance(getSubClass(this.packet.getClass(), "b"))
-                        );
-                    } else {
+                    setField(
+                            this.packet,
+                            "k",
+                            Optional.of(newInstance(
+                                    getSubClass(this.packet.getClass(), "b"),
+                                    types(scoreboardTeam.getClass()),
+                                    scoreboardTeam
+                            ))
+                    );
+                } else {
+                    try {
+                        setField(this.packet, "a", this.teamName);
+                        setField(this.packet, "b", this.getAsIChatBaseComponent(this.teamName));
+                        setField(this.packet, "e", "ALWAYS");
+                        setField(this.packet, "i", 1);
+                    } catch (Exception ex) {
                         setField(this.packet, "a", this.teamName);
                         setField(this.packet, "b", this.getAsIChatBaseComponent(this.teamName));
                         setField(this.packet, "e", "ALWAYS");
@@ -116,6 +120,8 @@ public class ScoreboardTeamHandler {
                     .filter(this.receivedPacket::contains)
                     .forEach(currentPlayer -> sendPacketNMS(currentPlayer, this.packet));
         } catch (Exception ex) {
+            ex.printStackTrace();
+
             Bukkit.getLogger().log(
                     Level.SEVERE,
                     "Could not send packet to destroy scoreboard team of "
@@ -146,14 +152,18 @@ public class ScoreboardTeamHandler {
                 // Determine which prefix should be shown
                 String prefixForPlayer = this.prefix;
                 String suffixForPlayer = this.suffix;
-                List<String> contents = Arrays.asList(this.nickName, this.realName);
+                List<String> contents;
 
                 if(currentPlayer.hasPermission("eazynick.bypass")
-                        && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")
-                        && setupYamlFile.getConfiguration().getBoolean("BypassFormat.Show")) {
-                    prefixForPlayer = setupYamlFile.getConfigString(this.player, "BypassFormat.NameTagPrefix");
-                    suffixForPlayer = setupYamlFile.getConfigString(this.player, "BypassFormat.NameTagSuffix");
-                }
+                        && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission")) {
+                    if(setupYamlFile.getConfiguration().getBoolean("BypassFormat.Show")) {
+                        prefixForPlayer = setupYamlFile.getConfigString(this.player, "BypassFormat.NameTagPrefix");
+                        suffixForPlayer = setupYamlFile.getConfigString(this.player, "BypassFormat.NameTagSuffix");
+                    }
+
+                    contents = Collections.singletonList(this.realName);
+                } else
+                    contents = Collections.singletonList(this.nickName);
 
                 // Replace placeholders
                 if(this.eazyNick.getUtils().isPluginInstalled("PlaceholderAPI")) {
@@ -166,7 +176,7 @@ public class ScoreboardTeamHandler {
                 suffixForPlayer = suffixForPlayer.substring(0, Math.min(suffixForPlayer.length(), 16));
 
                 // Set packet fields
-                if(this.eazyNick.getUtils().isVersion13OrLater()) {
+                if(VERSION_13_OR_LATER) {
                     try {
                         this.setTeamFields_1_16(prefixForPlayer, suffixForPlayer);
                         setField(this.packet, "g", contents);
@@ -255,6 +265,7 @@ public class ScoreboardTeamHandler {
                                             getNMSClass("world.scores.Scoreboard"),
                                             String.class
                                     },
+                                    null,
                                     this.teamName
                             );
                             setField(scoreboardTeam, (is1_18 || is1_19) ? "d" : "e", this.teamName);
@@ -273,7 +284,11 @@ public class ScoreboardTeamHandler {
                             setField(
                                     this.packet,
                                     "k",
-                                    newInstance(getSubClass(this.packet.getClass(), "b"))
+                                    Optional.of(newInstance(
+                                            getSubClass(this.packet.getClass(), "b"),
+                                            types(scoreboardTeam.getClass()),
+                                            scoreboardTeam
+                                    ))
                             );
                         } else {
                             this.setTeamFields_1_16(prefixForPlayer, suffixForPlayer);
@@ -315,6 +330,8 @@ public class ScoreboardTeamHandler {
                 if(!this.receivedPacket.contains(currentPlayer))
                     this.receivedPacket.add(currentPlayer);
             } catch (Exception ex) {
+                ex.printStackTrace();
+
                 Bukkit.getLogger().log(
                         Level.SEVERE,
                         "Could not send packet to create scoreboard team of "
@@ -362,8 +379,8 @@ public class ScoreboardTeamHandler {
     }
 
     private Object getAsIChatBaseComponent(String text) {
-        boolean is1_18 = NMS_VERSION.startsWith("1_18"),
-                is1_19 = NMS_VERSION.startsWith("1_19");
+        boolean is1_18 = NMS_VERSION.startsWith("v1_18"),
+                is1_19 = NMS_VERSION.startsWith("v1_19");
 
         try {
             // Create IChatBaseComponent from String using ChatSerializer
@@ -377,9 +394,7 @@ public class ScoreboardTeamHandler {
                     is1_18 || is1_19
                             ? "b"
                             : "a",
-                    new Class<?>[] {
-                            String.class
-                    },
+                    types(String.class),
                     ComponentSerializer.toString(TextComponent.fromLegacyText(text))
             );
         } catch (Exception ignore) {

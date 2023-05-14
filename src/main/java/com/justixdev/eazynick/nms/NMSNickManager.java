@@ -11,6 +11,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -197,7 +198,7 @@ public class NMSNickManager {
                     setField(
                             entityPlayer,
                             "listName",
-                            utils.isVersion13OrLater()
+                            VERSION_13_OR_LATER
                                     ? invokeStatic(
                                             craftChatMessage,
                                             "fromStringOrNull",
@@ -226,9 +227,11 @@ public class NMSNickManager {
                                         ),
                                         getStaticFieldValue(
                                                 enumPlayerInfoActionClass,
-                                                is1_17To1_19
-                                                        ? "d"
-                                                        : "UPDATE_DISPLAY_NAME"
+                                                NMS_VERSION.equals("v1_19_R3")
+                                                        ? "f"
+                                                        : is1_17To1_19
+                                                                ? "d"
+                                                                : "UPDATE_DISPLAY_NAME"
                                         ),
                                         is1_19_R2OrLater ? entityPlayer : entityPlayerArray
                                 )
@@ -308,8 +311,8 @@ public class NMSNickManager {
                                                     : "PacketPlayOutEntityDestroy"
                                     ),
                                     types(int[].class),
-                                    new int[] { this.player.getEntityId() })
-                            );
+                                    Array.newInstance(int.class, this.player.getEntityId())
+                            ));
                         }
 
                         // Remove player from list
@@ -469,17 +472,13 @@ public class NMSNickManager {
                         Class<?> packetPlayOutEntityLook =
                                 NMS_VERSION.equals("v1_7_R4") || NMS_VERSION.equals("v1_8_R1")
                                         ? getNMSClass("PacketPlayOutEntityLook")
-                                        : Arrays.stream(
-                                                getNMSClass(
-                                                        is1_17 || is1_18 || is1_19
-                                                                ? "network.protocol.game.PacketPlayOutEntity"
-                                                                : "PacketPlayOutEntity"
-                                                )
-                                                        .getDeclaredClasses()
-                                        )
-                                                .filter(clazz -> clazz.getSimpleName().equals("PacketPlayOutEntityLook"))
-                                                .findFirst()
-                                                .orElse(null);
+                                        : getSubClass(
+                                                getNMSClass(is1_17 || is1_18 || is1_19
+                                                        ? "network.protocol.game.PacketPlayOutEntity"
+                                                        : "PacketPlayOutEntity"
+                                                ),
+                                                "PacketPlayOutEntityLook"
+                                        );
 
                         if(packetPlayOutEntityLook != null) {
                             sendPacketExceptSelf(
@@ -489,7 +488,8 @@ public class NMSNickManager {
                                                     int.class,
                                                     byte.class,
                                                     byte.class,
-                                                    boolean.class),
+                                                    boolean.class
+                                            ),
                                             player.getEntityId(),
                                             (byte) ((int) (playerLocation.getYaw() * 256.0F / 360.0F)),
                                             (byte) ((int) (playerLocation.getPitch() * 256.0F / 360.0F)),

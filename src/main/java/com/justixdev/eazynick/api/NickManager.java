@@ -35,6 +35,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class NickManager extends ReflectionHelper {
 
     private final Player player;
@@ -568,7 +569,8 @@ public class NickManager extends ReflectionHelper {
             }
 
             // Create new fake scoreboard team
-            if(!this.setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB"))
+            if(!(utils.isPluginInstalled("TAB", "NEZNAMY")
+                    && this.setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB")))
                 this.utils.getScoreboardTeamHandlers().put(
                         this.player.getUniqueId(),
                         new ScoreboardTeamHandler(

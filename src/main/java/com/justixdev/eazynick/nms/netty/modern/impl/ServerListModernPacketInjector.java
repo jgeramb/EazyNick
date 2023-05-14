@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import static com.justixdev.eazynick.nms.ReflectionHelper.*;
 
+@SuppressWarnings({"unchecked", "SwitchStatementWithTooFewBranches"})
 public class ServerListModernPacketInjector extends ModernAddressPacketInjector {
 
     public ServerListModernPacketInjector(InetAddress address) {
@@ -24,52 +25,53 @@ public class ServerListModernPacketInjector extends ModernAddressPacketInjector 
                 is1_19 = NMS_VERSION.startsWith("v1_19");
 
         try {
-            if (packet.getClass().getSimpleName().equals("PacketStatusOutServerInfo")) {
-                Object serverPing = getFieldValue(packet, NMS_VERSION.equals("v1_19_R3") ? "a" : "b");
-                Object serverPingPlayerSample = getFieldValue(
-                        serverPing,
-                        NMS_VERSION.equals("v1_19_R3")
-                                ? "c"
-                                : is1_17 || is1_18 || is1_19
-                                        ? "d"
-                                        : "b"
-                );
-
-                if(NMS_VERSION.equals("v1_19_R3")) {
-                    serverPingPlayerSample = invoke(serverPingPlayerSample, "orElse", types(Object.class), (Object) null);
-
-                    List<GameProfile> gameProfileList = (List<GameProfile>) getFieldValue(
-                            serverPingPlayerSample,
-                            "d"
+            switch (packet.getClass().getSimpleName()) {
+                case "PacketStatusOutServerInfo":
+                    Object serverPing = getFieldValue(packet, NMS_VERSION.equals("v1_19_R3") ? "a" : "b");
+                    Object serverPingPlayerSample = getFieldValue(
+                            serverPing,
+                            NMS_VERSION.equals("v1_19_R3")
+                                    ? "c"
+                                    : is1_17 || is1_18 || is1_19
+                                    ? "d"
+                                    : "b"
                     );
-                    List<GameProfile> newGameProfileList = gameProfileList
-                            .stream()
-                            .map(gameProfile -> this.utils.getNickedPlayers().containsKey(gameProfile.getId())
-                                    ? (GameProfile) this.utils.getNickedPlayers()
-                                            .get(gameProfile.getId())
-                                            .getFakeGameProfile(this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID"))
-                                    : gameProfile
-                            )
-                            .collect(Collectors.toList());
 
-                    gameProfileList.clear();
-                    gameProfileList.addAll(newGameProfileList);
-                } else {
-                    GameProfile[] gameProfileArray = (GameProfile[]) getFieldValue(serverPingPlayerSample, "c");
+                    if (NMS_VERSION.equals("v1_19_R3")) {
+                        serverPingPlayerSample = invoke(serverPingPlayerSample, "orElse", types(Object.class), (Object) null);
 
-                    for (int i = 0; i < gameProfileArray.length; i++) {
-                        UUID uuid = gameProfileArray[i].getId();
+                        List<GameProfile> gameProfileList = (List<GameProfile>) getFieldValue(serverPingPlayerSample, "d");
+                        List<GameProfile> newGameProfileList = gameProfileList
+                                .stream()
+                                .map(gameProfile -> this.utils.getNickedPlayers().containsKey(gameProfile.getId())
+                                        ? (GameProfile) this.utils.getNickedPlayers()
+                                                .get(gameProfile.getId())
+                                                .getFakeGameProfile(this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID"))
+                                        : gameProfile
+                                )
+                                .collect(Collectors.toList());
 
-                        if (this.utils.getNickedPlayers().containsKey(uuid))
-                            // Replace game profile with fake game profile (nicked player profile)
-                            gameProfileArray[i] = (GameProfile) this.utils.getNickedPlayers()
-                                    .get(uuid)
-                                    .getFakeGameProfile(this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID"));
+                        gameProfileList.clear();
+                        gameProfileList.addAll(newGameProfileList);
+                    } else {
+                        GameProfile[] gameProfileArray = (GameProfile[]) getFieldValue(serverPingPlayerSample, "c");
+
+                        for (int i = 0; i < gameProfileArray.length; i++) {
+                            UUID uuid = gameProfileArray[i].getId();
+
+                            if (this.utils.getNickedPlayers().containsKey(uuid))
+                                // Replace game profile with fake game profile (nicked player profile)
+                                gameProfileArray[i] = (GameProfile) this.utils.getNickedPlayers()
+                                        .get(uuid)
+                                        .getFakeGameProfile(this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID"));
+                        }
+
+                        // Replace game profiles in ServerPingPlayerSample
+                        setField(serverPingPlayerSample, "c", gameProfileArray);
                     }
-
-                    // Replace game profiles in ServerPingPlayerSample
-                    setField(serverPingPlayerSample, "c", gameProfileArray);
-                }
+                    break;
+                default:
+                    break;
             }
         } catch (Exception ex) {
             ex.printStackTrace();

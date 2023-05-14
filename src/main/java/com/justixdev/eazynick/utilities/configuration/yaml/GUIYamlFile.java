@@ -2,6 +2,8 @@ package com.justixdev.eazynick.utilities.configuration.yaml;
 
 import com.justixdev.eazynick.EazyNick;
 
+import static com.justixdev.eazynick.nms.ReflectionHelper.VERSION_13_OR_LATER;
+
 public class GUIYamlFile extends YamlFile {
 
     public GUIYamlFile(EazyNick eazyNick) {
@@ -13,7 +15,6 @@ public class GUIYamlFile extends YamlFile {
         super.setDefaults();
 
         String arrow = "&0➤";
-        boolean newMaterials = this.eazyNick.getUtils().isVersion13OrLater();
 
         // Default NickGUI
         this.configuration.addDefault("NickGUI.InventoryTitle", "&5Nick&8:");
@@ -81,22 +82,22 @@ public class GUIYamlFile extends YamlFile {
         // Step 1
         this.configuration.addDefault("RankedNickGUI.Step1.InventoryTitle", "&5Choose a rank&8:");
         this.configuration.addDefault("RankedNickGUI.Step1.NoRankAvailable.DisplayName", "&cYou do not have permission to nick yourself with a specific rank");
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank1.ItemType", newMaterials ? "GRAY_WOOL" : "WOOL");
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank1.MetaData", newMaterials ? 0 : 7);
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank2.ItemType", newMaterials ? "LIME_WOOL" : "WOOL");
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank2.MetaData", newMaterials ? 0 : 5);
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank3.ItemType", newMaterials ? "LIME_WOOL" : "WOOL");
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank3.MetaData", newMaterials ? 0 : 5);
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank4.ItemType", newMaterials ? "LIGHT_BLUE_WOOL" : "WOOL");
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank4.MetaData", newMaterials ? 0 : 3);
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank5.ItemType", newMaterials ? "LIGHT_BLUE_WOOL" : "WOOL");
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank5.MetaData", newMaterials ? 0 : 3);
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank6.ItemType", newMaterials ? "ORANGE_WOOL" : "WOOL");
-        this.configuration.addDefault("RankedNickGUI.Step1.Rank6.MetaData", newMaterials ? 0 : 1);
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank1.ItemType", VERSION_13_OR_LATER ? "GRAY_WOOL" : "WOOL");
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank1.MetaData", VERSION_13_OR_LATER ? 0 : 7);
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank2.ItemType", VERSION_13_OR_LATER ? "LIME_WOOL" : "WOOL");
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank2.MetaData", VERSION_13_OR_LATER ? 0 : 5);
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank3.ItemType", VERSION_13_OR_LATER ? "LIME_WOOL" : "WOOL");
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank3.MetaData", VERSION_13_OR_LATER ? 0 : 5);
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank4.ItemType", VERSION_13_OR_LATER ? "LIGHT_BLUE_WOOL" : "WOOL");
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank4.MetaData", VERSION_13_OR_LATER ? 0 : 3);
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank5.ItemType", VERSION_13_OR_LATER ? "LIGHT_BLUE_WOOL" : "WOOL");
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank5.MetaData", VERSION_13_OR_LATER ? 0 : 3);
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank6.ItemType", VERSION_13_OR_LATER ? "ORANGE_WOOL" : "WOOL");
+        this.configuration.addDefault("RankedNickGUI.Step1.Rank6.MetaData", VERSION_13_OR_LATER ? 0 : 1);
 
         for (int i = 7; i <= 18; i++) {
-            this.configuration.addDefault("RankedNickGUI.Step1.Rank" + i + ".ItemType", newMaterials ? "LIGHT_GRAY_WOOL" : "WOOL");
-            this.configuration.addDefault("RankedNickGUI.Step1.Rank" + i + ".MetaData", newMaterials ? 0 : 8);
+            this.configuration.addDefault("RankedNickGUI.Step1.Rank" + i + ".ItemType", VERSION_13_OR_LATER ? "LIGHT_GRAY_WOOL" : "WOOL");
+            this.configuration.addDefault("RankedNickGUI.Step1.Rank" + i + ".MetaData", VERSION_13_OR_LATER ? 0 : 8);
         }
 
         // Step 2

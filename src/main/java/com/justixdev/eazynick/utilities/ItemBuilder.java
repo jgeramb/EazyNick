@@ -1,6 +1,5 @@
 package com.justixdev.eazynick.utilities;
 
-import com.justixdev.eazynick.EazyNick;
 import com.justixdev.eazynick.utilities.mojang.MojangAPI;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -22,14 +21,9 @@ public class ItemBuilder {
 
     public ItemBuilder(int amount) {
         this(
-                Material.getMaterial(
-                        EazyNick.getInstance().getUtils().isVersion13OrLater()
-                                ? "PLAYER_HEAD"
-                                : "SKULL_ITEM"),
+                Material.getMaterial(VERSION_13_OR_LATER ? "PLAYER_HEAD" : "SKULL_ITEM"),
                 amount,
-                EazyNick.getInstance().getUtils().isVersion13OrLater()
-                        ? 0
-                        : 3
+                VERSION_13_OR_LATER ? 0 : 3
         );
     }
 
@@ -42,7 +36,9 @@ public class ItemBuilder {
     }
 
     public ItemBuilder(Material mat, int amount, int subID) {
-        if(!(EazyNick.getInstance().getUtils().isVersion13OrLater())) {
+        if(VERSION_13_OR_LATER)
+            this.itemStack = new ItemStack(mat, amount);
+        else {
             try {
                 this.itemStack = (ItemStack) newInstance(
                         ItemStack.class,
@@ -58,14 +54,13 @@ public class ItemBuilder {
             } catch (Exception ignore) {
                 this.itemStack = new ItemStack(mat, amount);
             }
-        } else
-            this.itemStack = new ItemStack(mat, amount);
+        }
 
         this.itemMeta = itemStack.getItemMeta();
     }
 
     public ItemBuilder setDurability(int durability) {
-        if(!(EazyNick.getInstance().getUtils().isVersion13OrLater())) {
+        if(!VERSION_13_OR_LATER) {
             try {
                 invoke(itemStack, "setDurability", types(short.class), durability);
             } catch (Exception ignore) {

@@ -22,39 +22,44 @@ public class IncomingLegacyPacketInjector extends LegacyPlayerPacketInjector {
         SignGUI signGUI = this.eazyNick.getSignGUI();
 
         try {
-            if(packet.getClass().getName().endsWith("PacketPlayInUpdateSign")) {
-                if (signGUI.getEditCompleteListeners().containsKey(this.player)) {
-                    // Process SignGUI success
-                    Object[] rawLines = (Object[]) Objects.requireNonNull(getField(packet.getClass(), "b")).get(packet);
+            switch (packet.getClass().getSimpleName()) {
+                case "PacketPlayInUpdateSign":
+                    if (signGUI.getEditCompleteListeners().containsKey(this.player)) {
+                        // Process SignGUI success
+                        Object[] rawLines = (Object[]) Objects.requireNonNull(getField(packet.getClass(), "b")).get(packet);
 
-                    Bukkit.getScheduler().runTask(this.eazyNick, () -> {
-                        try {
-                            String[] lines = new String[4];
+                        Bukkit.getScheduler().runTask(this.eazyNick, () -> {
+                            try {
+                                String[] lines = new String[4];
 
-                            if (NMS_VERSION.startsWith("1_8")) {
-                                int i = 0;
+                                if (NMS_VERSION.startsWith("1_8")) {
+                                    int i = 0;
 
-                                for (Object line : rawLines) {
-                                    lines[i] = (String) invoke(line, "getText");
+                                    for (Object line : rawLines) {
+                                        lines[i] = (String) invoke(line, "getText");
 
-                                    i++;
-                                }
-                            } else
-                                lines = (String[]) rawLines;
+                                        i++;
+                                    }
+                                } else
+                                    lines = (String[]) rawLines;
 
-                            signGUI.getEditCompleteListeners().get(this.player).onEditComplete(new EditCompleteEvent(lines));
-                            signGUI.getBlocks().get(this.player).setType(signGUI.getOldTypes().get(this.player));
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    });
-                }
-            } else if(packet.getClass().getName().endsWith("PacketPlayInTabComplete")) {
-                // Cache input text
-                this.eazyNick.getUtils().getTextsToComplete().put(
-                        this.player,
-                        (String) getFieldValue(packet, "a")
-                );
+                                signGUI.getEditCompleteListeners().get(this.player).onEditComplete(new EditCompleteEvent(lines));
+                                signGUI.getBlocks().get(this.player).setType(signGUI.getOldTypes().get(this.player));
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        });
+                    }
+                    break;
+                case "PacketPlayInTabComplete":
+                    // Cache input text
+                    this.eazyNick.getUtils().getTextsToComplete().put(
+                            this.player,
+                            (String) getFieldValue(packet, "a")
+                    );
+                    break;
+                default:
+                    break;
             }
         } catch (Exception ex) {
             ex.printStackTrace();

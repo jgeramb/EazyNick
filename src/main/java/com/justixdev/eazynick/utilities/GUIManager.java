@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
+import static com.justixdev.eazynick.nms.ReflectionHelper.VERSION_13_OR_LATER;
 
 public class GUIManager {
 
@@ -36,7 +37,8 @@ public class GUIManager {
                 45,
                 this.guiYamlFile.getConfigString(player, "NickNameGUI.InventoryTitle")
                         .replace("%currentPage%", String.valueOf(page + 1))
-                        .replace("%currentpage%", String.valueOf(page + 1)));
+                        .replace("%currentpage%", String.valueOf(page + 1))
+        );
         ArrayList<String> toShow = new ArrayList<>();
 
         player.openInventory(inventory);
@@ -58,11 +60,13 @@ public class GUIManager {
                                     this.guiYamlFile.getConfigString(player, "NickNameGUI.NickName.DisplayName")
                                             .replace("%nickName%", nickName)
                                             .replace("%nickname%", nickName)
-                            ).setSkullOwner(
-                                    (toShow.size() > 12)
-                                            ? "MHF_Question"
-                                            : nickName
-                            ).build());
+                            )
+                            .setSkullOwner(toShow.size() > 12
+                                    ? "MHF_Question"
+                                    : nickName
+                            )
+                            .build()
+            );
 
             i++;
         }
@@ -72,7 +76,8 @@ public class GUIManager {
                     36,
                     new ItemBuilder(Material.ARROW)
                             .setDisplayName(this.guiYamlFile.getConfigString(player, "NickNameGUI.Previous.DisplayName"))
-                            .build());
+                            .build()
+            );
         }
 
         if(this.utils.getNickNames().size() > ((page + 1) * 36)) {
@@ -80,7 +85,8 @@ public class GUIManager {
                     44,
                     new ItemBuilder(Material.ARROW)
                             .setDisplayName(this.guiYamlFile.getConfigString(player, "NickNameGUI.Next.DisplayName"))
-                            .build());
+                            .build()
+            );
         }
 
         this.utils.getNickNameListPages().put(player.getUniqueId(), page);
@@ -101,7 +107,8 @@ public class GUIManager {
 
                         if(!name.isEmpty() && (name.length() <= nameLengthMax) && (name.length() >= nameLengthMin))
                             this.utils.performRankedNick(player, rankName, skinType, name);
-                    });
+                    }
+            );
         } else {
             AnvilGUI gui = new AnvilGUI(player, event -> {
                 if (event.getSlot() == AnvilGUI.AnvilSlot.OUTPUT) {
@@ -119,7 +126,8 @@ public class GUIManager {
                     AnvilGUI.AnvilSlot.INPUT_LEFT,
                     new ItemBuilder(Material.PAPER)
                             .setDisplayName(this.guiYamlFile.getConfigString(player, "AnvilGUI.Title"))
-                            .build());
+                            .build()
+            );
 
             try {
                 gui.open();
@@ -135,7 +143,6 @@ public class GUIManager {
 
         this.utils.getLastGUITexts().put(player.getUniqueId(), text);
 
-        boolean newVersion = this.utils.isVersion13OrLater();
         String[] args = text.isEmpty() ? new String[0] : text.split(" ");
 
         if(args.length == 0) {
@@ -148,13 +155,12 @@ public class GUIManager {
                 inv.setItem(
                         i,
                         new ItemBuilder(
-                                Material.getMaterial(newVersion
+                                Material.getMaterial(VERSION_13_OR_LATER
                                         ? "BLACK_STAINED_GLASS_PANE"
-                                        : "STAINED_GLASS_PANE"),
+                                        : "STAINED_GLASS_PANE"
+                                ),
                                 1,
-                                newVersion
-                                        ? 0
-                                        : 15
+                                VERSION_13_OR_LATER ? 0 : 15
                         )
                                 .setDisplayName("§r")
                                 .build()
@@ -168,7 +174,9 @@ public class GUIManager {
                 if(guiYamlFile.getConfiguration().getBoolean("RankGUI.Rank" + i + ".Enabled") && (permission.equalsIgnoreCase("NONE") || player.hasPermission(permission)))
                     availableRanks.add(
                             new ItemBuilder(
-                                    Material.valueOf(guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.Rank" + i + ".ItemType")),
+                                    Material.valueOf(
+                                            guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.Rank" + i + ".ItemType")
+                                    ),
                                     1,
                                     guiYamlFile.getConfiguration().getInt("RankedNickGUI.Step1.Rank" + i + ".MetaData")
                             )
@@ -389,14 +397,12 @@ public class GUIManager {
                     inv.setItem(
                             13,
                             new ItemBuilder(
-                                    Material.valueOf(
-                                            newVersion
-                                                    ? "RED_STAINED_GLASS"
-                                                    : "GLASS"),
+                                    Material.valueOf(VERSION_13_OR_LATER
+                                            ? "RED_STAINED_GLASS"
+                                            : "GLASS"
+                                    ),
                                     1,
-                                    newVersion
-                                            ? 0
-                                            : 14
+                                    VERSION_13_OR_LATER ? 0 : 14
                             )
                                     .setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.NoRankAvailable.DisplayName"))
                                     .build()
@@ -417,15 +423,12 @@ public class GUIManager {
                     inv.setItem(
                             i,
                             new ItemBuilder(
-                                    Material.getMaterial(
-                                            newVersion
-                                                    ? "BLACK_STAINED_GLASS_PANE"
-                                                    : "STAINED_GLASS_PANE"
+                                    Material.getMaterial(VERSION_13_OR_LATER
+                                            ? "BLACK_STAINED_GLASS_PANE"
+                                            : "STAINED_GLASS_PANE"
                                     ),
                                     1,
-                                    newVersion
-                                            ? 0
-                                            : 15
+                                    VERSION_13_OR_LATER ? 0 : 15
                             )
                                     .setDisplayName("§r")
                                     .build()
@@ -472,19 +475,19 @@ public class GUIManager {
 
                 for (int i = 0; i < inv.getSize(); i++) {
                     inv.setItem(i, new ItemBuilder(
-                            Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"),
+                            Material.getMaterial(VERSION_13_OR_LATER ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"),
                             1,
-                            newVersion ? 0 : 15
+                            VERSION_13_OR_LATER ? 0 : 15
                     ).setDisplayName("§r").build());
                 }
 
                 inv.setItem(
                         12,
-                        new ItemBuilder(
-                                Material.valueOf(
-                                        (newVersion && !NMS_VERSION.startsWith("v1_13"))
-                                                ? "OAK_SIGN"
-                                                : "SIGN"))
+                        new ItemBuilder(Material.valueOf(
+                                VERSION_13_OR_LATER && !NMS_VERSION.startsWith("v1_13")
+                                        ? "OAK_SIGN"
+                                        : "SIGN"
+                        ))
                                 .setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Custom.DisplayName"))
                                 .build()
                 );
@@ -512,14 +515,13 @@ public class GUIManager {
                 inv.setItem(
                         i,
                         new ItemBuilder(
-                                Material.getMaterial(
-                                        newVersion
-                                                ? "BLACK_STAINED_GLASS_PANE"
-                                                : "STAINED_GLASS_PANE"),
+                                Material.getMaterial(VERSION_13_OR_LATER
+                                        ? "BLACK_STAINED_GLASS_PANE"
+                                        : "STAINED_GLASS_PANE"
+                                ),
                                 1,
-                                newVersion
-                                        ? 0
-                                        : 15)
+                                VERSION_13_OR_LATER ? 0 : 15
+                        )
                                 .setDisplayName("§r")
                                 .build()
                 );
@@ -528,13 +530,12 @@ public class GUIManager {
             inv.setItem(
                     11,
                     new ItemBuilder(
-                            Material.valueOf(
-                                    newVersion
-                                            ? "LIME_WOOL"
-                                            : "WOOL"
+                            Material.valueOf(VERSION_13_OR_LATER
+                                    ? "LIME_WOOL"
+                                    : "WOOL"
                             ),
                             1,
-                            newVersion ? 0 : 5
+                            VERSION_13_OR_LATER ? 0 : 5
                     )
                             .setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Use.DisplayName"))
                             .build()
@@ -547,12 +548,11 @@ public class GUIManager {
             );
             inv.setItem(
                     15,
-                    new ItemBuilder(
-                            Material.valueOf(
-                                    (newVersion && !NMS_VERSION.startsWith("v1_13"))
-                                            ? "OAK_SIGN"
-                                            : "SIGN")
-                    )
+                    new ItemBuilder(Material.valueOf(
+                            VERSION_13_OR_LATER && !NMS_VERSION.startsWith("v1_13")
+                                    ? "OAK_SIGN"
+                                    : "SIGN"
+                    ))
                             .setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Custom.DisplayName"))
                             .build()
             );

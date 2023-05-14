@@ -14,7 +14,7 @@ import java.util.UUID;
 public class PlayerLoginListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerLogin(PlayerLoginEvent event) {
+    public void onLastPlayerLogin(PlayerLoginEvent event) {
         EazyNick eazyNick = EazyNick.getInstance();
         Utils utils = eazyNick.getUtils();
         SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
@@ -31,7 +31,8 @@ public class PlayerLoginListener implements Listener {
                 || utils.getLastNickData().containsKey(uniqueId)
                 || setupYamlFile.getConfiguration().getBoolean("JoinNick")
                 || (setupYamlFile.getConfiguration().getBoolean("SaveLocalNickData")
-                        && eazyNick.getSavedNickDataYamlFile().getConfiguration().contains(player.getUniqueId().toString().replace("-", ""))))
+                        && eazyNick.getSavedNickDataYamlFile().getConfiguration()
+                                .contains(player.getUniqueId().toString().replace("-", ""))))
             utils.getSoonNickedPlayers().add(uniqueId);
     }
 

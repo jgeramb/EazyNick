@@ -3,7 +3,6 @@ package com.justixdev.eazynick.nms.guis;
 import com.justixdev.eazynick.EazyNick;
 import com.justixdev.eazynick.utilities.AsyncTask;
 import com.justixdev.eazynick.utilities.AsyncTask.AsyncRunnable;
-import com.justixdev.eazynick.utilities.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -23,7 +22,6 @@ import static com.justixdev.eazynick.nms.ReflectionHelper.*;
 public class SignGUI implements Listener {
 
     private final EazyNick eazyNick;
-    private final Utils utils;
 
     @Getter
     private final Map<Player, Block> blocks = new HashMap<>();
@@ -34,7 +32,6 @@ public class SignGUI implements Listener {
 
     public SignGUI(EazyNick eazyNick) {
         this.eazyNick = eazyNick;
-        this.utils = eazyNick.getUtils();
     }
 
     public void open(Player player,
@@ -53,7 +50,7 @@ public class SignGUI implements Listener {
         this.editCompleteListeners.put(player, editCompleteListener);
 
         block.setType(Objects.requireNonNull(Material.getMaterial(
-                utils.isVersion13OrLater() && !NMS_VERSION.startsWith("v1_13")
+                VERSION_13_OR_LATER && !NMS_VERSION.startsWith("v1_13")
                         ? "OAK_SIGN"
                         : NMS_VERSION.startsWith("v1_13")
                                 ? "SIGN"
@@ -93,7 +90,7 @@ public class SignGUI implements Listener {
                 @Override
                 public void run() {
                     try {
-                        boolean useCraftBlockEntityState = utils.isVersion13OrLater()
+                        boolean useCraftBlockEntityState = VERSION_13_OR_LATER
                                 || Bukkit.getVersion().contains("1.12.2")
                                 || Bukkit.getVersion().contains("1.12.1");
                         Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);

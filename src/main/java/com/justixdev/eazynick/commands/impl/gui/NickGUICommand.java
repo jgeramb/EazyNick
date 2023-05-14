@@ -6,13 +6,14 @@ import com.justixdev.eazynick.commands.CommandResult;
 import com.justixdev.eazynick.commands.CustomCommand;
 import com.justixdev.eazynick.commands.parameters.ParameterCombination;
 import com.justixdev.eazynick.utilities.ItemBuilder;
-import com.justixdev.eazynick.utilities.Utils;
 import com.justixdev.eazynick.utilities.configuration.yaml.GUIYamlFile;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+
+import static com.justixdev.eazynick.nms.ReflectionHelper.VERSION_13_OR_LATER;
 
 @CustomCommand(name = "nickgui", description = "Opens a GUI to change/reset your identity")
 public class NickGUICommand extends Command {
@@ -28,7 +29,6 @@ public class NickGUICommand extends Command {
 	@Override
 	public CommandResult execute(CommandSender sender, ParameterCombination args) {
 		EazyNick eazyNick = EazyNick.getInstance();
-		Utils utils = eazyNick.getUtils();
 		GUIYamlFile guiYamlFile = eazyNick.getGuiYamlFile();
 
 		Player player = (Player) sender;
@@ -46,11 +46,11 @@ public class NickGUICommand extends Command {
 			inventory.setItem(
 					i,
 					new ItemBuilder(
-							Material.getMaterial(utils.isVersion13OrLater()
+							Material.getMaterial(VERSION_13_OR_LATER
 									? "BLACK_STAINED_GLASS_PANE"
 									: "STAINED_GLASS_PANE"),
 							1,
-							utils.isVersion13OrLater() ? 0 : 15
+							VERSION_13_OR_LATER ? 0 : 15
 					)
 							.setDisplayName("§r")
 							.build()

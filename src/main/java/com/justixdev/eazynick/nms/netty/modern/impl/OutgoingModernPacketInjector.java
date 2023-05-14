@@ -30,362 +30,338 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                 is1_19 = NMS_VERSION.startsWith("v1_19");
 
         try {
-            if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
-                UUID uuid = (UUID) Objects.requireNonNull(getField(packet.getClass(), "b")).get(packet);
+            switch (packet.getClass().getSimpleName()) {
+                case "PacketPlayOutNamedEntitySpawn":
+                    UUID uniqueIdToSpawn = (UUID) getFieldValue(packet, "b");
 
-                if(!this.utils.getSoonNickedPlayers().contains(uuid)) {
-                    if(this.utils.getNickedPlayers().containsKey(uuid))
+                    if(this.utils.getSoonNickedPlayers().contains(uniqueIdToSpawn))
+                        return null;
+
+                    if(this.utils.getNickedPlayers().containsKey(uniqueIdToSpawn)) {
                         // Replace uuid with fake uuid (spoofed uuid)
                         setField(
                                 packet,
                                 "b",
                                 this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
-                                        ? this.utils.getNickedPlayers().get(uuid).getSpoofedUniqueId()
-                                        : uuid
-                        );
-                } else
-                    return null;
-            } else if(packet.getClass().getSimpleName().equals("ClientboundPlayerInfoRemovePacket")) {
-                List<UUID> playerUUIDs = (List<UUID>) Objects.requireNonNull(getField(packet.getClass(), "a")).get(packet);
-
-                if(playerUUIDs.stream().noneMatch(uuid -> this.player.getUniqueId().equals(uuid))
-                        && this.utils.getNickedPlayers()
-                                .keySet()
-                                .stream()
-                                .anyMatch(uuid -> playerUUIDs.stream().anyMatch(uuid::equals))) {
-                    if (this.player.hasPermission("eazynick.bypass")
-                            && this.setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
-                        return false;
-
-                    final UUID bypassUniqueId = UUID.fromString("00000000-0000-0000-0000-000000000000");
-
-                    if(playerUUIDs.contains(bypassUniqueId))
-                        return newInstance(packet.getClass(),
-                                types(List.class),
-                                playerUUIDs.stream().filter(uuid -> !bypassUniqueId.equals(uuid)).collect(Collectors.toList()));
-                    else {
-                        return newInstance(
-                                packet.getClass(),
-                                types(List.class),
-                                playerUUIDs
-                                        .stream()
-                                        .map(uniqueId -> {
-                                            if(this.utils.getNickedPlayers().containsKey(uniqueId))
-                                                return this.utils.getNickedPlayers().get(uniqueId).getSpoofedUniqueId();
-
-                                            return uniqueId;
-                                        })
-                                        .collect(Collectors.toList())
+                                        ? this.utils.getNickedPlayers().get(uniqueIdToSpawn).getSpoofedUniqueId()
+                                        : uniqueIdToSpawn
                         );
                     }
-                }
-            } else if(packet.getClass().getSimpleName().equals("ClientboundPlayerInfoUpdatePacket")) {
-                Object playerInfoDataList = Objects.requireNonNull(getField(packet.getClass(), "b")).get(packet);
+                    break;
+                case "ClientboundPlayerInfoRemovePacket":
+                    List<UUID> playerUniqueIds = (List<UUID>) getFieldValue(packet, "a");
 
-                if(playerInfoDataList != null) {
-                    ArrayList<Object> dataToUpdate = new ArrayList<>();
-
-                    for (Object currentPlayerInfoData : (List<Object>) playerInfoDataList) {
-                        Object gameProfile = Objects.requireNonNull(getField(currentPlayerInfoData.getClass(), "b")).get(currentPlayerInfoData);
-                        UUID uuid = (UUID) gameProfile.getClass().getMethod("getId").invoke(gameProfile);
-                        Player infoPlayer = Bukkit.getPlayer(uuid);
-
-                        EnumSet<? extends Enum<?>> actions = ((EnumSet<? extends Enum<?>>) Objects.requireNonNull(getField(
-                                packet.getClass(),
-                                "a"
-                        )).get(packet));
-
-                        if (this.utils.getSoonNickedPlayers().contains(uuid)
-                                && actions.stream().anyMatch(action -> action.name().equals("ADD_PLAYER")))
+                    if(playerUniqueIds.stream().noneMatch(currentUniqueId -> this.player.getUniqueId().equals(currentUniqueId))
+                            && this.utils.getNickedPlayers()
+                            .keySet()
+                            .stream()
+                            .anyMatch(currentUniqueId -> playerUniqueIds.stream().anyMatch(currentUniqueId::equals))) {
+                        if (this.player.hasPermission("eazynick.bypass")
+                                && this.setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
                             return null;
 
-                        if ((infoPlayer == null)
-                                || !(this.utils.getNickedPlayers().containsKey(uuid))
-                                || (this.player.hasPermission("eazynick.bypass")
-                                        && this.setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
-                            dataToUpdate.add(currentPlayerInfoData);
-                        } else {
-                            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(infoPlayer);
-                            Object playerInteractManager = Objects.requireNonNull(getField(entityPlayer.getClass(), "d")).get(entityPlayer);
-                            NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uuid);
+                        final UUID bypassUniqueId = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-                            dataToUpdate.add(
-                                    newInstance(
-                                            currentPlayerInfoData.getClass(),
-                                            types(
-                                                    UUID.class,
-                                                    gameProfile.getClass(),
-                                                    boolean.class,
-                                                    int.class,
-                                                    getNMSClass("world.level.EnumGamemode"),
-                                                    getNMSClass("network.chat.IChatBaseComponent"),
-                                                    getNMSClass("network.chat.RemoteChatSession").getDeclaredClasses()[0]),
-                                            uuid.equals(player.getUniqueId())
-                                                    ? uuid
-                                                    : nickedPlayerData.getSpoofedUniqueId(),
-                                            nickedPlayerData.getFakeGameProfile(
-                                                    !(uuid.equals(player.getUniqueId()))
-                                                            && setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")),
-                                            true,
-                                            getFieldValue(entityPlayer, "e"),
-                                            invoke(playerInteractManager, "b"),
-                                            invoke(entityPlayer, NMS_VERSION.equals("v1_19_R3") ? "J" : "K"),
-                                            actions.stream().anyMatch(action -> action.name().equals("INITIALIZE_CHAT"))
-                                                    ? null
-                                                    : invokeStatic(
-                                                            getNMSClass("SystemUtils"),
-                                                            "a",
-                                                            types(Object.class, Function.class),
-                                                            invoke(entityPlayer, NMS_VERSION.equals("v1_19_R3") ? "X" : "Y"),
-                                                            (Function<Object, Object>) (chatSession) -> {
-                                                                try {
-                                                                    return invoke(chatSession, "b");
-                                                                } catch (Exception ignore) {
-                                                                }
+                        if(playerUniqueIds.contains(bypassUniqueId))
+                            packet = newInstance(
+                                    packet.getClass(),
+                                    types(List.class),
+                                    playerUniqueIds.stream().filter(currentUniqueId -> !bypassUniqueId.equals(currentUniqueId)).collect(Collectors.toList())
+                            );
+                        else {
+                            packet = newInstance(
+                                    packet.getClass(),
+                                    types(List.class),
+                                    playerUniqueIds
+                                            .stream()
+                                            .map(uniqueId -> {
+                                                if(this.utils.getNickedPlayers().containsKey(uniqueId))
+                                                    return this.utils.getNickedPlayers().get(uniqueId).getSpoofedUniqueId();
 
-                                                                return null;
+                                                return uniqueId;
+                                            })
+                                            .collect(Collectors.toList())
+                            );
+                        }
+                    }
+                    break;
+                case "ClientboundPlayerInfoUpdatePacket":
+                    EnumSet<? extends Enum<?>> actions = ((EnumSet<? extends Enum<?>>) getFieldValue(packet, "a"));
+                    Object playerInfoDataList = getFieldValue(packet, "b");
+
+                    if(playerInfoDataList != null) {
+                        ArrayList<Object> dataToUpdate = new ArrayList<>();
+
+                        for (Object currentPlayerInfoData : (List<Object>) playerInfoDataList) {
+                            Object gameProfile = getFieldValue(currentPlayerInfoData, "b");
+                            UUID uniqueIdToUpdate = (UUID) gameProfile.getClass().getMethod("getId").invoke(gameProfile);
+                            Player infoPlayer = Bukkit.getPlayer(uniqueIdToUpdate);
+
+                            if (this.utils.getSoonNickedPlayers().contains(uniqueIdToUpdate)
+                                    && actions.stream().anyMatch(action -> action.name().equals("ADD_PLAYER")))
+                                return null;
+
+                            if ((infoPlayer == null)
+                                    || !(this.utils.getNickedPlayers().containsKey(uniqueIdToUpdate))
+                                    || (this.player.hasPermission("eazynick.bypass")
+                                    && this.setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
+                                dataToUpdate.add(currentPlayerInfoData);
+                            } else {
+                                Object entityPlayer = this.player.getClass().getMethod("getHandle").invoke(infoPlayer);
+                                Object playerInteractManager = getFieldValue(entityPlayer, "d");
+                                NickedPlayerData nickedPlayerData = this.utils.getNickedPlayers().get(uniqueIdToUpdate);
+
+                                dataToUpdate.add(
+                                        newInstance(
+                                                currentPlayerInfoData.getClass(),
+                                                types(
+                                                        UUID.class,
+                                                        gameProfile.getClass(),
+                                                        boolean.class,
+                                                        int.class,
+                                                        getNMSClass("world.level.EnumGamemode"),
+                                                        getNMSClass("network.chat.IChatBaseComponent"),
+                                                        getNMSClass("network.chat.RemoteChatSession").getDeclaredClasses()[0]
+                                                ),
+                                                uniqueIdToUpdate.equals(this.player.getUniqueId())
+                                                        ? uniqueIdToUpdate
+                                                        : nickedPlayerData.getSpoofedUniqueId(),
+                                                nickedPlayerData.getFakeGameProfile(
+                                                        !(uniqueIdToUpdate.equals(this.player.getUniqueId()))
+                                                                && this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")),
+                                                true,
+                                                getFieldValue(entityPlayer, "e"),
+                                                invoke(playerInteractManager, "b"),
+                                                invoke(entityPlayer, NMS_VERSION.equals("v1_19_R3") ? "J" : "K"),
+                                                actions.stream().anyMatch(action -> action.name().equals("INITIALIZE_CHAT"))
+                                                        ? null
+                                                        : invokeStatic(
+                                                        getNMSClass("SystemUtils"),
+                                                        "a",
+                                                        types(Object.class, Function.class),
+                                                        invoke(entityPlayer, NMS_VERSION.equals("v1_19_R3") ? "X" : "Y"),
+                                                        (Function<Object, Object>) (chatSession) -> {
+                                                            try {
+                                                                return invoke(chatSession, "b");
+                                                            } catch (Exception ignore) {
                                                             }
-                                                    )
-                                    )
-                            );
-                        }
-                    }
 
-                    setField(packet, "b", dataToUpdate);
-                }
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
-                Object b = getFieldValue(packet, "b");
-
-                if(b != null) {
-                    for (Object playerInfoData : (List<?>) b) {
-                        Object gameProfile = getFieldValue(
-                                playerInfoData,
-                                is1_17 || is1_18 || is1_19
-                                        ? "c"
-                                        : "d"
-                        );
-                        UUID uuid = (UUID) invoke(gameProfile, "getId");
-
-                        if(this.utils.getSoonNickedPlayers().contains(uuid)
-                                && this.setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")
-                                && getFieldValue(packet, "a").toString().endsWith("ADD_PLAYER"))
-                            return null;
-
-                        if(this.utils.getNickedPlayers().containsKey(uuid)) {
-                            // Replace game profile with fake game profile (nicked player profile)
-                            setField(
-                                    playerInfoData,
-                                    is1_17 || is1_18 || is1_19
-                                            ? "c"
-                                            : "d",
-                                    this.utils.getNickedPlayers().get(uuid).getFakeGameProfile(
-                                            !uuid.equals(player.getUniqueId())
-                                                    && setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
-                                    )
-                            );
-                        }
-                    }
-                }
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
-                if(this.utils.isVersion13OrLater()) {
-                    Object suggestions = getFieldValue(packet, "b");
-                    Object suggestionsRange = invoke(suggestions, "getRange");
-                    int suggestionsStart = (int) invoke(suggestionsRange, "getStart");
-                    ArrayList<Object> suggestionsList = new ArrayList<>((List<Object>) invoke(suggestions, "getList"));
-                    Map<Object, String> texts = new HashMap<>();
-                    String buffer = null;
-
-                    for (Object suggestion : suggestionsList) {
-                        try {
-                            String text = (String) invoke(suggestion, "getText");
-                            Object range = invoke(suggestion, "getRange");
-
-                            buffer = text.substring(0, (int) invoke(range, "getEnd") - (int) invoke(range, "getStart"));
-
-                            texts.put(suggestion, text);
-                        } catch (IllegalAccessException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-
-                    // Player names
-                    List<String> playerNames = new ArrayList<>();
-
-                    Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
-                        if (this.utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())) {
-                            String nickName = this.utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName();
-
-                            if (texts.values().stream().anyMatch(nickName::equalsIgnoreCase)) {
-                                playerNames.add(nickName);
-                                return;
+                                                            return null;
+                                                        }
+                                                )
+                                        )
+                                );
                             }
                         }
 
-                        String name = currentPlayer.getName();
+                        setField(packet, "b", dataToUpdate);
+                    }
+                    break;
+                case "PacketPlayOutTabComplete":
+                    if(VERSION_13_OR_LATER) {
+                        Object suggestions = getFieldValue(packet, "b");
+                        Object suggestionsRange = invoke(suggestions, "getRange");
+                        int suggestionsStart = (int) invoke(suggestionsRange, "getStart");
+                        ArrayList<Object> suggestionsList = new ArrayList<>((List<Object>) invoke(suggestions, "getList"));
+                        Map<Object, String> texts = new HashMap<>();
+                        String buffer = null;
 
-                        if (texts.values().stream().anyMatch(name::equalsIgnoreCase))
-                            playerNames.add(name);
-                    });
+                        for (Object suggestion : suggestionsList) {
+                            try {
+                                String text = (String) invoke(suggestion, "getText");
+                                Object range = invoke(suggestion, "getRange");
 
-                    if (!playerNames.isEmpty() || (buffer == null) || texts.containsKey("@p")) {
-                        if (buffer != null)
-                            buffer = buffer.toLowerCase();
-                        else
-                            buffer = "";
+                                buffer = text.substring(0, (int) invoke(range, "getEnd") - (int) invoke(range, "getStart"));
 
-                        // Player names are in the suggestions
-                        suggestionsList.removeIf(suggestion ->
-                                playerNames.stream().anyMatch(playerName ->
-                                        playerName.equalsIgnoreCase(texts.get(suggestion)))
+                                texts.put(suggestion, text);
+                            } catch (IllegalAccessException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+
+                        // Player names
+                        List<String> playerNames = new ArrayList<>();
+
+                        Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
+                            if (this.utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())) {
+                                String nickName = this.utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName();
+
+                                if (texts.values().stream().anyMatch(nickName::equalsIgnoreCase)) {
+                                    playerNames.add(nickName);
+                                    return;
+                                }
+                            }
+
+                            String name = currentPlayer.getName();
+
+                            if (texts.values().stream().anyMatch(name::equalsIgnoreCase))
+                                playerNames.add(name);
+                        });
+
+                        if (!playerNames.isEmpty() || (buffer == null) || texts.containsKey("@p")) {
+                            if (buffer != null)
+                                buffer = buffer.toLowerCase();
+                            else
+                                buffer = "";
+
+                            // Player names are in the suggestions
+                            suggestionsList.removeIf(suggestion ->
+                                    playerNames.stream().anyMatch(playerName ->
+                                            playerName.equalsIgnoreCase(texts.get(suggestion)))
+                            );
+
+                            for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+                                String name = this.utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())
+                                        ? this.utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName()
+                                        : currentPlayer.getName();
+
+                                if (buffer.isEmpty() || name.toLowerCase().startsWith(buffer))
+                                    suggestionsList.add(this.getAsSuggestion(suggestionsStart, buffer, name));
+                            }
+                        }
+
+                        StringBuilder command = new StringBuilder();
+
+                        for (int i = 1; i <= (suggestionsStart - 2 /* slash & space */); i++)
+                            command.append("?");
+
+                        setField(
+                                packet,
+                                "b",
+                                invokeStatic(
+                                        findClass("com.mojang.brigadier.suggestion.Suggestions"),
+                                        "create",
+                                        types(String.class, Collection.class),
+                                        "/" + command + " " + buffer,
+                                        suggestionsList
+                                )
                         );
+                    } else {
+                        setField(
+                                packet,
+                                "a",
+                                replaceTabCompletions(this.player, (String[]) getFieldValue(packet, "a"))
+                        );
+                    }
+                    break;
+                case "ClientboundSystemChatPacket":
+                    if(this.setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
+                        // Get content
+                        String content = (String) getFieldValue(packet, "content");
 
-                        for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
-                            String name = this.utils.getNickedPlayers().containsKey(currentPlayer.getUniqueId())
-                                    ? this.utils.getNickedPlayers().get(currentPlayer.getUniqueId()).getNickName()
-                                    : currentPlayer.getName();
+                        // Replace names
+                        Object editedComponent = this.replaceNames(this.deserialize(content), true);
 
-                            if (buffer.isEmpty() || name.toLowerCase().startsWith(buffer))
-                                suggestionsList.add(this.getAsSuggestion(suggestionsStart, buffer, name));
+                        // Overwrite chat message
+                        if (editedComponent != null) {
+                            return newInstance(
+                                    packet.getClass(),
+                                    types(
+                                            findClass("net.minecraft.network.chat.IChatBaseComponent"),
+                                            boolean.class
+                                    ),
+                                    editedComponent, invoke(packet, "c")
+                            );
                         }
                     }
+                    break;
+                case "PacketPlayOutScoreboardObjective":
+                    // Replace name
+                    if(VERSION_13_OR_LATER)
+                        setField(packet,
+                                is1_17 || is1_18 || is1_19
+                                        ? "e"
+                                        : "b",
+                                this.replaceNames(
+                                        getFieldValue(
+                                                packet,
+                                                is1_17 || is1_18 || is1_19
+                                                        ? "e"
+                                                        : "b"
+                                        ),
+                                        false
+                                )
+                        );
+                    else {
+                        String name = (String) getFieldValue(packet, "b");
 
-                    StringBuilder command = new StringBuilder();
-
-                    for (int i = 1; i <= (suggestionsStart - 2 /* slash & space */); i++)
-                        command.append("?");
-
-                    setField(
-                            packet,
-                            "b",
-                            invokeStatic(
-                                    findClass("com.mojang.brigadier.suggestion.Suggestions"),
-                                    "create",
-                                    types(String.class, Collection.class),
-                                    "/" + command + " " + buffer,
-                                    suggestionsList
-                            )
-                    );
-                } else {
-                    setField(
-                            packet,
-                            "a",
-                            replaceTabCompletions(this.player, (String[]) getFieldValue(packet, "a"))
-                    );
-                }
-            } else if (packet.getClass().getSimpleName().equals("PacketPlayOutChat")
-                    && this.setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
-                // Get chat message from packet and replace names
-                Object editedComponent = this.replaceNames(getFieldValue(packet, "a"), true);
-
-                // Overwrite chat message
-                if(editedComponent != null)
-                    setField(packet, "a", editedComponent);
-            } else if (packet.getClass().getSimpleName().equals("ClientboundSystemChatPacket")
-                    && this.setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
-                // Get content
-                String content = (String) getFieldValue(packet, "content");
-
-                // Replace names
-                Object editedComponent = this.replaceNames(this.deserialize(content), true);
-
-                // Overwrite chat message
-                if (editedComponent != null)
-                    return newInstance(
-                            packet.getClass(),
-                            types(
-                                    findClass("net.minecraft.network.chat.IChatBaseComponent"),
-                                    boolean.class),
-                            editedComponent, invoke(packet, "c")
-                    );
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutScoreboardObjective")) {
-                //Replace name
-                if(this.utils.isVersion13OrLater())
-                    setField(packet,
-                            is1_17 || is1_18 || is1_19
-                                    ? "e"
-                                    : "b",
-                            this.replaceNames(
-                                    getFieldValue(
-                                            packet,
-                                            is1_17 || is1_18 || is1_19
-                                                    ? "e"
-                                                    : "b"
-                                    ),
-                                    false
-                            )
-                    );
-                else {
-                    String name = (String) getFieldValue(packet, "b");
+                        if(name != null)
+                            setField(
+                                    packet,
+                                    "b",
+                                    this.utils.getNickedPlayers()
+                                            .values()
+                                            .stream()
+                                            .filter(nickedPlayerData -> name.contains(nickedPlayerData.getRealName()))
+                                            .findFirst()
+                                            .map(nickedPlayerData -> name.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName()))
+                                            .orElse(name)
+                            );
+                    }
+                    break;
+                case "PacketPlayOutScoreboardScore":
+                    String name = (String) getFieldValue(packet, "a");
 
                     if(name != null)
                         setField(
                                 packet,
-                                "b",
+                                "a",
                                 this.utils.getNickedPlayers()
-                                .values()
-                                .stream()
+                                        .values()
+                                        .stream()
                                         .filter(nickedPlayerData -> name.contains(nickedPlayerData.getRealName()))
                                         .findFirst()
                                         .map(nickedPlayerData -> name.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName()))
                                         .orElse(name)
                         );
-                }
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutScoreboardScore")) {
-                String name = (String) getFieldValue(packet, "a");
+                    break;
+                // old packets
+                case "PacketPlayOutPlayerInfo":
+                    Object b = getFieldValue(packet, "b");
 
-                if(name != null)
-                    setField(
-                            packet,
-                            "a",
-                            this.utils.getNickedPlayers()
-                                    .values()
-                                    .stream()
-                                    .filter(nickedPlayerData -> name.contains(nickedPlayerData.getRealName()))
-                                    .findFirst()
-                                    .map(nickedPlayerData -> name.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName()))
-                                    .orElse(name)
-                    );
-            } else if(packet.getClass().getSimpleName().equals("PacketPlayOutScoreboardTeam")) {
-                if(!(this.player.hasPermission("eazynick.bypass") && this.setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
-                        && !(this.utils.isPluginInstalled("TAB", "NEZNAMY")
-                                && this.setupYamlFile.getConfiguration().getBoolean("ChangeGroupAndPrefixAndSuffixInTAB"))
-                        && this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.NameTag")) {
-                    String contentsFieldName = NMS_VERSION.equals("v1_8_R1")
-                            ? "e"
-                            : NMS_VERSION.equals("v1_8_R2")
-                                    || NMS_VERSION.equals("v1_8_R3")
-                                    || NMS_VERSION.equals("v1_9_R1")
-                                    ? "g"
-                                    : is1_17 || is1_18 || is1_19
-                                            ? "j"
-                                            : "h";
-                    Object contentsList = getFieldValue(packet, contentsFieldName);
+                    if(b != null) {
+                        for (Object playerInfoData : (List<?>) b) {
+                            Object gameProfile = getFieldValue(
+                                    playerInfoData,
+                                    is1_17 || is1_18 || is1_19
+                                            ? "c"
+                                            : "d"
+                            );
+                            UUID playerInfoDataUniqueId = (UUID) invoke(gameProfile, "getId");
 
-                    if(contentsList != null) {
-                        List<String> contents = new ArrayList<>((List<String>) contentsList);
+                            if(this.utils.getSoonNickedPlayers().contains(playerInfoDataUniqueId)
+                                    && this.setupYamlFile.getConfiguration().getBoolean("SeeNickSelf")
+                                    && getFieldValue(packet, "a").toString().endsWith("ADD_PLAYER"))
+                                return null;
 
-                        setField(
-                                packet,
-                                contentsFieldName,
-                                contents
-                                        .stream()
-                                        .map(name ->
-                                                this.utils.getNickedPlayers()
-                                                    .values()
-                                                    .stream()
-                                                    .filter(nickedPlayerData -> name.contains(nickedPlayerData.getRealName()))
-                                                    .findFirst()
-                                                            .map(nickedPlayerData -> {
-                                                                if(contents.stream().noneMatch(name2 -> name2.contains(nickedPlayerData.getNickName())))
-                                                                    return name.replace(nickedPlayerData.getRealName(), nickedPlayerData.getNickName());
-
-                                                                return null;
-                                                            }).orElse(null))
-                                        .filter(Objects::nonNull)
-                                        .collect(Collectors.toList())
-                        );
+                            if(this.utils.getNickedPlayers().containsKey(playerInfoDataUniqueId)) {
+                                // Replace game profile with fake game profile (nicked player profile)
+                                setField(
+                                        playerInfoData,
+                                        is1_17 || is1_18 || is1_19
+                                                ? "c"
+                                                : "d",
+                                        this.utils.getNickedPlayers().get(playerInfoDataUniqueId).getFakeGameProfile(
+                                                !playerInfoDataUniqueId.equals(player.getUniqueId())
+                                                        && setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
+                                        )
+                                );
+                            }
+                        }
                     }
-                }
+                    break;
+                case "PacketPlayOutChat":
+                    if(this.setupYamlFile.getConfiguration().getBoolean("OverwriteMessagePackets")) {
+                        // Get chat message from packet and replace names
+                        Object editedComponent = this.replaceNames(getFieldValue(packet, "a"), true);
+
+                        // Overwrite chat message
+                        if (editedComponent != null)
+                            setField(packet, "a", editedComponent);
+                    }
+                    break;
+                default:
+                    break;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -443,7 +419,8 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                         || NMS_VERSION.startsWith("v1_16")
                                         || is1_17
                                         ? "getSiblings"
-                                        : "a"))) {
+                                        : "a"
+                ))) {
                     if (partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")
                             || partlyIChatBaseComponent.getClass().getSimpleName().equals("IChatMutableComponent")) {
                         Arrays.stream(this.serialize(partlyIChatBaseComponent)
@@ -525,7 +502,8 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                             ? "b"
                             : "a",
                     types(String.class),
-                    json);
+                    json
+            );
         } catch (Exception ex) {
             return "";
         }
