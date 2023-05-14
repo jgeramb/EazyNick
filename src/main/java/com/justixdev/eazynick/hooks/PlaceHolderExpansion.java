@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
+
 public class PlaceHolderExpansion extends PlaceholderExpansion {
 
     private final EazyNick eazyNick;
@@ -22,15 +24,14 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
     public String onPlaceholderRequest(Player player, @NotNull String identifier) {
         EazyNick eazyNick = EazyNick.getInstance();
         SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
-        MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
-        MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
+        MySQLNickManager mysqlNickManager = eazyNick.getMysqlNickManager();
+        MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMysqlPlayerDataManager();
 
         if(player != null) {
-            String version = eazyNick.getVersion();
             NickManager api = new NickManager(player);
             boolean isMySQLNicked = (mysqlNickManager != null)
-                    && mysqlNickManager.isPlayerNicked(player.getUniqueId())
-                    && !(api.isNicked()),
+                    && mysqlNickManager.isNicked(player.getUniqueId())
+                    && !api.isNicked(),
                     isLobbyMode = setupYamlFile.getConfiguration().getBoolean("LobbyMode");
 
             if(identifier.equals("is_nicked") || identifier.equals("is_disguised"))
@@ -97,7 +98,7 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
             if(identifier.equals("global_custom"))
                 return setupYamlFile.getConfigString(
                         player,
-                        ((mysqlNickManager != null) && mysqlNickManager.isPlayerNicked(player.getUniqueId()))
+                        ((mysqlNickManager != null) && mysqlNickManager.isNicked(player.getUniqueId()))
                                 ? "CustomPlaceholders.Global.Nicked"
                                 : "CustomPlaceholders.Global.Default"
                 );
@@ -107,17 +108,19 @@ public class PlaceHolderExpansion extends PlaceholderExpansion {
                 return String.valueOf(
                         Math.round(
                                 player.getHealth()
-                                        + ((version.startsWith("1_14") || version.startsWith("1_15") || version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19"))
-                                        ? player.getAbsorptionAmount()
-                                        : (player.hasPotionEffect(PotionEffectType.ABSORPTION)
-                                        ? ((player.getActivePotionEffects()
-                                        .stream()
-                                        .filter(currentPotionEffect -> currentPotionEffect.getType().equals(PotionEffectType.ABSORPTION))
-                                        .findFirst().get().getAmplifier() + 1) * 2)
-                                        : 0)
-                                )
-                        )
-                );
+                                        + (NMS_VERSION.startsWith("v1_14")
+                                        || NMS_VERSION.startsWith("v1_15")
+                                        || NMS_VERSION.startsWith("v1_16")
+                                        || NMS_VERSION.startsWith("v1_17")
+                                        || NMS_VERSION.startsWith("v1_18")
+                                        || NMS_VERSION.startsWith("v1_19")
+                                                ? player.getAbsorptionAmount()
+                                                : (player.hasPotionEffect(PotionEffectType.ABSORPTION)
+                                                        ? ((player.getActivePotionEffects()
+                                                                .stream()
+                                                                .filter(currentPotionEffect -> currentPotionEffect.getType().equals(PotionEffectType.ABSORPTION))
+                                                                .findFirst().get().getAmplifier() + 1) * 2)
+                                                        : 0))));
         }
 
         return "";

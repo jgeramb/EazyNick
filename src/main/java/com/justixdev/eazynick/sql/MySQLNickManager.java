@@ -1,108 +1,57 @@
 package com.justixdev.eazynick.sql;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
+@RequiredArgsConstructor
 public class MySQLNickManager {
 
     private static final HashMap<UUID, CachedNickData> CACHE = new HashMap<>();
+
     private final MySQL mysql;
 
-    public MySQLNickManager(MySQL mysql) {
-        this.mysql = mysql;
-    }
-
     public String getNickName(UUID uniqueId) {
-        if(CACHE.containsKey(uniqueId))
-            return CACHE.get(uniqueId).getNickName();
-
-        //Check if player is in table
-        if(isPlayerNicked(uniqueId)) {
-            //Check if connection is open
-            if(mysql.isConnected()) {
-                try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uniqueId.toString() + "'")) {
-                    if(resultSet.next()) {
-                        String nickName = resultSet.getString("NickName");
-
-                        CACHE.put(uniqueId, new CachedNickData(nickName, resultSet.getString("SkinName")));
-
-                        return nickName;
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-
-        return "NaN";
+        return this.isNicked(uniqueId) ? CACHE.get(uniqueId).getNickName() : "";
     }
 
     public String getSkinName(UUID uniqueId) {
-        if(CACHE.containsKey(uniqueId))
-            return CACHE.get(uniqueId).getSkinName();
-
-        //Check if player is in table
-        if(isPlayerNicked(uniqueId)) {
-            //Check if connection is open
-            if(mysql.isConnected()) {
-                try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uniqueId.toString() + "'")) {
-                    if(resultSet.next()) {
-                        String skinName = resultSet.getString("SkinName");
-
-                        CACHE.put(uniqueId, new CachedNickData(resultSet.getString("NickName"), skinName));
-
-                        return skinName;
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-
-        return "Error";
+        return this.isNicked(uniqueId) ? CACHE.get(uniqueId).getSkinName() : "";
     }
 
     public void addPlayer(UUID uniqueId, String nickName, String skinName) {
-        //Check if connection is open
-        if(mysql.isConnected()) {
-            //Check if player is not in table
-            if(!(isPlayerNicked(uniqueId))) {
-                CACHE.put(uniqueId, new CachedNickData(nickName, skinName));
+        this.removePlayer(uniqueId);
 
-                mysql.update("INSERT INTO NickedPlayers (UUID, NickName, SkinName) VALUES ('" + uniqueId.toString() + "', '" + nickName + "', '" + skinName + "')");
-            }
-        }
+        CACHE.put(uniqueId, new CachedNickData(nickName, skinName));
+
+        this.mysql.update("INSERT INTO nicked_players VALUES (?, ?, ?)", uniqueId, nickName, skinName);
     }
 
     public void removePlayer(UUID uniqueId) {
-        //Check if connection is open
-        if(mysql.isConnected()) {
-            //Check if player is in table
-            if(isPlayerNicked(uniqueId)) {
-                CACHE.remove(uniqueId);
+        CACHE.remove(uniqueId);
 
-                mysql.update("DELETE FROM NickedPlayers WHERE UUID = '" + uniqueId.toString() + "'");
-            }
-        }
+        this.mysql.update("DELETE FROM nicked_players WHERE unique_id = ?", uniqueId);
     }
 
-    public boolean isPlayerNicked(UUID uniqueId) {
+    public boolean isNicked(UUID uniqueId) {
         if(CACHE.containsKey(uniqueId))
             return true;
 
-        //Check if connection is open
-        if(mysql.isConnected()) {
-            try(ResultSet resultSet = mysql.getResult("SELECT * FROM NickedPlayers WHERE UUID = '" + uniqueId.toString() + "'")) {
-                if(resultSet.next()) {
-                    CACHE.put(uniqueId, new CachedNickData(resultSet.getString("NickName"), resultSet.getString("SkinName")));
+        try(ResultSet resultSet = this.mysql.getResult("SELECT * FROM nicked_players WHERE unique_id = ?", uniqueId)) {
+            if(resultSet.next()) {
+                CACHE.put(uniqueId, CachedNickData.fromResultSet(resultSet));
 
-                    return true;
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+                return true;
             }
+        } catch (SQLException ex) {
+            Bukkit.getLogger().log(Level.WARNING, "Could not execute sql query: " + ex.getMessage());
         }
 
         return false;
@@ -112,21 +61,16 @@ public class MySQLNickManager {
         CACHE.remove(uniqueId);
     }
 
+    @Data
+    @AllArgsConstructor
     public static class CachedNickData {
 
         private final String nickName, skinName;
 
-        public CachedNickData(String nickName, String skinName) {
-            this.nickName = nickName;
-            this.skinName = skinName;
-        }
-
-        public String getNickName() {
-            return nickName;
-        }
-
-        public String getSkinName() {
-            return skinName;
+        public static CachedNickData fromResultSet(ResultSet resultSet) throws SQLException {
+            return new CachedNickData(
+                    resultSet.getString("nickname"),
+                    resultSet.getString("skin_name"));
         }
 
     }

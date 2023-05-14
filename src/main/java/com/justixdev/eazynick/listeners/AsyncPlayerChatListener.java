@@ -24,7 +24,7 @@ public class AsyncPlayerChatListener implements Listener {
         if(utils.getPlayersTypingNameInChat().containsKey(player.getUniqueId())) {
             String[] args = (utils.getPlayersTypingNameInChat().get(player.getUniqueId())
                     + " "
-                    + event.getMessage().trim()).split(" ");
+                    + event.getMessage().trim()).split("\\s+");
 
             utils.getPlayersTypingNameInChat().remove(player.getUniqueId());
             utils.performRankedNick(player, args[0], args[1], args[2]);
@@ -43,7 +43,10 @@ public class AsyncPlayerChatListener implements Listener {
 
         utils.setLastChatMessage(event.getMessage());
 
-        if (!(setupYamlFile.getConfiguration().getBoolean("ReplaceNickedChatFormat")) || utils.getWorldsWithDisabledPrefixAndSuffix().stream().anyMatch(world -> world.equalsIgnoreCase(player.getWorld().getName())) || event.isCancelled()) return;
+        if (!setupYamlFile.getConfiguration().getBoolean("ReplaceNickedChatFormat")
+                || utils.getWorldsWithDisabledPrefixAndSuffix().stream().anyMatch(world -> world.equalsIgnoreCase(player.getWorld().getName()))
+                || event.isCancelled())
+            return;
 
         NickManager api = new NickManager(player);
 
@@ -63,25 +66,26 @@ public class AsyncPlayerChatListener implements Listener {
             if(utils.isPluginInstalled("PlaceholderAPI"))
                 format = PlaceholderAPI.setPlaceholders(player, format);
 
-            format = format.replace("%message%", event.getMessage())
+            String finalFormat = format
+                    .replace("%message%", event.getMessage())
                     .replaceAll("%", "%%");
 
-            event.setFormat(format);
+            event.setFormat(finalFormat);
 
-            Bukkit.getConsoleSender().sendMessage(format);
+            Bukkit.getConsoleSender().sendMessage(finalFormat);
 
-            for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+            Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
                 if (currentPlayer.getName().equalsIgnoreCase(player.getName())) {
                     if (setupYamlFile.getConfiguration().getBoolean("SeeNickSelf"))
-                        currentPlayer.sendMessage(format);
+                        currentPlayer.sendMessage(finalFormat);
                     else
-                        currentPlayer.sendMessage(format.replace(player.getDisplayName(), api.getOldDisplayName()));
+                        currentPlayer.sendMessage(finalFormat.replace(player.getDisplayName(), api.getOldDisplayName()));
                 } else if (currentPlayer.hasPermission("eazynick.bypass")
                         && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))
-                    currentPlayer.sendMessage(format.replace(player.getDisplayName(), api.getOldDisplayName()));
+                    currentPlayer.sendMessage(finalFormat.replace(player.getDisplayName(), api.getOldDisplayName()));
                 else
-                    currentPlayer.sendMessage(format);
-            }
+                    currentPlayer.sendMessage(finalFormat);
+            });
         }
     }
 

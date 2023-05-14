@@ -1,7 +1,7 @@
 package com.justixdev.eazynick.listeners;
 
 import com.justixdev.eazynick.EazyNick;
-import com.justixdev.eazynick.api.PlayerUnnickEvent;
+import com.justixdev.eazynick.api.events.PlayerUnnickEvent;
 import com.justixdev.eazynick.utilities.GUIManager;
 import com.justixdev.eazynick.utilities.Utils;
 import com.justixdev.eazynick.utilities.configuration.yaml.GUIYamlFile;
@@ -18,16 +18,18 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
+
 public class InventoryClickListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClick(InventoryClickEvent event) {
         EazyNick eazyNick = EazyNick.getInstance();
         Utils utils = eazyNick.getUtils();
-        GUIManager guiManager = eazyNick.getGUIManager();
+        GUIManager guiManager = eazyNick.getGuiManager();
         SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
         LanguageYamlFile languageYamlFile = eazyNick.getLanguageYamlFile();
-        GUIYamlFile guiYamlFile = eazyNick.getGUIYamlFile();
+        GUIYamlFile guiYamlFile = eazyNick.getGuiYamlFile();
 
         String prefix = utils.getPrefix();
 
@@ -63,8 +65,7 @@ public class InventoryClickListener implements Listener {
                             languageYamlFile.sendMessage(
                                     player,
                                     languageYamlFile.getConfigString(player, "Messages.DisabledWorld")
-                                            .replace("%prefix%", prefix)
-                            );
+                                            .replace("%prefix%", prefix));
                     } else if (displayName.equalsIgnoreCase(guiYamlFile.getConfigString(player, "NickGUI.Unnick.DisplayName"))) {
                         player.closeInventory();
 
@@ -90,14 +91,12 @@ public class InventoryClickListener implements Listener {
                                         player,
                                         displayName.replace(guiYamlFile.getConfigString(player, "NickNameGUI.NickName.DisplayName")
                                                 .replace("%nickName%", "")
-                                                .replace("%nickname%", ""), "")
-                                );
+                                                .replace("%nickname%", ""), ""));
                             else
                                 languageYamlFile.sendMessage(
                                         player,
                                         languageYamlFile.getConfigString(player, "Messages.DisabledWorld")
-                                                .replace("%prefix%", prefix)
-                                );
+                                                .replace("%prefix%", prefix));
                         }
                     }
                 } else {
@@ -114,8 +113,7 @@ public class InventoryClickListener implements Listener {
                                 if(displayName.equals(guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".Rank"))) {
                                     guiManager.openRankedNickGUI(
                                             player,
-                                            guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".RankName")
-                                    );
+                                            guiYamlFile.getConfigString(player, "RankGUI.Rank" + i + ".RankName"));
                                     return;
                                 }
                             }
@@ -128,31 +126,27 @@ public class InventoryClickListener implements Listener {
                                     player,
                                     utils.getLastGUITexts().get(player.getUniqueId())
                                             + (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Default.DisplayName"))
-                                            ? " DEFAULT"
-                                            : (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName"))
-                                            ? " NORMAL"
-                                            : (displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Random.DisplayName"))
-                                            ? " RANDOM"
-                                            : " SKINFROMNAME")
-                                    )
-                                    )
-                            );
+                                                    ? " DEFAULT"
+                                                    : displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Normal.DisplayName"))
+                                                            ? " NORMAL"
+                                                            : displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step2.Random.DisplayName"))
+                                                                    ? " RANDOM"
+                                                                    : " SKINFROMNAME"));
                     } else if (title.equalsIgnoreCase(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.InventoryTitle"))) {
                         event.setCancelled(true);
 
                         String lastText = utils.getLastGUITexts().get(player.getUniqueId());
 
                         if(displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Custom.DisplayName"))) {
-                            if(eazyNick.getVersion().equals("1_7_R4")
-                                    || eazyNick.getVersion().equals("1_8_R1")) {
+                            if(NMS_VERSION.equals("v1_7_R4")
+                                    || NMS_VERSION.equals("v1_8_R1")) {
                                 utils.getPlayersTypingNameInChat().put(player.getUniqueId(), lastText);
 
                                 player.closeInventory();
                                 languageYamlFile.sendMessage(
                                         player,
                                         languageYamlFile.getConfigString(player, "Messages.TypeNameInChat")
-                                                .replace("%prefix%", prefix)
-                                );
+                                                .replace("%prefix%", prefix));
                             } else {
                                 String[] args = lastText.split(" ");
 
@@ -166,8 +160,7 @@ public class InventoryClickListener implements Listener {
                             } while (utils.getNickedPlayers()
                                     .values()
                                     .stream()
-                                    .anyMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(currentName.get()))
-                            );
+                                    .anyMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(currentName.get())));
 
                             guiManager.openRankedNickGUI(player, lastText + " " + currentName.get());
                         }
@@ -190,14 +183,12 @@ public class InventoryClickListener implements Listener {
                                         args[1],
                                         title
                                                 .replace(step4Parts[0], "")
-                                                .replace(step4Parts[1], "")
-                                );
+                                                .replace(step4Parts[1], ""));
                             else
                                 languageYamlFile.sendMessage(
                                         player,
                                         languageYamlFile.getConfigString(player, "Messages.DisabledWorld")
-                                                .replace("%prefix%", prefix)
-                                );
+                                                .replace("%prefix%", prefix));
                         } else if(displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Retry.DisplayName"))) {
                             AtomicReference<String> currentName = new AtomicReference<>();
 
@@ -206,23 +197,21 @@ public class InventoryClickListener implements Listener {
                             } while (utils.getNickedPlayers()
                                     .values()
                                     .stream()
-                                    .anyMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(currentName.get()))
-                            );
+                                    .anyMatch(currentNickedPlayerData -> currentNickedPlayerData.getNickName().equalsIgnoreCase(currentName.get())));
 
                             guiManager.openRankedNickGUI(player, lastText + " " + currentName.get());
                         } else if(displayName.equals(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Custom.DisplayName"))) {
-                            if(eazyNick.getVersion().equals("1_7_R4")
-                                    || eazyNick.getVersion().equals("1_8_R1")
+                            if(NMS_VERSION.equals("v1_7_R4")
+                                    || NMS_VERSION.equals("v1_8_R1")
                                     || !(setupYamlFile.getConfiguration().getBoolean("UseSignGUIForCustomName")
-                                    || setupYamlFile.getConfiguration().getBoolean("UseAnvilGUIForCustomName"))) {
+                                            || setupYamlFile.getConfiguration().getBoolean("UseAnvilGUIForCustomName"))) {
                                 utils.getPlayersTypingNameInChat().put(player.getUniqueId(), lastText);
 
                                 player.closeInventory();
                                 languageYamlFile.sendMessage(
                                         player,
                                         languageYamlFile.getConfigString(player, "Messages.TypeNameInChat")
-                                                .replace("%prefix%", prefix)
-                                );
+                                                .replace("%prefix%", prefix));
                             } else
                                 guiManager.openCustomGUI(player, args[0], args[1]);
                         }

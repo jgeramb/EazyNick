@@ -1,10 +1,11 @@
 package com.justixdev.eazynick.utilities;
 
-import com.justixdev.eazynick.EazyNick;
 import org.bukkit.ChatColor;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
 
 public class StringUtils {
 
@@ -17,22 +18,49 @@ public class StringUtils {
         this.string = string;
     }
 
+    public String repeat(int count) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < count; i++)
+            builder.append(this.string);
+
+        return builder.toString();
+    }
+
+    public boolean matchesPartially(String str) {
+        int matchingCharacters = 0, minMatchingIndex = 0;
+
+        for (char character : str.toCharArray()) {
+            for (int j = minMatchingIndex; j < this.string.length(); j++) {
+                if(this.string.charAt(j) == character) {
+                    minMatchingIndex = j + 1;
+                    matchingCharacters++;
+                }
+            }
+        }
+
+        return matchingCharacters == this.string.length();
+    }
+
     public String getPureString() {
         return ChatColor.stripColor(getColoredString());
     }
 
     public String getColoredString() {
-        String version = EazyNick.getInstance().getVersion();
+        String version = NMS_VERSION;
 
         // HEX-Color-Support
-        if(version.startsWith("1_16") || version.startsWith("1_17") || version.startsWith("1_18") || version.startsWith("1_19")) {
-            Matcher matcher = HEX_COLOR_PATTERN.matcher(string);
-            StringBuffer buffer = new StringBuffer(string.length() + 4 * 8);
+        if(version.startsWith("v1_16")
+                || version.startsWith("v1_17")
+                || version.startsWith("v1_18")
+                || version.startsWith("v1_19")) {
+            Matcher matcher = HEX_COLOR_PATTERN.matcher(this.string);
+            StringBuffer buffer = new StringBuffer(this.string.length() + 4 * 8);
 
             while (matcher.find()) {
                 String group = matcher.group(1);
 
-                // Convert for example #fff to #ffffff
+                // Convert #fff to #ffffff
                 if(group.length() == 3)
                     matcher.appendReplacement(
                             buffer,
@@ -42,8 +70,7 @@ public class StringUtils {
                                     + COLOR_CHAR + group.charAt(1)
                                     + COLOR_CHAR + group.charAt(1)
                                     + COLOR_CHAR + group.charAt(2)
-                                    + COLOR_CHAR + group.charAt(2)
-                    );
+                                    + COLOR_CHAR + group.charAt(2));
                 else
                     matcher.appendReplacement(
                             buffer,
@@ -53,14 +80,13 @@ public class StringUtils {
                                     + COLOR_CHAR + group.charAt(2)
                                     + COLOR_CHAR + group.charAt(3)
                                     + COLOR_CHAR + group.charAt(4)
-                                    + COLOR_CHAR + group.charAt(5)
-                    );
+                                    + COLOR_CHAR + group.charAt(5));
             }
 
-            string = matcher.appendTail(buffer).toString();
+            this.string = matcher.appendTail(buffer).toString();
         }
 
-        return ChatColor.translateAlternateColorCodes('&', string);
+        return ChatColor.translateAlternateColorCodes('&', this.string);
     }
 
 }

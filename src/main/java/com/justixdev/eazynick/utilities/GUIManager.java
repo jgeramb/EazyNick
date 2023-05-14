@@ -1,8 +1,8 @@
 package com.justixdev.eazynick.utilities;
 
 import com.justixdev.eazynick.EazyNick;
-import com.justixdev.eazynick.nms.fakegui.anvil.AnvilGUI;
-import com.justixdev.eazynick.nms.fakegui.sign.SignGUI;
+import com.justixdev.eazynick.nms.guis.AnvilGUI;
+import com.justixdev.eazynick.nms.guis.SignGUI;
 import com.justixdev.eazynick.utilities.configuration.yaml.GUIYamlFile;
 import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import org.bukkit.Bukkit;
@@ -14,6 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
+import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
+
 public class GUIManager {
 
     private final Utils utils;
@@ -23,82 +25,82 @@ public class GUIManager {
 
     public GUIManager(EazyNick eazyNick) {
         this.utils = eazyNick.getUtils();
-        this.guiYamlFile = eazyNick.getGUIYamlFile();
+        this.guiYamlFile = eazyNick.getGuiYamlFile();
         this.setupYamlFile = eazyNick.getSetupYamlFile();
         this.signGUI = eazyNick.getSignGUI();
     }
 
     public void openNickList(Player player, int page) {
-        Inventory inv = Bukkit.createInventory(
+        Inventory inventory = Bukkit.createInventory(
                 null,
                 45,
-                guiYamlFile.getConfigString(player, "NickNameGUI.InventoryTitle")
+                this.guiYamlFile.getConfigString(player, "NickNameGUI.InventoryTitle")
                         .replace("%currentPage%", String.valueOf(page + 1))
-                        .replace("%currentpage%", String.valueOf(page + 1))
-        );
+                        .replace("%currentpage%", String.valueOf(page + 1)));
         ArrayList<String> toShow = new ArrayList<>();
 
-        player.openInventory(inv);
+        player.openInventory(inventory);
 
-        for (int i = 36 * page; i < utils.getNickNames().size(); i++) {
+        for (int i = 36 * page; i < this.utils.getNickNames().size(); i++) {
             if(toShow.size() >= 36)
                 break;
 
-            toShow.add(utils.getNickNames().get(i));
+            toShow.add(this.utils.getNickNames().get(i));
         }
 
         int i = 0;
 
         for (String nickName : toShow) {
-            inv.setItem(
+            inventory.setItem(
                     i,
                     new ItemBuilder(1)
                             .setDisplayName(
-                                    guiYamlFile.getConfigString(player, "NickNameGUI.NickName.DisplayName")
+                                    this.guiYamlFile.getConfigString(player, "NickNameGUI.NickName.DisplayName")
                                             .replace("%nickName%", nickName)
                                             .replace("%nickname%", nickName)
                             ).setSkullOwner(
                                     (toShow.size() > 12)
                                             ? "MHF_Question"
                                             : nickName
-                            ).build()
-            );
+                            ).build());
+
             i++;
         }
 
-        if(page != 0)
-            inv.setItem(
+        if(page != 0) {
+            inventory.setItem(
                     36,
                     new ItemBuilder(Material.ARROW)
-                            .setDisplayName(guiYamlFile.getConfigString(player, "NickNameGUI.Previous.DisplayName"))
-                            .build()
-            );
+                            .setDisplayName(this.guiYamlFile.getConfigString(player, "NickNameGUI.Previous.DisplayName"))
+                            .build());
+        }
 
-        if(utils.getNickNames().size() > ((page + 1) * 36))
-            inv.setItem(
+        if(this.utils.getNickNames().size() > ((page + 1) * 36)) {
+            inventory.setItem(
                     44,
                     new ItemBuilder(Material.ARROW)
-                            .setDisplayName(guiYamlFile.getConfigString(player, "NickNameGUI.Next.DisplayName"))
-                            .build()
-            );
+                            .setDisplayName(this.guiYamlFile.getConfigString(player, "NickNameGUI.Next.DisplayName"))
+                            .build());
+        }
 
-        utils.getNickNameListPages().put(player.getUniqueId(), page);
+        this.utils.getNickNameListPages().put(player.getUniqueId(), page);
     }
 
     public void openCustomGUI(Player player, String rankName, String skinType) {
-        if(setupYamlFile.getConfiguration().getBoolean("UseSignGUIForCustomName")) {
-            signGUI.open(
+        if(this.setupYamlFile.getConfiguration().getBoolean("UseSignGUIForCustomName")) {
+            this.signGUI.open(
                     player,
-                    guiYamlFile.getConfigString(player, "SignGUI.Line1"),
-                    guiYamlFile.getConfigString(player, "SignGUI.Line2"),
-                    guiYamlFile.getConfigString(player, "SignGUI.Line3"),
-                    guiYamlFile.getConfigString(player, "SignGUI.Line4"),
+                    this.guiYamlFile.getConfigString(player, "SignGUI.Line1"),
+                    this.guiYamlFile.getConfigString(player, "SignGUI.Line2"),
+                    this.guiYamlFile.getConfigString(player, "SignGUI.Line3"),
+                    this.guiYamlFile.getConfigString(player, "SignGUI.Line4"),
                     event -> {
                         String name = event.getLines()[0];
-                        int nameLengthMin = Math.max(Math.min(setupYamlFile.getConfiguration().getInt("Settings.NameLength.Min"), 16), 1), nameLengthMax = Math.max(Math.min(setupYamlFile.getConfiguration().getInt("Settings.NameLength.Max"), 16), 1);
+                        int nameLengthMin = Math.max(Math.min(this.setupYamlFile.getConfiguration().getInt("Settings.NameLength.Min"), 16), 1),
+                                nameLengthMax = Math.max(Math.min(this.setupYamlFile.getConfiguration().getInt("Settings.NameLength.Max"), 16), 1);
 
-                        if(!(name.isEmpty()) && (name.length() <= nameLengthMax) && (name.length() >= nameLengthMin))
-                            utils.performRankedNick(player, rankName, skinType, name);
+                        if(!name.isEmpty() && (name.length() <= nameLengthMax) && (name.length() >= nameLengthMin))
+                            this.utils.performRankedNick(player, rankName, skinType, name);
                     });
         } else {
             AnvilGUI gui = new AnvilGUI(player, event -> {
@@ -106,7 +108,7 @@ public class GUIManager {
                     event.setWillClose(true);
                     event.setWillDestroy(true);
 
-                    utils.performRankedNick(player, rankName, skinType, event.getName());
+                    this.utils.performRankedNick(player, rankName, skinType, event.getName());
                 } else {
                     event.setWillClose(false);
                     event.setWillDestroy(false);
@@ -116,9 +118,8 @@ public class GUIManager {
             gui.setSlot(
                     AnvilGUI.AnvilSlot.INPUT_LEFT,
                     new ItemBuilder(Material.PAPER)
-                            .setDisplayName(guiYamlFile.getConfigString(player, "AnvilGUI.Title"))
-                            .build()
-            );
+                            .setDisplayName(this.guiYamlFile.getConfigString(player, "AnvilGUI.Title"))
+                            .build());
 
             try {
                 gui.open();
@@ -130,19 +131,18 @@ public class GUIManager {
 
     public void openRankedNickGUI(Player player, String text) {
         EazyNick eazyNick = EazyNick.getInstance();
-        GUIYamlFile guiYamlFile = eazyNick.getGUIYamlFile();
+        GUIYamlFile guiYamlFile = eazyNick.getGuiYamlFile();
 
-        utils.getLastGUITexts().put(player.getUniqueId(), text);
+        this.utils.getLastGUITexts().put(player.getUniqueId(), text);
 
-        boolean newVersion = utils.isVersion13OrLater();
+        boolean newVersion = this.utils.isVersion13OrLater();
         String[] args = text.isEmpty() ? new String[0] : text.split(" ");
 
         if(args.length == 0) {
             Inventory inv = Bukkit.createInventory(
                     null,
                     27,
-                    guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.InventoryTitle")
-            );
+                    guiYamlFile.getConfigString(player, "RankedNickGUI.Step1.InventoryTitle"));
 
             for (int i = 0; i < inv.getSize(); i++)
                 inv.setItem(
@@ -150,8 +150,7 @@ public class GUIManager {
                         new ItemBuilder(
                                 Material.getMaterial(newVersion
                                         ? "BLACK_STAINED_GLASS_PANE"
-                                        : "STAINED_GLASS_PANE"
-                                ),
+                                        : "STAINED_GLASS_PANE"),
                                 1,
                                 newVersion
                                         ? 0
@@ -393,8 +392,7 @@ public class GUIManager {
                                     Material.valueOf(
                                             newVersion
                                                     ? "RED_STAINED_GLASS"
-                                                    : "GLASS"
-                                    ),
+                                                    : "GLASS"),
                                     1,
                                     newVersion
                                             ? 0
@@ -408,7 +406,7 @@ public class GUIManager {
 
             player.openInventory(inv);
         } else if(args.length == 1) {
-            if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
+            if(this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
                 Inventory inv = Bukkit.createInventory(
                         null,
                         27,
@@ -463,7 +461,7 @@ public class GUIManager {
 
                 player.openInventory(inv);
             } else
-                openRankedNickGUI(player, text + " DEFAULT");
+                this.openRankedNickGUI(player, text + " DEFAULT");
         } else if(args.length == 2) {
             if(player.hasPermission("eazynick.nick.custom")) {
                 Inventory inv = Bukkit.createInventory(
@@ -472,20 +470,21 @@ public class GUIManager {
                         guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.InventoryTitle")
                 );
 
-                for (int i = 0; i < inv.getSize(); i++)
-                    inv.setItem(
-                            i,
-                            new ItemBuilder(Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"), 1, newVersion ? 0 : 15).setDisplayName("§r").build());
+                for (int i = 0; i < inv.getSize(); i++) {
+                    inv.setItem(i, new ItemBuilder(
+                            Material.getMaterial(newVersion ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"),
+                            1,
+                            newVersion ? 0 : 15
+                    ).setDisplayName("§r").build());
+                }
 
                 inv.setItem(
                         12,
                         new ItemBuilder(
                                 Material.valueOf(
-                                        (newVersion && !(eazyNick.getVersion().startsWith("1_13")))
+                                        (newVersion && !NMS_VERSION.startsWith("v1_13"))
                                                 ? "OAK_SIGN"
-                                                : "SIGN"
-                                )
-                        )
+                                                : "SIGN"))
                                 .setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step3.Custom.DisplayName"))
                                 .build()
                 );
@@ -499,7 +498,7 @@ public class GUIManager {
 
                 player.openInventory(inv);
             } else
-                openRankedNickGUI(player, text + " RANDOM");
+                this.openRankedNickGUI(player, text + " RANDOM");
         } else {
             Inventory inv = Bukkit.createInventory(
                     null,
@@ -509,23 +508,22 @@ public class GUIManager {
                             .replace("%nickname%", args[2])
             );
 
-            for (int i = 0; i < inv.getSize(); i++)
+            for (int i = 0; i < inv.getSize(); i++) {
                 inv.setItem(
                         i,
                         new ItemBuilder(
                                 Material.getMaterial(
                                         newVersion
                                                 ? "BLACK_STAINED_GLASS_PANE"
-                                                : "STAINED_GLASS_PANE"
-                                ),
+                                                : "STAINED_GLASS_PANE"),
                                 1,
                                 newVersion
                                         ? 0
-                                        : 15
-                        )
+                                        : 15)
                                 .setDisplayName("§r")
                                 .build()
                 );
+            }
 
             inv.setItem(
                     11,
@@ -545,15 +543,15 @@ public class GUIManager {
                     13,
                     new ItemBuilder(1)
                             .setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Retry.DisplayName"))
-                            .build());
+                            .build()
+            );
             inv.setItem(
                     15,
                     new ItemBuilder(
                             Material.valueOf(
-                                    (newVersion && !(eazyNick.getVersion().startsWith("1_13")))
+                                    (newVersion && !NMS_VERSION.startsWith("v1_13"))
                                             ? "OAK_SIGN"
-                                            : "SIGN"
-                            )
+                                            : "SIGN")
                     )
                             .setDisplayName(guiYamlFile.getConfigString(player, "RankedNickGUI.Step4.Custom.DisplayName"))
                             .build()

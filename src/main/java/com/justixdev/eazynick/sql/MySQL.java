@@ -1,5 +1,6 @@
 package com.justixdev.eazynick.sql;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
@@ -8,22 +9,14 @@ import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@RequiredArgsConstructor
 public class MySQL {
 
-    private static final String PREFIX = "[MySQL] ";
+    private static final String PREFIX = "[DB] ";
     private static final Logger LOGGER = Bukkit.getLogger();
+
     private Connection connection;
     private final String host, port, database, username, password;
-
-    public MySQL(String host, String port, String database, String username, String password) {
-        this.host = host;
-        this.port = port;
-        this.database = database;
-        this.username = username;
-        this.password = password;
-
-        connect();
-    }
 
     public void connect() {
         // Make sure no connection is open
@@ -33,11 +26,8 @@ public class MySQL {
             // Open connection
             connection = DriverManager.getConnection(
                     "jdbc:mysql://"
-                            + host
-                            + ":"
-                            + port
-                            + "/"
-                            + database
+                            + host + ":" + port
+                            + "/" + database
                             + "?autoReconnect=true&characterEncoding=utf8&useUnicode=true&interactiveClient=true&useSSL=false",
                     username,
                     password
@@ -70,103 +60,117 @@ public class MySQL {
     }
 
     public void disconnect() {
-        //Check if connection is open
-        if(!(isConnected())) return;
+        if (!this.isConnected())
+            return;
 
         try {
-            //Close connection
+            // Close connection
             connection.close();
 
             LOGGER.info(PREFIX + "Connection to database closed successfully!");
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, PREFIX + "Could not close connection to database!");
         }
+
+        this.connection = null;
     }
 
     public boolean isConnected() {
-        try {
-            return ((connection != null) && !(connection.isClosed()));
-        } catch (SQLException ignore) {
-        }
+        if(this.connection == null)
+            return false;
 
-        return false;
+        try {
+            return !this.connection.isClosed();
+        } catch (SQLException ignore) {
+            return false;
+        }
     }
 
-    public void update(String sql) {
-        // Check if connection is open
-        if(!(isConnected())) return;
+    private void setParameters(PreparedStatement statement, Object... parameters) {
+        for (int i = 0; i < parameters.length; i++) {
+            int index = i + 1;
+
+            try {
+                Object parameter = parameters[i];
+
+                if (parameter == null)
+                    statement.setNull(index, Types.VARCHAR);
+                else if (parameter instanceof String)
+                    statement.setString(index, (String) parameter);
+                else if (parameter instanceof Integer)
+                    statement.setInt(index, (Integer) parameter);
+                else if (parameter instanceof Long)
+                    statement.setLong(index, (Long) parameter);
+                else if (parameter instanceof Float)
+                    statement.setFloat(index, (Float) parameter);
+                else if (parameter instanceof Double)
+                    statement.setDouble(index, (Double) parameter);
+                else if (parameter instanceof Array)
+                    statement.setArray(index, (Array) parameter);
+                else if (parameter instanceof Date)
+                    statement.setDate(index, (Date) parameter);
+                else if (parameter instanceof Boolean)
+                    statement.setBoolean(index, (Boolean) parameter);
+                else
+                    statement.setString(index, parameter.toString());
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Could not set parameter at position " + index + ": " + ex.getMessage());
+            }
+        }
+    }
+
+    public void update(String sql, Object... parameters) {
+        if(!this.isConnected())
+            return;
 
         new FutureTask<>(() -> {
-            try {
-                // Execute update
-                Statement s = connection.createStatement();
-                s.executeUpdate(sql);
-                s.close();
-            } catch (SQLException ex) {
-                String msg = ex.getMessage();
+            PreparedStatement statement = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            this.setParameters(statement, parameters);
+            statement.executeUpdate();
 
-                if(msg.contains("The driver has not received any packets from the server.")
-                        || msg.contains("The last packet successfully received from the server was")) {
-                    try {
-                        connection.close();
-                    } catch (SQLException ignore) {
-                    }
-
-                    connection = null;
-
-                    connect();
-                } else
-                    LOGGER.log(
-                            Level.WARNING,
-                            PREFIX + "An error occurred while executing mysql update (" + msg + ")!"
-                    );
-            }
-        }, 1).run();
+            return null;
+        }).run();
     }
 
-    public ResultSet getResult(String query) {
-        // Check if connection is open
-        if(!(isConnected())) return null;
+    public ResultSet updateAndGet(String sql, Object... parameters) throws SQLException {
+        if(this.isConnected()) {
+            FutureTask<ResultSet> task = new FutureTask<>(() -> {
+                PreparedStatement statement = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                this.setParameters(statement, parameters);
+                statement.executeUpdate();
 
-        try {
-            final FutureTask<ResultSet> task = new FutureTask<>(() -> {
-                try {
-                    // Execute query
-                    return connection.createStatement().executeQuery(query);
-                } catch (SQLException ex) {
-                    String msg = ex.getMessage();
-
-                    if (msg.contains("The driver has not received any packets from the server.")
-                            || msg.contains("The last packet successfully received from the server was")) {
-                        try {
-                            connection.close();
-                        } catch (SQLException ignore) {
-                        }
-
-                        connection = null;
-
-                        connect();
-                    } else
-                        LOGGER.log(
-                                Level.WARNING,
-                                PREFIX + "An error occurred while executing mysql update (" + msg + ")!"
-                        );
-                }
-
-                return null;
+                return statement.getGeneratedKeys();
             });
-
             task.run();
 
-            return task.get();
-        } catch (InterruptedException | ExecutionException ignore) {
+            try {
+                return task.get();
+            } catch (InterruptedException | ExecutionException ex) {
+                System.err.println("Could not execute update \"" + sql + "\": " + ex.getMessage());
+            }
         }
 
-        return null;
+        throw new SQLException("not connected");
     }
 
-    public Connection getConnection() {
-        return connection;
+    public ResultSet getResult(String query, Object... parameters) throws SQLException {
+        if(this.isConnected()) {
+            FutureTask<ResultSet> task = new FutureTask<>(() -> {
+                PreparedStatement statement = this.connection.prepareStatement(query);
+                this.setParameters(statement, parameters);
+
+                return statement.executeQuery();
+            });
+            task.run();
+
+            try {
+                return task.get();
+            } catch (InterruptedException | ExecutionException ex) {
+                System.err.println("Could not execute query \"" + query + "\": " + ex.getMessage());
+            }
+        }
+
+        throw new SQLException("not connected");
     }
 
 }

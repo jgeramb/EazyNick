@@ -39,27 +39,42 @@
         </repository>
     </repositories>
     <dependencies>
+        <!-- compile only -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.26</version>
+            <scope>compile</scope>
         </dependency>
+
+        <!-- spigot -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.19.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.8.0</artifactId>
+            <version>1.8-R0.1-SNAPSHOT-latest</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/spigot-1.8.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.7.10</artifactId>
+            <version>1.7.10-SNAPSHOT-b1657</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/spigot-1.7.10.jar</systemPath>
+        </dependency>
+
+        <!-- plugin integrations -->
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.11.3</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.19.3-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.91.Final</version>
         </dependency>
         <dependency>
             <groupId>de.dytanic.cloudnet</groupId>
@@ -89,35 +104,21 @@
             <groupId>me.neznamy</groupId>
             <artifactId>tab-api</artifactId>
             <version>3.2.4</version>
+            <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/NametagEdit.jar</systemPath>
             <groupId>com.nametagedit</groupId>
             <artifactId>nametagedit</artifactId>
             <version>4.5.11</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/NametagEdit.jar</systemPath>
         </dependency>
         <dependency>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/PermissionsEx.jar</systemPath>
             <groupId>ru.tehkode</groupId>
             <artifactId>permissions</artifactId>
             <version>1.23.4</version>
-        </dependency>
-        <dependency>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/spigot-1.7.10.jar</systemPath>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.7.10</artifactId>
-            <version>1.7.10-SNAPSHOT-b1657</version>
-        </dependency>
-        <dependency>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/spigot-1.8.jar</systemPath>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.8.0</artifactId>
-            <version>1.8-R0.1-SNAPSHOT-latest</version>
+            <systemPath>${basedir}/lib/PermissionsEx.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

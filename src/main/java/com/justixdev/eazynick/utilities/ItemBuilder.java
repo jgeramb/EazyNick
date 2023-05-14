@@ -1,8 +1,7 @@
 package com.justixdev.eazynick.utilities;
 
 import com.justixdev.eazynick.EazyNick;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import com.justixdev.eazynick.utilities.mojang.MojangAPI;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -10,10 +9,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
+
+import static com.justixdev.eazynick.nms.ReflectionHelper.*;
 
 public class ItemBuilder {
 
@@ -21,11 +21,11 @@ public class ItemBuilder {
     private ItemMeta itemMeta;
 
     public ItemBuilder(int amount) {
-        this(Material.getMaterial(
+        this(
+                Material.getMaterial(
                         EazyNick.getInstance().getUtils().isVersion13OrLater()
                                 ? "PLAYER_HEAD"
-                                : "SKULL_ITEM"
-                ),
+                                : "SKULL_ITEM"),
                 amount,
                 EazyNick.getInstance().getUtils().isVersion13OrLater()
                         ? 0
@@ -44,11 +44,13 @@ public class ItemBuilder {
     public ItemBuilder(Material mat, int amount, int subID) {
         if(!(EazyNick.getInstance().getUtils().isVersion13OrLater())) {
             try {
-                this.itemStack = ItemStack.class.getConstructor(
-                        Material.class,
-                        int.class,
-                        short.class
-                ).newInstance(
+                this.itemStack = (ItemStack) newInstance(
+                        ItemStack.class,
+                        new Class<?>[] {
+                                Material.class,
+                                int.class,
+                                short.class
+                        },
                         mat,
                         amount,
                         (short) subID
@@ -65,13 +67,7 @@ public class ItemBuilder {
     public ItemBuilder setDurability(int durability) {
         if(!(EazyNick.getInstance().getUtils().isVersion13OrLater())) {
             try {
-                itemStack.getClass().getMethod(
-                        "setDurability",
-                        short.class
-                ).invoke(
-                        itemStack,
-                        (short) durability
-                );
+                invoke(itemStack, "setDurability", types(short.class), durability);
             } catch (Exception ignore) {
             }
         }
@@ -99,7 +95,7 @@ public class ItemBuilder {
         if(value) {
             itemMeta.addEnchant(Enchantment.DURABILITY, 1, false);
 
-            if(!(EazyNick.getInstance().getVersion().equalsIgnoreCase("1_7_R4")))
+            if(!NMS_VERSION.equalsIgnoreCase("v1_7_R4"))
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
@@ -108,48 +104,33 @@ public class ItemBuilder {
 
     public ItemBuilder setSkullOwner(String owner) {
         if(owner != null) {
-            EazyNick eazyNick = EazyNick.getInstance();
-
-            String value = "";
-
             try {
-                if(eazyNick.getVersion().startsWith("1_7"))
-                    value = eazyNick.getGameProfileBuilder_1_7()
-                            .fetch(eazyNick.getUUIDFetcher_1_7().getUUID(owner))
-                            .getProperties().get("textures")
-                            .iterator()
-                            .next()
-                            .getValue();
-                else if(eazyNick.getVersion().equals("1_8_R1"))
-                    value = eazyNick.getGameProfileBuilder_1_8_R1()
-                            .fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(owner))
-                            .getProperties().get("textures")
-                            .iterator()
-                            .next()
-                            .getValue();
-                else
-                    value = eazyNick.getGameProfileBuilder()
-                            .fetch(eazyNick.getUUIDFetcher().getUUID(owner))
-                            .getProperties().get("textures")
-                            .iterator()
-                            .next()
-                            .getValue();
+                Object gameProfile = MojangAPI.getGameProfile(owner);
+
+                if(gameProfile != null) {
+                    return setSkullTextures(
+                            (String) invoke(invoke(invoke(invoke(
+                                    gameProfile,
+                                    "getProperties"),
+                                    "get", types(Object.class), "textures"),
+                                    "iterator"),
+                                    "next")
+                    );
+                }
             } catch (Exception ignore) {
             }
+        }
 
-            return setSkullTextures(value);
-        } else
-            return this;
+        return this;
     }
 
     public ItemBuilder setSkullTextures(String value) {
-        SkullMeta skullMeta = (SkullMeta) itemMeta;
+        SkullMeta skullMeta = (SkullMeta) this.itemMeta;
 
         try {
-            String version = EazyNick.getInstance().getVersion();
             Object profile;
 
-            if(version.startsWith("1_7")) {
+            if(NMS_VERSION.startsWith("v1_7")) {
                 net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(
                         UUID.randomUUID(),
                         "MHF_Custom"
@@ -162,12 +143,12 @@ public class ItemBuilder {
 
                 profile = gameProfile;
             } else {
-                GameProfile gameProfile = new GameProfile(
+                com.mojang.authlib.GameProfile gameProfile = new com.mojang.authlib.GameProfile(
                         UUID.randomUUID(),
                         "MHF_Custom"
                 );
                 gameProfile.getProperties().removeAll("textures");
-                gameProfile.getProperties().put("textures", new Property(
+                gameProfile.getProperties().put("textures", new com.mojang.authlib.properties.Property(
                         "textures",
                         value
                 ));
@@ -175,21 +156,19 @@ public class ItemBuilder {
                 profile = gameProfile;
             }
 
-            Field profileField = skullMeta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(skullMeta, profile);
+            setField(skullMeta, "profile", profile);
         } catch (Exception ignore) {
         }
 
-        itemMeta = skullMeta;
+        this.itemMeta = skullMeta;
 
         return this;
     }
 
     public ItemStack build() {
-        itemStack.setItemMeta(itemMeta);
+        this.itemStack.setItemMeta(this.itemMeta);
 
-        return itemStack;
+        return this.itemStack;
     }
 
 }

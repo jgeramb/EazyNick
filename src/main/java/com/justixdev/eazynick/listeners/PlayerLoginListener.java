@@ -23,20 +23,15 @@ public class PlayerLoginListener implements Listener {
         UUID uniqueId = player.getUniqueId();
 
         if (
-                (
-                        setupYamlFile.getConfiguration().getBoolean("BungeeCord") && (
-                                !(setupYamlFile.getConfiguration().getBoolean("LobbyMode"))
-                                        || (player.hasPermission("eazynick.bypasslobbymode")
-                                        && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))
-                        ) && eazyNick.getMySQLNickManager().isPlayerNicked(uniqueId)
-                )
-                        || utils.getLastNickData().containsKey(uniqueId)
-                        || setupYamlFile.getConfiguration().getBoolean("JoinNick")
-                        || (
-                        setupYamlFile.getConfiguration().getBoolean("SaveLocalNickDatas")
-                                && eazyNick.getsavedNickDataYamlFile().getConfiguration().contains(player.getUniqueId().toString().replace("-", ""))
-                )
-        )
+                (setupYamlFile.getConfiguration().getBoolean("BungeeCord")
+                        && (!setupYamlFile.getConfiguration().getBoolean("LobbyMode")
+                                || (player.hasPermission("eazynick.bypasslobbymode")
+                                        && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission")))
+                        && eazyNick.getMysqlNickManager().isNicked(uniqueId))
+                || utils.getLastNickData().containsKey(uniqueId)
+                || setupYamlFile.getConfiguration().getBoolean("JoinNick")
+                || (setupYamlFile.getConfiguration().getBoolean("SaveLocalNickData")
+                        && eazyNick.getSavedNickDataYamlFile().getConfiguration().contains(player.getUniqueId().toString().replace("-", ""))))
             utils.getSoonNickedPlayers().add(uniqueId);
     }
 

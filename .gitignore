@@ -2,3 +2,4 @@
 out
 target
 lib
+compile-dev.*

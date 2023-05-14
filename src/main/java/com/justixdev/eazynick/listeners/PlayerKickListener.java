@@ -26,16 +26,16 @@ public class PlayerKickListener implements Listener {
         EazyNick eazyNick = EazyNick.getInstance();
         Utils utils = eazyNick.getUtils();
         SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
-        MySQLNickManager mysqlNickManager = eazyNick.getMySQLNickManager();
-        MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMySQLPlayerDataManager();
+        MySQLNickManager mysqlNickManager = eazyNick.getMysqlNickManager();
+        MySQLPlayerDataManager mysqlPlayerDataManager = eazyNick.getMysqlPlayerDataManager();
 
         Player player = event.getPlayer();
         UUID uniqueId = player.getUniqueId();
         NickManager api = new NickManager(player);
 
-        if (api.isNicked() && !(setupYamlFile.getConfiguration().getBoolean("APIMode"))) {
+        if (api.isNicked() && !setupYamlFile.getConfiguration().getBoolean("APIMode")) {
             boolean isBungeeCord = setupYamlFile.getConfiguration().getBoolean("BungeeCord");
-            NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uniqueId).clone();
+            NickedPlayerData nickedPlayerData = utils.getNickedPlayers().get(uniqueId).copy();
 
             if(setupYamlFile.getConfiguration().getBoolean("NickCommands.OnUnnick")) {
                 if(utils.isPluginInstalled("PlaceholderAPI"))
@@ -46,19 +46,18 @@ public class PlayerKickListener implements Listener {
                                             : player,
                                     PlaceholderAPI.setPlaceholders(
                                             player,
-                                            command.replace("%player%", player.getName())
-                                                    .replace("%nickName%", nickedPlayerData.getNickName())
-                                    )
-                            ));
+                                            command
+                                                    .replace("%player%", player.getName())
+                                                    .replace("%nickName%", nickedPlayerData.getNickName()))));
                 else
                     setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick")
                             .forEach(command -> Bukkit.dispatchCommand(
                                     setupYamlFile.getConfiguration().getBoolean("NickCommands.SendAsConsole")
                                             ? Bukkit.getConsoleSender()
                                             : player,
-                                    command.replace("%player%", player.getName())
-                                            .replace("%nickName%", nickedPlayerData.getNickName())
-                            ));
+                                    command
+                                            .replace("%player%", player.getName())
+                                            .replace("%nickName%", nickedPlayerData.getNickName())));
             }
 
             if(utils.getOldExperienceLevels().containsKey(player.getUniqueId())) {
@@ -69,8 +68,7 @@ public class PlayerKickListener implements Listener {
 
             api.unnickPlayerWithoutRemovingMySQL(
                     !(setupYamlFile.getConfiguration().getBoolean("DisconnectUnnick") || isBungeeCord),
-                    false
-            );
+                    false);
 
             if(utils.isPluginInstalled("LuckPerms"))
                 new LuckPermsHook(player).resetNodes();
@@ -82,35 +80,33 @@ public class PlayerKickListener implements Listener {
             if(setupYamlFile.getConfiguration().getBoolean("OverwriteJoinQuitMessages")) {
                 String message = setupYamlFile.getConfigString(player, "OverwrittenMessages.Quit");
 
-                if(isBungeeCord && mysqlNickManager.isPlayerNicked(uniqueId))
+                if(isBungeeCord && mysqlNickManager.isNicked(uniqueId))
                     message = message.replace("%name%", mysqlNickManager.getNickName(uniqueId))
                             .replace(
                                     "%displayName%",
                                     mysqlPlayerDataManager.getChatPrefix(uniqueId)
                                             + mysqlNickManager.getNickName(uniqueId)
-                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId)
-                            ).replace(
+                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId))
+                            .replace(
                                     "%displayname%",
                                     mysqlPlayerDataManager.getChatPrefix(uniqueId)
                                             + mysqlNickManager.getNickName(uniqueId)
-                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId)
-                            );
+                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId));
                 else
                     message = message.replace("%name%", nickedPlayerData.getNickName())
                             .replace(
                                     "%displayName%",
                                     nickedPlayerData.getChatPrefix()
                                             + nickedPlayerData.getNickName()
-                                            + nickedPlayerData.getChatSuffix()
-                            ).replace(
+                                            + nickedPlayerData.getChatSuffix())
+                            .replace(
                                     "%displayname%",
                                     nickedPlayerData.getChatPrefix()
                                             + nickedPlayerData.getNickName()
-                                            + nickedPlayerData.getChatSuffix()
-                            );
+                                            + nickedPlayerData.getChatSuffix());
 
                 event.setLeaveMessage(message);
-            } else if (!(event.getLeaveMessage().isEmpty())) {
+            } else if (!event.getLeaveMessage().isEmpty()) {
                 if (event.getLeaveMessage().contains("formerly known as"))
                     event.setLeaveMessage("§e" + player.getName() + " left the game.");
 
@@ -123,16 +119,7 @@ public class PlayerKickListener implements Listener {
             }
         }
 
-        if(utils.getIncomingPacketInjectors().containsKey(uniqueId)) {
-            Object incomingPacketInjector = utils.getIncomingPacketInjectors().get(uniqueId);
-
-            try {
-                incomingPacketInjector.getClass().getMethod("unregister").invoke(incomingPacketInjector);
-            } catch (Exception ignore) {
-            }
-
-            utils.getIncomingPacketInjectors().remove(uniqueId);
-        }
+        eazyNick.getPacketInjectorManager().remove(player);
     }
 
 }

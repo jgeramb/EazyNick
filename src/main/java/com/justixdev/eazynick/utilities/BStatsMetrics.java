@@ -42,7 +42,8 @@ public class BStatsMetrics {
             config.addDefault("logSentData", false);
             config.addDefault("logResponseStatusText", false);
 
-            config.options()
+            config
+                    .options()
                     .header("bStats (https://bStats.org) collects some basic information for plugin authors, like how\n"
                             + "many people use their plugin and their total player count. It's recommended to keep bStats\n"
                             + "enabled, but if you're not comfortable with this, you can turn this setting off. There is no\n"
@@ -52,7 +53,7 @@ public class BStatsMetrics {
 
             try {
                 config.save(configFile);
-            } catch (IOException ignored) {
+            } catch (IOException ignore) {
             }
         }
 
@@ -61,7 +62,8 @@ public class BStatsMetrics {
         boolean logErrors = config.getBoolean("logFailedRequests", false);
         boolean logSentData = config.getBoolean("logSentData", false);
         boolean logResponseStatusText = config.getBoolean("logResponseStatusText", false);
-        metricsBase = new MetricsBase(
+
+        this.metricsBase = new MetricsBase(
                 "bukkit",
                 serverUUID,
                 serviceId,
@@ -79,7 +81,7 @@ public class BStatsMetrics {
     }
 
     public void addCustomChart(CustomChart chart) {
-        metricsBase.addCustomChart(chart);
+        this.metricsBase.addCustomChart(chart);
     }
 
     private void appendPlatformData(JsonObjectBuilder builder) {
@@ -95,7 +97,7 @@ public class BStatsMetrics {
     }
 
     private void appendServiceData(JsonObjectBuilder builder) {
-        builder.appendField("pluginVersion", plugin.getDescription().getVersion());
+        builder.appendField("pluginVersion", this.plugin.getDescription().getVersion());
     }
 
     private int getPlayerAmount() {
@@ -105,7 +107,7 @@ public class BStatsMetrics {
             return onlinePlayersMethod.getReturnType().equals(Collection.class)
                     ? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size()
                     : ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             return Bukkit.getOnlinePlayers().size();
         }
     }
@@ -114,10 +116,10 @@ public class BStatsMetrics {
 
         public static final String METRICS_VERSION = "2.2.1", REPORT_URL = "https://bStats.org/api/v2/data/%s";
 
-        private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
-                1,
-                task -> new Thread(task, "bStats-Metrics")
-        );
+        private static final ScheduledExecutorService scheduler =
+                Executors.newScheduledThreadPool(
+                        1,
+                        task -> new Thread(task, "bStats-Metrics"));
 
         private final String platform;
         private final String serverUuid;
@@ -155,10 +157,10 @@ public class BStatsMetrics {
             this.logSentData = logSentData;
             this.logResponseStatusText = logResponseStatusText;
 
-            checkRelocation();
+            this.checkRelocation();
 
             if (enabled)
-                startSubmitting();
+                this.startSubmitting();
         }
 
         public void addCustomChart(CustomChart chart) {
@@ -167,13 +169,13 @@ public class BStatsMetrics {
 
         private void startSubmitting() {
             final Runnable submitTask = () -> {
-                if (!(enabled) || !(checkServiceEnabledSupplier.get())) {
+                if (!this.enabled || !this.checkServiceEnabledSupplier.get()) {
                     scheduler.shutdown();
                     return;
                 }
 
-                if (submitTaskConsumer != null)
-                    submitTaskConsumer.accept(this::submitData);
+                if (this.submitTaskConsumer != null)
+                    this.submitTaskConsumer.accept(this::submitData);
                 else
                     this.submitData();
             };
@@ -188,41 +190,41 @@ public class BStatsMetrics {
         private void submitData() {
             final JsonObjectBuilder baseJsonBuilder = new JsonObjectBuilder();
 
-            appendPlatformDataConsumer.accept(baseJsonBuilder);
+            this.appendPlatformDataConsumer.accept(baseJsonBuilder);
 
             final JsonObjectBuilder serviceJsonBuilder = new JsonObjectBuilder();
-            appendServiceDataConsumer.accept(serviceJsonBuilder);
+            this.appendServiceDataConsumer.accept(serviceJsonBuilder);
 
-            JsonObjectBuilder.JsonObject[] chartData = customCharts
+            JsonObjectBuilder.JsonObject[] chartData = this.customCharts
                     .stream()
-                    .map(customChart -> customChart.getRequestJsonObject(errorLogger, logErrors))
+                    .map(customChart -> customChart.getRequestJsonObject(this.errorLogger, this.logErrors))
                     .filter(Objects::nonNull)
                     .toArray(JsonObjectBuilder.JsonObject[]::new);
 
-            serviceJsonBuilder.appendField("id", serviceId);
+            serviceJsonBuilder.appendField("id", this.serviceId);
             serviceJsonBuilder.appendField("customCharts", chartData);
 
             baseJsonBuilder.appendField("service", serviceJsonBuilder.build());
-            baseJsonBuilder.appendField("serverUUID", serverUuid);
+            baseJsonBuilder.appendField("serverUUID", this.serverUuid);
             baseJsonBuilder.appendField("metricsVersion", METRICS_VERSION);
 
             JsonObjectBuilder.JsonObject data = baseJsonBuilder.build();
 
             scheduler.execute(() -> {
                 try {
-                    sendData(data);
+                    this.sendData(data);
                 } catch (Exception e) {
-                    if (logErrors)
-                        errorLogger.accept("Could not submit bStats metrics data", e);
+                    if (this.logErrors)
+                        this.errorLogger.accept("Could not submit bStats metrics data", e);
                 }
             });
         }
 
         private void sendData(JsonObjectBuilder.JsonObject data) throws Exception {
-            if (logSentData)
-                infoLogger.accept("Sent bStats metrics data: " + data.toString());
+            if (this.logSentData)
+                this.infoLogger.accept("Sent bStats metrics data: " + data.toString());
 
-            String url = String.format(REPORT_URL, platform);
+            String url = String.format(REPORT_URL, this.platform);
             HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
 
             byte[] compressedData = compress(data.toString());
@@ -248,13 +250,13 @@ public class BStatsMetrics {
                     builder.append(line);
             }
 
-            if (logResponseStatusText)
-                infoLogger.accept("Sent data to bStats and received response: " + builder);
+            if (this.logResponseStatusText)
+                this.infoLogger.accept("Sent data to bStats and received response: " + builder);
         }
 
         private void checkRelocation() {
             if ((System.getProperty("bstats.relocatecheck") == null)
-                    || !(System.getProperty("bstats.relocatecheck").equals("false"))) {
+                    || !System.getProperty("bstats.relocatecheck").equals("false")) {
                 final String defaultPackage = new String(new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's'});
                 final String examplePackage = new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
 
@@ -292,18 +294,18 @@ public class BStatsMetrics {
 
         public JsonObjectBuilder.JsonObject getRequestJsonObject(BiConsumer<String, Throwable> errorLogger, boolean logErrors) {
             JsonObjectBuilder builder = new JsonObjectBuilder();
-            builder.appendField("chartId", chartId);
+            builder.appendField("chartId", this.chartId);
 
             try {
-                JsonObjectBuilder.JsonObject data = getChartData();
+                JsonObjectBuilder.JsonObject data = this.getChartData();
 
                 if (data == null)
                     return null;
 
                 builder.appendField("data", data);
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 if (logErrors)
-                    errorLogger.accept("Failed to get data for custom chart with id " + chartId, t);
+                    errorLogger.accept("Failed to get data for custom chart with id " + this.chartId, th);
 
                 return null;
             }
@@ -327,7 +329,7 @@ public class BStatsMetrics {
 
         @Override
         protected JsonObjectBuilder.JsonObject getChartData() throws Exception {
-            String value = callable.call();
+            String value = this.callable.call();
 
             if (value == null || value.isEmpty())
                 return null;
@@ -343,29 +345,27 @@ public class BStatsMetrics {
         private boolean hasAtLeastOneField = false;
 
         public JsonObjectBuilder() {
-            builder.append("{");
+            this.builder.append("{");
         }
 
         public JsonObjectBuilder appendField(String key, String value) {
             if (value == null)
                 throw new IllegalArgumentException("JSON value must not be null");
 
-            appendFieldUnescaped(key, "\"" + escape(value) + "\"");
+            this.appendFieldUnescaped(key, "\"" + escape(value) + "\"");
 
             return this;
         }
 
         public void appendField(String key, int value) {
-            appendFieldUnescaped(key, String.valueOf(value));
-
+            this.appendFieldUnescaped(key, String.valueOf(value));
         }
 
         public void appendField(String key, JsonObject object) {
             if (object == null)
                 throw new IllegalArgumentException("JSON object must not be null");
 
-            appendFieldUnescaped(key, object.toString());
-
+            this.appendFieldUnescaped(key, object.toString());
         }
 
         public void appendField(String key, JsonObject[] values) {
@@ -377,32 +377,31 @@ public class BStatsMetrics {
                     .map(JsonObject::toString)
                     .collect(Collectors.joining(","));
 
-            appendFieldUnescaped(key, "[" + escapedValues + "]");
-
+            this.appendFieldUnescaped(key, "[" + escapedValues + "]");
         }
 
         private void appendFieldUnescaped(String key, String escapedValue) {
-            if (builder == null)
+            if (this.builder == null)
                 throw new IllegalStateException("JSON has already been built");
 
             if (key == null)
                 throw new IllegalArgumentException("JSON key must not be null");
 
-            if (hasAtLeastOneField)
-                builder.append(",");
+            if (this.hasAtLeastOneField)
+                this.builder.append(",");
 
-            builder.append("\"").append(escape(key)).append("\":").append(escapedValue);
+            this.builder.append("\"").append(escape(key)).append("\":").append(escapedValue);
 
-            hasAtLeastOneField = true;
+            this.hasAtLeastOneField = true;
         }
 
         public JsonObject build() {
-            if (builder == null)
+            if (this.builder == null)
                 throw new IllegalStateException("JSON has already been built");
 
-            JsonObject object = new JsonObject(builder.append("}").toString());
+            JsonObject object = new JsonObject(this.builder.append("}").toString());
 
-            builder = null;
+            this.builder = null;
 
             return object;
         }

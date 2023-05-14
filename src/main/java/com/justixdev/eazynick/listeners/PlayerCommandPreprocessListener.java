@@ -1,13 +1,17 @@
 package com.justixdev.eazynick.listeners;
 
 import com.justixdev.eazynick.EazyNick;
+import com.justixdev.eazynick.api.events.PlayerUnnickEvent;
 import com.justixdev.eazynick.utilities.Utils;
 import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
+import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+
+import java.util.Objects;
 
 public class PlayerCommandPreprocessListener implements Listener {
 
@@ -18,11 +22,17 @@ public class PlayerCommandPreprocessListener implements Listener {
         SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 
         Player player = event.getPlayer();
-        StringBuilder msg = new StringBuilder(event.getMessage());
-        String[] args = msg.toString().trim().split(" ");
+        String message = event.getMessage().trim();
+
+        // Name replacements
+        String[] args = message.split("\\s+");
+        StringBuilder msg = new StringBuilder(message);
         boolean allowRealName = setupYamlFile.getConfiguration().getBoolean("AllowRealNamesInCommands");
 
-        if(utils.getReplaceNameInCommandBlackList().stream().noneMatch(command -> args[0].equalsIgnoreCase("/" + command)) && (EazyNick.getInstance().getCommand(args[0].substring(1)) == null)) {
+        if(utils.getReplaceNameInCommandBlackList()
+                .stream()
+                .noneMatch(command -> args[0].equalsIgnoreCase("/" + command))
+                && (EazyNick.getInstance().getCommand(args[0].substring(1)) == null)) {
             utils.getNickedPlayers().values().forEach(nickedPlayerData -> {
                 for (int i = 0; i < args.length; i++) {
                     if(args[i].equalsIgnoreCase(nickedPlayerData.getNickName()))
@@ -40,9 +50,35 @@ public class PlayerCommandPreprocessListener implements Listener {
             event.setMessage(msg.toString().trim());
         }
 
-        String msg2 = msg.toString().toLowerCase().replace("bukkit:", "");
+        // Command system
+        if(eazyNick.getCommandManager().execute(player, event.getMessage().substring(1))) {
+            event.setCancelled(true);
+            return;
+        }
 
-        if (!(msg2.startsWith("/help nick") || msg2.startsWith("/help eazynick") || msg2.startsWith("/? nick") || msg2.startsWith("/? eazynick")) || !(player.hasPermission("bukkit.command.help"))) return;
+        String rawCommand = msg.toString().toLowerCase().replace("bukkit:", "");
+
+        if(rawCommand.startsWith("/rl") || rawCommand.startsWith("/reload")) {
+            event.setCancelled(true);
+
+            utils.getNickedPlayers()
+                    .keySet()
+                    .stream()
+                    .map(Bukkit::getPlayer)
+                    .filter(Objects::nonNull)
+                    .forEach(currentPlayer -> Bukkit.getPluginManager().callEvent(new PlayerUnnickEvent(currentPlayer)));
+
+            Bukkit.getScheduler().runTaskLater(eazyNick, Bukkit::reload, 20);
+            return;
+        }
+
+        if (
+                !(rawCommand.startsWith("/help nick")
+                        || rawCommand.startsWith("/help eazynick")
+                        || rawCommand.startsWith("/? nick")
+                        || rawCommand.startsWith("/? eazynick"))
+                || !player.hasPermission("bukkit.command.help"))
+            return;
 
         event.setCancelled(true);
 

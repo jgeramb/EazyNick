@@ -4,24 +4,61 @@ import com.justixdev.eazynick.EazyNick;
 import com.justixdev.eazynick.utilities.MineSkinAPI;
 import com.justixdev.eazynick.utilities.Utils;
 import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
+import com.justixdev.eazynick.utilities.mojang.MojangAPI;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
+import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
+import static com.justixdev.eazynick.nms.ReflectionHelper.invoke;
+
 public class NickedPlayerData {
 
+    @Getter
     private final UUID uniqueId;
-    private UUID spoofedUniqueId;
-    private final String realName;
-    private String oldDisplayName, oldPlayerListName, nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName;
+    @Getter
     private final int sortID;
+    @Getter
     private Object skinProfile;
+    @Getter
+    private final String realName;
+    @Getter @Setter
+    private UUID spoofedUniqueId;
+    @Getter @Setter
+    private String oldDisplayName,
+            oldPlayerListName,
+            nickName,
+            skinName,
+            chatPrefix,
+            chatSuffix,
+            tabPrefix,
+            tabSuffix,
+            tagPrefix,
+            tagSuffix,
+            groupName;
 
-    public NickedPlayerData(UUID uniqueId, UUID spoofedUniqueId, String oldDisplayName, String oldPlayerListName, String realName, String nickName, String skinName, String chatPrefix, String chatSuffix, String tabPrefix, String tabSuffix, String tagPrefix, String tagSuffix, String groupName, int sortID) {
+    public NickedPlayerData(UUID uniqueId,
+                            UUID spoofedUniqueId,
+                            String oldDisplayName,
+                            String oldPlayerListName,
+                            String realName,
+                            String nickName,
+                            String skinName,
+                            String chatPrefix,
+                            String chatSuffix,
+                            String tabPrefix,
+                            String tabSuffix,
+                            String tagPrefix,
+                            String tagSuffix,
+                            String groupName,
+                            int sortID) {
         this.uniqueId = uniqueId;
         this.spoofedUniqueId = spoofedUniqueId;
         this.oldDisplayName = oldDisplayName;
@@ -48,47 +85,34 @@ public class NickedPlayerData {
         if(this.spoofedUniqueId == null)
             this.spoofedUniqueId = this.uniqueId;
 
-        String version = eazyNick.getVersion();
         boolean changeNameTag = eazyNick.getSetupYamlFile().getConfiguration().getBoolean("Settings.ChangeOptions.NameTag");
 
-        try {
-            //Create and return new game profile
-            if(version.startsWith("1_7")) {
-                net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, changeNameTag ? nickName : realName);
-                net.minecraft.util.com.mojang.authlib.properties.PropertyMap properties = gameProfile.getProperties();
-                properties.removeAll("textures");
+        // Create and return new game profile
+        if(NMS_VERSION.startsWith("v1_7")) {
+            net.minecraft.util.com.mojang.authlib.GameProfile gameProfile = new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, changeNameTag ? nickName : realName);
+            net.minecraft.util.com.mojang.authlib.properties.PropertyMap properties = gameProfile.getProperties();
+            properties.removeAll("textures");
 
-                if(skinProfile == null)
-                    skinProfile = eazyNick.getUtils().getDefaultGameProfile_1_7();
+            if(this.skinProfile == null)
+                this.skinProfile = eazyNick.getUtils().getDefaultGameProfile_1_7();
 
-                properties.putAll("textures", ((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().get("textures"));
+            properties.putAll("textures", ((net.minecraft.util.com.mojang.authlib.GameProfile) this.skinProfile).getProperties().get("textures"));
 
-                return gameProfile;
-            } else {
-                GameProfile gameProfile = new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, changeNameTag ? nickName : realName);
-                PropertyMap properties = gameProfile.getProperties();
-                properties.removeAll("textures");
+            return gameProfile;
+        } else {
+            GameProfile gameProfile = new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, changeNameTag ? nickName : realName);
+            PropertyMap properties = gameProfile.getProperties();
+            properties.removeAll("textures");
 
-                if(skinProfile == null)
-                    skinProfile = eazyNick.getUtils().getDefaultGameProfile();
+            if(this.skinProfile == null)
+                this.skinProfile = eazyNick.getUtils().getDefaultGameProfile();
 
-                properties.putAll("textures", ((GameProfile) skinProfile).getProperties().get("textures"));
+            properties.putAll("textures", ((GameProfile) this.skinProfile).getProperties().get("textures"));
 
-                return gameProfile;
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            return gameProfile;
         }
-
-        //Return default game profile
-        return (version.startsWith("1_7") ? new net.minecraft.util.com.mojang.authlib.GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName) : new GameProfile(spoofUniqueId ? spoofedUniqueId : uniqueId, nickName));
     }
 
-    Object getSkinProfile() {
-        return skinProfile;
-    }
-
-    @SuppressWarnings("ConstantConditions")
     private void prepareSkinProfile() {
         new Thread(() -> {
             EazyNick eazyNick = EazyNick.getInstance();
@@ -96,180 +120,113 @@ public class NickedPlayerData {
             MineSkinAPI mineSkinAPI = eazyNick.getMineSkinAPI();
             SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 
-            String version = eazyNick.getVersion();
-
-            if(setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
-                skinProfile = version.startsWith("1_7") ? utils.getDefaultGameProfile_1_7() : utils.getDefaultGameProfile();
-
-                try {
-                    Object profile = null;
-
-                    if(skinName.startsWith("MINESKIN:")) {
-                        //Load skin from mineskin.org
-                        if(version.startsWith("1_7")) {
-                            ((GameProfile) skinProfile).getProperties().removeAll("textures");
-                            ((net.minecraft.util.com.mojang.authlib.GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]));
-                        } else {
-                            ((GameProfile) skinProfile).getProperties().removeAll("textures");
-                            ((GameProfile) skinProfile).getProperties().putAll("textures", mineSkinAPI.getTextureProperties(skinName.equals("MINESKIN:RANDOM") ? utils.getRandomStringFromList(utils.getMineSkinUUIDs()) : skinName.split(":")[1]));
-                        }
-                    } else {
-                        //Load skin from mojang api
-                        if(version.startsWith("1_7"))
-                            profile = eazyNick.getGameProfileBuilder_1_7().fetch(eazyNick.getUUIDFetcher_1_7().getUUID(skinName));
-                        else if(version.equals("1_8_R1"))
-                            profile = eazyNick.getGameProfileBuilder_1_8_R1().fetch(eazyNick.getUUIDFetcher_1_8_R1().getUUID(skinName));
-                        else
-                            profile = eazyNick.getGameProfileBuilder().fetch(eazyNick.getUUIDFetcher().getUUID(skinName));
-                    }
-
-                    if(profile != null)
-                        skinProfile = profile;
-                } catch (Exception ex) {
-                    if(setupYamlFile.getConfiguration().getBoolean("ShowProfileErrorMessages")) {
-                        if(utils.isSupportMode()) {
-                            utils.sendConsole("§cAn error occured while preparing skin profile§7:");
-
-                            ex.printStackTrace();
-                        } else
-                            utils.sendConsole("§cAn error occured while preparing skin profile§7, §cthis is NOT a plugin error§7!");
-                    }
-
-                    skinProfile = version.startsWith("1_7") ? utils.getDefaultGameProfile_1_7() : utils.getDefaultGameProfile();
-                }
-            } else {
-                Player player = Bukkit.getPlayer(uniqueId);
+            if(!setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.Skin")) {
+                Player player = Bukkit.getPlayer(this.uniqueId);
 
                 if(player != null) {
                     try {
-                        skinProfile = player.getClass().getMethod("getProfile").invoke(player);
-                    } catch (Exception ignore) {
+                        this.skinProfile = invoke(player,"getProfile");
+                    } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException ignore) {
                     }
-
                 }
+
+                return;
+            }
+
+            this.skinProfile = NMS_VERSION.startsWith("v1_7")
+                    ? utils.getDefaultGameProfile_1_7()
+                    : utils.getDefaultGameProfile();
+
+            try {
+                Object profile = null;
+
+                if(skinName.startsWith("MINESKIN:")) {
+                    // Load skin from mineskin.org
+                    if(NMS_VERSION.startsWith("v1_7")) {
+                        ((net.minecraft.util.com.mojang.authlib.GameProfile) this.skinProfile).getProperties().removeAll("textures");
+                        ((net.minecraft.util.com.mojang.authlib.GameProfile) this.skinProfile).getProperties().putAll(
+                                "textures",
+                                mineSkinAPI.getTextureProperties_1_7(skinName.equals("MINESKIN:RANDOM")
+                                        ? utils.getRandomStringFromList(utils.getMineSkinUUIDs())
+                                        : this.skinName.split(":")[1])
+                        );
+                    } else {
+                        ((GameProfile) this.skinProfile).getProperties().removeAll("textures");
+                        ((GameProfile) this.skinProfile).getProperties().putAll(
+                                "textures",
+                                mineSkinAPI.getTextureProperties(this.skinName.equals("MINESKIN:RANDOM")
+                                        ? utils.getRandomStringFromList(utils.getMineSkinUUIDs())
+                                        : this.skinName.split(":")[1])
+                        );
+                    }
+                } else
+                    profile = MojangAPI.getGameProfile(this.skinName);
+
+                if(profile != null)
+                    this.skinProfile = profile;
+            } catch (IOException ex) {
+                if(setupYamlFile.getConfiguration().getBoolean("ShowProfileErrorMessages")) {
+                    if(utils.isSupportMode()) {
+                        utils.sendConsole("§cAn error occurred while preparing skin profile§7:");
+
+                        ex.printStackTrace();
+                    } else
+                        utils.sendConsole("§cAn error occurred while preparing skin profile§7, §cthis is NOT a plugin error§7!");
+                }
+
+                this.skinProfile = NMS_VERSION.startsWith("v1_7")
+                        ? utils.getDefaultGameProfile_1_7()
+                        : utils.getDefaultGameProfile();
             }
         }).start();
-    }
-
-    public UUID getUniqueId() {
-        return uniqueId;
-    }
-
-    public UUID getSpoofedUniqueId() {
-        return spoofedUniqueId;
-    }
-
-    public String getOldDisplayName() {
-        return oldDisplayName;
-    }
-
-    public String getOldPlayerListName() {
-        return oldPlayerListName;
-    }
-
-    public String getRealName() {
-        return realName;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public String getSkinName() {
-        return skinName;
-    }
-
-    public String getChatPrefix() {
-        return chatPrefix;
-    }
-
-    public String getChatSuffix() {
-        return chatSuffix;
-    }
-
-    public String getTabPrefix() {
-        return tabPrefix;
-    }
-
-    public String getTabSuffix() {
-        return tabSuffix;
-    }
-
-    public String getTagPrefix() {
-        return tagPrefix;
-    }
-
-    public String getTagSuffix() {
-        return tagSuffix;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public int getSortID() {
-        return sortID;
-    }
-
-    public void setSpoofedUniqueId(UUID spoofedUniqueId) {
-        this.spoofedUniqueId = spoofedUniqueId;
-    }
-
-    public void setOldDisplayName(String oldDisplayName) {
-        this.oldDisplayName = oldDisplayName;
-    }
-
-    public void setOldPlayerListName(String oldPlayerListName) {
-        this.oldPlayerListName = oldPlayerListName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
     }
 
     public void setSkinName(String skinName) {
         this.skinName = skinName;
 
-        //Reload skin
+        // Reload skin
         prepareSkinProfile();
     }
 
-    public void setChatPrefix(String chatPrefix) {
-        this.chatPrefix = chatPrefix;
-    }
-
-    public void setChatSuffix(String chatSuffix) {
-        this.chatSuffix = chatSuffix;
-    }
-
-    public void setTabPrefix(String tabPrefix) {
-        this.tabPrefix = tabPrefix;
-    }
-
-    public void setTabSuffix(String tabSuffix) {
-        this.tabSuffix = tabSuffix;
-    }
-
-    public void setTagPrefix(String tagPrefix) {
-        this.tagPrefix = tagPrefix;
-    }
-
-    public void setTagSuffix(String tagSuffix) {
-        this.tagSuffix = tagSuffix;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public NickedPlayerData clone() {
-        return new NickedPlayerData(uniqueId, spoofedUniqueId, oldDisplayName, oldPlayerListName, realName, nickName, skinName, chatPrefix, chatSuffix, tabPrefix, tabSuffix, tagPrefix, tagSuffix, groupName, sortID);
+    public NickedPlayerData copy() {
+        return new NickedPlayerData(
+                uniqueId,
+                spoofedUniqueId,
+                oldDisplayName,
+                oldPlayerListName,
+                realName,
+                nickName,
+                skinName,
+                chatPrefix,
+                chatSuffix,
+                tabPrefix,
+                tabSuffix,
+                tagPrefix,
+                tagSuffix,
+                groupName,
+                sortID
+        );
     }
 
     @Override
     public String toString() {
-        return "NickedPlayerData={realUniqueId=" + uniqueId + " | spoofedUniqueId=" + spoofedUniqueId + " | oldDisplayName=" + oldDisplayName + " | oldPlayerListName=" + oldPlayerListName+ " | realName=" + realName+ " | nickName=" + nickName + " | skinName=" + skinName + " | chatPrefix=" + chatPrefix + " | chatSuffix=" + chatSuffix + " | tabPrefix=" + tabPrefix + " | tabSuffix=" + tabSuffix + " | tagPrefix=" + tagPrefix + " | tagSuffix=" + tagSuffix + " | groupName=" + groupName + " | sortID=" + sortID + "}";
+        return "NickedPlayerData={" +
+                "realUniqueId=" + uniqueId + " | " +
+                "spoofedUniqueId=" + spoofedUniqueId + " | " +
+                "oldDisplayName=" + oldDisplayName + " | " +
+                "oldPlayerListName=" + oldPlayerListName+ " | " +
+                "realName=" + realName+ " | " +
+                "nickName=" + nickName + " | " +
+                "skinName=" + skinName + " | " +
+                "chatPrefix=" + chatPrefix + " | " +
+                "chatSuffix=" + chatSuffix + " | " +
+                "tabPrefix=" + tabPrefix + " | " +
+                "tabSuffix=" + tabSuffix + " | " +
+                "tagPrefix=" + tagPrefix + " | " +
+                "tagSuffix=" + tagSuffix + " | " +
+                "groupName=" + groupName + " | " +
+                "sortID=" + sortID +
+        "}";
     }
 
 }

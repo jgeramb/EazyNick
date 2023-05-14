@@ -21,39 +21,38 @@ public class AsyncTask {
     }
 
     public AsyncTask run() {
-        asyncRunnable.prepare(this);
+        this.asyncRunnable.prepare(this);
 
-        thread = new Thread(() -> {
+        this.thread = new Thread(() -> {
             // Wait 'delay' milliseconds
             try {
-                Thread.sleep(delay);
+                Thread.sleep(this.delay);
             } catch (InterruptedException ignore) {
             }
 
             do {
-                asyncRunnable.run();
+                this.asyncRunnable.run();
 
                 // Check if task should be executed again
-                if(period >= 0) {
+                if(this.period >= 0) {
                     // Wait 'period' milliseconds
                     try {
-                        //noinspection BusyWait
-                        Thread.sleep(period);
+                        Thread.sleep(this.period);
                     } catch (InterruptedException ignore) {
                     }
                 }
-            } while(running.get());
+            } while(this.running.get());
 
-            thread.interrupt();
+            this.thread.interrupt();
         });
 
-        thread.start();
+        this.thread.start();
 
         return this;
     }
 
     public void cancel() {
-        running.set(false);
+        this.running.set(false);
     }
 
     public static abstract class AsyncRunnable {
@@ -67,8 +66,8 @@ public class AsyncTask {
         public abstract void run();
 
         public void cancel() {
-            if(asyncTask != null)
-                asyncTask.cancel();
+            if(this.asyncTask != null)
+                this.asyncTask.cancel();
             else
                 throw new UnsupportedOperationException("Not running");
         }

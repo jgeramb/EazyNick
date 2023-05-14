@@ -9,11 +9,6 @@ public class SavedNickDataYamlFile extends YamlFile {
     }
 
     @Override
-    public void initConfiguration() {
-        setDefaults();
-    }
-
-    @Override
     public void setDefaults() {
     }
 

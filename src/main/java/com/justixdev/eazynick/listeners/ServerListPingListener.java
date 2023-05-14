@@ -9,14 +9,7 @@ public class ServerListPingListener implements Listener {
 
     @EventHandler
     public void onServerListPing(ServerListPingEvent event) {
-        try {
-            Object outgoingPacketInjector = EazyNick.getInstance().getOutgoingPacketInjector();
-
-            if(outgoingPacketInjector != null)
-                outgoingPacketInjector.getClass().getMethod("init").invoke(outgoingPacketInjector);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        EazyNick.getInstance().getPacketInjectorManager().inject(event.getAddress());
     }
 
 }

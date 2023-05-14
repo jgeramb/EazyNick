@@ -18,8 +18,7 @@ public class PlayerDropItemListener implements Listener {
         Player player = event.getPlayer();
 
         if ((event.getItemDrop().getItemStack().getType() != Material.AIR)
-                && (event.getItemDrop().getItemStack().getItemMeta() != null)
-                && event.getItemDrop().getItemStack().getItemMeta().hasDisplayName()) {
+                && (event.getItemDrop().getItemStack().getItemMeta() != null)) {
             String displayName = event.getItemDrop().getItemStack().getItemMeta().getDisplayName();
 
             if (displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.DisplayName.Enabled"))
@@ -28,7 +27,7 @@ public class PlayerDropItemListener implements Listener {
                     || displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.WorldChange.DisplayName.Disabled"))
                     || displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Enabled"))
                     || displayName.equalsIgnoreCase(languageYamlFile.getConfigString(player, "NickItem.BungeeCord.DisplayName.Disabled"))) {
-                if (!(eazyNick.getSetupYamlFile().getConfiguration().getBoolean("NickItem.InventorySettings.PlayersCanDropItem")))
+                if (!eazyNick.getSetupYamlFile().getConfiguration().getBoolean("NickItem.InventorySettings.PlayersCanDropItem"))
                     event.setCancelled(true);
             }
         }

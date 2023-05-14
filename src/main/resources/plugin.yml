@@ -3,76 +3,10 @@ version: '0.0.0'
 author: Justix
 main: com.justixdev.eazynick.EazyNick
 description: This plugin allows you to change your identity (skin, name, uuid, nametag, tabname, chatname)
-website: https://github.com/JustixDevelopment/EazyNick/releases/
+website: https://github.com/JustixDevelopment/EazyNick/
 softdepend: [PlaceholderAPI, CloudNetAPI, ColoredTags, NametagEdit, PermissionsEx, LuckPerms, Datenschutz, Vault, SurvivalGames, AuthMe, TAB, DeluxeChat, ChatControl, Essentials, SkinsRestorer]
 api-version: 1.13
 load: POSTWORLD
-
-commands:
-  realname:
-    description: Shows the real name of a nicked player
-    aliases:
-      - rd
-      - realdisguise
-  nick:
-    description: Changes your identity (skin, name, nametag, tabname, chatname)
-    aliases:
-      - d
-      - disguise
-  unnick:
-    description: Resets your complete identity
-    aliases:
-      - ud
-      - undisguise
-  nickgui:
-    description: Opens a gui to change/reset your identity
-    aliases:
-      - dgui
-      - disguisegui
-  nickother:
-    description: Changes/Resets the identity of other players
-    aliases:
-      - do
-      - disguiseother
-  name:
-    description: Shows your active nickname
-  resetname:
-    description: Resets your name
-  changeskin:
-    description: Changes your skin
-  resetskin:
-    description: Resets your skin
-  changeskinother:
-    description: Changes the skin of other players
-  resetskinother:
-    description: Resets the skin of other players
-  nicklist:
-    description: Opens a GUI with all random nicknames
-    aliases:
-      - dlist
-      - disgusielist
-  bookgui:
-    description: Opens a Nick-GUI like on hypixel.net
-  reloadconfig:
-    description: Reloads the configuration file
-  fixskin:
-    description: Fixes your skin, if it was not loaded correctly
-  nickedplayers:
-    description: Shows a list of all players, who are currently nicked
-  eazynick:
-    description: Shows some information about the plugin and its commands
-  nickupdatecheck:
-    description: Checks for updates of the plugin
-  togglebungeenick:
-    description: Toggles the automatic nickname on server switch
-    aliases:
-      - togglenick
-      - togglebungeedisguise
-      - toggledisguise
-  guinick:
-    description: This command is only for the plugin, you do not require to know what this is for
-  renick:
-    description: This command is only for the plugin, you do not require to know for what this is
 
 permissions:
   eazynick.help:
