@@ -231,8 +231,8 @@ public class EazyNick extends JavaPlugin {
                 this.mysql.connect();
 
                 // Create default tables
-                this.mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayers (unique_id varchar(36), nickname varchar(32), skin_name varchar(32))");
-                this.mysql.update("CREATE TABLE IF NOT EXISTS NickedPlayerData (unique_id varchar(36), group varchar(64), chat_prefix varchar(64), chat_suffix varchar(64), tab_prefix varchar(64), tab_suffix varchar(64), tag_prefix varchar(64), tag_suffix varchar(64))");
+                this.mysql.update("CREATE TABLE IF NOT EXISTS nicked_players (unique_id varchar(36), nickname varchar(32), skin_name varchar(32))");
+                this.mysql.update("CREATE TABLE IF NOT EXISTS nicked_player_data (unique_id varchar(36), group varchar(64), chat_prefix varchar(64), chat_suffix varchar(64), tab_prefix varchar(64), tab_suffix varchar(64), tag_prefix varchar(64), tag_suffix varchar(64))");
 
                 // Initialize mysql managers
                 this.mysqlNickManager = new MySQLNickManager(this.mysql);

@@ -22,16 +22,11 @@ public abstract class ModernPacketInjector extends PacketInjector {
 
     @Override
     public void inject() {
-        if (this.channel.pipeline().get(this.handlerName) != null) {
-            System.err.println("Skipping " + this.type.name() + " handler for " + this.address.getHostAddress() + "!");
-            return;
-        }
-
         // Inject into to netty channel
         ChannelDuplexHandler handler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                if(!onPacketReceive(msg))
+                if (!onPacketReceive(msg))
                     return;
 
                 super.channelRead(ctx, msg);
@@ -41,7 +36,7 @@ public abstract class ModernPacketInjector extends PacketInjector {
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
                 Object newPacket = onPacketSend(msg);
 
-                if(newPacket == null)
+                if (newPacket == null)
                     return;
 
                 super.write(ctx, newPacket, promise);
@@ -55,7 +50,10 @@ public abstract class ModernPacketInjector extends PacketInjector {
             }
         };
 
-        if(this.type.equals(InjectorType.INCOMING))
+        if (this.channel.pipeline().get(this.handlerName) != null)
+            return;
+
+        if (this.type.equals(InjectorType.INCOMING))
             this.channel.pipeline().addBefore(
                     "packet_handler",
                     this.handlerName,

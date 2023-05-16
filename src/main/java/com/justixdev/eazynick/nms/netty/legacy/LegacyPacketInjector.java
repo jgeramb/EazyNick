@@ -22,9 +22,6 @@ public abstract class LegacyPacketInjector extends PacketInjector {
 
     @Override
     public void inject() {
-        if (this.channel.pipeline().get(this.handlerName) != null)
-            return;
-
         // Inject into to netty channel
         ChannelDuplexHandler handler = new ChannelDuplexHandler() {
 
@@ -53,6 +50,9 @@ public abstract class LegacyPacketInjector extends PacketInjector {
                 super.close(ctx, future);
             }
         };
+
+        if (this.channel.pipeline().get(this.handlerName) != null)
+            return;
 
         if(this.type.equals(InjectorType.INCOMING))
             this.channel.pipeline().addBefore(

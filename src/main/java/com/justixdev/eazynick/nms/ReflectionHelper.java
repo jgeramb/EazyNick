@@ -232,9 +232,9 @@ public class ReflectionHelper {
 
         do {
             if(currentIndent > 0)
-                System.out.println(" ");
+                Bukkit.getLogger().log(Level.INFO, "");
 
-            System.out.println(
+            Bukkit.getLogger().log(Level.INFO,
                     new StringUtils(" ").repeat(currentIndent)
                     + ((currentIndent == 0) ? "" : "... extends ")
                     + Modifier.toString(current.getModifiers())
@@ -251,7 +251,7 @@ public class ReflectionHelper {
                     }
                 }
 
-                System.out.println(
+                Bukkit.getLogger().log(Level.INFO,
                         new StringUtils(" ").repeat(currentIndent + 2)
                         + Modifier.toString(field.getModifiers())
                         + " " + field.getType().getName()
@@ -261,7 +261,7 @@ public class ReflectionHelper {
             }
 
             if(current.getDeclaredFields().length > 0)
-                System.out.println(" ");
+                Bukkit.getLogger().log(Level.INFO, "");
 
             for (Method method : current.getDeclaredMethods()) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -275,7 +275,7 @@ public class ReflectionHelper {
                             .append(param.getName());
                 }
 
-                System.out.println(
+                Bukkit.getLogger().log(Level.INFO,
                         new StringUtils(" ").repeat(currentIndent + 2)
                         + Modifier.toString(method.getModifiers())
                         + " " + method.getReturnType().getName()
