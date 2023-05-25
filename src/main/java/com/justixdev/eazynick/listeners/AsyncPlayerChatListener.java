@@ -12,9 +12,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
+
 public class AsyncPlayerChatListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onFirstAsyncPlayerChat(AsyncPlayerChatEvent event) {
         EazyNick eazyNick = EazyNick.getInstance();
         Utils utils = eazyNick.getUtils();
@@ -33,22 +35,31 @@ public class AsyncPlayerChatListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled=true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLastAsyncPlayerChat(AsyncPlayerChatEvent event) {
         EazyNick eazyNick = EazyNick.getInstance();
         Utils utils = eazyNick.getUtils();
         SetupYamlFile setupYamlFile = eazyNick.getSetupYamlFile();
 
         Player player = event.getPlayer();
+        boolean replaceChat =
+                setupYamlFile.getConfiguration().getBoolean("ReplaceNickedChatFormat")
+                && utils.getWorldsWithDisabledPrefixAndSuffix()
+                        .stream()
+                        .anyMatch(world -> world.equalsIgnoreCase(player.getWorld().getName()));
 
         utils.setLastChatMessage(event.getMessage());
 
-        if (!setupYamlFile.getConfiguration().getBoolean("ReplaceNickedChatFormat")
-                || utils.getWorldsWithDisabledPrefixAndSuffix().stream().anyMatch(world -> world.equalsIgnoreCase(player.getWorld().getName()))
-                || event.isCancelled())
-            return;
-
         NickManager api = new NickManager(player);
+
+        if(event.getFormat().equals("<%1$s> %2$s") && !replaceChat && NMS_VERSION.startsWith("v1_19")) {
+            event.setCancelled(true);
+            Bukkit.getOnlinePlayers().forEach(currentPlayer -> currentPlayer.sendMessage("<" + api.getNickName() + "> " + event.getMessage()));
+            return;
+        }
+
+        if (!replaceChat || event.isCancelled())
+            return;
 
         if (api.isNicked()) {
             event.setCancelled(true);

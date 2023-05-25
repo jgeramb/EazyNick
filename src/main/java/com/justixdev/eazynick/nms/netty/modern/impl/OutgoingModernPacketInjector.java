@@ -110,6 +110,7 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                 Object entityPlayer = this.player.getClass().getMethod("getHandle").invoke(infoPlayer);
                                 Object playerInteractManager = getFieldValue(entityPlayer, "d");
                                 NickedPlayerData nickedPlayerData = this.utils.getNickedPlayers().get(uniqueIdToUpdate);
+                                boolean isSelfPacket = uniqueIdToUpdate.equals(this.player.getUniqueId());
 
                                 dataToUpdate.add(
                                         newInstance(
@@ -123,20 +124,22 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                                         getNMSClass("network.chat.IChatBaseComponent"),
                                                         getNMSClass("network.chat.RemoteChatSession").getDeclaredClasses()[0]
                                                 ),
-                                                uniqueIdToUpdate.equals(this.player.getUniqueId())
+                                                isSelfPacket
                                                         ? uniqueIdToUpdate
                                                         : nickedPlayerData.getSpoofedUniqueId(),
                                                 nickedPlayerData.getFakeGameProfile(
-                                                        !(uniqueIdToUpdate.equals(this.player.getUniqueId()))
-                                                                && this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")),
+                                                        !isSelfPacket
+                                                                && this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
+                                                ),
                                                 true,
                                                 getFieldValue(entityPlayer, "e"),
                                                 invoke(playerInteractManager, "b"),
                                                 invoke(entityPlayer, NMS_VERSION.equals("v1_19_R3") ? "J" : "K"),
-                                                actions.stream().anyMatch(action -> action.name().equals("INITIALIZE_CHAT"))
-                                                        ? null
-                                                        : invokeStatic(
-                                                        getNMSClass("SystemUtils"),
+                                                invokeStatic(
+                                                        getNMSClass(NMS_VERSION.equals("v1_19_R3")
+                                                                ? "Optionull"
+                                                                : "SystemUtils"
+                                                        ),
                                                         "a",
                                                         types(Object.class, Function.class),
                                                         invoke(entityPlayer, NMS_VERSION.equals("v1_19_R3") ? "X" : "Y"),
@@ -171,7 +174,10 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                 String text = (String) invoke(suggestion, "getText");
                                 Object range = invoke(suggestion, "getRange");
 
-                                buffer = text.substring(0, (int) invoke(range, "getEnd") - (int) invoke(range, "getStart"));
+                                buffer = text.substring(
+                                        0,
+                                        (int) invoke(range, "getEnd") - (int) invoke(range, "getStart")
+                                );
 
                                 texts.put(suggestion, text);
                             } catch (IllegalAccessException ex) {
@@ -249,19 +255,21 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                         // Get content
                         String content = (String) getFieldValue(packet, "content");
 
-                        // Replace names
-                        Object editedComponent = this.replaceNames(this.deserialize(content), true);
+                        if(content != null) {
+                            // Replace names
+                            Object editedComponent = this.replaceNames(this.deserialize(content), true);
 
-                        // Overwrite chat message
-                        if (editedComponent != null) {
-                            return newInstance(
-                                    packet.getClass(),
-                                    types(
-                                            findClass("net.minecraft.network.chat.IChatBaseComponent"),
-                                            boolean.class
-                                    ),
-                                    editedComponent, invoke(packet, "c")
-                            );
+                            // Overwrite chat message
+                            if (editedComponent != null)
+                                return newInstance(
+                                        packet.getClass(),
+                                        types(
+                                                findClass("net.minecraft.network.chat.IChatBaseComponent"),
+                                                boolean.class
+                                        ),
+                                        editedComponent,
+                                        invoke(packet, "a")
+                                );
                         }
                     }
                     break;
@@ -389,7 +397,8 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                         stringRangeClass,
                         types(int.class, int.class),
                         suggestionsStart,
-                        suggestionsStart + matchingChars),
+                        suggestionsStart + matchingChars
+                ),
                 match
         );
     }
@@ -497,7 +506,8 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                             || NMS_VERSION.startsWith("v1_19")
                                             ? "network.chat.IChatBaseComponent"
                                             : "IChatBaseComponent"
-                            ).getDeclaredClasses()[0],
+                            )
+                                    .getDeclaredClasses()[0],
                     NMS_VERSION.startsWith("v1_18") || NMS_VERSION.startsWith("v1_19")
                             ? "b"
                             : "a",
