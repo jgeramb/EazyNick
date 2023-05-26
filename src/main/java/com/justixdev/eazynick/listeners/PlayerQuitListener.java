@@ -17,7 +17,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public class PlayerQuitListener implements Listener {
@@ -49,7 +48,9 @@ public class PlayerQuitListener implements Listener {
                                             player,
                                             command
                                                     .replace("%player%", player.getName())
-                                                    .replace("%nickName%", nickedPlayerData.getNickName()))));
+                                                    .replace("%nickName%", nickedPlayerData.getNickName()))
+                                    )
+                            );
                 else
                     setupYamlFile.getConfiguration().getStringList("NickCommands.Unnick")
                             .forEach(command -> Bukkit.dispatchCommand(
@@ -58,7 +59,8 @@ public class PlayerQuitListener implements Listener {
                                             : player,
                                     command
                                             .replace("%player%", player.getName())
-                                            .replace("%nickName%", nickedPlayerData.getNickName())));
+                                            .replace("%nickName%", nickedPlayerData.getNickName()))
+                            );
             }
 
             if(utils.getOldExperienceLevels().containsKey(player.getUniqueId())) {
@@ -87,27 +89,31 @@ public class PlayerQuitListener implements Listener {
                                     "%displayName%",
                                     mysqlPlayerDataManager.getChatPrefix(uniqueId)
                                             + mysqlNickManager.getNickName(uniqueId)
-                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId))
+                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId)
+                            )
                             .replace(
                                     "%displayname%",
                                     mysqlPlayerDataManager.getChatPrefix(uniqueId)
                                             + mysqlNickManager.getNickName(uniqueId)
-                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId));
+                                            + mysqlPlayerDataManager.getChatSuffix(uniqueId)
+                            );
                 else
                     message = message.replace("%name%", nickedPlayerData.getNickName())
                             .replace(
                                     "%displayName%",
                                     nickedPlayerData.getChatPrefix()
                                             + nickedPlayerData.getNickName()
-                                            + nickedPlayerData.getChatSuffix())
+                                            + nickedPlayerData.getChatSuffix()
+                            )
                             .replace(
                                     "%displayname%",
                                     nickedPlayerData.getChatPrefix()
                                             + nickedPlayerData.getNickName()
-                                            + nickedPlayerData.getChatSuffix());
+                                            + nickedPlayerData.getChatSuffix()
+                            );
 
                 event.setQuitMessage(message);
-            } else if (!Objects.requireNonNull(event.getQuitMessage()).isEmpty()) {
+            } else if (event.getQuitMessage() != null) {
                 if (event.getQuitMessage().contains("formerly known as"))
                     event.setQuitMessage("§e" + player.getName() + " left the game.");
 
