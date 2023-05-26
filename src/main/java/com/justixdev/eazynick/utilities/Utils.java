@@ -550,7 +550,8 @@ public class Utils {
                 player,
                 this.nickOnWorldChangePlayers.contains(player.getUniqueId())
                         ? this.nickNames.get(new Random().nextInt(this.nickNames.size()))
-                        : EazyNick.getInstance().getMysqlNickManager().getNickName(player.getUniqueId()));
+                        : EazyNick.getInstance().getMysqlNickManager().getNickName(player.getUniqueId())
+        );
     }
 
     public void performReNick(Player player, String name) {
@@ -581,20 +582,20 @@ public class Utils {
                     // Check if the nickname is different from the real name
                     if(!name.equalsIgnoreCase(player.getName())) {
                         if((mysqlPlayerDataManager != null) && mysqlPlayerDataManager.isRegistered(uniqueId)) {
-                            if(setupYamlFile.getConfiguration().contains("UseLocalRankPrefixes")) {
-                                // Use MySQL data as fallback data
-                                NameFormatting nameFormatting = new NameFormatting(
-                                        mysqlPlayerDataManager.getChatPrefix(uniqueId),
-                                        mysqlPlayerDataManager.getChatSuffix(uniqueId),
-                                        mysqlPlayerDataManager.getTabPrefix(uniqueId),
-                                        mysqlPlayerDataManager.getTabSuffix(uniqueId),
-                                        mysqlPlayerDataManager.getTagPrefix(uniqueId),
-                                        mysqlPlayerDataManager.getTagSuffix(uniqueId)
-                                );
-                                String groupName = mysqlPlayerDataManager.getGroupName(uniqueId);
-                                int sortID = 9999;
+                            // Use MySQL data as fallback data
+                            NameFormatting nameFormatting = new NameFormatting(
+                                    mysqlPlayerDataManager.getChatPrefix(uniqueId),
+                                    mysqlPlayerDataManager.getChatSuffix(uniqueId),
+                                    mysqlPlayerDataManager.getTabPrefix(uniqueId),
+                                    mysqlPlayerDataManager.getTabSuffix(uniqueId),
+                                    mysqlPlayerDataManager.getTagPrefix(uniqueId),
+                                    mysqlPlayerDataManager.getTagSuffix(uniqueId)
+                            );
+                            String groupName = mysqlPlayerDataManager.getGroupName(uniqueId);
+                            int sortID = 9999;
 
-                                // Import from 'setup.yml'
+                            if(setupYamlFile.getConfiguration().contains("UseLocalRankPrefixes")) {
+                                // fall back to 'setup.yml'
                                 if(groupName.equalsIgnoreCase(setupYamlFile.getConfigString("Settings.NickFormat.GroupName"))
                                         || groupName.equalsIgnoreCase(setupYamlFile.getConfigString("Settings.NickFormat.ServerFullRank.GroupName"))) {
                                     String serverFullRank = (getOnlinePlayerCount() >= Bukkit.getMaxPlayers()) ? ".ServerFullRank" : "";
@@ -609,8 +610,9 @@ public class Utils {
                                     );
                                     sortID = setupYamlFile.getConfiguration().getInt("Settings.NickFormat" + serverFullRank + ".SortID");
                                 } else {
+                                    // search in guis.yml
                                     for (int i = 1; i <= 18; i++) {
-                                        if(groupName.equalsIgnoreCase(guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".GroupName"))) {
+                                        if (groupName.equalsIgnoreCase(guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".GroupName"))) {
                                             nameFormatting = new NameFormatting(
                                                     guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".Chat.Prefix"),
                                                     guiYamlFile.getConfigString("Settings.NickFormat.Rank" + i + ".Chat.Suffix"),
@@ -630,23 +632,22 @@ public class Utils {
                                 this.replaceRandomColorPlaceholder(nameFormatting);
 
                                 // Nick player
-                                Bukkit.getPluginManager().callEvent(
-                                        new PlayerNickEvent(
-                                                player,
-                                                name,
-                                                mysqlNickManager.getSkinName(player.getUniqueId()),
-                                                spoofedUniqueId,
-                                                nameFormatting.getChatPrefix(),
-                                                nameFormatting.getChatSuffix(),
-                                                nameFormatting.getTabPrefix(),
-                                                nameFormatting.getTabSuffix(),
-                                                nameFormatting.getTagPrefix(),
-                                                nameFormatting.getTagSuffix(),
-                                                true,
-                                                false,
-                                                sortID,
-                                                mysqlPlayerDataManager.getGroupName(player.getUniqueId()))
-                                );
+                                Bukkit.getPluginManager().callEvent(new PlayerNickEvent(
+                                        player,
+                                        name,
+                                        mysqlNickManager.getSkinName(player.getUniqueId()),
+                                        spoofedUniqueId,
+                                        nameFormatting.getChatPrefix(),
+                                        nameFormatting.getChatSuffix(),
+                                        nameFormatting.getTabPrefix(),
+                                        nameFormatting.getTabSuffix(),
+                                        nameFormatting.getTagPrefix(),
+                                        nameFormatting.getTagSuffix(),
+                                        true,
+                                        false,
+                                        sortID,
+                                        mysqlPlayerDataManager.getGroupName(player.getUniqueId())
+                                ));
                             } else
                                 // Nick player using MySQL data
                                 Bukkit.getPluginManager().callEvent(new PlayerNickEvent(
@@ -663,8 +664,8 @@ public class Utils {
                                         true,
                                         false,
                                         9999,
-                                        mysqlPlayerDataManager.getGroupName(player.getUniqueId()))
-                                );
+                                        mysqlPlayerDataManager.getGroupName(player.getUniqueId())
+                                ));
                         } else {
                             // Import data from 'setup.yml'
                             boolean serverFull = getOnlinePlayerCount() >= Bukkit.getMaxPlayers();
@@ -682,40 +683,40 @@ public class Utils {
                                             : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
                             );
 
-                            Bukkit.getPluginManager().callEvent(
-                                    new PlayerNickEvent(
-                                            player,
-                                            name,
-                                            mysqlNickManager.getSkinName(player.getUniqueId()),
-                                            spoofedUniqueId,
-                                            serverFull
-                                                    ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Prefix")
-                                                    : setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Prefix"),
-                                            serverFull
-                                                    ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Suffix")
-                                                    : setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Suffix"),
-                                            serverFull
-                                                    ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Prefix")
-                                                    : setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Prefix"),
-                                            serverFull
-                                                    ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Suffix")
-                                                    : setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Suffix"),
-                                            prefix,
-                                            suffix,
-                                            true,
-                                            false,
-                                            getOnlinePlayerCount() >= Bukkit.getMaxPlayers()
-                                                    ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID")
-                                                    : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.GrSortIDoupName"),
-                                            getOnlinePlayerCount() >= Bukkit.getMaxPlayers()
-                                                    ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName")
-                                                    : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
-                                    )
-                            );
+                            Bukkit.getPluginManager().callEvent(new PlayerNickEvent(
+                                    player,
+                                    name,
+                                    mysqlNickManager.getSkinName(player.getUniqueId()),
+                                    spoofedUniqueId,
+                                    serverFull
+                                            ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Prefix")
+                                            : setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Prefix"),
+                                    serverFull
+                                            ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.Chat.Suffix")
+                                            : setupYamlFile.getConfigString(player, "Settings.NickFormat.Chat.Suffix"),
+                                    serverFull
+                                            ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Prefix")
+                                            : setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Prefix"),
+                                    serverFull
+                                            ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.PlayerList.Suffix")
+                                            : setupYamlFile.getConfigString(player, "Settings.NickFormat.PlayerList.Suffix"),
+                                    prefix,
+                                    suffix,
+                                    true,
+                                    false,
+                                    getOnlinePlayerCount() >= Bukkit.getMaxPlayers()
+                                            ? setupYamlFile.getConfiguration().getInt("Settings.NickFormat.ServerFullRank.SortID")
+                                            : setupYamlFile.getConfiguration().getInt("Settings.NickFormat.GrSortIDoupName"),
+                                    getOnlinePlayerCount() >= Bukkit.getMaxPlayers()
+                                            ? setupYamlFile.getConfigString(player, "Settings.NickFormat.ServerFullRank.GroupName")
+                                            : setupYamlFile.getConfigString(player, "Settings.NickFormat.GroupName")
+                            ));
                         }
                     } else
-                        languageYamlFile.sendMessage(player, languageYamlFile.getConfigString(player, "Messages.CanNotNickAsSelf")
-                                .replace("%prefix%", this.prefix)
+                        languageYamlFile.sendMessage(
+                                player,
+                                languageYamlFile.getConfigString(player, "Messages.CanNotNickAsSelf")
+                                        .replace("%prefix%", this.prefix)
                         );
                 } else
                     languageYamlFile.sendMessage(

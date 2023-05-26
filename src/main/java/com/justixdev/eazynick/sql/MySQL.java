@@ -126,7 +126,12 @@ public class MySQL {
         new FutureTask<>(() -> {
             PreparedStatement statement = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             this.setParameters(statement, parameters);
-            statement.executeUpdate();
+
+            try {
+                statement.executeUpdate();
+            } catch (SQLException ex) {
+                System.err.println("Could not execute update \"" + sql + "\": " + ex.getMessage());
+            }
 
             return null;
         }).run();
@@ -147,6 +152,7 @@ public class MySQL {
                 return task.get();
             } catch (InterruptedException | ExecutionException ex) {
                 System.err.println("Could not execute update \"" + sql + "\": " + ex.getMessage());
+                return null;
             }
         }
 
@@ -167,6 +173,7 @@ public class MySQL {
                 return task.get();
             } catch (InterruptedException | ExecutionException ex) {
                 System.err.println("Could not execute query \"" + query + "\": " + ex.getMessage());
+                return null;
             }
         }
 

@@ -31,20 +31,20 @@ public class MySQLNickManager {
 
         CACHE.put(uniqueId, new CachedNickData(nickName, skinName));
 
-        this.mysql.update("INSERT INTO nicked_players VALUES (?, ?, ?)", uniqueId, nickName, skinName);
+        this.mysql.update("INSERT INTO `nicked_players` VALUES (?, ?, ?)", uniqueId, nickName, skinName);
     }
 
     public void removePlayer(UUID uniqueId) {
         CACHE.remove(uniqueId);
 
-        this.mysql.update("DELETE FROM nicked_players WHERE unique_id = ?", uniqueId);
+        this.mysql.update("DELETE FROM `nicked_players` WHERE unique_id = ?", uniqueId);
     }
 
     public boolean isNicked(UUID uniqueId) {
         if(CACHE.containsKey(uniqueId))
             return true;
 
-        try(ResultSet resultSet = this.mysql.getResult("SELECT * FROM nicked_players WHERE unique_id = ?", uniqueId)) {
+        try(ResultSet resultSet = this.mysql.getResult("SELECT * FROM `nicked_players` WHERE unique_id = ?", uniqueId)) {
             if(resultSet.next()) {
                 CACHE.put(uniqueId, CachedNickData.fromResultSet(resultSet));
 

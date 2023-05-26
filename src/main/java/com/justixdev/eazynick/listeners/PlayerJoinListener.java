@@ -191,11 +191,12 @@ public class PlayerJoinListener implements Listener {
                         if (setupYamlFile.getConfiguration().getBoolean("BungeeCord")) {
                             if (!setupYamlFile.getConfiguration().getBoolean("LobbyMode")
                                     || (player.hasPermission("eazynick.bypasslobbymode")
-                                            && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))) {
+                                            && setupYamlFile.getConfiguration().getBoolean("EnableBypassLobbyModePermission"))
+                            ) {
                                 if (mysqlNickManager.isNicked(uniqueId)) {
                                     String nickName = mysqlNickManager.getNickName(uniqueId);
 
-                                    if((nickName != null) && !(nickName.equals(player.getName())))
+                                    if((nickName != null) && !nickName.equals(player.getName()))
                                         utils.performReNick(player);
                                     else
                                         api.changeSkin(nickName);

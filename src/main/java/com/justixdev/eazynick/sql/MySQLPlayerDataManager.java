@@ -64,7 +64,7 @@ public class MySQLPlayerDataManager {
                 tagSuffix));
 
         this.mysql.update(
-                "INSERT INTO nicked_player_data VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO `nicked_player_data` VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 uniqueId,
                 groupName,
                 chatPrefix,
@@ -78,14 +78,14 @@ public class MySQLPlayerDataManager {
     public void removeData(UUID uniqueId) {
         CACHE.remove(uniqueId);
 
-        this.mysql.update("DELETE FROM nicked_player_data WHERE unique_id = ?", uniqueId);
+        this.mysql.update("DELETE FROM `nicked_player_data` WHERE unique_id = ?", uniqueId);
     }
 
     public boolean isRegistered(UUID uniqueId) {
         if(CACHE.containsKey(uniqueId))
             return true;
 
-        try(ResultSet resultSet = this.mysql.getResult("SELECT * FROM nicked_player_data WHERE unique_id = ?", uniqueId)) {
+        try(ResultSet resultSet = this.mysql.getResult("SELECT * FROM `nicked_player_data` WHERE unique_id = ?", uniqueId)) {
             if(resultSet.next()) {
                 CACHE.put(uniqueId, CachedNickedPlayerData.fromResultSet(resultSet));
 
