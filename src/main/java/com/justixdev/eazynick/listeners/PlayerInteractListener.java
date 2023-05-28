@@ -41,7 +41,7 @@ public class PlayerInteractListener implements Listener {
                     && player.hasPermission("eazynick.item")) {
                 if (event.getAction().equals(Action.RIGHT_CLICK_AIR)
                         || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                    if(!(NMS_VERSION.startsWith("1_8") || NMS_VERSION.startsWith("1_7"))) {
+                    if(!(NMS_VERSION.startsWith("v1_8") || NMS_VERSION.startsWith("v1_7"))) {
                         if(Objects.equals(event.getHand(), EquipmentSlot.OFF_HAND))
                             return;
                     }

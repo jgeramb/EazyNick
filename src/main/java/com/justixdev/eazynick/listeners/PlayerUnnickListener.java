@@ -14,6 +14,9 @@ import com.justixdev.eazynick.utilities.configuration.yaml.SavedNickDataYamlFile
 import com.justixdev.eazynick.utilities.configuration.yaml.SetupYamlFile;
 import com.nametagedit.plugin.NametagEdit;
 import com.nametagedit.plugin.api.INametagApi;
+import de.dytanic.cloudnet.api.CloudAPI;
+import de.dytanic.cloudnet.lib.player.CloudPlayer;
+import de.dytanic.cloudnet.lib.player.permission.PermissionEntity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -194,6 +197,15 @@ public class PlayerUnnickListener implements Listener {
 
                 utils.getNametagEditPrefixes().remove(player.getUniqueId());
                 utils.getNametagEditSuffixes().remove(player.getUniqueId());
+            }
+
+            if (utils.isPluginInstalled("CloudNetAPI")
+                    && setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
+                CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId());
+                PermissionEntity entity = cloudPlayer.getPermissionEntity();
+
+                entity.setPrefix(utils.getOldCloudNETPrefixes().remove(player.getUniqueId()));
+                entity.setSuffix(utils.getOldCloudNETSuffixes().remove(player.getUniqueId()));
             }
         }
     }

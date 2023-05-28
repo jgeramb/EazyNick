@@ -91,8 +91,6 @@ public class Utils {
     private final Map<UUID, String>
             oldCloudNETPrefixes = new HashMap<>(),
             oldCloudNETSuffixes = new HashMap<>();
-    private final Map<UUID, Integer>
-            oldCloudNETTagIDs = new HashMap<>();
 
     // LuckPerms old player data
     private final Map<UUID, Object>
@@ -743,7 +741,7 @@ public class Utils {
 
         try {
             // Check if the player has a nick item
-            ItemStack itemInHand = NMS_VERSION.startsWith("1_8") || NMS_VERSION.startsWith("1_7")
+            ItemStack itemInHand = NMS_VERSION.startsWith("v1_8") || NMS_VERSION.startsWith("v1_7")
                     ? (ItemStack) invoke(player, "getItemInHand")
                     : player.getInventory().getItemInMainHand();
             boolean hasItem = (itemInHand != null)

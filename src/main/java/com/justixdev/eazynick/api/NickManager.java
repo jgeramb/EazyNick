@@ -672,24 +672,16 @@ public class NickManager extends ReflectionHelper {
 			}
 
             // Update CloudNet v2 prefix and suffix
-            if (this.utils.isPluginInstalled("CloudNetAPI")) {
+            if (this.utils.isPluginInstalled("CloudNetAPI")
+                    && this.setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
                 CloudPlayer cloudPlayer = CloudAPI.getInstance().getOnlinePlayer(this.player.getUniqueId());
+                PermissionEntity entity = cloudPlayer.getPermissionEntity();
 
-                if (this.setupYamlFile.getConfiguration().getBoolean("ServerIsUsingCloudNETPrefixesAndSuffixes")) {
-                    PermissionEntity entity = cloudPlayer.getPermissionEntity();
-                    de.dytanic.cloudnet.lib.player.permission.PermissionGroup highestPermissionGroup =
-                            entity.getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
+                this.utils.getOldCloudNETPrefixes().put(this.player.getUniqueId(), entity.getPrefix());
+                this.utils.getOldCloudNETSuffixes().put(this.player.getUniqueId(), entity.getSuffix());
 
-                    this.utils.getOldCloudNETPrefixes().put(this.player.getUniqueId(), entity.getPrefix());
-                    this.utils.getOldCloudNETSuffixes().put(this.player.getUniqueId(), entity.getSuffix());
-                    this.utils.getOldCloudNETTagIDs().put(this.player.getUniqueId(), highestPermissionGroup.getTagId());
-
-                    entity.setPrefix(tmpTagPrefix);
-                    entity.setSuffix(tmpTagSuffix);
-                    highestPermissionGroup.setPrefix(tmpTagPrefix);
-                    highestPermissionGroup.setSuffix(tmpTagSuffix);
-                    highestPermissionGroup.setTagId(Integer.MAX_VALUE);
-                }
+                entity.setPrefix(tmpTagPrefix);
+                entity.setSuffix(tmpTagSuffix);
             }
         });
 
