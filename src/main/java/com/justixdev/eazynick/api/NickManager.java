@@ -549,6 +549,24 @@ public class NickManager extends ReflectionHelper {
             this.utils.getNickedPlayers().get(this.player.getUniqueId()).setGroupName(groupName);
     }
 
+    /**
+     * @return the sort id of the player, or -1 if it is not nicked
+     */
+    public int getSortID() {
+        return this.isNicked()
+                ? this.utils.getNickedPlayers().get(this.player.getUniqueId()).getSortID()
+                : -1;
+    }
+
+    /**
+     * @return the spoofed UUID of the player, or the real player UUID if it is not nicked
+     */
+    public UUID getSpoofedUniqueId() {
+        return this.isNicked()
+                ? this.utils.getNickedPlayers().get(this.player.getUniqueId()).getSpoofedUniqueId()
+                : this.player.getUniqueId();
+    }
+
     public void updatePrefixSuffix(String nickName,
                                    String realName,
                                    String tagPrefix,

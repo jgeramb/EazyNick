@@ -60,7 +60,7 @@ public class SetupYamlFile extends YamlFile {
         this.configuration.addDefault("PrefixSuffixUpdateDelay", 100);
         this.configuration.addDefault("RandomDisguiseDelay", false);
         this.configuration.addDefault("RemoveMySQLNickOnUnnickWhenLobbyModeEnabled", true);
-        this.configuration.addDefault("ReplaceNickedChatFormat", true);
+        this.configuration.addDefault("ReplaceNickedChatFormat", false);
         this.configuration.addDefault("SaveLocalNickData", false);
         this.configuration.addDefault("SeeNickSelf", true);
         this.configuration.addDefault("ServerIsUsingCloudNETPrefixesAndSuffixes", false);
