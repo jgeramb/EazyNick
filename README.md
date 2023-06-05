@@ -4,8 +4,6 @@
 ## Useful links
 > [Discord](https://discord.justix-dev.com)
 
-> [Documentation](https://www.justix-dev.com/docs/eazynick)
-
 > [Support my work](https://www.paypal.me/JustixDevelopment)
 
 ## Compiling
