@@ -24,10 +24,11 @@ public class ModernAddressPacketInjector extends ModernPacketInjector {
     public void initChannel() {
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
 
         getFirstFieldByType(
-                is1_17 || is1_18 || is1_19
+                is1_17 || is1_18 || is1_19 || is1_20
                         ? getNMSClass("network.NetworkManager")
                         : getNMSClass("NetworkManager"),
                 Channel.class
@@ -46,15 +47,16 @@ public class ModernAddressPacketInjector extends ModernPacketInjector {
                     )).toArray();
                 else if(NMS_VERSION.startsWith("v1_15")
                         || NMS_VERSION.startsWith("v1_16")
-                        || NMS_VERSION.startsWith("v1_17")
-                        || NMS_VERSION.startsWith("v1_18")
-                        || NMS_VERSION.startsWith("v1_19"))
+                        || is1_17
+                        || is1_18
+                        || is1_19
+                        || is1_20)
                     managers = ((Queue<?>) getFieldValue(
                             invoke(
                                     minecraftServer,
                                     NMS_VERSION.equals("v1_19_R2")
                                             ? "ac"
-                                            : is1_18 || is1_19
+                                            : is1_18 || is1_19 || is1_20
                                                     ? "ad"
                                                     : "getServerConnection"
                             ),

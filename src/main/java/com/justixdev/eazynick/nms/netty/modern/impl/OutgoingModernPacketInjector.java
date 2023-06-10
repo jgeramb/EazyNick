@@ -27,7 +27,8 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
     public Object onPacketSend(Object packet) {
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
 
         try {
             switch (packet.getClass().getSimpleName()) {
@@ -108,7 +109,7 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                 dataToUpdate.add(currentPlayerInfoData);
                             } else {
                                 Object entityPlayer = this.player.getClass().getMethod("getHandle").invoke(infoPlayer);
-                                Object playerInteractManager = getFieldValue(entityPlayer, "d");
+                                Object playerInteractManager = getFieldValue(entityPlayer, is1_20 ? "e" : "d");
                                 NickedPlayerData nickedPlayerData = this.utils.getNickedPlayers().get(uniqueIdToUpdate);
                                 boolean isSelfPacket = uniqueIdToUpdate.equals(this.player.getUniqueId());
 
@@ -132,17 +133,17 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                                                 && this.setupYamlFile.getConfiguration().getBoolean("Settings.ChangeOptions.UUID")
                                                 ),
                                                 true,
-                                                getFieldValue(entityPlayer, "e"),
+                                                getFieldValue(entityPlayer, is1_20 ? "f" : "e"),
                                                 invoke(playerInteractManager, "b"),
-                                                invoke(entityPlayer, NMS_VERSION.equals("v1_19_R3") ? "J" : "K"),
+                                                invoke(entityPlayer, (NMS_VERSION.equals("v1_19_R3") || is1_20) ? "J" : "K"),
                                                 invokeStatic(
-                                                        getNMSClass(NMS_VERSION.equals("v1_19_R3")
+                                                        getNMSClass(NMS_VERSION.equals("v1_19_R3") || is1_20
                                                                 ? "Optionull"
                                                                 : "SystemUtils"
                                                         ),
                                                         "a",
                                                         types(Object.class, Function.class),
-                                                        invoke(entityPlayer, NMS_VERSION.equals("v1_19_R3") ? "X" : "Y"),
+                                                        invoke(entityPlayer, (NMS_VERSION.equals("v1_19_R3") || is1_20) ? "X" : "Y"),
                                                         (Function<Object, Object>) (chatSession) -> {
                                                             try {
                                                                 return invoke(chatSession, "b");
@@ -264,11 +265,11 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                 return newInstance(
                                         packet.getClass(),
                                         types(
-                                                findClass("net.minecraft.network.chat.IChatBaseComponent"),
+                                                getNMSClass("network.chat.IChatBaseComponent"),
                                                 boolean.class
                                         ),
                                         editedComponent,
-                                        invoke(packet, "a")
+                                        invoke(packet, "c")
                                 );
                         }
                     }
@@ -277,13 +278,13 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                     // Replace name
                     if(VERSION_13_OR_LATER)
                         setField(packet,
-                                is1_17 || is1_18 || is1_19
+                                is1_17 || is1_18 || is1_19 || is1_20
                                         ? "e"
                                         : "b",
                                 this.replaceNames(
                                         getFieldValue(
                                                 packet,
-                                                is1_17 || is1_18 || is1_19
+                                                is1_17 || is1_18 || is1_19 || is1_20
                                                         ? "e"
                                                         : "b"
                                         ),
@@ -331,7 +332,7 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                         for (Object playerInfoData : (List<?>) b) {
                             Object gameProfile = getFieldValue(
                                     playerInfoData,
-                                    is1_17 || is1_18 || is1_19
+                                    is1_17 || is1_18 || is1_19 || is1_20
                                             ? "c"
                                             : "d"
                             );
@@ -346,7 +347,7 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
                                 // Replace game profile with fake game profile (nicked player profile)
                                 setField(
                                         playerInfoData,
-                                        is1_17 || is1_18 || is1_19
+                                        is1_17 || is1_18 || is1_19 || is1_20
                                                 ? "c"
                                                 : "d",
                                         this.utils.getNickedPlayers().get(playerInfoDataUniqueId).getFakeGameProfile(
@@ -408,7 +409,8 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
 
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
         Object editedComponent = null;
 
         try {
@@ -418,17 +420,17 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
 
                 for (Object partlyIChatBaseComponent : ((List<Object>) invoke(
                         iChatBaseComponent,
-                        is1_19
+                        is1_19 || is1_20
                                 ? "c"
                                 : is1_18
-                                ? "b"
-                                :
-                                Bukkit.getVersion().contains("1.14.4")
-                                        || NMS_VERSION.startsWith("v1_15")
-                                        || NMS_VERSION.startsWith("v1_16")
-                                        || is1_17
-                                        ? "getSiblings"
-                                        : "a"
+                                        ? "b"
+                                        :
+                                        Bukkit.getVersion().contains("1.14.4")
+                                                || NMS_VERSION.startsWith("v1_15")
+                                                || NMS_VERSION.startsWith("v1_16")
+                                                || is1_17
+                                                ? "getSiblings"
+                                                : "a"
                 ))) {
                     if (partlyIChatBaseComponent.getClass().getSimpleName().equals("ChatComponentText")
                             || partlyIChatBaseComponent.getClass().getSimpleName().equals("IChatMutableComponent")) {
@@ -473,11 +475,16 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
     }
 
     private String serialize(Object iChatBaseComponent) {
+        boolean is1_18 = NMS_VERSION.startsWith("v1_18"),
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
+
         try {
             Class<?> iChatBaseComponentClass = getNMSClass(
                     NMS_VERSION.startsWith("v1_17")
-                            || NMS_VERSION.startsWith("v1_18")
-                            || NMS_VERSION.startsWith("v1_19")
+                            || is1_18
+                            || is1_19
+                            || is1_20
                             ? "network.chat.IChatBaseComponent"
                             : "IChatBaseComponent"
             );
@@ -496,19 +503,24 @@ public class OutgoingModernPacketInjector extends ModernPlayerPacketInjector {
     }
 
     public Object deserialize(String json) {
+        boolean is1_18 = NMS_VERSION.startsWith("v1_18"),
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
+
         try {
             return invokeStatic(
                     NMS_VERSION.equals("v1_8_R1")
                             ? getNMSClass("ChatSerializer")
                             : getNMSClass(
                                     NMS_VERSION.startsWith("v1_17")
-                                            || NMS_VERSION.startsWith("v1_18")
-                                            || NMS_VERSION.startsWith("v1_19")
+                                            || is1_18
+                                            || is1_19
+                                            || is1_20
                                             ? "network.chat.IChatBaseComponent"
                                             : "IChatBaseComponent"
                             )
                                     .getDeclaredClasses()[0],
-                    NMS_VERSION.startsWith("v1_18") || NMS_VERSION.startsWith("v1_19")
+                    is1_18 || is1_19 || is1_20
                             ? "b"
                             : "a",
                     types(String.class),

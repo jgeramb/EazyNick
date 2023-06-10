@@ -51,13 +51,14 @@ public class ScoreboardTeamHandler {
         try {
             boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                     is1_18 = NMS_VERSION.startsWith("v1_18"),
-                    is1_19 = NMS_VERSION.startsWith("v1_19");
+                    is1_19 = NMS_VERSION.startsWith("v1_19"),
+                    is1_20 = NMS_VERSION.startsWith("v1_20");
 
             this.packet = this.newPacket();
 
             // Set packet fields
             if(VERSION_13_OR_LATER) {
-                if(is1_17 || is1_18 || is1_19) {
+                if(is1_17 || is1_18 || is1_19 || is1_20) {
                     setField(this.packet, "h", 1);
                     setField(this.packet, "i", this.teamName);
 
@@ -72,9 +73,9 @@ public class ScoreboardTeamHandler {
                     );
                     setField(
                             scoreboardTeam,
-                            is1_18 || is1_19
-                                    ? "d"
-                                    : "e",
+                            is1_17
+                                    ? "e"
+                                    : "d",
                             this.teamName
                     );
 
@@ -142,7 +143,8 @@ public class ScoreboardTeamHandler {
 
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
             is1_18 = NMS_VERSION.startsWith("v1_18"),
-            is1_19 = NMS_VERSION.startsWith("v1_19");
+            is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
 
         Bukkit.getOnlinePlayers().forEach(currentPlayer -> {
             try {
@@ -182,7 +184,7 @@ public class ScoreboardTeamHandler {
                         setField(this.packet, "g", contents);
                         setField(this.packet, "i", 0);
                     } catch (Exception ex) {
-                        String colorName = (is1_17 || is1_18 || is1_19) ? "v" : "RESET";
+                        String colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "v" : "RESET";
 
                         if(this.prefix.length() > 1) {
                             for (int i = this.prefix.length() - 1; i >= 0; i--) {
@@ -193,55 +195,55 @@ public class ScoreboardTeamHandler {
                                         if((c != 'k') && (c != 'l') && (c != 'm') && (c != 'n') && (c != 'o')) {
                                             switch (c) {
                                                 case '0':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "a" : "BLACK";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "a" : "BLACK";
                                                     break;
                                                 case '1':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "b" : "DARK_BLUE";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "b" : "DARK_BLUE";
                                                     break;
                                                 case '2':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "c" : "DARK_GREEN";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "c" : "DARK_GREEN";
                                                     break;
                                                 case '3':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "d" : "DARK_AQUA";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "d" : "DARK_AQUA";
                                                     break;
                                                 case '4':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "e" : "DARK_RED";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "e" : "DARK_RED";
                                                     break;
                                                 case '5':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "f" : "DARK_PURPLE";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "f" : "DARK_PURPLE";
                                                     break;
                                                 case '6':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "g" : "GOLD";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "g" : "GOLD";
                                                     break;
                                                 case '7':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "h" : "GRAY";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "h" : "GRAY";
                                                     break;
                                                 case '8':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "i" : "DARK_GRAY";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "i" : "DARK_GRAY";
                                                     break;
                                                 case '9':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "j" : "BLUE";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "j" : "BLUE";
                                                     break;
                                                 case 'a':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "k" : "GREEN";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "k" : "GREEN";
                                                     break;
                                                 case 'b':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "l" : "AQUA";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "l" : "AQUA";
                                                     break;
                                                 case 'c':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "m" : "RED";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "m" : "RED";
                                                     break;
                                                 case 'd':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "n" : "LIGHT_PURPLE";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "n" : "LIGHT_PURPLE";
                                                     break;
                                                 case 'e':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "o" : "YELLOW";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "o" : "YELLOW";
                                                     break;
                                                 case 'f':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "p" : "WHITE";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "p" : "WHITE";
                                                     break;
                                                 case 'r':
-                                                    colorName = (is1_17 || is1_18 || is1_19) ? "v" : "RESET";
+                                                    colorName = (is1_17 || is1_18 || is1_19 || is1_20) ? "v" : "RESET";
                                                     break;
                                                 default:
                                                     break;
@@ -254,7 +256,7 @@ public class ScoreboardTeamHandler {
                             }
                         }
 
-                        if(is1_17 || is1_18 || is1_19) {
+                        if(is1_17 || is1_18 || is1_19 || is1_20) {
                             setField(this.packet, "h", 0);
                             setField(this.packet, "i", this.teamName);
                             setField(this.packet, "j", contents);
@@ -268,14 +270,14 @@ public class ScoreboardTeamHandler {
                                     null,
                                     this.teamName
                             );
-                            setField(scoreboardTeam, (is1_18 || is1_19) ? "d" : "e", this.teamName);
-                            setField(scoreboardTeam, (is1_18 || is1_19) ? "g" : "h", this.getAsIChatBaseComponent(this.prefix));
-                            setField(scoreboardTeam, (is1_18 || is1_19) ? "h" : "i", this.getAsIChatBaseComponent(this.suffix));
-                            setField(scoreboardTeam, (is1_18 || is1_19) ? "i" : "j", false);
-                            setField(scoreboardTeam, (is1_18 || is1_19) ? "j" : "k", false);
+                            setField(scoreboardTeam, (is1_18 || is1_19 || is1_20) ? "d" : "e", this.teamName);
+                            setField(scoreboardTeam, (is1_18 || is1_19 || is1_20) ? "g" : "h", this.getAsIChatBaseComponent(this.prefix));
+                            setField(scoreboardTeam, (is1_18 || is1_19 || is1_20) ? "h" : "i", this.getAsIChatBaseComponent(this.suffix));
+                            setField(scoreboardTeam, (is1_18 || is1_19 || is1_20) ? "i" : "j", false);
+                            setField(scoreboardTeam, (is1_18 || is1_19 || is1_20) ? "j" : "k", false);
                             setField(
                                     scoreboardTeam,
-                                    is1_18 || is1_19
+                                    is1_18 || is1_19 || is1_20
                                             ? "m"
                                             : "n",
                                     getStaticFieldValue(getNMSClass("EnumChatFormat"), colorName)
@@ -348,15 +350,16 @@ public class ScoreboardTeamHandler {
     private Object newPacket() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
 
         return newInstance(
                 getNMSClass(
-                        is1_17 || is1_18 || is1_19
+                        is1_17 || is1_18 || is1_19 || is1_20
                                 ? "network.protocol.game.PacketPlayOutScoreboardTeam"
                                 : "PacketPlayOutScoreboardTeam"
                 ),
-                is1_17 || is1_18 || is1_19
+                is1_17 || is1_18 || is1_19 || is1_20
                         ? types(
                                 String.class,
                                 int.class,
@@ -364,7 +367,7 @@ public class ScoreboardTeamHandler {
                                 Collection.class
                         )
                         : new Class[0],
-                is1_17 || is1_18 || is1_19
+                is1_17 || is1_18 || is1_19 || is1_20
                         ? new Object[] { null, 0, null, new ArrayList<>() }
                         : new Object[0]
         );
@@ -380,18 +383,19 @@ public class ScoreboardTeamHandler {
 
     private Object getAsIChatBaseComponent(String text) {
         boolean is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
 
         try {
             // Create IChatBaseComponent from String using ChatSerializer
             return invokeStatic(
                     getNMSClass(
-                            NMS_VERSION.startsWith("v1_17") || is1_18 || is1_19
+                            NMS_VERSION.startsWith("v1_17") || is1_18 || is1_19 || is1_20
                                     ? "network.chat.IChatBaseComponent"
                                     : "IChatBaseComponent"
                     )
                             .getDeclaredClasses()[0],
-                    is1_18 || is1_19
+                    is1_18 || is1_19 || is1_20
                             ? "b"
                             : "a",
                     types(String.class),

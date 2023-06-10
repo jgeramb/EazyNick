@@ -128,7 +128,7 @@ public class PlayerJoinListener implements Listener {
             @SuppressWarnings("ConstantConditions")
             @Override
             public void run() {
-                if(NMS_VERSION.equals("v1_19_R3")
+                if((NMS_VERSION.equals("v1_19_R3") || NMS_VERSION.startsWith("v1_20"))
                         && !(player.hasPermission("eazynick.bypass")
                                 && setupYamlFile.getConfiguration().getBoolean("EnableBypassPermission"))) {
                     try {

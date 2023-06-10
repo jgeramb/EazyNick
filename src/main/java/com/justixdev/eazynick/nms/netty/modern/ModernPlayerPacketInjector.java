@@ -28,14 +28,18 @@ public class ModernPlayerPacketInjector extends ModernPacketInjector implements 
         try {
             boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                     is1_18 = NMS_VERSION.startsWith("v1_18"),
-                    is1_19 = NMS_VERSION.startsWith("v1_19");
+                    is1_19 = NMS_VERSION.startsWith("v1_19"),
+                    is1_20 = NMS_VERSION.startsWith("v1_20");
             Object entityPlayer = invoke(this.player, "getHandle");
             Object playerConnection = getFieldValue(entityPlayer,
-                    is1_17 || is1_18 || is1_19
-                            ? "b"
-                            : "playerConnection");
+                    is1_20
+                            ? "c"
+                            : is1_17 || is1_18 || is1_19
+                                    ? "b"
+                                    : "playerConnection"
+            );
             Object networkManager = getFieldValue(playerConnection,
-                    NMS_VERSION.equals("v1_19_R3")
+                    NMS_VERSION.equals("v1_19_R3") || is1_20
                             ? "h"
                             : is1_19
                                     ? "b"
@@ -45,8 +49,8 @@ public class ModernPlayerPacketInjector extends ModernPacketInjector implements 
             );
 
             this.channel = (Channel) getFieldValue(networkManager,
-                    is1_17 || is1_18 || is1_19
-                            ? NMS_VERSION.equals("v1_18_R2") || is1_19
+                    is1_17 || is1_18 || is1_19 || is1_20
+                            ? NMS_VERSION.equals("v1_18_R2") || is1_19 || is1_20
                                     ? "m"
                                     : "k"
                             : "channel"

@@ -20,7 +20,8 @@ public class IncomingModernPacketInjector extends ModernPlayerPacketInjector {
         SignGUI signGUI = this.eazyNick.getSignGUI();
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
 
         try {
             switch (packet.getClass().getSimpleName()) {
@@ -29,7 +30,7 @@ public class IncomingModernPacketInjector extends ModernPlayerPacketInjector {
                         // Process SignGUI success
                         Object[] rawLines = (Object[]) getFieldValue(
                                 packet,
-                                is1_17 || is1_18 || is1_19
+                                is1_17 || is1_18 || is1_19 || is1_20
                                         ? "c"
                                         : "b"
                         );

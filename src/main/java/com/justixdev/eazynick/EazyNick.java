@@ -108,7 +108,7 @@ public class EazyNick extends JavaPlugin {
             int versionNumber = Integer.parseInt(NMS_VERSION.substring(1).split("_")[1]);
 
             // Check if bukkit version is compatible
-            if ((versionNumber < 7) || (versionNumber > 19)) {
+            if ((versionNumber < 7) || (versionNumber > 20)) {
                 this.utils.sendConsole("§cYour server version is currently not supported§7.");
 
                 Bukkit.getPluginManager().disablePlugin(this);

@@ -52,7 +52,7 @@ public class AsyncPlayerChatListener implements Listener {
 
         NickManager api = new NickManager(player);
 
-        if(event.getFormat().equals("<%1$s> %2$s") && !replaceChat && NMS_VERSION.startsWith("v1_19")) {
+        if(event.getFormat().equals("<%1$s> %2$s") && !replaceChat && (NMS_VERSION.startsWith("v1_19") || NMS_VERSION.startsWith("v1_20"))) {
             event.setCancelled(true);
             Bukkit.getOnlinePlayers().forEach(currentPlayer -> currentPlayer.sendMessage("<" + api.getNickName() + "> " + event.getMessage()));
             return;

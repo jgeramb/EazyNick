@@ -27,21 +27,6 @@ public class StringUtils {
         return builder.toString();
     }
 
-    public boolean matchesPartially(String str) {
-        int matchingCharacters = 0, minMatchingIndex = 0;
-
-        for (char character : str.toCharArray()) {
-            for (int j = minMatchingIndex; j < this.string.length(); j++) {
-                if(this.string.charAt(j) == character) {
-                    minMatchingIndex = j + 1;
-                    matchingCharacters++;
-                }
-            }
-        }
-
-        return matchingCharacters == this.string.length();
-    }
-
     public String getPureString() {
         return ChatColor.stripColor(getColoredString());
     }
@@ -53,7 +38,8 @@ public class StringUtils {
         if(version.startsWith("v1_16")
                 || version.startsWith("v1_17")
                 || version.startsWith("v1_18")
-                || version.startsWith("v1_19")) {
+                || version.startsWith("v1_19")
+                || version.startsWith("v1_20")) {
             Matcher matcher = HEX_COLOR_PATTERN.matcher(this.string);
             StringBuffer buffer = new StringBuffer(this.string.length() + 4 * 8);
 

@@ -22,22 +22,23 @@ public class ServerListModernPacketInjector extends ModernAddressPacketInjector 
     public Object onPacketSend(Object packet) {
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
 
         try {
             switch (packet.getClass().getSimpleName()) {
                 case "PacketStatusOutServerInfo":
-                    Object serverPing = getFieldValue(packet, NMS_VERSION.equals("v1_19_R3") ? "a" : "b");
+                    Object serverPing = getFieldValue(packet, (NMS_VERSION.equals("v1_19_R3") || is1_20) ? "a" : "b");
                     Object serverPingPlayerSample = getFieldValue(
                             serverPing,
-                            NMS_VERSION.equals("v1_19_R3")
+                            NMS_VERSION.equals("v1_19_R3") || is1_20
                                     ? "c"
                                     : is1_17 || is1_18 || is1_19
                                     ? "d"
                                     : "b"
                     );
 
-                    if (NMS_VERSION.equals("v1_19_R3")) {
+                    if (NMS_VERSION.equals("v1_19_R3") || is1_20) {
                         serverPingPlayerSample = invoke(serverPingPlayerSample, "orElse", types(Object.class), (Object) null);
 
                         List<GameProfile> gameProfileList = (List<GameProfile>) getFieldValue(serverPingPlayerSample, "d");

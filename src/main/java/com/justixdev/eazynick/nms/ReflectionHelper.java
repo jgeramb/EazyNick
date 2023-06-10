@@ -292,7 +292,7 @@ public class ReflectionHelper {
 
     public static Class<?> getNMSClass(String className) {
         return findClass(
-                NMS_VERSION.startsWith("v1_17") || NMS_VERSION.startsWith("v1_18") || NMS_VERSION.startsWith("v1_19")
+                NMS_VERSION.startsWith("v1_17") || NMS_VERSION.startsWith("v1_18") || NMS_VERSION.startsWith("v1_19") || NMS_VERSION.startsWith("v1_20")
                         ? "net.minecraft." + className
                         : "net.minecraft.server." + NMS_VERSION + "." + className);
     }
@@ -305,20 +305,25 @@ public class ReflectionHelper {
         try {
             boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                     is1_18 = NMS_VERSION.startsWith("v1_18"),
-                    is1_19 = NMS_VERSION.startsWith("v1_19");
+                    is1_19 = NMS_VERSION.startsWith("v1_19"),
+                    is1_20 = NMS_VERSION.startsWith("v1_20");
             Object handle = invoke(player, "getHandle");
             Object playerConnection = Objects.requireNonNull(getField(
                     handle.getClass(),
-                    (is1_17 || is1_18 || is1_19) ? "b" : "playerConnection"
+                    is1_20
+                            ? "c"
+                            : is1_17 || is1_18 || is1_19
+                            ? "b"
+                            : "playerConnection"
             )).get(handle);
 
             // Send packet to player connection
             invoke(
                     playerConnection,
-                    is1_18 || is1_19
+                    is1_18 || is1_19 || is1_20
                             ? "a"
                             : "sendPacket",
-                    types(getNMSClass(is1_17 || is1_18 || is1_19 ? "network.protocol.Packet" : "Packet")),
+                    types(getNMSClass(is1_17 || is1_18 || is1_19 || is1_20 ? "network.protocol.Packet" : "Packet")),
                     packet);
         } catch (Exception ex) {
             ex.printStackTrace();

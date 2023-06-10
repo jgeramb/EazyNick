@@ -161,7 +161,8 @@ public class NMSNickManager {
             boolean is1_17To1_19 = NMS_VERSION.startsWith("v1_17")
                     || NMS_VERSION.startsWith("v1_18")
                     || NMS_VERSION.startsWith("v1_19"),
-                    is1_19_R2OrLater = NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3");
+                    is1_20 = NMS_VERSION.startsWith("v1_20"),
+                    is1_19_R2OrLater = NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3") || is1_20;
 
             Class<?> enumPlayerInfoActionClass =
                     NMS_VERSION.equals("v1_8_R1")
@@ -203,12 +204,15 @@ public class NMSNickManager {
                                             craftChatMessage,
                                             "fromStringOrNull",
                                             types(String.class),
-                                            finalName)
+                                            finalName
+                                    )
                                     : ((Object[]) Objects.requireNonNull(invokeStatic(
                                             craftChatMessage,
                                             "fromString",
                                             types(String.class),
-                                            finalName)))[0]);
+                                            finalName
+                                    )))[0]
+                    );
 
                     for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
                         // Send packet to update list name
@@ -227,7 +231,7 @@ public class NMSNickManager {
                                         ),
                                         getStaticFieldValue(
                                                 enumPlayerInfoActionClass,
-                                                NMS_VERSION.equals("v1_19_R3")
+                                                NMS_VERSION.equals("v1_19_R3") || is1_20
                                                         ? "f"
                                                         : is1_17To1_19
                                                                 ? "d"
@@ -248,7 +252,8 @@ public class NMSNickManager {
         try {
             boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                     is1_18 = NMS_VERSION.startsWith("v1_18"),
-                    is1_19 = NMS_VERSION.startsWith("v1_19");
+                    is1_19 = NMS_VERSION.startsWith("v1_19"),
+                    is1_20 = NMS_VERSION.startsWith("v1_20");
             boolean skinsRestorer = this.utils.isPluginInstalled("SkinsRestorer")
                     && this.setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin");
 
@@ -258,31 +263,37 @@ public class NMSNickManager {
             Object entityPlayerArray = toArray(entityPlayer);
             Object worldClient = invoke(
                     entityPlayer,
-                    NMS_VERSION.equals("v1_19_R3")
-                            ? "Y"
-                            : NMS_VERSION.equals("v1_19_R2")
-                                    ? "cH"
-                                    : Bukkit.getVersion().contains("1.19.2")
-                                            ? "cC"
-                                            : is1_19
-                                                    ? "cD"
-                                                    : is1_18
-                                                            ? "cA"
-                                                            : "getWorld"
+                    is1_20
+                            ? "dI"
+                            : NMS_VERSION.equals("v1_19_R3")
+                                    ? "Y"
+                                    : NMS_VERSION.equals("v1_19_R2")
+                                            ? "cH"
+                                            : Bukkit.getVersion().contains("1.19.2")
+                                                    ? "cC"
+                                                    : is1_19
+                                                            ? "cD"
+                                                            : is1_18
+                                                                    ? "cA"
+                                                                    : "getWorld"
             );
             Object worldData = invoke(
                     worldClient,
-                    is1_18 || is1_19
-                            ? NMS_VERSION.equals("v1_19_R2")
-                                    ? "o_"
-                                    : "n_"
-                            : "getWorldData"
+                    is1_20
+                            ? "u_"
+                            :  is1_18 || is1_19
+                                    ? NMS_VERSION.equals("v1_19_R2")
+                                            ? "o_"
+                                            : "n_"
+                                    : "getWorldData"
             );
             Object interactManager = getFieldValue(
                     entityPlayer,
-                    is1_17 || is1_18 || is1_19
-                            ? "d"
-                            : "playerInteractManager"
+                    is1_20
+                            ? "e"
+                            : is1_17 || is1_18 || is1_19
+                                    ? "d"
+                                    : "playerInteractManager"
             );
 
             // Remove player from world and list
@@ -298,15 +309,17 @@ public class NMSNickManager {
                                         && currentPlayer.equals(this.player)
                                 ) && !skinsRestorer
                         ) {
-                            if(is1_17 && !Bukkit.getVersion().contains("1.17.1"))
+                            if(is1_17 && !Bukkit.getVersion().contains("1.17.1")) {
                                 sendPacket(currentPlayer, newInstance(
                                         getNMSClass("network.protocol.game.PacketPlayOutEntityDestroy"),
                                         types(int.class),
                                         this.player.getEntityId())
                                 );
+                            }
+
                             sendPacket(currentPlayer, newInstance(
                                     getNMSClass(
-                                            is1_17 || is1_18 || is1_19
+                                            is1_17 || is1_18 || is1_19 || is1_20
                                                     ? "network.protocol.game.PacketPlayOutEntityDestroy"
                                                     : "PacketPlayOutEntityDestroy"
                                     ),
@@ -316,7 +329,7 @@ public class NMSNickManager {
                         }
 
                         // Remove player from list
-                        if(NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")) {
+                        if(NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3") || is1_20) {
                             sendPacket(
                                     currentPlayer,
                                     newInstance(
@@ -381,7 +394,7 @@ public class NMSNickManager {
                             players.stream().filter(Player::isOnline).forEach(currentPlayer -> {
                                 try {
                                     // Add player to list
-                                    if(NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")) {
+                                    if(NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3") || is1_20) {
                                         Class<?> enumPlayerInfoActionClass = getSubClass(
                                                 getNMSClass("network.protocol.game.ClientboundPlayerInfoUpdatePacket"),
                                                 "a"
@@ -454,13 +467,13 @@ public class NMSNickManager {
                             // Spawn player
                             sendPacketExceptSelf(
                                     newInstance(
-                                            getNMSClass(is1_17 || is1_18 || is1_19
+                                            getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                                     ? "network.protocol.game.PacketPlayOutNamedEntitySpawn"
-                                                    : "PacketPlayOutNamedEntitySpawn"),
-                                            types(getNMSClass(
-                                                    is1_17 || is1_18 || is1_19
-                                                            ? "world.entity.player.EntityHuman"
-                                                            : "EntityHuman"
+                                                    : "PacketPlayOutNamedEntitySpawn"
+                                            ),
+                                            types(getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
+                                                    ? "world.entity.player.EntityHuman"
+                                                    : "EntityHuman"
                                             )),
                                             entityPlayer
                                     ),
@@ -473,7 +486,7 @@ public class NMSNickManager {
                                 NMS_VERSION.equals("v1_7_R4") || NMS_VERSION.equals("v1_8_R1")
                                         ? getNMSClass("PacketPlayOutEntityLook")
                                         : getSubClass(
-                                                getNMSClass(is1_17 || is1_18 || is1_19
+                                                getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                                         ? "network.protocol.game.PacketPlayOutEntity"
                                                         : "PacketPlayOutEntity"
                                                 ),
@@ -501,7 +514,7 @@ public class NMSNickManager {
 
                         Object packetHeadRotation;
 
-                        if(is1_17 || is1_18 || is1_19)
+                        if(is1_17 || is1_18 || is1_19 || is1_20)
                             packetHeadRotation = newInstance(
                                     getNMSClass("network.protocol.game.PacketPlayOutEntityHeadRotation"),
                                     types(
@@ -527,7 +540,42 @@ public class NMSNickManager {
                             // Self skin update
                             Object packetRespawnPlayer;
 
-                            if(NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")) {
+                            if(is1_20) {
+                                Object worldServer = invoke(player.getWorld(), "getHandle");
+                                Class<?> resourceKeyClass = getNMSClass("resources.ResourceKey"),
+                                        enumGameModeClass = getNMSClass("world.level.EnumGamemode");
+
+                                packetRespawnPlayer = newInstance(
+                                        getNMSClass("network.protocol.game.PacketPlayOutRespawn"),
+                                        types(
+                                                resourceKeyClass,
+                                                resourceKeyClass,
+                                                long.class,
+                                                enumGameModeClass,
+                                                enumGameModeClass,
+                                                boolean.class,
+                                                boolean.class,
+                                                byte.class,
+                                                Optional.class,
+                                                int.class
+                                        ),
+                                        invoke(worldServer, "aa"),
+                                        invoke(worldServer, "ac"),
+                                        invokeStatic(
+                                                getNMSClass("world.level.biome.BiomeManager"),
+                                                "a",
+                                                types(long.class),
+                                                player.getWorld().getSeed()
+                                        ),
+                                        invoke(interactManager, "b"),
+                                        invoke(interactManager, "c"),
+                                        invoke(worldServer, "af"),
+                                        invoke(worldServer, "z"),
+                                        (byte) 3, // keep all data
+                                        invoke(entityPlayer, "gm"),
+                                        invoke(entityPlayer, "ar")
+                                );
+                            } else if(NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")) {
                                 Object worldServer = invoke(player.getWorld(), "getHandle");
                                 Class<?> resourceKeyClass = getNMSClass("resources.ResourceKey"),
                                         enumGameModeClass = getNMSClass("world.level.EnumGamemode");
@@ -809,7 +857,8 @@ public class NMSNickManager {
 
                             sendPacketNMS(player, packetRespawnPlayer);
 
-                            player.updateInventory();
+                            if(!is1_20)
+                                player.updateInventory();
 
                             // Reload chunks
                             if(NMS_VERSION.equals("v1_8_R3")) {
@@ -839,7 +888,14 @@ public class NMSNickManager {
 
                             // Fix position
                             boolean teleportFar = is1_17 || is1_18;
-                            Object playerConnection = getFieldValue(entityPlayer, (is1_17 || is1_18 || is1_19) ? "b" : "playerConnection");
+                            Object playerConnection = getFieldValue(
+                                    entityPlayer,
+                                    is1_20
+                                            ? "c"
+                                            : (is1_17 || is1_18 || is1_19)
+                                                    ? "b"
+                                                    : "playerConnection"
+                            );
 
                             if(player.getLocation().getBlock().getRelative(BlockFace.UP, 2).getType().equals(Material.AIR)) {
                                 Bukkit.getScheduler().runTask(eazyNick, () -> {
@@ -941,7 +997,8 @@ public class NMSNickManager {
                                                     .build()
                                     );
 
-                                player.updateInventory();
+                                if(!is1_20)
+                                    player.updateInventory();
 
                                 if(player.getFoodLevel() != 20)
                                     player.setFoodLevel(player.getFoodLevel() + 1);

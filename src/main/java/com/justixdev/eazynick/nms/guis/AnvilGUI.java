@@ -38,17 +38,18 @@ public class AnvilGUI {
     public AnvilGUI(final Player player, final AnvilClickEventHandler handler) {
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
 
-        this.blockPositionClass = getNMSClass(is1_17 || is1_18 || is1_19
+        this.blockPositionClass = getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                 ? "core.BlockPosition"
                 : "BlockPosition"
         );
-        this.containerAnvil = getNMSClass(is1_17 || is1_18 || is1_19
+        this.containerAnvil = getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                 ? "world.inventory.ContainerAnvil"
                 : "ContainerAnvil"
         );
-        this.entityHuman = getNMSClass(is1_17 || is1_18 || is1_19
+        this.entityHuman = getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                 ? "world.entity.player.EntityHuman"
                 : "EntityHuman"
         );
@@ -126,19 +127,20 @@ public class AnvilGUI {
         try {
             boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                     is1_18 = NMS_VERSION.startsWith("v1_18"),
-                    is1_19 = NMS_VERSION.startsWith("v1_19");
+                    is1_19 = NMS_VERSION.startsWith("v1_19"),
+                    is1_20 = NMS_VERSION.startsWith("v1_20");
             Class<?> iChatBaseComponentClass =
-                    getNMSClass(is1_17 || is1_18 || is1_19
+                    getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                             ? "network.chat.IChatBaseComponent"
                             : "IChatBaseComponent"
                     ),
                     playerInventoryClass =
-                            getNMSClass(is1_17 || is1_18 || is1_19
+                            getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                     ? "world.entity.player.PlayerInventory"
                                     : "PlayerInventory"
                             ),
                     worldClass =
-                            getNMSClass(is1_17 || is1_18 || is1_19
+                            getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                     ? "world.level.World"
                                     : "World"
                             );
@@ -146,40 +148,55 @@ public class AnvilGUI {
                     playerInventory =
                             Objects.requireNonNull(getField(
                                     this.entityHuman,
-                                    NMS_VERSION.equals("v1_19_R3")
-                                            ? "ck"
-                                            : NMS_VERSION.equals("v1_18_R1") || NMS_VERSION.equals("v1_19_R1")
-                                                    ? "cp"
-                                                    : is1_17 || is1_18 || is1_19
-                                                            ? "co"
-                                                            : "inventory"
+                                    is1_20
+                                            ? "cl"
+                                            : NMS_VERSION.equals("v1_19_R3")
+                                                    ? "ck"
+                                                    : NMS_VERSION.equals("v1_18_R1") || NMS_VERSION.equals("v1_19_R1")
+                                                            ? "cp"
+                                                            : is1_17 || is1_18 || is1_19
+                                                                    ? "co"
+                                                                    : "inventory"
                             )).get(entityPlayer),
                     world =
-                            getFieldValue(
-                                    entityPlayer,
-                                    NMS_VERSION.equals("v1_19_R3")
-                                            ? "H"
-                                            : is1_18 || is1_19
-                                                    ? "s"
-                                                    : is1_17
-                                                            ? "t"
-                                                            : "world"
-                            ),
-                    blockPosition = newInstance(this.blockPositionClass, types(int.class, int.class, int.class), 0, 0, 0);
+                            Objects.requireNonNull(getField(
+                                    getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
+                                            ? "world.entity.Entity"
+                                            : "Entity"
+                                    ),
+                                    is1_20
+                                            ? "t"
+                                            : NMS_VERSION.equals("v1_19_R3")
+                                                    ? "H"
+                                                    : is1_18 || is1_19
+                                                            ? "s"
+                                                            : is1_17
+                                                                    ? "t"
+                                                                    : "world"
+                            )).get(entityPlayer),
+                    blockPosition = newInstance(
+                            this.blockPositionClass,
+                            types(int.class, int.class, int.class),
+                            0,
+                            0,
+                            0
+                    );
             int c = (int) invoke(entityPlayer, "nextContainerCounter");
             boolean newContainer = NMS_VERSION.startsWith("v1_14")
                     || NMS_VERSION.startsWith("v1_15")
                     || NMS_VERSION.startsWith("v1_16")
                     || is1_17
                     || is1_18
-                    || is1_19;
+                    || is1_19
+                    || is1_20;
+
             Object container = newContainer
                     ? newInstance(
                             this.containerAnvil,
                             types(
                                     int.class,
                                     playerInventoryClass,
-                                    getNMSClass(is1_17 || is1_18 || is1_19
+                                    getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                             ? "world.inventory.ContainerAccess"
                                             : "ContainerAccess"
                                     )
@@ -187,11 +204,11 @@ public class AnvilGUI {
                             c,
                             playerInventory,
                             invokeStatic(
-                                    getNMSClass(is1_17 || is1_18 || is1_19
+                                    getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                             ? "world.inventory.ContainerAccess"
                                             : "ContainerAccess"
                                     ),
-                                    is1_18 || is1_19
+                                    is1_18 || is1_19 || is1_20
                                             ? "a"
                                             : "at",
                                     types(worldClass, this.blockPositionClass),
@@ -215,16 +232,11 @@ public class AnvilGUI {
 
             setField(container, "checkReachable", false);
 
-            this.inventory = ((InventoryView) invoke(container, "getBukkitView")).getTopInventory();
-
-            for (AnvilSlot slot : this.items.keySet())
-                this.inventory.setItem(slot.getSlot(), this.items.get(slot));
-
             String title = "Repairing";
-            Object iChatBaseComponent = is1_17 || is1_18 || is1_19
+            Object iChatBaseComponent = is1_17 || is1_18 || is1_19 || is1_20
                     ? invokeStatic(
                             iChatBaseComponentClass.getDeclaredClasses()[0],
-                            (is1_18 || is1_19) ? "b" : "a",
+                            (is1_18 || is1_19 || is1_20) ? "b" : "a",
                             types(String.class),
                     "{\"text\":\"" + title + "\"}"
                     )
@@ -236,22 +248,24 @@ public class AnvilGUI {
 
             setField(
                     entityPlayer,
-                    NMS_VERSION.equals("v1_19_R3")
-                            ? "bP"
-                            : is1_19
-                                    ? "bU"
-                                    : NMS_VERSION.equals("v1_18_R2")
-                                            ? "bV"
-                                            : is1_18
-                                                    ? "bW"
-                                                    : is1_17
-                                                            ? "bV"
-                                                            : "activeContainer",
+                    is1_20
+                            ? "bR"
+                            : NMS_VERSION.equals("v1_19_R3")
+                                    ? "bP"
+                                    : is1_19
+                                            ? "bU"
+                                            : NMS_VERSION.equals("v1_18_R2")
+                                                    ? "bV"
+                                                    : is1_18
+                                                            ? "bW"
+                                                            : is1_17
+                                                                    ? "bV"
+                                                                    : "activeContainer",
                     container
             );
             setField(
                     container,
-                    is1_17 || is1_18 || is1_19
+                    is1_17 || is1_18 || is1_19 || is1_20
                             ? "v"
                             : NMS_VERSION.startsWith("v1_1")
                                     && !(NMS_VERSION.startsWith("v1_10") || NMS_VERSION.startsWith("v1_11"))
@@ -261,7 +275,7 @@ public class AnvilGUI {
             );
             setField(
                     container,
-                    is1_17 || is1_18 || is1_19
+                    is1_17 || is1_18 || is1_19 || is1_20
                             ? "j"
                             : "windowId",
                     c
@@ -275,16 +289,21 @@ public class AnvilGUI {
                 );
             }
 
+            this.inventory = ((InventoryView) invoke(container, "getBukkitView")).getTopInventory();
+
+            for (AnvilSlot slot : this.items.keySet())
+                this.inventory.setItem(slot.getSlot(), this.items.get(slot));
+
             sendPacketNMS(this.player,
                     newContainer
                             ? newInstance(
-                                    getNMSClass(is1_17 || is1_18 || is1_19
+                                    getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                             ? "network.protocol.game.PacketPlayOutOpenWindow"
                                             : "PacketPlayOutOpenWindow"
                                     ),
                                     types(
                                             int.class,
-                                            getNMSClass(is1_17 || is1_18 || is1_19
+                                            getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                                     ? "world.inventory.Containers"
                                                     : "Containers"
                                             ),
@@ -292,11 +311,11 @@ public class AnvilGUI {
                                     ),
                                     c,
                                     getStaticFieldValue(
-                                            getNMSClass(is1_17 || is1_18 || is1_19
+                                            getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                                                     ? "world.inventory.Containers"
                                                     : "Containers"
                                             ),
-                                            is1_17 || is1_18 || is1_19
+                                            is1_17 || is1_18 || is1_19 || is1_20
                                                     ? "h"
                                                     : "ANVIL"
                                     ),
@@ -314,44 +333,48 @@ public class AnvilGUI {
 
             invoke(
                     container,
-                    is1_18 || is1_19
+                    is1_18 || is1_19 || is1_20
                             ? "a"
                             : "addSlotListener",
-                    types(getNMSClass(is1_17 || is1_18 || is1_19
+                    types(getNMSClass(is1_17 || is1_18 || is1_19 || is1_20
                             ? "world.inventory.ICrafting"
                             : "ICrafting"
                     )),
-                    is1_17 || is1_18 || is1_19
+                    is1_17 || is1_18 || is1_19 || is1_20
                             ? getFieldValue(
                                     entityPlayer,
-                                    NMS_VERSION.equals("v1_19_R3")
-                                            ? "cW"
-                                            : is1_19 || NMS_VERSION.equals("v1_18_R2")
-                                                    ? "da"
-                                                    : is1_18
-                                                            ? "db"
-                                                            : "cX"
+                                    is1_20
+                                            ? "cX"
+                                            : NMS_VERSION.equals("v1_19_R3")
+                                                    ? "cW"
+                                                    : is1_19 || NMS_VERSION.equals("v1_18_R2")
+                                                            ? "da"
+                                                            : is1_18
+                                                                    ? "db"
+                                                                    : "cX"
                             )
                             : entityPlayer
             );
 
-            if(is1_17 || is1_18 || is1_19) {
+            if(is1_17 || is1_18 || is1_19 || is1_20) {
                 invoke(
                         container,
                         "a",
                         types(getNMSClass("world.inventory.ContainerSynchronizer")),
                         getFieldValue(
                                 entityPlayer,
-                                NMS_VERSION.equals("v1_19_R3")
-                                        ? "cV"
-                                        : is1_19 || NMS_VERSION.equals("v1_18_R2")
-                                                ? "cZ"
-                                                : is1_18
-                                                        ? "da"
-                                                        : "cW"
+                                is1_20
+                                        ? "cW"
+                                        : NMS_VERSION.equals("v1_19_R3")
+                                                ? "cV"
+                                                : is1_19 || NMS_VERSION.equals("v1_18_R2")
+                                                        ? "cZ"
+                                                        : is1_18
+                                                                ? "da"
+                                                                : "cW"
                         )
                 );
-                invoke(container, (is1_18 || is1_19) ? "b" : "updateInventory");
+                invoke(container, (is1_18 || is1_19 || is1_20) ? "b" : "updateInventory");
             }
         } catch (Exception ex) {
             ex.printStackTrace();

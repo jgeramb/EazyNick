@@ -53,6 +53,7 @@ public class NMSBookUtils extends ReflectionHelper {
                                         || NMS_VERSION.startsWith("v1_17")
                                         || NMS_VERSION.startsWith("v1_18")
                                         || NMS_VERSION.startsWith("v1_19")
+                                        || NMS_VERSION.startsWith("v1_20")
                                         ? invokeStatic(
                                                 craftChatMessage,
                                                 "toJSON",
@@ -61,14 +62,18 @@ public class NMSBookUtils extends ReflectionHelper {
                                                                 NMS_VERSION.startsWith("v1_17")
                                                                         || NMS_VERSION.startsWith("v1_18")
                                                                         || NMS_VERSION.startsWith("v1_19")
+                                                                        || NMS_VERSION.startsWith("v1_20")
                                                                         ? "network.chat.IChatBaseComponent"
                                                                         : "IChatBaseComponent")),
                                                 invokeStatic(
                                                         craftChatMessage,
                                                         "fromJSON",
                                                         types(String.class),
-                                                        bookPage.getAsString()))
-                                        : bookPage.getAsIChatBaseComponent());
+                                                        bookPage.getAsString()
+                                                )
+                                        )
+                                        : bookPage.getAsIChatBaseComponent()
+                        );
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -106,20 +111,21 @@ public class NMSBookUtils extends ReflectionHelper {
                     try {
                         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                                is1_19 = NMS_VERSION.startsWith("v1_19");
+                                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                                is1_20 = NMS_VERSION.startsWith("v1_20");
                         Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
                         Class<?> craftItemStackClass = getCraftClass("inventory.CraftItemStack");
                         Object nmsItemStack = invokeStatic(craftItemStackClass, "asNMSCopy", types(ItemStack.class), book);
 
                         if(!(NMS_VERSION.startsWith("v1_7") || NMS_VERSION.startsWith("v1_8"))) {
                             Class<?> enumHandClass = getNMSClass(
-                                    is1_17 || is1_18 || is1_19
+                                    is1_17 || is1_18 || is1_19 || is1_20
                                             ? "world.EnumHand"
                                             : "EnumHand"
                             );
                             Object mainHand = getStaticFieldValue(
                                     enumHandClass,
-                                    is1_17 || is1_18 || is1_19
+                                    is1_17 || is1_18 || is1_19 || is1_20
                                             ? "a"
                                             : "MAIN_HAND"
                             );
@@ -129,9 +135,10 @@ public class NMSBookUtils extends ReflectionHelper {
                                     || NMS_VERSION.startsWith("v1_16")
                                     || is1_17
                                     || is1_18
-                                    || is1_19) {
+                                    || is1_19
+                                    || is1_20) {
                                 Class<?> itemWrittenBookClass = getNMSClass(
-                                        is1_17 || is1_18 || is1_19
+                                        is1_17 || is1_18 || is1_19 || is1_20
                                                 ? "world.item.ItemWrittenBook"
                                                 : "ItemWrittenBook"
                                 );
@@ -141,43 +148,47 @@ public class NMSBookUtils extends ReflectionHelper {
                                         "a",
                                         types(
                                                 getNMSClass(
-                                                        is1_17 || is1_18 || is1_19
+                                                        is1_17 || is1_18 || is1_19 || is1_20
                                                                 ? "world.item.ItemStack"
                                                                 : "ItemStack"
                                                 ),
                                                 getNMSClass(
-                                                        is1_17 || is1_18 || is1_19
+                                                        is1_17 || is1_18 || is1_19 || is1_20
                                                                 ? "commands.CommandListenerWrapper"
                                                                 : "CommandListenerWrapper"
                                                 ),
                                                 getNMSClass(
-                                                        is1_17 || is1_18 || is1_19
+                                                        is1_17 || is1_18 || is1_19 || is1_20
                                                                 ? "world.entity.player.EntityHuman"
                                                                 : "EntityHuman")
                                         ),
                                         nmsItemStack,
                                         invoke(
                                                 entityPlayer,
-                                                NMS_VERSION.equals("v1_19_R3")
-                                                        ? "cZ"
-                                                        : NMS_VERSION.equals("v1_19_R2")
-                                                                ? "cY"
-                                                                : Bukkit.getVersion().contains("1.19.2")
-                                                                        ? "cT"
-                                                                        : is1_19
-                                                                                ? "cU"
-                                                                                : is1_18
-                                                                                        ? "cQ"
-                                                                                        : "getCommandListener"
+                                                is1_20
+                                                        ? "da"
+                                                        : NMS_VERSION.equals("v1_19_R3")
+                                                                ? "cZ"
+                                                                : NMS_VERSION.equals("v1_19_R2")
+                                                                        ? "cY"
+                                                                        : Bukkit.getVersion().contains("1.19.2")
+                                                                                ? "cT"
+                                                                                : is1_19
+                                                                                        ? "cU"
+                                                                                        : is1_18
+                                                                                                ? "cQ"
+                                                                                                : "getCommandListener"
                                         ),
                                         entityPlayer)) {
                                     Object activeContainer = getFieldValue(
                                             entityPlayer,
-                                            is1_19
-                                                    ? "bU"
-                                                    : is1_17 || is1_18
-                                                            ? "bV"
-                                                            : "activeContainer"
+                                            is1_20
+                                                    ? "bW"
+                                                    : is1_19
+                                                            ? "bU"
+                                                            : is1_17 || is1_18
+                                                                    ? "bV"
+                                                                    : "activeContainer"
                                     );
 
                                     invoke(activeContainer, "c");
@@ -185,7 +196,7 @@ public class NMSBookUtils extends ReflectionHelper {
 
                                 sendPacketNMS(player, newInstance(
                                         getNMSClass(
-                                                is1_17 || is1_18 || is1_19
+                                                is1_17 || is1_18 || is1_19 || is1_20
                                                         ? "network.protocol.game.PacketPlayOutOpenBook"
                                                         : "PacketPlayOutOpenBook"),
                                         types(enumHandClass),

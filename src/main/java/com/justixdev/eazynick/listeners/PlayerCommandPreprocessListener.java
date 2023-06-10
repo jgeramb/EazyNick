@@ -13,6 +13,8 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.util.Objects;
 
+import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
+
 public class PlayerCommandPreprocessListener implements Listener {
 
     @EventHandler
@@ -48,6 +50,18 @@ public class PlayerCommandPreprocessListener implements Listener {
                 msg.append(arg).append(" ");
 
             event.setMessage(msg.toString().trim());
+        }
+
+        if(message.toLowerCase().startsWith("/me ")
+                && (message.length() > 4)
+                && !event.isCancelled()
+                && (NMS_VERSION.startsWith("v1_19") || NMS_VERSION.startsWith("v1_20"))
+        ) {
+            event.setCancelled(true);
+            Bukkit.getOnlinePlayers().forEach(currentPlayer ->
+                    currentPlayer.sendMessage("* " + player.getName() + " " + message.substring(4))
+            );
+            return;
         }
 
         // Command system

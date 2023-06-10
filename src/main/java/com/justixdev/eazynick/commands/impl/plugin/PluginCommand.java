@@ -174,7 +174,7 @@ public class PluginCommand extends Command {
                     sender.sendMessage(prefix);
 
                     if (sender instanceof Player) {
-                        if (NMS_VERSION.startsWith("v1_17") || NMS_VERSION.startsWith("v1_18") || NMS_VERSION.startsWith("v1_19"))
+                        if (NMS_VERSION.startsWith("v1_17") || NMS_VERSION.startsWith("v1_18") || NMS_VERSION.startsWith("v1_19") || NMS_VERSION.startsWith("v1_20"))
                             ((Player) sender).spigot().sendMessage(
                                     new ComponentBuilder(prefix + "§71. Join the discord server §8(discord.justix-dev.com)")
                                             .event(new ClickEvent(ClickEvent.Action.OPEN_URL,

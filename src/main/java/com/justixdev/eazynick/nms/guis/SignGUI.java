@@ -10,6 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -42,7 +44,8 @@ public class SignGUI implements Listener {
                      EditCompleteListener editCompleteListener) {
         boolean is1_17 = NMS_VERSION.startsWith("v1_17"),
                 is1_18 = NMS_VERSION.startsWith("v1_18"),
-                is1_19 = NMS_VERSION.startsWith("v1_19");
+                is1_19 = NMS_VERSION.startsWith("v1_19"),
+                is1_20 = NMS_VERSION.startsWith("v1_20");
         Block block = player.getWorld().getBlockAt(player.getLocation().clone().add(0, 250 - player.getLocation().getBlockY(), 0));
 
         this.blocks.put(player, block);
@@ -59,10 +62,20 @@ public class SignGUI implements Listener {
 
         Bukkit.getScheduler().runTaskLater(this.eazyNick, () -> {
             Sign sign = (Sign) block.getState();
-            sign.setLine(0, line1);
-            sign.setLine(1, line2);
-            sign.setLine(2, line3);
-            sign.setLine(3, line4);
+
+            if(is1_20) {
+                SignSide front = sign.getSide(Side.FRONT);
+                front.setLine(0, line1);
+                front.setLine(1, line2);
+                front.setLine(2, line3);
+                front.setLine(3, line4);
+            } else {
+                sign.setLine(0, line1);
+                sign.setLine(1, line2);
+                sign.setLine(2, line3);
+                sign.setLine(3, line4);
+            }
+
             sign.update(false, false);
 
             Bukkit.getOnlinePlayers()
@@ -79,7 +92,8 @@ public class SignGUI implements Listener {
                                         types(Location.class, Material.class, byte.class),
                                         block.getLocation(),
                                         Material.AIR,
-                                        (byte) 0);
+                                        (byte) 0
+                                );
                             } catch (Exception ignore) {
                             }
                         }
@@ -94,74 +108,76 @@ public class SignGUI implements Listener {
                                 || Bukkit.getVersion().contains("1.12.2")
                                 || Bukkit.getVersion().contains("1.12.1");
                         Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-                        Object playerConnection = entityPlayer.getClass().getField(
-                                is1_17 || is1_18 || is1_19
-                                        ? "b"
-                                        : "playerConnection"
-                        ).get(entityPlayer);
-
                         Object tileSign = getFieldValue(sign, useCraftBlockEntityState ? "tileEntity" : "sign");
 
                         setField(
                                 tileSign,
-                                NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")
-                                        ? "h"
-                                        : is1_17 || is1_18 || is1_19
-                                                ? "f"
-                                                : "isEditable",
-                                true
+                                is1_20
+                                        ? "g"
+                                        : NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")
+                                                ? "h"
+                                                : is1_17 || is1_18 || is1_19
+                                                        ? "f"
+                                                        : "isEditable",
+                                !is1_20
                         );
+
                         setField(
                                 tileSign,
-                                NMS_VERSION.startsWith("v1_15") || NMS_VERSION.startsWith("v1_16")
-                                        ? "c"
-                                        : NMS_VERSION.startsWith("v1_14")
-                                                ? "j"
-                                                : NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")
-                                                        ? "i"
-                                                        : NMS_VERSION.startsWith("v1_13") || is1_17 || is1_18 || is1_19
-                                                                ? "g"
-                                                                : "h",
-                                is1_17 || is1_18 || is1_19
+                                is1_20
+                                        ? "d"
+                                        : NMS_VERSION.equals("v1_19_R2") || NMS_VERSION.equals("v1_19_R3")
+                                                ? "i"
+                                                : NMS_VERSION.startsWith("v1_13") || is1_17 || is1_18 || is1_19
+                                                        ? "g"
+                                                        : NMS_VERSION.startsWith("v1_15") || NMS_VERSION.startsWith("v1_16")
+                                                                ? "c"
+                                                                : NMS_VERSION.startsWith("v1_14")
+                                                                        ? "j"
+                                                                        : "h",
+                                is1_17 || is1_18 || is1_19 || is1_20
                                         ? player.getUniqueId()
                                         : entityPlayer
                         );
 
                         Class<?> blockPositionClass = getNMSClass(
-                                is1_17 || is1_18 || is1_19
+                                is1_17 || is1_18 || is1_19 || is1_20
                                         ? "core.BlockPosition"
                                         : "BlockPosition"
                         );
 
-                        invoke(
-                                playerConnection,
-                                is1_18 || is1_19
-                                        ? "a"
-                                        : "sendPacket",
-                                types(
-                                        getNMSClass(
-                                                is1_17 || is1_18 || is1_19
-                                                        ? "network.protocol.Packet"
-                                                        : "Packet"
+                        sendPacketNMS(
+                                player,
+                                is1_20
+                                        ?  newInstance(
+                                                getNMSClass("network.protocol.game.PacketPlayOutOpenSignEditor"),
+                                                types(blockPositionClass, boolean.class),
+                                                newInstance(
+                                                        blockPositionClass,
+                                                        types(int.class, int.class, int.class),
+                                                        sign.getX(),
+                                                        sign.getY(),
+                                                        sign.getZ()
+                                                ),
+                                                true
                                         )
-                                ),
-                                newInstance(
-                                        getNMSClass(
-                                                is1_17 || is1_18 || is1_19
-                                                        ? "network.protocol.game.PacketPlayOutOpenSignEditor"
-                                                        : "PacketPlayOutOpenSignEditor"
-                                        ),
-                                        types(blockPositionClass),
-                                        newInstance(
-                                                blockPositionClass,
-                                                NMS_VERSION.equals("v1_19_R3")
-                                                        ? types(int.class, int.class, int.class)
-                                                        : types(double.class, double.class, double.class),
-                                                sign.getX(),
-                                                sign.getY(),
-                                                sign.getZ()
+                                        : newInstance(
+                                                getNMSClass(
+                                                        is1_17 || is1_18 || is1_19
+                                                                ? "network.protocol.game.PacketPlayOutOpenSignEditor"
+                                                                : "PacketPlayOutOpenSignEditor"
+                                                ),
+                                                types(blockPositionClass),
+                                                newInstance(
+                                                        blockPositionClass,
+                                                        NMS_VERSION.equals("v1_19_R3")
+                                                                ? types(int.class, int.class, int.class)
+                                                                : types(double.class, double.class, double.class),
+                                                        sign.getX(),
+                                                        sign.getY(),
+                                                        sign.getZ()
+                                                )
                                         )
-                                )
                         );
                     } catch (Exception ex) {
                         ex.printStackTrace();
