@@ -88,7 +88,7 @@ public class NickManager extends ReflectionHelper {
             if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
                 // Update skins restorer data
                 try {
-                    if ((boolean) getFieldValue(invokeStatic(getNMSClass("SkinsRestorerBukkit"), "getPluginInstance"), "proxyMode")) {
+                    if ((boolean) getFieldValue(invokeStatic(findClass("net.skinsrestorer.bukkit.SkinsRestorerBukkit"), "getPluginInstance"), "proxyMode")) {
                         if(!(skinName.startsWith("MINESKIN:"))) {
                             try {
                                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

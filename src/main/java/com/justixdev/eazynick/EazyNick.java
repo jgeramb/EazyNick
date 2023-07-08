@@ -139,7 +139,7 @@ public class EazyNick extends JavaPlugin {
 
                         if(utils.isPluginInstalled("SkinsRestorer")
                                 && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
-                            if ((boolean) getFieldValue(invokeStatic(getNMSClass("SkinsRestorerBukkit"), "getPluginInstance"), "proxyMode"))
+                            if ((boolean) getFieldValue(invokeStatic(findClass("net.skinsrestorer.bukkit.SkinsRestorerBukkit"), "getPluginInstance"), "proxyMode"))
                                 Bukkit.getMessenger().registerOutgoingPluginChannel(instance, "sr:messagechannel");
                         }
                     });
