@@ -27,8 +27,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static com.justixdev.eazynick.nms.ReflectionHelper.NMS_VERSION;
-import static com.justixdev.eazynick.nms.ReflectionHelper.getFieldValue;
+import static com.justixdev.eazynick.nms.ReflectionHelper.*;
 
 public class EazyNick extends JavaPlugin {
 
@@ -140,9 +139,7 @@ public class EazyNick extends JavaPlugin {
 
                         if(utils.isPluginInstalled("SkinsRestorer")
                                 && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
-                            Plugin skinsRestorer = Bukkit.getPluginManager().getPlugin("SkinsRestorer");
-
-                            if ((boolean) getFieldValue(Objects.requireNonNull(skinsRestorer), "proxyMode"))
+                            if ((boolean) getFieldValue(invokeStatic(getNMSClass("SkinsRestorerBukkit"), "getPluginInstance"), "proxyMode"))
                                 Bukkit.getMessenger().registerOutgoingPluginChannel(instance, "sr:messagechannel");
                         }
                     });

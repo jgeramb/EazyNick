@@ -86,7 +86,8 @@ public class ModernAddressPacketInjector extends ModernPacketInjector {
                     }
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                if(!ex.getMessage().startsWith("Duplicate handler name"))
+                    ex.printStackTrace();
             }
         });
     }

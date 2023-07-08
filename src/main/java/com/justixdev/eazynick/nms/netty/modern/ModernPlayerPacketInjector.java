@@ -57,7 +57,8 @@ public class ModernPlayerPacketInjector extends ModernPacketInjector implements 
             );
             this.inject();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if(!ex.getMessage().startsWith("Duplicate handler name"))
+                ex.printStackTrace();
         }
     }
 

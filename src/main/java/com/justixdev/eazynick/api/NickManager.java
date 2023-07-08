@@ -25,7 +25,6 @@ import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
@@ -89,9 +88,7 @@ public class NickManager extends ReflectionHelper {
             if(utils.isPluginInstalled("SkinsRestorer") && setupYamlFile.getConfiguration().getBoolean("ChangeSkinsRestorerSkin")) {
                 // Update skins restorer data
                 try {
-                    Plugin skinsRestorer = Bukkit.getPluginManager().getPlugin("SkinsRestorer");
-
-                    if ((boolean) getFieldValue(Objects.requireNonNull(skinsRestorer), "proxyMode")) {
+                    if ((boolean) getFieldValue(invokeStatic(getNMSClass("SkinsRestorerBukkit"), "getPluginInstance"), "proxyMode")) {
                         if(!(skinName.startsWith("MINESKIN:"))) {
                             try {
                                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
